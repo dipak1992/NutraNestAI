@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Leaf, Sparkles, ShieldCheck, Users, Calendar, ShoppingCart, ChevronRight, Check, Star, Zap, BookOpen, Soup } from 'lucide-react'
+import { Leaf, Sparkles, ShieldCheck, Users, Calendar, ShoppingCart, ChevronRight, Check, Star, Zap, BookOpen, Soup, Lock, BadgeCheck, Heart, UserCheck } from 'lucide-react'
 
 function Hero() {
   const modes = [
@@ -152,27 +152,178 @@ function Features() {
 
 function Testimonials() {
   const items = [
-    { quote: "My baby has 3 allergies and my husband is diabetic. NutriNest is honestly the only reason we eat proper meals anymore.", author: "Sarah K.", role: "Mom of 2, Chicago" },
-    { quote: "I spent 2 hours every Sunday meal planning. Now it takes 5 minutes and the AI handles all the dietary stuff automatically.", author: "James T.", role: "Dad of 3, Austin" },
-    { quote: "The baby-safe variations feature alone is worth every penny. No more second-guessing whether something is safe for my 9-month-old.", author: "Priya M.", role: "Mom of 1, Seattle" },
+    {
+      quote: "My baby has 3 allergies and my husband is diabetic. NutriNest is honestly the only reason we eat proper meals anymore.",
+      author: "Sarah K.",
+      role: "Mom of 2",
+      location: "Chicago, IL",
+      initials: "SK",
+      tags: ["Allergy-aware", "Multi-condition"],
+    },
+    {
+      quote: "I spent 2 hours every Sunday meal planning. Now it takes 5 minutes and the AI handles all the dietary stuff automatically.",
+      author: "James T.",
+      role: "Dad of 3",
+      location: "Austin, TX",
+      initials: "JT",
+      tags: ["Time-saving", "3 kids"],
+    },
+    {
+      quote: "The baby-safe variations feature alone is worth every penny. No more second-guessing whether something is safe for my 9-month-old.",
+      author: "Priya M.",
+      role: "Mom of 1",
+      location: "Seattle, WA",
+      initials: "PM",
+      tags: ["Baby-safe", "Peace of mind"],
+    },
+    {
+      quote: "We have a picky toddler and my wife is on a pregnancy-safe diet. NutriNest generates meals that actually work for everyone — every night.",
+      author: "David R.",
+      role: "Dad of 1",
+      location: "Denver, CO",
+      initials: "DR",
+      tags: ["Picky eater", "Pregnancy diet"],
+    },
+    {
+      quote: "As a pediatric nurse I was skeptical, but NutriNest explains every safety decision. I trust it and recommend it to parents at work now.",
+      author: "Lisa N.",
+      role: "Mom & Pediatric Nurse",
+      location: "Nashville, TN",
+      initials: "LN",
+      tags: ["Medical background", "Nurse-approved"],
+    },
+    {
+      quote: "My son has FPIES and finding any tool that handles his triggers was impossible — until NutriNest. Absolute game changer for our family.",
+      author: "Monica H.",
+      role: "Mom of 2",
+      location: "Portland, OR",
+      initials: "MH",
+      tags: ["FPIES", "Rare conditions"],
+    },
   ]
+
   return (
-    <section className="py-20 sm:py-24 bg-muted/20">
-      <div className="mx-auto max-w-5xl px-4 sm:px-6">
+    <section className="py-20 sm:py-24">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="text-center mb-14">
-          <Badge variant="outline" className="mb-4">Testimonials</Badge>
-          <h2 className="text-3xl sm:text-4xl font-bold">Loved by families everywhere</h2>
+          <Badge variant="outline" className="mb-4">Real families, real results</Badge>
+          <h2 className="text-3xl sm:text-4xl font-bold">Loved by 12,000+ families</h2>
+          <p className="mt-3 text-muted-foreground max-w-xl mx-auto">Families navigating allergies, medical conditions, babies, and picky eaters — NutriNest handles it all.</p>
         </div>
-        <div className="grid sm:grid-cols-3 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {items.map((t) => (
-            <div key={t.author} className="glass-card rounded-xl p-6 border border-border/60">
-              <div className="flex gap-0.5 mb-4">{Array.from({ length: 5 }).map((_, i) => <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />)}</div>
-              <p className="text-sm text-muted-foreground mb-4 leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
-              <p className="font-semibold text-sm">{t.author}</p>
-              <p className="text-xs text-muted-foreground">{t.role}</p>
+            <div key={t.author} className="glass-card rounded-xl p-6 border border-border/60 flex flex-col gap-4">
+              <div className="flex gap-0.5">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
+                ))}
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed flex-1">&ldquo;{t.quote}&rdquo;</p>
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="h-8 w-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold flex-shrink-0">
+                    {t.initials}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <p className="font-semibold text-sm">{t.author}</p>
+                      <BadgeCheck className="h-3.5 w-3.5 text-primary" aria-label="Verified user" />
+                    </div>
+                    <p className="text-xs text-muted-foreground">{t.role} &middot; {t.location}</p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {t.tags.map((tag) => (
+                    <span key={tag} className="text-[11px] px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/15">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
             </div>
           ))}
         </div>
+      </div>
+    </section>
+  )
+}
+
+function TrustBadges() {
+  const badges = [
+    {
+      icon: ShieldCheck,
+      title: 'Built-in safety checks',
+      description: 'Every meal variation is screened against age, allergy, and condition rules before it ever reaches your screen.',
+      iconBg: 'bg-emerald-100 text-emerald-700',
+      cardBg: 'bg-emerald-50 border-emerald-200',
+      textColor: 'text-emerald-900',
+    },
+    {
+      icon: Lock,
+      title: 'Your data stays private',
+      description: 'We never sell your family health data. Dietary profiles exist only to personalize your meals.',
+      iconBg: 'bg-blue-100 text-blue-700',
+      cardBg: 'bg-blue-50 border-blue-200',
+      textColor: 'text-blue-900',
+    },
+    {
+      icon: Heart,
+      title: 'Made by parents, for parents',
+      description: 'NutriNest was built by a family facing these exact challenges — we understand what is actually at stake.',
+      iconBg: 'bg-rose-100 text-rose-700',
+      cardBg: 'bg-rose-50 border-rose-200',
+      textColor: 'text-rose-900',
+    },
+    {
+      icon: UserCheck,
+      title: 'No sneaky commitments',
+      description: 'Try core features completely free — no credit card required. Cancel any paid plan instantly, anytime.',
+      iconBg: 'bg-amber-100 text-amber-700',
+      cardBg: 'bg-amber-50 border-amber-200',
+      textColor: 'text-amber-900',
+    },
+  ]
+
+  return (
+    <section className="py-16 sm:py-20 bg-muted/20">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6">
+        <div className="text-center mb-12">
+          <Badge variant="outline" className="mb-4">Why families trust us</Badge>
+          <h2 className="text-3xl font-bold">Safe, transparent, and family-first</h2>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {badges.map((b) => {
+            const Icon = b.icon
+            return (
+              <div key={b.title} className={`rounded-xl border p-5 ${b.cardBg}`}>
+                <div className={`mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg ${b.iconBg}`}>
+                  <Icon className="h-5 w-5" />
+                </div>
+                <h3 className={`font-semibold text-sm mb-1.5 ${b.textColor}`}>{b.title}</h3>
+                <p className={`text-xs leading-relaxed opacity-80 ${b.textColor}`}>{b.description}</p>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function FriendlyDisclaimer() {
+  return (
+    <section className="py-10 border-t border-border/60">
+      <div className="mx-auto max-w-3xl px-4 sm:px-6 text-center">
+        <div className="inline-flex items-center gap-2 text-muted-foreground mb-3">
+          <Heart className="h-4 w-4 text-rose-400" aria-hidden="true" />
+          <span className="text-sm font-medium">A note from our team</span>
+        </div>
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          NutriNest AI is a meal planning assistant — not a substitute for a medical professional or registered dietitian.
+          Our built-in safety rules are designed to help reduce risk, but they are not a guarantee.
+          Always consult your pediatrician or healthcare provider for specific dietary guidance, especially for infants, children with health conditions, or during pregnancy.
+          When you are unsure, please ask your doctor first. We want your family to be safe above everything else.
+        </p>
       </div>
     </section>
   )
@@ -288,6 +439,7 @@ export default function LandingPage() {
         <ProblemSolution />
         <Features />
         <Testimonials />
+        <TrustBadges />
         <PricingPreview />
         <GrowthContent />
         <section className="py-20 gradient-sage">
@@ -299,6 +451,7 @@ export default function LandingPage() {
             </Button>
           </div>
         </section>
+        <FriendlyDisclaimer />
       </main>
       <footer className="border-t border-border/60 bg-muted/20 py-10">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">

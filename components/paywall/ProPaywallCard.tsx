@@ -19,9 +19,8 @@ export function ProPaywallCard({
   redirectPath = '/planner',
   compact = false,
 }: ProPaywallCardProps) {
+  const signupHref = `/signup?redirect=${encodeURIComponent(redirectPath)}`
   const loginHref = `/login?redirect=${encodeURIComponent(redirectPath)}`
-  const primaryHref = isAuthenticated ? '/pricing?intent=pro' : loginHref
-  const primaryLabel = isAuthenticated ? 'Upgrade to Pro' : 'Log in to unlock Pro'
 
   return (
     <div className="rounded-2xl border border-amber-300/70 bg-gradient-to-br from-amber-50 via-background to-rose-50 p-5 sm:p-6 shadow-sm">
@@ -31,7 +30,7 @@ export function ProPaywallCard({
         </div>
         <div className="flex-1">
           <Badge variant="outline" className="mb-2 border-amber-300 bg-white/70 text-amber-800">
-            <Lock className="mr-1.5 h-3 w-3" /> Pro required
+            <Lock className="mr-1.5 h-3 w-3" /> {isAuthenticated ? 'Pro required' : 'Free account required'}
           </Badge>
           <h3 className="text-lg font-bold tracking-tight">{title}</h3>
           <p className="mt-1 text-sm text-muted-foreground leading-relaxed">{description}</p>
@@ -50,12 +49,29 @@ export function ProPaywallCard({
       )}
 
       <div className="mt-5 flex flex-col gap-2 sm:flex-row">
-        <Button asChild>
-          <Link href={primaryHref}>{primaryLabel}</Link>
-        </Button>
-        <Button asChild variant="outline">
-          <Link href="/pricing">See what Pro includes</Link>
-        </Button>
+        {isAuthenticated ? (
+          <>
+            <Button asChild>
+              <Link href="/pricing?intent=pro">Upgrade to Pro</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/pricing">See what Pro includes</Link>
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button asChild>
+              <Link href={signupHref}>Create free account</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/pricing">See what Pro includes</Link>
+            </Button>
+            <p className="text-center text-xs text-muted-foreground sm:text-left">
+              Already have an account?{' '}
+              <Link href={loginHref} className="font-medium text-primary hover:underline">Sign in</Link>
+            </p>
+          </>
+        )}
       </div>
     </div>
   )

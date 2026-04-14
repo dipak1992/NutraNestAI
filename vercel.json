@@ -16,5 +16,19 @@
     "app/api/regenerate-meal/route.ts": {
       "maxDuration": 60
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/email/reminders?type=dinner",
+      "schedule": "0 21 * * *"
+    },
+    {
+      "path": "/api/email/reminders?type=weekly",
+      "schedule": "0 9 * * MON"
+    },
+    {
+      "path": "/api/email/reminders?type=admin-summary",
+      "schedule": "0 10 * * MON"
+    }
+  ]
 }

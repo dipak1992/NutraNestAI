@@ -47,8 +47,8 @@ const TIERS = [
 const FAQ = [
   { q: 'What is included for free?', a: 'Free includes instant meal previews, two extra Tonight swipes per day, and a 3-day planner preview so users can experience the value before upgrading.' },
   { q: 'Can I change plans anytime?', a: 'Absolutely. You can upgrade, downgrade, or cancel at any time from your account settings.' },
-  { q: 'How does NutriNest handle allergies?', a: 'Our AI reads each family member\'s allergy and dietary profile before generating every meal and variation, ensuring complete safety.' },
-  { q: 'What AI model powers NutriNest?', a: 'We use Claude by Anthropic to generate personalized, safe meal plans tailored to your family\'s needs.' },
+  { q: 'How does MealEase handle allergies?', a: 'Our AI reads each family member\'s allergy and dietary profile before generating every meal and variation, ensuring complete safety.' },
+  { q: 'What AI model powers MealEase?', a: 'We use Claude by Anthropic to generate personalized, safe meal plans tailored to your family\'s needs.' },
   { q: 'When does the paywall appear?', a: 'Users see the first preview immediately. The paywall appears after the free swipe allowance or once the first weekly plan preview has shown enough value to justify unlocking Pro.' },
 ]
 

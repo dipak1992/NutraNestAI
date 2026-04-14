@@ -45,18 +45,18 @@ const getPlan = cache(async (slug: string): Promise<PublishedPlan | null> => {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const plan = await getPlan(slug)
-  if (!plan) return { title: 'Plan not found — NutriNest AI' }
+  if (!plan) return { title: 'Plan not found — MealEase' }
   const mealCount = plan.plan_data.days.filter((d) => d.meal).length
   return {
-    title: `${plan.title} — NutriNest AI`,
+    title: `${plan.title} — MealEase`,
     description:
       plan.description ??
-      `A weekly meal plan with ${mealCount} meals. Powered by NutriNest AI.`,
+      `A weekly meal plan with ${mealCount} meals. Powered by MealEase.`,
     openGraph: {
       title: plan.title,
       description: plan.description ?? undefined,
       type: 'article',
-      siteName: 'NutriNest AI',
+      siteName: 'MealEase',
     },
   }
 }
@@ -77,7 +77,7 @@ export default async function SharePlanPage({ params }: Props) {
       {/* Minimal brand header */}
       <div className="flex items-center justify-between mb-8 pb-4 border-b border-border/60">
         <Link href="/" className="font-bold text-primary text-lg">
-          🥗 NutriNest AI
+          🥗 MealEase
         </Link>
       </div>
 
@@ -140,7 +140,7 @@ export default async function SharePlanPage({ params }: Props) {
           <ShareButton slug={slug} type="plan" />
           <p className="text-sm text-muted-foreground">
             Powered by{' '}
-            <span className="font-semibold text-foreground">NutriNest AI</span> —{' '}
+            <span className="font-semibold text-foreground">MealEase</span> —{' '}
             <Link href="/signup" className="text-primary hover:underline">
               Build your own meal plan →
             </Link>

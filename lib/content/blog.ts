@@ -40,7 +40,7 @@ const BLOG_POSTS: BlogPost[] = [
     publishedAt: '2026-04-14',
     readingTime: '6 min read',
     author: {
-      name: 'NutriNest AI Editorial',
+      name: 'MealEase Editorial',
       role: 'Family nutrition team',
     },
     sections: [
@@ -95,7 +95,7 @@ const BLOG_POSTS: BlogPost[] = [
     publishedAt: '2026-04-14',
     readingTime: '5 min read',
     author: {
-      name: 'NutriNest AI Editorial',
+      name: 'MealEase Editorial',
       role: 'Family nutrition team',
     },
     sections: [
@@ -137,7 +137,7 @@ const BLOG_POSTS: BlogPost[] = [
     publishedAt: '2026-04-14',
     readingTime: '7 min read',
     author: {
-      name: 'NutriNest AI Editorial',
+      name: 'MealEase Editorial',
       role: 'Family nutrition team',
     },
     sections: [
@@ -178,7 +178,7 @@ const BLOG_POSTS: BlogPost[] = [
     publishedAt: '2026-04-14',
     readingTime: '6 min read',
     author: {
-      name: 'NutriNest AI Editorial',
+      name: 'MealEase Editorial',
       role: 'Family nutrition team',
     },
     sections: [

@@ -50,7 +50,7 @@ export function buildMetadata({
       title,
       description,
       url: absoluteUrl(path),
-      siteName: 'NutriNest AI',
+      siteName: 'MealEase',
       type,
     },
     twitter: {

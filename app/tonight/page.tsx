@@ -298,7 +298,7 @@ function TonightPageInner() {
             <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-white">
               <Leaf className="h-3.5 w-3.5" />
             </span>
-            <span className="text-gradient-sage">NutriNest AI</span>
+            <span className="text-gradient-sage">MealEase</span>
           </div>
           <Button asChild size="sm" variant="ghost">
             <Link href="/signup">Sign up</Link>

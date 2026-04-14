@@ -1,5 +1,5 @@
 // ============================================================
-// NutriNest AI — Tonight Mode Pre-built Meals
+// MealEase — Tonight Mode Pre-built Meals
 // Curated meals for instant, magical generation
 // ============================================================
 

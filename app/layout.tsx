@@ -1,43 +1,38 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Inter } from 'next/font/google'
 import './globals.css'
 import { Providers } from '@/components/providers'
 import { Toaster } from '@/components/ui/sonner'
 import { getSiteUrl } from '@/lib/seo'
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-})
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const inter = Inter({
+  variable: '--font-inter',
   subsets: ['latin'],
 })
 
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   title: {
-    default: 'NutriNest AI — Family Meal Planning Made Safe & Simple',
-    template: '%s | NutriNest AI',
+    default: 'MealEase – Make family meals easy',
+    template: '%s | MealEase',
   },
   description:
-    'Plan one meal. Feed the whole family — safely. AI-powered meal planning that creates personalized variations for every family member based on their age, allergies, and health conditions.',
-  keywords: ['meal planning', 'family nutrition', 'AI meal planner', 'baby food', 'allergy-safe recipes'],
+    'MealEase helps you decide what to cook with simple, smart meal plans for your whole family. From one idea to a full meal plan in seconds.',
+  keywords: ['meal planning', 'family meals', 'meal planner', 'easy dinner ideas', 'family recipe planner'],
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: 'NutriNest AI — Family Meal Planning Made Safe & Simple',
-    description: 'Plan one meal. Feed the whole family — safely.',
+    title: 'MealEase – Make family meals easy',
+    description: 'From one idea to a full meal plan for your whole family — in seconds.',
     type: 'website',
     url: '/',
-    siteName: 'NutriNest AI',
+    siteName: 'MealEase',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'NutriNest AI — Family Meal Planning Made Safe & Simple',
-    description: 'Plan one meal. Feed the whole family — safely.',
+    title: 'MealEase – Make family meals easy',
+    description: 'From one idea to a full meal plan for your whole family — in seconds.',
   },
 }
 
@@ -49,7 +44,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <Providers>

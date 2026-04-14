@@ -9,7 +9,7 @@ export const revalidate = 3600
 export const metadata = buildMetadata({
   title: 'Public Meal Ideas for Families',
   description:
-    'Browse public NutriNest meal pages with family-friendly recipes, prep times, and safe variation ideas for babies, toddlers, kids, and adults.',
+    'Browse public MealEase meal pages with family-friendly recipes, prep times, and serving ideas for babies, toddlers, kids, and adults.',
   path: '/meals',
   keywords: ['family recipes', 'meal ideas', 'healthy family dinners', 'public meal pages'],
 })
@@ -26,7 +26,7 @@ export default async function PublicMealsPage() {
         </Badge>
         <h1 className="text-4xl font-bold tracking-tight mb-4">Family meal ideas you can discover, save, and cook</h1>
         <p className="text-lg text-muted-foreground leading-relaxed">
-          These public NutriNest meals are built for families juggling age, texture, allergy, and health-condition differences around one dinner table.
+          These public MealEase meals are built for families juggling age, texture, allergy, and health-condition differences around one dinner table.
         </p>
       </div>
 
@@ -52,7 +52,7 @@ export default async function PublicMealsPage() {
               </div>
               <h2 className="text-xl font-semibold mb-2 line-clamp-2">{meal.title}</h2>
               <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 mb-4">
-                {meal.description ?? 'Family-friendly meal idea generated and published with NutriNest AI.'}
+                {meal.description ?? 'Family-friendly meal idea generated and published with MealEase.'}
               </p>
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span className="flex items-center gap-1.5">

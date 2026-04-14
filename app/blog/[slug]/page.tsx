@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: post.description,
       type: 'article',
       url: absoluteUrl(`/blog/${post.slug}`),
-      siteName: 'NutriNest AI',
+      siteName: 'MealEase',
       publishedTime: post.publishedAt,
       modifiedTime: post.updatedAt ?? post.publishedAt,
     },
@@ -69,7 +69,7 @@ export default async function BlogPostPage({ params }: Props) {
     },
     publisher: {
       '@type': 'Organization',
-      name: 'NutriNest AI',
+      name: 'MealEase',
     },
     mainEntityOfPage: absoluteUrl(`/blog/${post.slug}`),
     keywords: post.tags.join(', '),
@@ -149,7 +149,7 @@ export default async function BlogPostPage({ params }: Props) {
         <footer className="mt-12 border-t border-border/60 pt-6 text-sm text-muted-foreground">
           Want personalized weekly meals instead of generic advice?{' '}
           <Link href="/signup" className="font-medium text-primary hover:underline">
-            Build your plan with NutriNest AI
+            Build your plan with MealEase
           </Link>
           .
         </footer>

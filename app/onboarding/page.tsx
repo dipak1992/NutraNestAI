@@ -6,7 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useLightOnboardingStore, type HouseholdType } from '@/lib/store'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Leaf, ChevronRight, ChevronLeft, Check, X, Loader2 } from 'lucide-react'
+import { ChevronRight, ChevronLeft, Check, X, Loader2 } from 'lucide-react'
+import { MealEaseLogo } from '@/components/ui/MealEaseLogo'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 
@@ -423,7 +424,7 @@ function StepDone({
         <div className="text-5xl mb-5">🎉</div>
         <h1 className="text-2xl font-bold tracking-tight">You're all set!</h1>
         <p className="text-muted-foreground mt-2.5 text-sm leading-relaxed max-w-xs mx-auto">
-          NutriNest will personalize every meal recommendation for your household. You can update these any time.
+          MealEase will personalize every meal recommendation for your household. You can update these any time.
         </p>
       </div>
 
@@ -521,10 +522,7 @@ export default function OnboardingPage() {
       {/* ── Header ──────────────────────────────────────────────────────────── */}
       <header className="flex items-center justify-between px-6 pt-6 pb-2 flex-shrink-0">
         <div className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white shadow-sm">
-            <Leaf className="h-4 w-4" />
-          </span>
-          <span className="font-bold text-gradient-sage">NutriNest AI</span>
+          <MealEaseLogo size="sm" />
         </div>
         <button
           type="button"

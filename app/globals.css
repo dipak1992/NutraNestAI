@@ -7,8 +7,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-mono);
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -47,50 +47,50 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 
-  /* NutriNest brand tokens */
-  --color-sage: oklch(0.52 0.095 155);
-  --color-sage-light: oklch(0.92 0.04 155);
-  --color-sage-muted: oklch(0.96 0.02 155);
+  /* MealEase brand tokens */
+  --color-sage: oklch(0.66 0.17 145);
+  --color-sage-light: oklch(0.92 0.06 145);
+  --color-sage-muted: oklch(0.96 0.025 145);
   --color-coral: oklch(0.63 0.17 30);
   --color-coral-light: oklch(0.93 0.06 30);
-  --color-cream: oklch(0.985 0.008 85);
-  --color-warm-brown: oklch(0.50 0.04 55);
+  --color-cream: oklch(0.974 0.008 155);
+  --color-warm-brown: oklch(0.52 0.015 255);
 }
 
 :root {
-  /* NutriNest AI — warm cream + sage green + coral accent */
-  --background: oklch(0.987 0.006 85);      /* warm cream */
-  --foreground: oklch(0.18 0.015 50);       /* warm dark brown */
+  /* MealEase — clean green + white + warm accent */
+  --background: oklch(0.974 0.008 155);     /* #F6F8F7 soft green-white */
+  --foreground: oklch(0.22 0.02 255);       /* #1F2937 near-black */
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.015 50);
+  --card-foreground: oklch(0.22 0.02 255);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.015 50);
-  --primary: oklch(0.52 0.095 155);         /* sage green */
+  --popover-foreground: oklch(0.22 0.02 255);
+  --primary: oklch(0.66 0.17 145);          /* #4CAF50 fresh green */
   --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.96 0.012 85);        /* warm off-white */
-  --secondary-foreground: oklch(0.28 0.02 50);
-  --muted: oklch(0.96 0.01 85);
-  --muted-foreground: oklch(0.50 0.025 55);
-  --accent: oklch(0.63 0.17 30);            /* warm coral */
-  --accent-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.97 0.008 155);       /* light green-tinted white */
+  --secondary-foreground: oklch(0.22 0.02 255);
+  --muted: oklch(0.97 0.008 155);
+  --muted-foreground: oklch(0.52 0.015 255);
+  --accent: oklch(0.94 0.025 60);           /* #F4EDE4 warm cream */
+  --accent-foreground: oklch(0.22 0.02 255);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.92 0.012 85);
-  --input: oklch(0.92 0.012 85);
-  --ring: oklch(0.52 0.095 155);
-  --chart-1: oklch(0.52 0.095 155);
+  --border: oklch(0.93 0.008 155);
+  --input: oklch(0.93 0.008 155);
+  --ring: oklch(0.66 0.17 145);
+  --chart-1: oklch(0.66 0.17 145);
   --chart-2: oklch(0.63 0.17 30);
   --chart-3: oklch(0.72 0.12 95);
   --chart-4: oklch(0.65 0.1 200);
   --chart-5: oklch(0.55 0.13 290);
-  --radius: 0.75rem;
-  --sidebar: oklch(0.99 0.004 85);
-  --sidebar-foreground: oklch(0.18 0.015 50);
-  --sidebar-primary: oklch(0.52 0.095 155);
+  --radius: 0.875rem;
+  --sidebar: oklch(1 0 0);
+  --sidebar-foreground: oklch(0.22 0.02 255);
+  --sidebar-primary: oklch(0.66 0.17 145);
   --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.96 0.012 85);
-  --sidebar-accent-foreground: oklch(0.28 0.02 50);
-  --sidebar-border: oklch(0.92 0.012 85);
-  --sidebar-ring: oklch(0.52 0.095 155);
+  --sidebar-accent: oklch(0.97 0.008 155);
+  --sidebar-accent-foreground: oklch(0.22 0.02 255);
+  --sidebar-border: oklch(0.93 0.008 155);
+  --sidebar-ring: oklch(0.66 0.17 145);
 }
 
 .dark {
@@ -144,18 +144,18 @@
 }
 
 /* ==========================================
-   NutriNest AI — Custom Utility Styles
+   MealEase — Custom Utility Styles
    ========================================== */
 
 @layer utilities {
   .gradient-cream {
-    background: linear-gradient(135deg, oklch(0.99 0.008 90), oklch(0.975 0.012 80));
+    background: linear-gradient(135deg, oklch(0.98 0.008 155), oklch(0.97 0.012 145));
   }
   .gradient-sage {
-    background: linear-gradient(135deg, oklch(0.52 0.095 155), oklch(0.45 0.1 150));
+    background: linear-gradient(135deg, oklch(0.66 0.17 145), oklch(0.58 0.18 145));
   }
   .gradient-hero {
-    background: linear-gradient(160deg, oklch(0.99 0.008 90) 0%, oklch(0.975 0.015 100) 50%, oklch(0.965 0.02 155) 100%);
+    background: linear-gradient(160deg, oklch(0.99 0.004 155) 0%, oklch(0.978 0.012 150) 50%, oklch(0.967 0.022 145) 100%);
   }
   .glass-card {
     background: rgba(255, 255, 255, 0.72);
@@ -164,13 +164,13 @@
     border: 1px solid rgba(255, 255, 255, 0.4);
   }
   .text-gradient-sage {
-    background: linear-gradient(135deg, oklch(0.45 0.1 150), oklch(0.35 0.12 155));
+    background: linear-gradient(135deg, oklch(0.58 0.18 145), oklch(0.46 0.2 148));
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
   .text-gradient-warm {
-    background: linear-gradient(135deg, oklch(0.28 0.025 50), oklch(0.52 0.095 155));
+    background: linear-gradient(135deg, oklch(0.22 0.02 255), oklch(0.66 0.17 145));
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;

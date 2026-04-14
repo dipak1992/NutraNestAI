@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: meal.description ?? data.tagline,
       type: 'article',
       url: absoluteUrl(`/meals/${slug}`),
-      siteName: 'NutriNest AI',
+      siteName: 'MealEase',
     },
     twitter: {
       card: 'summary_large_image',
@@ -73,7 +73,7 @@ export default async function PublicMealDetailPage({ params }: Props) {
     datePublished: meal.published_at ?? meal.created_at,
     author: {
       '@type': 'Organization',
-      name: 'NutriNest AI',
+      name: 'MealEase',
     },
     recipeCuisine: data.cuisineType,
     prepTime: `PT${data.prepTime}M`,
@@ -146,7 +146,7 @@ export default async function PublicMealDetailPage({ params }: Props) {
             <div>
               <h2 className="font-semibold mb-1">Why this meal works for families</h2>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                NutriNest generates one base dinner and then adapts serving guidance for different ages, textures, and household constraints.
+                MealEase generates one base dinner and then adapts serving guidance for different ages, textures, and household constraints.
               </p>
             </div>
           </div>
@@ -219,7 +219,7 @@ export default async function PublicMealDetailPage({ params }: Props) {
           <p className="text-sm text-muted-foreground">
             Want personalized versions for your household?{' '}
             <Link href="/signup" className="font-medium text-primary hover:underline">
-              Try NutriNest AI
+              Try MealEase
             </Link>
           </p>
         </footer>

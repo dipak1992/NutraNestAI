@@ -25,10 +25,10 @@ const getMeal = cache(async (slug: string): Promise<SavedMeal | null> => {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const meal = await getMeal(slug)
-  if (!meal) return { title: 'Meal not found — NutriNest AI', robots: { index: false, follow: false } }
+  if (!meal) return { title: 'Meal not found — MealEase', robots: { index: false, follow: false } }
   const m = meal.meal_data
   return {
-    title: `${m.title} — NutriNest AI`,
+    title: `${m.title} — MealEase`,
     description:
       m.tagline ?? `A ${m.cuisineType} recipe ready in ${m.totalTime} minutes.`,
     alternates: {
@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: m.title,
       description: m.tagline ?? undefined,
       type: 'article',
-      siteName: 'NutriNest AI',
+      siteName: 'MealEase',
       url: absoluteUrl(`/meals/${slug}`),
     },
   }
@@ -60,7 +60,7 @@ export default async function ShareMealPage({ params }: Props) {
       {/* Minimal brand header */}
       <div className="flex items-center justify-between mb-8 pb-4 border-b border-border/60">
         <Link href="/" className="font-bold text-primary text-lg">
-          🥗 NutriNest AI
+          🥗 MealEase
         </Link>
       </div>
 
@@ -147,7 +147,7 @@ export default async function ShareMealPage({ params }: Props) {
           <ShareButton slug={slug} type="meal" />
           <p className="text-sm text-muted-foreground">
             Powered by{' '}
-            <span className="font-semibold text-foreground">NutriNest AI</span> —{' '}
+            <span className="font-semibold text-foreground">MealEase</span> —{' '}
             <Link href="/signup" className="text-primary hover:underline">
               Build your own meal plan →
             </Link>

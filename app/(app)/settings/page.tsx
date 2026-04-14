@@ -175,7 +175,7 @@ export default function SettingsPage() {
 
           <div className="glass-card rounded-xl border border-border/60 p-5 space-y-4">
             <h2 className="font-semibold">Session</h2>
-            <p className="text-sm text-muted-foreground">Sign out of your NutriNest account on this device.</p>
+            <p className="text-sm text-muted-foreground">Sign out of your MealEase account on this device.</p>
             <Button variant="outline" onClick={handleSignOut} disabled={signingOut} className="gap-2 text-destructive hover:text-destructive hover:bg-destructive/5">
               <LogOut className="h-4 w-4" />{signingOut ? 'Signing out…' : 'Sign Out'}
             </Button>

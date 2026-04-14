@@ -111,7 +111,7 @@ export default function ResetPasswordPage() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Set a new password</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Choose a strong password for your NutriNest account.
+          Choose a strong password for your MealEase account.
         </p>
       </div>
 

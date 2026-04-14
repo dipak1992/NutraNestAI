@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { DashboardClient } from '@/components/dashboard/DashboardClient'
 
-export const metadata = { title: 'Dashboard – NutriNest AI' }
+export const metadata = { title: 'Dashboard – MealEase' }
 
 export default async function DashboardPage() {
   const supabase = await createClient()

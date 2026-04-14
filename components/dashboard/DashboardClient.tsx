@@ -173,7 +173,7 @@ export function DashboardClient({ userName }: Props) {
                 transition={{ duration: 0.15 }}
                 className="text-gradient-sage font-bold text-base"
               >
-                NutriNest AI
+                MealEase
               </motion.span>
             )}
           </AnimatePresence>

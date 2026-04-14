@@ -76,7 +76,7 @@ export default function LoginPage() {
     <div className="glass-card rounded-2xl border border-border/60 p-8 shadow-xl">
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Welcome back</h1>
-        <p className="text-sm text-muted-foreground mt-1">Sign in to your NutriNest account</p>
+        <p className="text-sm text-muted-foreground mt-1">Sign in to your MealEase account</p>
       </div>
 
       {urlError && (

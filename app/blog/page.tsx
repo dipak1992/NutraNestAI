@@ -17,7 +17,7 @@ export default function BlogIndexPage() {
   return (
     <main className="mx-auto max-w-5xl px-4 py-14 sm:px-6 lg:px-8">
       <div className="max-w-3xl mb-10">
-        <Badge variant="outline" className="mb-4">NutriNest Blog</Badge>
+        <Badge variant="outline" className="mb-4">MealEase Blog</Badge>
         <h1 className="text-4xl font-bold tracking-tight mb-4">Family nutrition advice built for real households</h1>
         <p className="text-lg text-muted-foreground leading-relaxed">
           Browse practical articles on feeding babies, toddlers, kids, and adults from one dinner plan without adding more chaos to the week.

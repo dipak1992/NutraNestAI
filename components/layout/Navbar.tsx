@@ -13,7 +13,6 @@ import {
   Settings,
   Menu,
   X,
-  Leaf,
   LogOut,
   User,
   Bookmark,
@@ -33,6 +32,7 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { createClient } from '@/lib/supabase/client'
 import { useUIStore } from '@/lib/store'
+import { MealEaseLogo } from '@/components/ui/MealEaseLogo'
 
 const navLinks = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -61,17 +61,14 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
 
   const initials = userEmail
     ? userEmail.slice(0, 2).toUpperCase()
-    : 'NN'
+    : 'ME'
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/90 backdrop-blur-sm">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
-        <Link href="/dashboard" className="flex items-center gap-2 font-bold text-lg">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white">
-            <Leaf className="h-4 w-4" />
-          </span>
-          <span className="text-gradient-sage hidden sm:inline">NutriNest AI</span>
+        <Link href="/dashboard" className="flex items-center">
+          <MealEaseLogo size="md" />
         </Link>
 
         {/* Desktop nav */}

@@ -214,8 +214,8 @@ export default function ReferralPage() {
           onClick={() => {
             if (navigator.share) {
               navigator.share({
-                title: 'NutriNest AI — free AI meal planning',
-                text: 'Join me on NutriNest AI for smart family meal planning.',
+                title: 'MealEase — free meal planning for families',
+                text: 'Join me on MealEase for smart family meal planning.',
                 url: referralLink,
               }).catch(() => {})
             } else {

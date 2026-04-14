@@ -42,7 +42,7 @@ FAMILY MEMBERS:${memberDescriptions}`;
 }
 
 function buildSystemPrompt(): string {
-  return `You are NutriNest AI, an expert family nutritionist and meal planning system.
+  return `You are MealEase AI, an expert family nutritionist and meal planning system.
 
 Your core purpose: Generate ONE weekly family meal plan where each meal has a BASE version plus safe, realistic, age-appropriate modifications for EVERY family member.
 
@@ -100,7 +100,7 @@ export async function generateMealPlan(request: AIGenerationRequest): Promise<AI
   }
 
   // Fallback to mock/demo data
-  console.info('[NutriNest AI] Using mock meal plan — set ANTHROPIC_API_KEY to enable live generation');
+  console.info('[MealEase] Using mock meal plan — set ANTHROPIC_API_KEY to enable live generation');
   return generateMockPlan(request);
 }
 
@@ -136,7 +136,7 @@ async function generateWithClaude(
     }
     return JSON.parse(jsonText) as AIGeneratedPlan;
   } catch (err) {
-    console.error('[NutriNest AI] Failed to parse AI response:', err);
+    console.error('[MealEase] Failed to parse AI response:', err);
     throw new Error('Failed to parse meal plan response from AI');
   }
 }

@@ -8,8 +8,9 @@ import {
   animate,
   AnimatePresence,
 } from 'framer-motion'
-import { Clock, ChefHat, Users, Heart, RefreshCw, Shuffle, Loader2 } from 'lucide-react'
+import { Clock, ChefHat, Users, Heart, RefreshCw, Shuffle, Loader2, ThumbsUp, ThumbsDown } from 'lucide-react'
 import type { SmartMealRequest, SmartMealResult } from '@/lib/engine/types'
+import { useLearningStore } from '@/lib/learning/store'
 
 // ─── Card style map by cuisine ───────────────────────────────────────────────
 
@@ -176,7 +177,7 @@ function buildRequest(
   }
 }
 
-async function fetchMeal(req: SmartMealRequest): Promise<SmartMealResult | null> {
+async function fetchMeal(req: SmartMealRequest & { learnedBoosts?: unknown }): Promise<SmartMealResult | null> {
   try {
     const res = await fetch('/api/smart-meal', {
       method: 'POST',
@@ -204,12 +205,15 @@ export function MealSwipeStack({ mode, input }: Props) {
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
   const [empty, setEmpty] = useState(false)
+  const [feedbackFlash, setFeedbackFlash] = useState<'like' | 'reject' | null>(null)
   const seenIds = useRef<string[]>([])
+  const { recordLike, recordReject, recordSave, getBoosts } = useLearningStore()
 
   async function loadMeals(count: number) {
     setLoading(true)
+    const boosts = getBoosts()
     const reqs = Array.from({ length: count }, () =>
-      fetchMeal(buildRequest(mode, input, seenIds.current))
+      fetchMeal({ ...buildRequest(mode, input, seenIds.current), ...(boosts ? { learnedBoosts: boosts } : {}) })
     )
     const results = await Promise.all(reqs)
     const fresh = results.filter((m): m is SmartMealResult => {
@@ -256,11 +260,36 @@ export function MealSwipeStack({ mode, input }: Props) {
   }
 
   function toggleSave(id: string) {
+    const meal = meals.find(m => m.id === id)
     setSavedIds(prev => {
       const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
+      if (next.has(id)) {
+        next.delete(id)
+      } else {
+        next.add(id)
+        if (meal) recordSave(meal)
+      }
       return next
     })
+  }
+
+  function handleLike() {
+    const topMeal = meals[topIdx]
+    if (!topMeal) return
+    recordLike(topMeal)
+    setFeedbackFlash('like')
+    setTimeout(() => setFeedbackFlash(null), 600)
+  }
+
+  function handleReject() {
+    const topMeal = meals[topIdx]
+    if (!topMeal) return
+    recordReject(topMeal)
+    setFeedbackFlash('reject')
+    setTimeout(() => {
+      setFeedbackFlash(null)
+      handleDismiss()
+    }, 300)
   }
 
   // ─── states ────────────────────────────────────────────────────────────────
@@ -319,12 +348,22 @@ export function MealSwipeStack({ mode, input }: Props) {
       )}
 
       {/* action bar */}
-      <div className="flex items-center justify-center gap-4">
+      <div className="flex items-center justify-center gap-3">
+        {/* Reject */}
+        <motion.button
+          whileTap={{ scale: 0.88 }}
+          onClick={handleReject}
+          className="flex flex-col items-center gap-1.5 px-4 py-3 rounded-2xl border border-border bg-background text-muted-foreground hover:text-red-500 hover:border-red-300 text-xs font-medium transition-colors"
+        >
+          <ThumbsDown className="h-5 w-5" />
+          Nope
+        </motion.button>
+
         {/* Save */}
         <motion.button
           whileTap={{ scale: 0.88 }}
           onClick={() => toggleSave(topMeal.id)}
-          className={`flex flex-col items-center gap-1.5 px-5 py-3 rounded-2xl border transition-colors text-xs font-medium ${
+          className={`flex flex-col items-center gap-1.5 px-4 py-3 rounded-2xl border transition-colors text-xs font-medium ${
             isSaved
               ? 'bg-rose-50 border-rose-300 text-rose-600'
               : 'bg-background border-border text-muted-foreground hover:text-foreground'
@@ -334,21 +373,35 @@ export function MealSwipeStack({ mode, input }: Props) {
           {isSaved ? 'Saved' : 'Save'}
         </motion.button>
 
+        {/* Like */}
+        <motion.button
+          whileTap={{ scale: 0.88 }}
+          onClick={handleLike}
+          className={`flex flex-col items-center gap-1.5 px-4 py-3 rounded-2xl border transition-colors text-xs font-medium ${
+            feedbackFlash === 'like'
+              ? 'bg-emerald-50 border-emerald-300 text-emerald-600'
+              : 'bg-background border-border text-muted-foreground hover:text-emerald-500 hover:border-emerald-300'
+          }`}
+        >
+          <ThumbsUp className="h-5 w-5" />
+          Love it
+        </motion.button>
+
         {/* Replace (dismiss top card) */}
         <motion.button
           whileTap={{ scale: 0.88 }}
           onClick={handleDismiss}
-          className="flex flex-col items-center gap-1.5 px-5 py-3 rounded-2xl border border-border bg-background text-muted-foreground hover:text-foreground text-xs font-medium transition-colors"
+          className="flex flex-col items-center gap-1.5 px-4 py-3 rounded-2xl border border-border bg-background text-muted-foreground hover:text-foreground text-xs font-medium transition-colors"
         >
           <RefreshCw className="h-5 w-5" />
-          Replace
+          Skip
         </motion.button>
 
         {/* Shuffle all */}
         <motion.button
           whileTap={{ scale: 0.88 }}
           onClick={handleShuffle}
-          className="flex flex-col items-center gap-1.5 px-5 py-3 rounded-2xl border border-border bg-background text-muted-foreground hover:text-foreground text-xs font-medium transition-colors"
+          className="flex flex-col items-center gap-1.5 px-4 py-3 rounded-2xl border border-border bg-background text-muted-foreground hover:text-foreground text-xs font-medium transition-colors"
         >
           <Shuffle className="h-5 w-5" />
           Shuffle

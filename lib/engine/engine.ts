@@ -14,6 +14,8 @@ import type {
   Stage,
 } from './types'
 import { MEAL_DATABASE } from './meals'
+import type { LearnedBoosts } from '@/lib/learning/types'
+import { applyLearnedBoosts } from '@/lib/learning/engine'
 
 // ── Scoring Weights ─────────────────────────────────────────
 
@@ -123,7 +125,10 @@ const SUBSTITUTE_MAP: Record<string, string[]> = {
 // Main Entry Point
 // ════════════════════════════════════════════════════════════
 
-export function generateSmartMeal(request: SmartMealRequest): SmartMealResult {
+export function generateSmartMeal(
+  request: SmartMealRequest,
+  learnedBoosts?: LearnedBoosts | null,
+): SmartMealResult {
   const pantry = normalizePantry(request.pantryItems)
   const allergies = request.allergies?.map(a => a.toLowerCase()) ?? []
   const dietary = request.dietaryRestrictions?.map(d => d.toLowerCase()) ?? []
@@ -228,6 +233,29 @@ export function generateSmartMeal(request: SmartMealRequest): SmartMealResult {
         if (meal.ingredients.some(i => i.name.toLowerCase().includes(dl))) {
           score += W.PICKY_DISLIKED
         }
+      }
+    }
+
+    // Adaptive learning boosts
+    if (learnedBoosts) {
+      const lb = applyLearnedBoosts(
+        learnedBoosts,
+        meal.id,
+        meal.cuisineTags[0] ?? '',
+        meal.proteinType,
+        meal.tags,
+        meal.difficulty,
+        meal.prepTime + meal.cookTime,
+        null,
+        null,
+      )
+      score += lb.score
+      reasons.push(...lb.reasons)
+
+      // Amplify kid-friendly scoring for picky patterns
+      if (learnedBoosts.pickyMultiplier > 1 &&
+          (request.household.kidsCount + request.household.toddlersCount > 0)) {
+        score += Math.round(meal.kidFriendlyScore * (learnedBoosts.pickyMultiplier - 1) * W.KID_FRIENDLY)
       }
     }
 

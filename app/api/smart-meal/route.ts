@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server'
 import { generateSmartMeal } from '@/lib/engine/engine'
 import type { SmartMealRequest } from '@/lib/engine/types'
+import type { LearnedBoosts } from '@/lib/learning/types'
 
 export async function POST(req: Request) {
   try {
-    const body = (await req.json()) as SmartMealRequest
+    const body = (await req.json()) as SmartMealRequest & { learnedBoosts?: LearnedBoosts }
 
     if (!body.household) {
       return NextResponse.json(
@@ -21,10 +22,15 @@ export async function POST(req: Request) {
       )
     }
 
-    const result = generateSmartMeal({
-      ...body,
-      household: { adultsCount, kidsCount, toddlersCount, babiesCount },
-    })
+    const { learnedBoosts, ...mealRequest } = body
+
+    const result = generateSmartMeal(
+      {
+        ...mealRequest,
+        household: { adultsCount, kidsCount, toddlersCount, babiesCount },
+      },
+      learnedBoosts,
+    )
 
     return NextResponse.json(result)
   } catch (error) {

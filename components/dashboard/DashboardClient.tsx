@@ -7,6 +7,9 @@ import { ArrowLeft, ChevronRight } from 'lucide-react'
 import { MealSwipeStack } from '@/components/dashboard/MealSwipeStack'
 import { SmartInput } from '@/components/dashboard/SmartInput'
 import { DEMO_WEEKLY_PLAN } from '@/lib/demo-data'
+import { TodayCard } from '@/components/habit/TodayCard'
+import { InsightCards } from '@/components/habit/InsightCards'
+import { StreakBadge } from '@/components/habit/StreakBadge'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -45,7 +48,7 @@ const SITUATIONS: {
   {
     id: 'tired',
     emoji: '😴',
-    label: "I'm tired, decide for me",
+    label: "I don't want to think today",
     hint: 'Instant picks, no fuss',
     color: 'border-violet-300 text-violet-800',
     bgHover: 'hover:bg-violet-50',
@@ -190,13 +193,25 @@ export function DashboardClient({ userName }: Props) {
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.2 }}
             >
-              <div className="mb-7">
-                <p className="text-muted-foreground text-sm mb-0.5">
-                  {getGreeting()}, {firstName}
+              <div className="mb-5 flex items-start justify-between">
+                <div>
+                  <p className="text-muted-foreground text-sm mb-0.5">
+                    {getGreeting()}, {firstName}
+                  </p>
+                  <h1 className="text-2xl font-bold text-foreground leading-tight">
+                    What&apos;s for dinner?
+                  </h1>
+                </div>
+                <StreakBadge />
+              </div>
+
+              <TodayCard />
+              <InsightCards />
+
+              <div className="mt-6 mb-3">
+                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+                  Or choose your situation
                 </p>
-                <h1 className="text-2xl font-bold text-foreground leading-tight">
-                  What&apos;s your situation?
-                </h1>
               </div>
 
               <div className="flex flex-col gap-3">

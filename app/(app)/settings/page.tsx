@@ -10,9 +10,10 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Settings, User, Home, Leaf, LogOut, Trash2, Crown } from 'lucide-react'
+import { Settings, User, Home, Leaf, LogOut, Trash2, Crown, Bell } from 'lucide-react'
 import { getStageEmoji, stageLabelDisplay, ALLERGY_LABELS, CONDITION_LABELS } from '@/lib/utils'
 import { toast } from 'sonner'
+import { NotificationSettings } from '@/components/habit/NotificationSettings'
 
 const CUISINE_OPTIONS = ['Italian', 'Mexican', 'Asian', 'Mediterranean', 'American', 'Indian', 'Middle Eastern', 'Japanese', 'Thai', 'French']
 const COOKING_TIME_OPTIONS = [
@@ -69,6 +70,7 @@ export default function SettingsPage() {
           <TabsTrigger value="household" className="gap-2"><Home className="h-4 w-4" />Household</TabsTrigger>
           <TabsTrigger value="preferences" className="gap-2"><Leaf className="h-4 w-4" />Preferences</TabsTrigger>
           <TabsTrigger value="account" className="gap-2"><User className="h-4 w-4" />Account</TabsTrigger>
+          <TabsTrigger value="notifications" className="gap-2"><Bell className="h-4 w-4" />Notifications</TabsTrigger>
         </TabsList>
 
         <TabsContent value="household" className="space-y-6">
@@ -185,6 +187,10 @@ export default function SettingsPage() {
               <Trash2 className="h-4 w-4" />Delete Account (coming soon)
             </Button>
           </div>
+        </TabsContent>
+
+        <TabsContent value="notifications">
+          <NotificationSettings />
         </TabsContent>
       </Tabs>
     </div>

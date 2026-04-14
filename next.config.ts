@@ -44,15 +44,14 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default withSentryConfig(nextConfig, {
-  // Sentry organization and project slugs (set SENTRY_ORG and SENTRY_PROJECT in env)
-  org: process.env.SENTRY_ORG,
-  project: process.env.SENTRY_PROJECT,
-  // Suppress Sentry build output noise
-  silent: !process.env.CI,
-  // Disable source map upload when no auth token is present
-  authToken: process.env.SENTRY_AUTH_TOKEN,
-  // Disable the Sentry webpack plugin entirely if DSN is absent (local dev)
-  disableClientWebpackPlugin: !process.env.SENTRY_DSN,
-  disableServerWebpackPlugin: !process.env.SENTRY_DSN,
-})
+// Only wrap with Sentry when all required vars are present (skips source map upload otherwise)
+export default process.env.SENTRY_AUTH_TOKEN && process.env.SENTRY_ORG && process.env.SENTRY_PROJECT
+  ? withSentryConfig(nextConfig, {
+      org: process.env.SENTRY_ORG,
+      project: process.env.SENTRY_PROJECT,
+      silent: !process.env.CI,
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      disableClientWebpackPlugin: !process.env.SENTRY_DSN,
+      disableServerWebpackPlugin: !process.env.SENTRY_DSN,
+    })
+  : nextConfig

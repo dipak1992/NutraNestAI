@@ -7,25 +7,38 @@ import {
   isProTier,
   normalizeTier,
 } from '@/lib/paywall/config'
+import { REFERRAL_MAX_BONUS_DAYS } from '@/lib/referral/config'
 
 export interface PaywallStatus {
   isAuthenticated: boolean
   tier: SubscriptionTier
   isPro: boolean
+  isTempPro: boolean
+  effectivePlanPreviewDays: number
   freePlanPreviewDays: number
   freeTonightSwipeLimit: number
+  bonusDays: number
+  tempProUntil: string | null
 }
 
-async function ensureProfile(user: User): Promise<SubscriptionTier> {
+async function ensureProfile(user: User): Promise<{
+  tier: SubscriptionTier
+  bonusDays: number
+  tempProUntil: string | null
+}> {
   const supabase = await createClient()
   const { data } = await supabase
     .from('profiles')
-    .select('subscription_tier')
+    .select('subscription_tier, bonus_days, temp_pro_until')
     .eq('id', user.id)
     .maybeSingle()
 
   if (data?.subscription_tier) {
-    return normalizeTier(data.subscription_tier)
+    return {
+      tier: normalizeTier(data.subscription_tier),
+      bonusDays: data.bonus_days ?? 0,
+      tempProUntil: data.temp_pro_until ?? null,
+    }
   }
 
   const fallbackTier: SubscriptionTier = 'free'
@@ -38,7 +51,7 @@ async function ensureProfile(user: User): Promise<SubscriptionTier> {
     { onConflict: 'id' },
   )
 
-  return fallbackTier
+  return { tier: fallbackTier, bonusDays: 0, tempProUntil: null }
 }
 
 export async function getPaywallStatus(): Promise<PaywallStatus> {
@@ -52,19 +65,34 @@ export async function getPaywallStatus(): Promise<PaywallStatus> {
       isAuthenticated: false,
       tier: 'free',
       isPro: false,
+      isTempPro: false,
+      effectivePlanPreviewDays: FREE_PLAN_PREVIEW_DAYS,
       freePlanPreviewDays: FREE_PLAN_PREVIEW_DAYS,
       freeTonightSwipeLimit: FREE_TONIGHT_SWIPE_LIMIT,
+      bonusDays: 0,
+      tempProUntil: null,
     }
   }
 
-  const tier = await ensureProfile(user)
+  const { tier, bonusDays, tempProUntil } = await ensureProfile(user)
+
+  const isTempPro = !!tempProUntil && new Date(tempProUntil) > new Date()
+  const isPro = isProTier(tier) || isTempPro
+  const clampedBonusDays = Math.min(bonusDays, REFERRAL_MAX_BONUS_DAYS)
+  const effectivePlanPreviewDays = isPro
+    ? 7
+    : Math.min(FREE_PLAN_PREVIEW_DAYS + clampedBonusDays, 7)
 
   return {
     isAuthenticated: true,
     tier,
-    isPro: isProTier(tier),
+    isPro,
+    isTempPro,
+    effectivePlanPreviewDays,
     freePlanPreviewDays: FREE_PLAN_PREVIEW_DAYS,
     freeTonightSwipeLimit: FREE_TONIGHT_SWIPE_LIMIT,
+    bonusDays: clampedBonusDays,
+    tempProUntil,
   }
 }
 

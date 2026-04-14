@@ -8,7 +8,7 @@ import { useLightOnboardingStore } from '@/lib/store'
 import { useLearningStore } from '@/lib/learning/store'
 import { buildGroceryList } from '@/lib/planner/grocery'
 import { DAY_FULL } from '@/lib/planner/types'
-import { FREE_PLAN_PREVIEW_DAYS } from '@/lib/paywall/config'
+
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 import { WeeklyPlannerGrid } from './WeeklyPlannerGrid'
 import { Button } from '@/components/ui/button'
@@ -83,7 +83,7 @@ export function WeeklyPlannerV2() {
   const mealsPlanned = plan.days.filter((d) => d.meal !== null).length
 
   useEffect(() => {
-    if (!status.isPro && selectedDayIndex >= FREE_PLAN_PREVIEW_DAYS) {
+    if (!status.isPro && selectedDayIndex >= (status.effectivePlanPreviewDays ?? 3)) {
       setSelectedDayIndex(0)
     }
   }, [selectedDayIndex, setSelectedDayIndex, status.isPro])
@@ -178,7 +178,7 @@ export function WeeklyPlannerV2() {
   // ── Regenerate a single day ───────────────────────────────
   const handleRegenerateDay = useCallback(
     async (dayIndex: number) => {
-      if (!status.isPro && dayIndex >= FREE_PLAN_PREVIEW_DAYS) {
+      if (!status.isPro && dayIndex >= (status.effectivePlanPreviewDays ?? 3)) {
         setPaywallOpen(true)
         return
       }
@@ -296,7 +296,7 @@ export function WeeklyPlannerV2() {
 
   const weekLabel = buildDateLabel(plan.weekStart)
   const lockedDayIndexes = !status.isPro && mealsPlanned > 0
-    ? plan.days.slice(FREE_PLAN_PREVIEW_DAYS).map((day) => day.dayIndex)
+    ? plan.days.slice(status.effectivePlanPreviewDays ?? 3).map((day) => day.dayIndex)
     : []
 
   return (
@@ -320,7 +320,7 @@ export function WeeklyPlannerV2() {
           </p>
           {!paywallLoading && !status.isPro && (
             <p className="mt-1 text-xs text-amber-700">
-              Free includes instant previews, {status.freeTonightSwipeLimit} Tonight swipes, and {status.freePlanPreviewDays} planned dinners.
+              Free includes instant previews, {status.freeTonightSwipeLimit} Tonight swipes, and {status.effectivePlanPreviewDays} planned dinners{status.bonusDays > 0 ? ` (+${status.bonusDays} referral bonus)` : ''}.
             </p>
           )}
         </div>

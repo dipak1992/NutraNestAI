@@ -1,9 +1,30 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
-import { Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
+import { Bell, CalendarDays, Mail, Gift, Megaphone, Loader2 } from 'lucide-react'
+
+interface NotifPrefs {
+  dinner_reminders: boolean
+  weekly_reminders: boolean
+  referral_emails: boolean
+  product_updates: boolean
+}
+
+interface DinnerSchedule {
+  enabled: boolean
+  preferred_hour: number
+}
+
+const PREF_DEFAULTS: NotifPrefs = {
+  dinner_reminders: true,
+  weekly_reminders: true,
+  referral_emails: true,
+  product_updates: true,
+}
 
 const HOUR_OPTIONS = [
   { label: '4:00 PM', value: 16 },
@@ -12,48 +33,122 @@ const HOUR_OPTIONS = [
   { label: '7:00 PM', value: 19 },
 ]
 
+const PREF_FIELDS: Array<{
+  key: keyof NotifPrefs
+  label: string
+  description: string
+  icon: React.ReactNode
+}> = [
+  {
+    key: 'dinner_reminders',
+    label: "Tonight's Dinner Reminders",
+    description: "Daily nudge at your preferred time with what's on the menu.",
+    icon: <Bell className="h-4 w-4 text-primary" />,
+  },
+  {
+    key: 'weekly_reminders',
+    label: 'Weekly Meal-Planning Reminder',
+    description: 'Sunday morning prompt to plan meals for the week ahead.',
+    icon: <CalendarDays className="h-4 w-4 text-primary" />,
+  },
+  {
+    key: 'referral_emails',
+    label: 'Referral Rewards',
+    description: 'Get notified when you earn a reward from referring a friend.',
+    icon: <Gift className="h-4 w-4 text-primary" />,
+  },
+  {
+    key: 'product_updates',
+    label: 'Product Updates',
+    description: 'Occasional news about new features and improvements.',
+    icon: <Megaphone className="h-4 w-4 text-primary" />,
+  },
+]
+
+const ESSENTIAL_ITEMS = [
+  { label: 'Account & Security Emails', description: 'Magic links, password resets, and sign-in confirmations.' },
+  { label: 'Billing & Receipts', description: 'Invoices and payment confirmations for Pro subscriptions.' },
+  { label: 'Support Replies', description: 'Responses to your contact form submissions.' },
+]
+
 export function NotificationSettings() {
-  const [enabled, setEnabled] = useState(false)
-  const [preferredHour, setPreferredHour] = useState(17)
+  const supabase = createClient()
+  const [prefs, setPrefs] = useState<NotifPrefs>(PREF_DEFAULTS)
+  const [dinner, setDinner] = useState<DinnerSchedule>({ enabled: false, preferred_hour: 17 })
   const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
+  const [savingPref, setSavingPref] = useState<keyof NotifPrefs | null>(null)
+  const [savingHour, setSavingHour] = useState(false)
 
   useEffect(() => {
-    fetch('/api/habit/notifications')
-      .then(r => r.ok ? r.json() : null)
-      .then(data => {
-        if (data) {
-          setEnabled(data.enabled ?? false)
-          setPreferredHour(data.preferred_hour ?? 17)
-        }
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false))
-  }, [])
+    async function load() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { setLoading(false); return }
 
-  async function save(nextEnabled: boolean, nextHour: number) {
-    setSaving(true)
-    try {
-      await fetch('/api/habit/notifications', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ enabled: nextEnabled, preferred_hour: nextHour }),
-      })
-    } catch {
-      // silent — best effort
-    } finally {
-      setSaving(false)
+      const [prefsRes, schedRes] = await Promise.all([
+        supabase
+          .from('notification_preferences')
+          .select('dinner_reminders, weekly_reminders, referral_emails, product_updates')
+          .eq('user_id', user.id)
+          .maybeSingle(),
+        supabase
+          .from('notification_preferences')
+          .select('enabled, preferred_hour')
+          .eq('user_id', user.id)
+          .maybeSingle(),
+      ])
+
+      if (prefsRes.data) {
+        setPrefs({
+          dinner_reminders: prefsRes.data.dinner_reminders ?? PREF_DEFAULTS.dinner_reminders,
+          weekly_reminders: prefsRes.data.weekly_reminders ?? PREF_DEFAULTS.weekly_reminders,
+          referral_emails:  prefsRes.data.referral_emails  ?? PREF_DEFAULTS.referral_emails,
+          product_updates:  prefsRes.data.product_updates  ?? PREF_DEFAULTS.product_updates,
+        })
+      }
+      if (schedRes.data) {
+        setDinner({
+          enabled: (schedRes.data as { enabled?: boolean }).enabled ?? false,
+          preferred_hour: (schedRes.data as { preferred_hour?: number }).preferred_hour ?? 17,
+        })
+      }
+      setLoading(false)
+    }
+    load()
+  }, [supabase])
+
+  async function togglePref(key: keyof NotifPrefs) {
+    const next = !prefs[key]
+    setPrefs(p => ({ ...p, [key]: next }))
+    setSavingPref(key)
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) { setSavingPref(null); return }
+
+    const { error } = await supabase
+      .from('notification_preferences')
+      .upsert({ user_id: user.id, [key]: next }, { onConflict: 'user_id' })
+
+    setSavingPref(null)
+    if (error) {
+      setPrefs(p => ({ ...p, [key]: !next }))
+      toast.error('Failed to save preference')
+    } else {
+      toast.success('Preference saved')
     }
   }
 
-  function handleToggle(checked: boolean) {
-    setEnabled(checked)
-    save(checked, preferredHour)
-  }
+  async function setDinnerHour(hour: number) {
+    setDinner(d => ({ ...d, preferred_hour: hour }))
+    setSavingHour(true)
 
-  function handleHourChange(hour: number) {
-    setPreferredHour(hour)
-    save(enabled, hour)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) { setSavingHour(false); return }
+
+    await supabase
+      .from('notification_preferences')
+      .upsert({ user_id: user.id, preferred_hour: hour }, { onConflict: 'user_id' })
+
+    setSavingHour(false)
   }
 
   if (loading) {
@@ -65,38 +160,50 @@ export function NotificationSettings() {
   }
 
   return (
-    <div className="space-y-6 py-2">
-      {/* Enable toggle */}
-      <div className="flex items-center justify-between rounded-2xl border border-border bg-card px-5 py-4">
-        <div>
-          <Label className="text-base font-semibold">Dinner reminders</Label>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Get a nudge to plan tonight&apos;s meal
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          {saving && <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />}
-          <Switch
-            checked={enabled}
-            onCheckedChange={handleToggle}
-            disabled={saving}
-          />
+    <div className="space-y-8">
+      {/* Configurable preferences */}
+      <div className="glass-card rounded-xl border border-border/60 p-5">
+        <h2 className="font-semibold mb-4">Email Preferences</h2>
+        <div className="divide-y divide-border/40">
+          {PREF_FIELDS.map(({ key, label, description, icon }) => (
+            <div key={key} className="flex items-center justify-between gap-4 py-4 first:pt-0 last:pb-0">
+              <div className="flex items-start gap-3 min-w-0">
+                <span className="mt-0.5 shrink-0">{icon}</span>
+                <div className="min-w-0">
+                  <Label htmlFor={key} className="cursor-pointer font-medium text-sm">{label}</Label>
+                  <p className="text-xs text-muted-foreground mt-0.5">{description}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                {savingPref === key && <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />}
+                <Switch
+                  id={key}
+                  checked={prefs[key]}
+                  onCheckedChange={() => togglePref(key)}
+                  disabled={savingPref === key}
+                />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Time picker (only visible when enabled) */}
-      {enabled && (
-        <div className="rounded-2xl border border-border bg-card px-5 py-4">
-          <Label className="text-base font-semibold block mb-3">Reminder time</Label>
+      {/* Dinner reminder time picker */}
+      {prefs.dinner_reminders && (
+        <div className="glass-card rounded-xl border border-border/60 p-5">
+          <div className="flex items-center justify-between mb-3">
+            <Label className="font-semibold text-sm">Dinner Reminder Time</Label>
+            {savingHour && <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />}
+          </div>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {HOUR_OPTIONS.map(({ label, value }) => (
               <button
                 key={value}
-                onClick={() => handleHourChange(value)}
-                disabled={saving}
+                onClick={() => setDinnerHour(value)}
+                disabled={savingHour}
                 className={[
                   'rounded-xl py-2.5 text-sm font-medium border transition-colors',
-                  preferredHour === value
+                  dinner.preferred_hour === value
                     ? 'bg-primary text-primary-foreground border-primary'
                     : 'border-border text-foreground hover:bg-muted/60',
                 ].join(' ')}
@@ -106,10 +213,32 @@ export function NotificationSettings() {
             ))}
           </div>
           <p className="mt-3 text-xs text-muted-foreground">
-            Note: push notification support requires a native app. This preference is saved for future use.
+            Emails are sent based on your local timezone.
           </p>
         </div>
       )}
+
+      {/* Always-on essentials */}
+      <div className="glass-card rounded-xl border border-border/60 p-5">
+        <div className="flex items-center gap-2 mb-1">
+          <Mail className="h-4 w-4 text-muted-foreground" />
+          <h2 className="font-semibold">Essential Emails</h2>
+        </div>
+        <p className="text-xs text-muted-foreground mb-4">
+          These are required for your account to function and cannot be disabled.
+        </p>
+        <div className="divide-y divide-border/40">
+          {ESSENTIAL_ITEMS.map(({ label, description }) => (
+            <div key={label} className="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0">
+              <div className="min-w-0">
+                <p className="text-sm font-medium">{label}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{description}</p>
+              </div>
+              <Switch checked disabled aria-label="Always enabled" />
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

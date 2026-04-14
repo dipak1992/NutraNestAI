@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import { Providers } from '@/components/providers'
 import { Toaster } from '@/components/ui/sonner'
+import { getSiteUrl } from '@/lib/seo'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -15,6 +16,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(getSiteUrl()),
   title: {
     default: 'NutriNest AI — Family Meal Planning Made Safe & Simple',
     template: '%s | NutriNest AI',
@@ -22,10 +24,20 @@ export const metadata: Metadata = {
   description:
     'Plan one meal. Feed the whole family — safely. AI-powered meal planning that creates personalized variations for every family member based on their age, allergies, and health conditions.',
   keywords: ['meal planning', 'family nutrition', 'AI meal planner', 'baby food', 'allergy-safe recipes'],
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
     title: 'NutriNest AI — Family Meal Planning Made Safe & Simple',
     description: 'Plan one meal. Feed the whole family — safely.',
     type: 'website',
+    url: '/',
+    siteName: 'NutriNest AI',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'NutriNest AI — Family Meal Planning Made Safe & Simple',
+    description: 'Plan one meal. Feed the whole family — safely.',
   },
 }
 

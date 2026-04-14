@@ -24,6 +24,7 @@ export interface SavedMealSummary {
   cuisine_type: string | null
   is_public: boolean
   created_at: string
+  published_at: string | null
 }
 
 export interface PublishedPlan {

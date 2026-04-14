@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Leaf, Sparkles, ShieldCheck, Users, Calendar, ShoppingCart, ChevronRight, Check, Star, Zap } from 'lucide-react'
+import { Leaf, Sparkles, ShieldCheck, Users, Calendar, ShoppingCart, ChevronRight, Check, Star, Zap, BookOpen, Soup } from 'lucide-react'
 
 function Hero() {
   const modes = [
@@ -211,6 +211,62 @@ function PricingPreview() {
   )
 }
 
+function GrowthContent() {
+  const items = [
+    {
+      href: '/meals',
+      title: 'Browse public meal ideas',
+      description:
+        'Indexable recipe pages designed for search, sharing, and fast inspiration when families need dinner ideas.',
+      icon: Soup,
+      cta: 'Explore meals',
+    },
+    {
+      href: '/blog',
+      title: 'Read the NutriNest blog',
+      description:
+        'Articles on family meal planning, toddler dinners, baby-safe meals, and condition-aware cooking.',
+      icon: BookOpen,
+      cta: 'Read articles',
+    },
+  ]
+
+  return (
+    <section className="py-20 sm:py-24 bg-muted/20">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6">
+        <div className="text-center mb-12">
+          <Badge variant="outline" className="mb-4">Learn & Explore</Badge>
+          <h2 className="text-3xl sm:text-4xl font-bold">Discover meals and practical family nutrition advice</h2>
+          <p className="mt-3 text-muted-foreground max-w-2xl mx-auto">
+            NutriNest now publishes public meal pages and educational articles to help families find safer dinner ideas organically.
+          </p>
+        </div>
+        <div className="grid md:grid-cols-2 gap-6">
+          {items.map((item) => {
+            const Icon = item.icon
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="glass-card rounded-2xl border border-border/60 p-6 hover:border-primary/30 hover:shadow-md transition-all"
+              >
+                <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <Icon className="h-5 w-5" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-4">{item.description}</p>
+                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-primary">
+                  {item.cta} <ChevronRight className="h-4 w-4" />
+                </span>
+              </Link>
+            )
+          })}
+        </div>
+      </div>
+    </section>
+  )
+}
+
 export default function LandingPage() {
   return (
     <>
@@ -233,6 +289,7 @@ export default function LandingPage() {
         <Features />
         <Testimonials />
         <PricingPreview />
+        <GrowthContent />
         <section className="py-20 gradient-sage">
           <div className="mx-auto max-w-2xl px-4 text-center">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Start feeding your family safely today</h2>
@@ -251,6 +308,8 @@ export default function LandingPage() {
           </div>
           <p className="text-xs text-muted-foreground">&copy; {new Date().getFullYear()} NutriNest AI. Built with care for families.</p>
           <div className="flex gap-4 text-sm text-muted-foreground">
+            <Link href="/meals" className="hover:text-foreground transition-colors">Meals</Link>
+            <Link href="/blog" className="hover:text-foreground transition-colors">Blog</Link>
             <Link href="/pricing" className="hover:text-foreground transition-colors">Pricing</Link>
             <Link href="/login" className="hover:text-foreground transition-colors">Log in</Link>
             <Link href="/signup" className="hover:text-foreground transition-colors">Sign up</Link>

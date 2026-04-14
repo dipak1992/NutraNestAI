@@ -7,6 +7,7 @@ import { ShareButton } from '@/components/content/ShareButton'
 import { Badge } from '@/components/ui/badge'
 import { Clock, Users, DollarSign } from 'lucide-react'
 import Link from 'next/link'
+import { absoluteUrl } from '@/lib/seo'
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -24,17 +25,25 @@ const getMeal = cache(async (slug: string): Promise<SavedMeal | null> => {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const meal = await getMeal(slug)
-  if (!meal) return { title: 'Meal not found — NutriNest AI' }
+  if (!meal) return { title: 'Meal not found — NutriNest AI', robots: { index: false, follow: false } }
   const m = meal.meal_data
   return {
     title: `${m.title} — NutriNest AI`,
     description:
       m.tagline ?? `A ${m.cuisineType} recipe ready in ${m.totalTime} minutes.`,
+    alternates: {
+      canonical: `/meals/${slug}`,
+    },
+    robots: {
+      index: false,
+      follow: true,
+    },
     openGraph: {
       title: m.title,
       description: m.tagline ?? undefined,
       type: 'article',
       siteName: 'NutriNest AI',
+      url: absoluteUrl(`/meals/${slug}`),
     },
   }
 }

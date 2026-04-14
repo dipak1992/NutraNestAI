@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 interface ShareButtonProps {
   slug: string
   type: 'meal' | 'plan'
+  basePath?: string
   variant?: 'default' | 'outline' | 'ghost'
   size?: 'default' | 'sm' | 'icon'
   className?: string
@@ -16,12 +17,14 @@ interface ShareButtonProps {
 export function ShareButton({
   slug,
   type,
+  basePath = 'share',
   variant = 'outline',
   size = 'sm',
   className,
 }: ShareButtonProps) {
   function handleCopy() {
-    const url = `${window.location.origin}/share/${type}/${slug}`
+    const normalizedBasePath = basePath.replace(/^\/+|\/+$/g, '')
+    const url = `${window.location.origin}/${normalizedBasePath}/${type}/${slug}`
     navigator.clipboard.writeText(url).then(
       () => toast.success('Link copied!', { description: url }),
       () => toast.info('Share this link', { description: url }),

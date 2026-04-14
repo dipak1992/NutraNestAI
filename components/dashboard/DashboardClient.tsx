@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { ArrowLeft, ChevronRight } from 'lucide-react'
 import { MealSwipeStack } from '@/components/dashboard/MealSwipeStack'
+import { SmartInput } from '@/components/dashboard/SmartInput'
 import { DEMO_WEEKLY_PLAN } from '@/lib/demo-data'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -132,9 +133,12 @@ export function DashboardClient({ userName }: Props) {
     setSubmitted(false)
   }
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    if (!input.trim()) return
+  function handleSmartSubmit(value: string, detectedMode?: 'ingredients' | 'inspiration') {
+    // If image analysis detected a different mode, switch to it
+    if (detectedMode && detectedMode !== mode) {
+      setMode(detectedMode)
+    }
+    setInput(value)
     setSubmitted(true)
   }
 
@@ -245,24 +249,11 @@ export function DashboardClient({ userName }: Props) {
                 <p className="text-sm text-muted-foreground mt-1">{activeMode.hint}</p>
               </div>
 
-              <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-                <textarea
-                  value={input}
-                  onChange={e => setInput(e.target.value)}
-                  placeholder={activeMode.inputPlaceholder}
-                  rows={3}
-                  className="w-full rounded-2xl border border-border bg-muted/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none"
-                  autoFocus
-                />
-                <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  type="submit"
-                  disabled={!input.trim()}
-                  className="w-full py-3.5 rounded-2xl bg-primary text-primary-foreground font-semibold text-sm disabled:opacity-40 transition-opacity hover:opacity-90"
-                >
-                  Find my meals →
-                </motion.button>
-              </form>
+              <SmartInput
+                mode={mode as 'ingredients' | 'inspiration'}
+                placeholder={activeMode.inputPlaceholder}
+                onSubmit={handleSmartSubmit}
+              />
             </motion.div>
           )}
 

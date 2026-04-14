@@ -1,0 +1,464 @@
+'use client'
+
+import { Suspense, useEffect, useState, useMemo } from 'react'
+import { useSearchParams } from 'next/navigation'
+import Link from 'next/link'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import {
+  Clock, ChefHat, DollarSign, Users, ShieldCheck, Sparkles, ChevronDown,
+  ChevronRight, Lock, Leaf, RefreshCw, ArrowLeft, CheckCircle2, AlertTriangle,
+} from 'lucide-react'
+import {
+  getRandomTonightMeal, BLURRED_PLAN_PREVIEW,
+  type TonightMeal, type TonightMealVariation,
+} from '@/lib/tonight-meals'
+
+// ── Shimmer Loading Phase ──
+
+function LoadingPhase({ onComplete }: { onComplete: () => void }) {
+  const [step, setStep] = useState(0)
+  const steps = [
+    'Analyzing your family\'s needs...',
+    'Matching dietary requirements...',
+    'Selecting tonight\'s perfect dinner...',
+    'Building family-safe variations...',
+    'Your meal is ready!',
+  ]
+
+  useEffect(() => {
+    const timers = steps.map((_, i) =>
+      setTimeout(() => {
+        setStep(i)
+        if (i === steps.length - 1) setTimeout(onComplete, 600)
+      }, i * 700)
+    )
+    return () => timers.forEach(clearTimeout)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0, y: -20 }}
+      className="min-h-[70vh] flex flex-col items-center justify-center px-4"
+    >
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+        className="mb-8"
+      >
+        <Sparkles className="h-12 w-12 text-primary" />
+      </motion.div>
+      <div className="space-y-3 text-center">
+        {steps.map((text, i) => (
+          <motion.p
+            key={text}
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: i <= step ? 1 : 0.2, x: 0 }}
+            transition={{ duration: 0.3 }}
+            className={`text-sm sm:text-base transition-colors ${i <= step ? 'text-foreground font-medium' : 'text-muted-foreground'} ${i === step ? 'text-primary' : ''}`}
+          >
+            {i < step ? '✓ ' : i === step ? '● ' : '○ '}{text}
+          </motion.p>
+        ))}
+      </div>
+      <div className="mt-8 w-48 h-1.5 rounded-full bg-muted overflow-hidden">
+        <motion.div
+          className="h-full bg-primary rounded-full"
+          initial={{ width: '0%' }}
+          animate={{ width: `${((step + 1) / steps.length) * 100}%` }}
+          transition={{ duration: 0.4 }}
+        />
+      </div>
+    </motion.div>
+  )
+}
+
+// ── Variation Card ──
+
+function VariationCard({ variation, index }: { variation: TonightMealVariation; index: number }) {
+  const [expanded, setExpanded] = useState(false)
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.8 + index * 0.15 }}
+      className="glass-card rounded-xl border border-border/60 overflow-hidden"
+    >
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full flex items-center justify-between p-4 text-left hover:bg-muted/30 transition-colors"
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">{variation.emoji}</span>
+          <div>
+            <p className="font-semibold text-sm">{variation.label}</p>
+            <p className="text-xs text-muted-foreground">{variation.title}</p>
+          </div>
+        </div>
+        <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${expanded ? 'rotate-180' : ''}`} />
+      </button>
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <div className="px-4 pb-4 space-y-3">
+              <div>
+                <p className="text-xs font-medium text-muted-foreground mb-1.5">Modifications</p>
+                <ul className="space-y-1">
+                  {variation.modifications.map((m) => (
+                    <li key={m} className="text-sm flex items-start gap-2">
+                      <CheckCircle2 className="h-3.5 w-3.5 text-primary mt-0.5 flex-shrink-0" />
+                      {m}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              {variation.safetyNotes.length > 0 && (
+                <div>
+                  <p className="text-xs font-medium text-amber-600 mb-1.5 flex items-center gap-1">
+                    <AlertTriangle className="h-3 w-3" /> Safety Notes
+                  </p>
+                  <ul className="space-y-1">
+                    {variation.safetyNotes.map((n) => (
+                      <li key={n} className="text-xs text-amber-700 bg-amber-50 rounded px-2 py-1">{n}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              <p className="text-xs text-muted-foreground italic">💡 {variation.servingTip}</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  )
+}
+
+// ── Blurred Plan Upsell ──
+
+function BlurredPlanPreview() {
+  return (
+    <motion.section
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 1.6 }}
+      className="mt-12 relative"
+    >
+      <div className="text-center mb-6">
+        <Badge variant="outline" className="mb-3">
+          <Sparkles className="mr-1.5 h-3 w-3" /> Full Weekly Plan
+        </Badge>
+        <h3 className="text-xl sm:text-2xl font-bold">
+          Imagine this for{' '}
+          <span className="text-gradient-sage">every night of the week</span>
+        </h3>
+        <p className="text-sm text-muted-foreground mt-1">
+          Each meal personalized for your whole family — with safety checks built in.
+        </p>
+      </div>
+
+      <div className="relative">
+        {/* The blurred plan preview */}
+        <div className="grid gap-2 filter blur-[6px] select-none pointer-events-none" aria-hidden>
+          {BLURRED_PLAN_PREVIEW.map((day) => (
+            <div key={day.day} className="glass-card rounded-lg p-3 border border-border/40 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-semibold text-primary w-20">{day.day}</span>
+                <span className="text-sm font-medium">{day.meal}</span>
+              </div>
+              <div className="flex gap-1">
+                <span className="text-xs bg-muted rounded px-1.5 py-0.5">🧑</span>
+                <span className="text-xs bg-muted rounded px-1.5 py-0.5">👦</span>
+                <span className="text-xs bg-muted rounded px-1.5 py-0.5">👶</span>
+                <span className="text-xs bg-muted rounded px-1.5 py-0.5">🍼</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Overlay CTA */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/60 backdrop-blur-[2px] rounded-xl">
+          <Lock className="h-8 w-8 text-primary mb-3" />
+          <h4 className="font-bold text-lg mb-1">Unlock Your Full Weekly Plan</h4>
+          <p className="text-sm text-muted-foreground mb-4 text-center max-w-sm">
+            Get 7 days of personalized meals with family-safe variations, grocery lists, and nutrition insights.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button asChild size="lg" className="shadow-lg">
+              <Link href="/signup">
+                Create free account <ChevronRight className="ml-1.5 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg">
+              <Link href="/pricing">See pricing</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    </motion.section>
+  )
+}
+
+// ── Main Tonight Page ──
+
+function TonightPageInner() {
+  const searchParams = useSearchParams()
+  const mode = (searchParams.get('mode') as 'quick' | 'tired' | 'pantry') || 'quick'
+  const [loading, setLoading] = useState(true)
+  
+  const meal = useMemo(() => getRandomTonightMeal(mode), [mode])
+
+  const modeLabels: Record<string, { title: string; emoji: string }> = {
+    quick: { title: 'Quick Demo', emoji: '✨' },
+    tired: { title: "I'm Tired Mode", emoji: '😴' },
+    pantry: { title: 'Use What I Have', emoji: '🥫' },
+  }
+
+  const currentMode = modeLabels[mode] || modeLabels.quick
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/90 backdrop-blur-sm">
+        <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
+          <Link href="/" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowLeft className="h-4 w-4" /> Back
+          </Link>
+          <div className="flex items-center gap-2 font-bold text-sm">
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-white">
+              <Leaf className="h-3.5 w-3.5" />
+            </span>
+            <span className="text-gradient-sage">NutriNest AI</span>
+          </div>
+          <Button asChild size="sm" variant="ghost">
+            <Link href="/signup">Sign up</Link>
+          </Button>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-3xl px-4 py-8 sm:py-12">
+        <AnimatePresence mode="wait">
+          {loading ? (
+            <LoadingPhase key="loading" onComplete={() => setLoading(false)} />
+          ) : (
+            <motion.div
+              key="result"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              {/* Mode Badge + Title */}
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-center mb-8"
+              >
+                <Badge variant="outline" className="mb-3">
+                  {currentMode.emoji} {currentMode.title}
+                </Badge>
+                <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-2">
+                  {meal.title}
+                </h1>
+                <p className="text-muted-foreground text-base sm:text-lg">{meal.tagline}</p>
+              </motion.div>
+
+              {/* Stats Row */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="flex flex-wrap justify-center gap-4 sm:gap-6 mb-8"
+              >
+                <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                  <Clock className="h-4 w-4 text-primary" />
+                  {meal.prepTime + meal.cookTime} min total
+                </div>
+                <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                  <ChefHat className="h-4 w-4 text-primary" />
+                  {meal.difficulty}
+                </div>
+                <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                  <DollarSign className="h-4 w-4 text-primary" />
+                  ~${meal.estimatedCost.toFixed(0)}
+                </div>
+                <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                  <Users className="h-4 w-4 text-primary" />
+                  Serves {meal.servings}
+                </div>
+              </motion.div>
+
+              {/* Tags */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="flex flex-wrap justify-center gap-1.5 mb-10"
+              >
+                {meal.tags.map((tag) => (
+                  <Badge key={tag} variant="secondary" className="text-xs font-normal">
+                    {tag}
+                  </Badge>
+                ))}
+              </motion.div>
+
+              {/* Description */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.35 }}
+                className="glass-card rounded-xl border border-border/60 p-5 sm:p-6 mb-8"
+              >
+                <p className="text-muted-foreground leading-relaxed">{meal.description}</p>
+                {meal.leftoverTip && (
+                  <p className="mt-3 text-xs text-muted-foreground/80 italic border-t border-border/40 pt-3">
+                    💡 Leftover tip: {meal.leftoverTip}
+                  </p>
+                )}
+              </motion.div>
+
+              {/* Ingredients */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.45 }}
+                className="mb-8"
+              >
+                <h2 className="text-lg font-bold mb-3 flex items-center gap-2">
+                  <ShoppingBagIcon className="h-5 w-5 text-primary" />
+                  Ingredients
+                </h2>
+                <div className="glass-card rounded-xl border border-border/60 divide-y divide-border/40">
+                  {meal.ingredients.map((ing) => (
+                    <div key={ing.name} className="flex items-center justify-between px-4 py-2.5">
+                      <span className="text-sm">
+                        {ing.name}
+                        {ing.note && <span className="text-muted-foreground ml-1">({ing.note})</span>}
+                      </span>
+                      <span className="text-sm text-muted-foreground font-mono">{ing.quantity}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Steps */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.55 }}
+                className="mb-10"
+              >
+                <h2 className="text-lg font-bold mb-3 flex items-center gap-2">
+                  <ChefHat className="h-5 w-5 text-primary" />
+                  How to Make It
+                </h2>
+                <div className="space-y-2">
+                  {meal.steps.map((step, i) => (
+                    <div key={i} className="glass-card rounded-lg border border-border/40 p-3 flex items-start gap-3">
+                      <span className="flex-shrink-0 flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-bold">
+                        {i + 1}
+                      </span>
+                      <p className="text-sm leading-relaxed">{step}</p>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Family Variations */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.65 }}
+                className="mb-4"
+              >
+                <h2 className="text-lg font-bold mb-1 flex items-center gap-2">
+                  <ShieldCheck className="h-5 w-5 text-primary" />
+                  Family-Safe Variations
+                </h2>
+                <p className="text-sm text-muted-foreground mb-4">
+                  One meal, adapted for every member of your family
+                </p>
+                <div className="grid gap-2">
+                  {meal.variations.map((v, i) => (
+                    <VariationCard key={v.stage} variation={v} index={i} />
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Try Another Button */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.4 }}
+                className="text-center mt-8"
+              >
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.location.reload()}
+                  className="gap-2"
+                >
+                  <RefreshCw className="h-3.5 w-3.5" /> Generate another meal
+                </Button>
+              </motion.div>
+
+              {/* Blurred Plan Preview / Upsell */}
+              <BlurredPlanPreview />
+
+              {/* Final CTA */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.8 }}
+                className="mt-16 text-center pb-8"
+              >
+                <h3 className="text-xl font-bold mb-2">Ready to plan your whole week?</h3>
+                <p className="text-sm text-muted-foreground mb-5 max-w-md mx-auto">
+                  Get personalized meals for your entire family — with grocery lists, pantry tracking, and nutrition insights.
+                </p>
+                <Button asChild size="lg" className="shadow-lg px-8">
+                  <Link href="/signup">
+                    Get started free <ChevronRight className="ml-1.5 h-4 w-4" />
+                  </Link>
+                </Button>
+                <p className="mt-2 text-xs text-muted-foreground">Free plan · No credit card required</p>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </main>
+    </div>
+  )
+}
+
+export default function TonightPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <Sparkles className="h-8 w-8 text-primary animate-spin" />
+      </div>
+    }>
+      <TonightPageInner />
+    </Suspense>
+  )
+}
+
+// Simple shopping bag icon (no extra dep needed)
+function ShoppingBagIcon({ className }: { className?: string }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+      <path d="M3 6h18" />
+      <path d="M16 10a4 4 0 0 1-8 0" />
+    </svg>
+  )
+}

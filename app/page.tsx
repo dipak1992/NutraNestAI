@@ -1,9 +1,16 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Leaf, Sparkles, ShieldCheck, Users, Calendar, ShoppingCart, ChevronRight, Check, Star } from 'lucide-react'
+import { Leaf, Sparkles, ShieldCheck, Users, Calendar, ShoppingCart, ChevronRight, Check, Star, Zap } from 'lucide-react'
 
 function Hero() {
+  const modes = [
+    { label: 'Just show me', emoji: '✨', href: '/tonight?mode=quick', description: 'No input needed' },
+    { label: "I'm tired", emoji: '😴', href: '/tonight?mode=tired', description: 'Minimal effort meals' },
+    { label: 'Use what I have', emoji: '🥫', href: '/tonight?mode=pantry', description: 'Pantry staples' },
+    { label: 'Plan my week', emoji: '📅', href: '/onboarding', description: 'Full meal planning' },
+  ]
+
   return (
     <section className="relative overflow-hidden gradient-hero py-24 sm:py-32">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 text-center">
@@ -11,24 +18,46 @@ function Hero() {
           <Sparkles className="mr-1.5 h-3.5 w-3.5" />
           AI-Powered Family Meal Planning
         </Badge>
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight mb-6">
-          Plan one meal.{' '}
-          <span className="text-gradient-sage">Feed the whole family</span>{' '}
-          — safely.
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight mb-4">
+          Generate dinner in{' '}
+          <span className="text-gradient-sage">5 seconds</span>
         </h1>
-        <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-          NutriNest AI creates personalized meal variations for every family member simultaneously —
-          respecting allergies, life stages, and health conditions automatically.
+        <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-3 leading-relaxed">
+          One meal. Safe variations for your baby, toddler, kid, and you —
+          instantly.
         </p>
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Button asChild size="lg" className="text-base px-8 shadow-lg">
-            <Link href="/signup">Get started free <ChevronRight className="ml-2 h-4 w-4" /></Link>
-          </Button>
-          <Button asChild variant="outline" size="lg" className="text-base px-8">
-            <Link href="/login">Sign in</Link>
-          </Button>
+        <p className="text-sm text-muted-foreground mb-8">No signup required. Try it now.</p>
+
+        {/* Primary CTA */}
+        <Button asChild size="lg" className="text-base px-8 shadow-lg mb-8">
+          <Link href="/tonight?mode=quick">
+            <Zap className="mr-2 h-4 w-4" /> Generate tonight&apos;s dinner
+          </Link>
+        </Button>
+
+        {/* Mode Selector */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 max-w-2xl mx-auto mb-6">
+          {modes.map((m) => (
+            <Link
+              key={m.label}
+              href={m.href}
+              className="glass-card rounded-xl p-3 sm:p-4 border border-border/60 hover:border-primary/40 hover:shadow-md transition-all group text-center"
+            >
+              <span className="text-2xl sm:text-3xl block mb-1.5">{m.emoji}</span>
+              <span className="text-sm font-semibold group-hover:text-primary transition-colors block">{m.label}</span>
+              <span className="text-xs text-muted-foreground">{m.description}</span>
+            </Link>
+          ))}
         </div>
-        <p className="mt-4 text-sm text-muted-foreground">Free plan · No credit card required</p>
+
+        <div className="flex flex-col sm:flex-row gap-2 justify-center items-center text-sm text-muted-foreground">
+          <span>Already have an account?</span>
+          <div className="flex gap-3">
+            <Link href="/login" className="text-primary hover:underline font-medium">Sign in</Link>
+            <span>·</span>
+            <Link href="/signup" className="text-primary hover:underline font-medium">Create account</Link>
+          </div>
+        </div>
       </div>
     </section>
   )

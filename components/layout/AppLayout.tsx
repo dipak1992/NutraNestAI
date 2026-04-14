@@ -1,10 +1,13 @@
 import { createClient } from '@/lib/supabase/server'
 import { Navbar } from '@/components/layout/Navbar'
+import type { SubscriptionTier } from '@/types'
 
 export default async function AppLayout({
   children,
+  subscriptionTier,
 }: {
   children: React.ReactNode
+  subscriptionTier: SubscriptionTier
 }) {
   const supabase = await createClient()
   const {
@@ -13,7 +16,7 @@ export default async function AppLayout({
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Navbar userEmail={user?.email} />
+      <Navbar userEmail={user?.email} subscriptionTier={subscriptionTier} />
       <main className="flex-1">{children}</main>
     </div>
   )

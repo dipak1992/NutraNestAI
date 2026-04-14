@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
+import { ProPaywallCard } from '@/components/paywall/ProPaywallCard'
+import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 import { Package, Plus, Trash2, Search } from 'lucide-react'
 import { GROCERY_CATEGORY_ICONS } from '@/lib/utils'
 
@@ -32,10 +34,24 @@ const INITIAL_PANTRY: PantryItem[] = [
 const CATEGORIES = ['Grains & Pasta', 'Canned Goods', 'Spices & Seasonings', 'Oils & Condiments', 'Snacks', 'Other']
 
 export default function PantryPage() {
+  const { status, loading } = usePaywallStatus()
   const [items, setItems] = useState<PantryItem[]>(INITIAL_PANTRY)
   const [search, setSearch] = useState('')
   const [showAdd, setShowAdd] = useState(false)
   const [form, setForm] = useState({ name: '', amount: '', unit: '', category: 'Other', expires: '' })
+
+  if (!loading && !status.isPro) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <ProPaywallCard
+          title="Pantry tracking is a Pro feature"
+          description="Track what you already have, cut waste, and let NutriNest prioritize pantry ingredients automatically with Pro."
+          isAuthenticated={status.isAuthenticated}
+          redirectPath="/pantry"
+        />
+      </div>
+    )
+  }
 
   const filtered = items.filter((i) => i.name.toLowerCase().includes(search.toLowerCase()))
 

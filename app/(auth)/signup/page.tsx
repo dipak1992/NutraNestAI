@@ -50,10 +50,10 @@ export default function SignupPage() {
     <div className="glass-card rounded-2xl border border-border/60 p-8 shadow-xl">
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Create your account</h1>
-        <p className="text-sm text-muted-foreground mt-1">Start your free 14-day trial — no card required</p>
+        <p className="text-sm text-muted-foreground mt-1">Start free, then upgrade to Pro when you want the full planner</p>
       </div>
       <div className="mb-5 space-y-1.5">
-        {['Up to 4 family members on the free plan', 'AI-powered meal variations', 'Allergy &amp; safety checks built in'].map((f) => (
+        {['Instant meal previews and Tonight swipes', '3-day weekly planner preview', 'Upgrade to Pro for the full plan and grocery list'].map((f) => (
           <div key={f} className="flex items-center gap-2 text-sm text-muted-foreground">
             <Check className="h-4 w-4 text-primary flex-shrink-0" />
             <span dangerouslySetInnerHTML={{ __html: f }} />

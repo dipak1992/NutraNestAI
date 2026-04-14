@@ -17,9 +17,11 @@ import {
   LogOut,
   User,
   Bookmark,
+  Crown,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,11 +42,12 @@ const navLinks = [
   { href: '/insights', label: 'Insights', icon: BarChart3 },
 ]
 
-export function Navbar({ userEmail }: { userEmail?: string }) {
+export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: string; subscriptionTier?: 'free' | 'plus' | 'pro' }) {
   const pathname = usePathname()
   const router = useRouter()
   const { sidebarOpen, toggleSidebar } = useUIStore()
   const [signingOut, setSigningOut] = useState(false)
+  const isPro = subscriptionTier === 'pro'
 
   async function handleSignOut() {
     setSigningOut(true)
@@ -90,6 +93,23 @@ export function Navbar({ userEmail }: { userEmail?: string }) {
 
         {/* Right side */}
         <div className="flex items-center gap-2">
+          <Badge
+            variant="outline"
+            className={cn(
+              'hidden sm:inline-flex capitalize',
+              isPro
+                ? 'border-amber-300 bg-amber-50 text-amber-800'
+                : 'border-primary/20 bg-primary/5 text-primary',
+            )}
+          >
+            {isPro ? <Crown className="mr-1.5 h-3 w-3" /> : null}
+            {subscriptionTier}
+          </Badge>
+          {!isPro && (
+            <Button asChild size="sm" className="hidden sm:inline-flex">
+              <Link href="/pricing?intent=pro">Upgrade to Pro</Link>
+            </Button>
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="rounded-full">
@@ -115,6 +135,14 @@ export function Navbar({ userEmail }: { userEmail?: string }) {
                   Profile &amp; Settings
                 </Link>
               </DropdownMenuItem>
+              {!isPro && (
+                <DropdownMenuItem asChild>
+                  <Link href="/pricing?intent=pro" className="flex items-center gap-2">
+                    <Crown className="h-4 w-4" />
+                    Upgrade to Pro
+                  </Link>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={handleSignOut}
@@ -174,6 +202,16 @@ export function Navbar({ userEmail }: { userEmail?: string }) {
                 <Settings className="h-4 w-4" />
                 Settings
               </Link>
+              {!isPro && (
+                <Link
+                  href="/pricing?intent=pro"
+                  onClick={() => useUIStore.getState().setSidebarOpen(false)}
+                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-primary hover:bg-primary/5 transition-colors"
+                >
+                  <Crown className="h-4 w-4" />
+                  Upgrade to Pro
+                </Link>
+              )}
             </nav>
           </motion.div>
         )}

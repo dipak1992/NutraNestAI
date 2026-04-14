@@ -1,4 +1,6 @@
 import { DEMO_WEEKLY_PLAN, DEMO_MEMBERS } from '@/lib/demo-data'
+import { ProPaywallCard } from '@/components/paywall/ProPaywallCard'
+import { getPaywallStatus } from '@/lib/paywall/server'
 import { getStageEmoji, stageLabelDisplay } from '@/lib/utils'
 import { TrendingUp, Utensils, Users, Clock, Leaf, ShieldCheck } from 'lucide-react'
 
@@ -17,7 +19,22 @@ function StatCard({ icon, label, value, sub }: { icon: React.ReactNode; label: s
   )
 }
 
-export default function InsightsPage() {
+export default async function InsightsPage() {
+  const status = await getPaywallStatus()
+
+  if (!status.isPro) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <ProPaywallCard
+          title="Insights unlock when you upgrade to Pro"
+          description="Track cuisine trends, cook-time patterns, and household personalization once you move beyond the free preview."
+          isAuthenticated={status.isAuthenticated}
+          redirectPath="/insights"
+        />
+      </div>
+    )
+  }
+
   const days = DEMO_WEEKLY_PLAN.days ?? []
   const allMeals = days.flatMap((d) => d.meals ?? [])
   const totalMeals = allMeals.length

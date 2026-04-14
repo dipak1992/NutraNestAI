@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { useWeeklyPlanStore } from '@/lib/planner/store'
@@ -8,9 +8,13 @@ import { useLightOnboardingStore } from '@/lib/store'
 import { useLearningStore } from '@/lib/learning/store'
 import { buildGroceryList } from '@/lib/planner/grocery'
 import { DAY_FULL } from '@/lib/planner/types'
+import { FREE_PLAN_PREVIEW_DAYS } from '@/lib/paywall/config'
+import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 import { WeeklyPlannerGrid } from './WeeklyPlannerGrid'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { ProPaywallCard } from '@/components/paywall/ProPaywallCard'
+import { PaywallDialog } from '@/components/paywall/PaywallDialog'
 import {
   Sparkles,
   ShoppingCart,
@@ -21,6 +25,13 @@ import {
 } from 'lucide-react'
 import type { SmartMealRequest, SmartMealResult } from '@/lib/engine/types'
 import type { WeeklyPlan } from '@/lib/planner/types'
+
+interface WeeklyPlanResponse {
+  meals: SmartMealResult[]
+  groceryList: ReturnType<typeof buildGroceryList> | null
+  isPreview: boolean
+  previewDays: number
+}
 
 // ── Request builder ───────────────────────────────────────────
 
@@ -37,6 +48,9 @@ function buildDateLabel(weekStart: string): string {
 
 export function WeeklyPlannerV2() {
   const router = useRouter()
+  const { status, loading: paywallLoading } = usePaywallStatus()
+  const [paywallOpen, setPaywallOpen] = useState(false)
+  const [showPlannerLock, setShowPlannerLock] = useState(false)
 
   const {
     plan,
@@ -51,6 +65,7 @@ export function WeeklyPlannerV2() {
     setIsGeneratingWeek,
     setGeneratingDayIndex,
     clearPlan,
+    clearGrocery,
   } = useWeeklyPlanStore()
 
   const {
@@ -65,6 +80,13 @@ export function WeeklyPlannerV2() {
   } = useLightOnboardingStore()
 
   const getBoosts = useLearningStore((s) => s.getBoosts)
+  const mealsPlanned = plan.days.filter((d) => d.meal !== null).length
+
+  useEffect(() => {
+    if (!status.isPro && selectedDayIndex >= FREE_PLAN_PREVIEW_DAYS) {
+      setSelectedDayIndex(0)
+    }
+  }, [selectedDayIndex, setSelectedDayIndex, status.isPro])
 
   // ── Build SmartMealRequest from onboarding prefs ──────────
   const buildRequest = useCallback(
@@ -100,8 +122,15 @@ export function WeeklyPlannerV2() {
           weekStart: plan.weekStart,
         }),
       })
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const data = await res.json()
+      if (!res.ok) {
+        if (res.status === 401) {
+          toast.error('Log in to generate your weekly plan.')
+          router.push('/login?redirect=/planner')
+          return
+        }
+        throw new Error(`HTTP ${res.status}`)
+      }
+      const data = (await res.json()) as WeeklyPlanResponse
 
       const newPlan: WeeklyPlan = {
         ...plan,
@@ -112,18 +141,48 @@ export function WeeklyPlannerV2() {
         generatedAt: new Date().toISOString(),
       }
       setPlan(newPlan)
-      setGroceryList(data.groceryList)
-      toast.success('Week planned!', { description: '7 meals + grocery list ready.' })
+
+      if (data.groceryList) {
+        setGroceryList(data.groceryList)
+      } else {
+        clearGrocery()
+      }
+
+      if (data.isPreview) {
+        setShowPlannerLock(true)
+        setPaywallOpen(true)
+        toast.success('3-day preview ready!', {
+          description: 'Upgrade to Pro to unlock the full week and grocery list.',
+        })
+      } else {
+        setShowPlannerLock(false)
+        toast.success('Week planned!', { description: '7 meals + grocery list ready.' })
+      }
     } catch {
       toast.error('Could not generate plan — please try again.')
     } finally {
       setIsGeneratingWeek(false)
     }
-  }, [plan, storeFormat, buildRequest, getBoosts, setPlan, setGroceryList, setIsGeneratingWeek])
+  }, [
+    plan,
+    storeFormat,
+    buildRequest,
+    getBoosts,
+    setPlan,
+    setGroceryList,
+    setIsGeneratingWeek,
+    clearGrocery,
+    router,
+  ])
 
   // ── Regenerate a single day ───────────────────────────────
   const handleRegenerateDay = useCallback(
     async (dayIndex: number) => {
+      if (!status.isPro && dayIndex >= FREE_PLAN_PREVIEW_DAYS) {
+        setPaywallOpen(true)
+        return
+      }
+
       setGeneratingDayIndex(dayIndex)
       try {
         const existingIds = plan.days
@@ -168,11 +227,26 @@ export function WeeklyPlannerV2() {
         setGeneratingDayIndex(null)
       }
     },
-    [plan, groceryList, storeFormat, buildRequest, getBoosts, setPlan, setGroceryList, setGeneratingDayIndex],
+    [
+      plan,
+      groceryList,
+      storeFormat,
+      buildRequest,
+      getBoosts,
+      setPlan,
+      setGroceryList,
+      setGeneratingDayIndex,
+      status.isPro,
+    ],
   )
 
   // ── "Get everything" → ensure grocery list then navigate ─
   const handleGetEverything = useCallback(async () => {
+    if (!status.isPro) {
+      setPaywallOpen(true)
+      return
+    }
+
     const mealsWithFood = plan.days.filter((d) => d.meal !== null)
     if (mealsWithFood.length === 0) {
       toast.error('Generate your week first!', {
@@ -187,12 +261,15 @@ export function WeeklyPlannerV2() {
       setGroceryList(list)
     }
     router.push('/grocery-list')
-  }, [plan, groceryList, storeFormat, setGroceryList, router])
-
-  const mealsPlanned = plan.days.filter((d) => d.meal !== null).length
+  }, [plan, groceryList, storeFormat, setGroceryList, router, status.isPro])
 
   // ── Publish plan as public shareable link ─────────────────
   const handlePublishPlan = useCallback(async () => {
+    if (!status.isPro) {
+      setPaywallOpen(true)
+      return
+    }
+
     if (mealsPlanned === 0) {
       toast.error('Generate your week first!')
       return
@@ -215,9 +292,12 @@ export function WeeklyPlannerV2() {
     } catch {
       toast.error('Could not publish plan.')
     }
-  }, [plan, mealsPlanned])
+  }, [plan, mealsPlanned, status.isPro])
 
   const weekLabel = buildDateLabel(plan.weekStart)
+  const lockedDayIndexes = !status.isPro && mealsPlanned > 0
+    ? plan.days.slice(FREE_PLAN_PREVIEW_DAYS).map((day) => day.dayIndex)
+    : []
 
   return (
     <div className="space-y-6">
@@ -238,6 +318,11 @@ export function WeeklyPlannerV2() {
               </span>
             )}
           </p>
+          {!paywallLoading && !status.isPro && (
+            <p className="mt-1 text-xs text-amber-700">
+              Free includes instant previews, {status.freeTonightSwipeLimit} Tonight swipes, and {status.freePlanPreviewDays} planned dinners.
+            </p>
+          )}
         </div>
 
         <div className="flex flex-wrap gap-2">
@@ -299,9 +384,20 @@ export function WeeklyPlannerV2() {
         days={plan.days}
         selectedDayIndex={selectedDayIndex}
         generatingDayIndex={generatingDayIndex}
+        lockedDayIndexes={lockedDayIndexes}
         onSelectDay={setSelectedDayIndex}
+        onLockedDayClick={() => setPaywallOpen(true)}
         onRegenerate={handleRegenerateDay}
       />
+
+      {!paywallLoading && !status.isPro && (showPlannerLock || mealsPlanned > 0) && (
+        <ProPaywallCard
+          title="Your free preview stops after 3 dinners"
+          description="You’ve seen the value. Upgrade to Pro to unlock the remaining days, grocery list, and advanced planning tools."
+          isAuthenticated={status.isAuthenticated}
+          redirectPath="/planner"
+        />
+      )}
 
       {/* ── Empty state hint ── */}
       {mealsPlanned === 0 && !isGeneratingWeek && (
@@ -313,6 +409,15 @@ export function WeeklyPlannerV2() {
           </p>
         </div>
       )}
+
+      <PaywallDialog
+        open={paywallOpen}
+        onOpenChange={setPaywallOpen}
+        title="Unlock the full weekly planner"
+        description="Pro gives you the full 7-day plan, grocery list, and advanced household tools once you’ve seen the preview."
+        isAuthenticated={status.isAuthenticated}
+        redirectPath="/planner"
+      />
     </div>
   )
 }

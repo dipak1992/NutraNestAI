@@ -14,6 +14,7 @@ import {
   ChevronDown,
   ChevronUp,
   Leaf,
+  Lock,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -229,15 +230,42 @@ export interface WeeklyPlannerGridProps {
   days: Array<{ dayIndex: number; date: string; meal: SmartMealResult | null }>
   selectedDayIndex: number
   generatingDayIndex: number | null
+  lockedDayIndexes?: number[]
   onSelectDay: (i: number) => void
+  onLockedDayClick?: (dayIndex: number) => void
   onRegenerate: (dayIndex: number) => void
+}
+
+function LockedDayCard({
+  dayLabel,
+  date,
+}: {
+  dayLabel: string
+  date: string
+}) {
+  return (
+    <div className="rounded-2xl border-2 border-dashed border-amber-300/80 bg-gradient-to-br from-amber-50 to-background px-6 py-10 text-center">
+      <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-500 text-white shadow-sm">
+        <Lock className="h-5 w-5" />
+      </div>
+      <p className="text-sm font-semibold text-foreground">{dayLabel} · {date}</p>
+      <p className="mt-2 text-sm text-muted-foreground">
+        This day is part of the Pro-only weekly plan unlock.
+      </p>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Upgrade to reveal the remaining meals, grocery list, and advanced tools.
+      </p>
+    </div>
+  )
 }
 
 export function WeeklyPlannerGrid({
   days,
   selectedDayIndex,
   generatingDayIndex,
+  lockedDayIndexes = [],
   onSelectDay,
+  onLockedDayClick,
   onRegenerate,
 }: WeeklyPlannerGridProps) {
   return (
@@ -248,14 +276,23 @@ export function WeeklyPlannerGrid({
           const today = new Date().toISOString().split('T')[0]
           const isToday = day.date === today
           const hasMeal = day.meal !== null
+          const isLocked = lockedDayIndexes.includes(day.dayIndex)
           return (
             <button
               key={day.dayIndex}
               type="button"
-              onClick={() => onSelectDay(day.dayIndex)}
+              onClick={() => {
+                if (isLocked) {
+                  onLockedDayClick?.(day.dayIndex)
+                  return
+                }
+                onSelectDay(day.dayIndex)
+              }}
               className={cn(
                 'flex-shrink-0 flex flex-col items-center px-3 py-2 rounded-xl text-sm font-medium transition-colors border min-w-[52px]',
-                selectedDayIndex === day.dayIndex
+                isLocked
+                  ? 'border-amber-300/80 bg-amber-50 text-amber-900'
+                  : selectedDayIndex === day.dayIndex
                   ? 'bg-primary text-white border-primary shadow-sm'
                   : 'border-border/60 hover:border-primary/40 bg-card',
               )}
@@ -264,7 +301,11 @@ export function WeeklyPlannerGrid({
               <span className={cn('text-base font-bold', isToday && selectedDayIndex !== day.dayIndex && 'text-primary')}>
                 {new Date(day.date + 'T00:00:00').getDate()}
               </span>
-              <span className={cn('w-1.5 h-1.5 rounded-full mt-0.5', hasMeal ? 'bg-emerald-400' : 'bg-transparent')} />
+              {isLocked ? (
+                <Lock className="mt-0.5 h-3 w-3" />
+              ) : (
+                <span className={cn('w-1.5 h-1.5 rounded-full mt-0.5', hasMeal ? 'bg-emerald-400' : 'bg-transparent')} />
+              )}
             </button>
           )
         })}
@@ -273,9 +314,18 @@ export function WeeklyPlannerGrid({
       {/* Selected day */}
       {days[selectedDayIndex] && (() => {
         const day = days[selectedDayIndex]
+        const isLocked = lockedDayIndexes.includes(day.dayIndex)
         const dateLabel = new Date(day.date + 'T00:00:00').toLocaleDateString('en-US', {
           month: 'short', day: 'numeric',
         })
+        if (isLocked) {
+          return (
+            <LockedDayCard
+              dayLabel={DAY_FULL[day.dayIndex]}
+              date={dateLabel}
+            />
+          )
+        }
         return day.meal ? (
           <MealDayCard
             key={day.dayIndex}

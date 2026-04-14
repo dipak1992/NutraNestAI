@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Check, Zap, Leaf, Crown } from 'lucide-react'
+import { Check, Leaf, Crown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 
@@ -11,67 +11,45 @@ const TIERS = [
     icon: Leaf,
     price: 0,
     period: 'forever',
-    description: 'Perfect for small families just getting started.',
+    description: 'Try the product first, then upgrade only when you want the full workflow.',
     badge: null,
     features: [
-      'Up to 3 family members',
-      '1 meal plan per week',
-      'AI-generated meal variations',
-      'Basic grocery list',
-      'Email support',
+      'Instant meal preview',
+      '2 extra Tonight swipes per day',
+      '3-day weekly plan preview',
+      'Login to save your account',
     ],
     cta: 'Get Started Free',
     href: '/signup',
     variant: 'outline' as const,
   },
   {
-    name: 'Family',
-    icon: Zap,
-    price: 9,
-    period: 'month',
-    description: 'Everything a growing family needs for seamless meal planning.',
-    badge: 'Most Popular',
-    features: [
-      'Unlimited family members',
-      'Unlimited meal plans',
-      'Advanced AI customization',
-      'Full grocery list with export',
-      'Pantry management',
-      'Nutritional insights',
-      'Priority support',
-    ],
-    cta: 'Start Free Trial',
-    href: '/signup',
-    variant: 'default' as const,
-  },
-  {
     name: 'Pro',
     icon: Crown,
     price: 19,
     period: 'month',
-    description: 'For nutritionists and families with complex dietary needs.',
-    badge: null,
+    description: 'Unlock the full planner, grocery flow, and premium family tools.',
+    badge: 'Most Popular',
     features: [
-      'Everything in Family',
-      'Detailed nutrition tracking',
-      'Meal history & analytics',
-      'Custom AI prompts',
-      'Multiple household profiles',
-      'API access',
-      'Dedicated support',
+      'Full 7-day weekly plan',
+      'Auto-built grocery list',
+      'Pantry management',
+      'Insights dashboard',
+      'Unlimited Tonight swipes',
+      'Plan publishing and advanced features',
     ],
-    cta: 'Start Free Trial',
-    href: '/signup',
-    variant: 'outline' as const,
+    cta: 'Upgrade to Pro',
+    href: '/signup?plan=pro',
+    variant: 'default' as const,
   },
 ]
 
 const FAQ = [
-  { q: 'Is there a free trial?', a: 'Yes! Family and Pro plans include a 14-day free trial—no credit card required.' },
+  { q: 'What is included for free?', a: 'Free includes instant meal previews, two extra Tonight swipes per day, and a 3-day planner preview so users can experience the value before upgrading.' },
   { q: 'Can I change plans anytime?', a: 'Absolutely. You can upgrade, downgrade, or cancel at any time from your account settings.' },
   { q: 'How does NutriNest handle allergies?', a: 'Our AI reads each family member\'s allergy and dietary profile before generating every meal and variation, ensuring complete safety.' },
   { q: 'What AI model powers NutriNest?', a: 'We use Claude by Anthropic to generate personalized, safe meal plans tailored to your family\'s needs.' },
-  { q: 'Can I export my grocery list?', a: 'Family and Pro subscribers can export grocery lists as PDF or share them directly with a link.' },
+  { q: 'When does the paywall appear?', a: 'Users see the first preview immediately. The paywall appears after the free swipe allowance or once the first weekly plan preview has shown enough value to justify unlocking Pro.' },
 ]
 
 export default function PricingPage() {
@@ -81,10 +59,10 @@ export default function PricingPage() {
         <div className="text-center mb-14">
           <Badge className="bg-primary/10 text-primary border-0 mb-4">Simple Pricing</Badge>
           <h1 className="text-4xl sm:text-5xl font-bold mb-4">Feed your family well,<br /><span className="text-gradient-sage">without the stress</span></h1>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">Start free. Upgrade when your family grows. All plans include AI-powered meal variations for every family member.</p>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">Show value first, then unlock the full workflow with Pro: the complete weekly planner, grocery list, pantry, and insights.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16 max-w-4xl mx-auto">
           {TIERS.map((tier) => {
             const Icon = tier.icon
             const isPopular = !!tier.badge

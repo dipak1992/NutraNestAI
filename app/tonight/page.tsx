@@ -1,11 +1,13 @@
 'use client'
 
-import { Suspense, useEffect, useState, useMemo } from 'react'
+import { Suspense, useEffect, useState, useMemo, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { PaywallDialog } from '@/components/paywall/PaywallDialog'
+import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 import {
   Clock, ChefHat, DollarSign, Users, ShieldCheck, Sparkles, ChevronDown,
   ChevronRight, Lock, Leaf, RefreshCw, ArrowLeft, CheckCircle2, AlertTriangle,
@@ -14,6 +16,35 @@ import {
   getRandomTonightMeal, BLURRED_PLAN_PREVIEW,
   type TonightMeal, type TonightMealVariation,
 } from '@/lib/tonight-meals'
+
+const TONIGHT_SWIPE_STORAGE_KEY = 'nutrinest-tonight-swipes'
+
+function getTodayKey() {
+  return new Date().toISOString().slice(0, 10)
+}
+
+function readSwipeCount() {
+  if (typeof window === 'undefined') return 0
+
+  try {
+    const raw = window.localStorage.getItem(TONIGHT_SWIPE_STORAGE_KEY)
+    if (!raw) return 0
+    const parsed = JSON.parse(raw) as { date?: string; count?: number }
+    if (parsed.date !== getTodayKey()) return 0
+    return parsed.count ?? 0
+  } catch {
+    return 0
+  }
+}
+
+function writeSwipeCount(count: number) {
+  if (typeof window === 'undefined') return
+
+  window.localStorage.setItem(
+    TONIGHT_SWIPE_STORAGE_KEY,
+    JSON.stringify({ date: getTodayKey(), count }),
+  )
+}
 
 // ── Shimmer Loading Phase ──
 
@@ -215,8 +246,16 @@ function TonightPageInner() {
   const searchParams = useSearchParams()
   const mode = (searchParams.get('mode') as 'quick' | 'tired' | 'pantry') || 'quick'
   const [loading, setLoading] = useState(true)
-  
-  const meal = useMemo(() => getRandomTonightMeal(mode), [mode])
+  const { status } = usePaywallStatus()
+  const [swipesUsed, setSwipesUsed] = useState(0)
+  const [mealRefreshKey, setMealRefreshKey] = useState(0)
+  const [paywallOpen, setPaywallOpen] = useState(false)
+
+  useEffect(() => {
+    setSwipesUsed(readSwipeCount())
+  }, [])
+
+  const meal = useMemo(() => getRandomTonightMeal(mode), [mode, mealRefreshKey])
 
   const modeLabels: Record<string, { title: string; emoji: string }> = {
     quick: { title: 'Quick Demo', emoji: '✨' },
@@ -225,6 +264,27 @@ function TonightPageInner() {
   }
 
   const currentMode = modeLabels[mode] || modeLabels.quick
+
+  const handleAnotherMeal = useCallback(() => {
+    if (status.isPro) {
+      setMealRefreshKey((current) => current + 1)
+      return
+    }
+
+    const nextSwipeCount = swipesUsed + 1
+    if (nextSwipeCount > status.freeTonightSwipeLimit) {
+      setPaywallOpen(true)
+      return
+    }
+
+    writeSwipeCount(nextSwipeCount)
+    setSwipesUsed(nextSwipeCount)
+    setMealRefreshKey((current) => current + 1)
+  }, [status.freeTonightSwipeLimit, status.isPro, swipesUsed])
+
+  const swipesRemaining = status.isPro
+    ? null
+    : Math.max(status.freeTonightSwipeLimit - swipesUsed, 0)
 
   return (
     <div className="min-h-screen bg-background">
@@ -404,11 +464,18 @@ function TonightPageInner() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => window.location.reload()}
+                  onClick={handleAnotherMeal}
                   className="gap-2"
                 >
                   <RefreshCw className="h-3.5 w-3.5" /> Generate another meal
                 </Button>
+                {swipesRemaining !== null && (
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {swipesRemaining > 0
+                      ? `${swipesRemaining} free swipe${swipesRemaining === 1 ? '' : 's'} left today after this preview.`
+                      : 'Free swipes used. Pro unlocks unlimited inspiration.'}
+                  </p>
+                )}
               </motion.div>
 
               {/* Blurred Plan Preview / Upsell */}
@@ -435,6 +502,15 @@ function TonightPageInner() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        <PaywallDialog
+          open={paywallOpen}
+          onOpenChange={setPaywallOpen}
+          title="You’ve used your free Tonight swipes"
+          description="Keep the instant preview, then unlock unlimited swipes, the full weekly planner, grocery list, and advanced family tools with Pro."
+          isAuthenticated={status.isAuthenticated}
+          redirectPath={`/tonight?mode=${mode}`}
+        />
       </main>
     </div>
   )

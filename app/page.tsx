@@ -180,9 +180,8 @@ function Testimonials() {
 
 function PricingPreview() {
   const tiers = [
-    { name: 'Free', price: '$0', description: 'Perfect for small families.', features: ['Up to 4 family members', '2 AI plan generations/month', 'Basic grocery lists', 'Meal history (last 2 weeks)'], cta: 'Get started free', href: '/signup', highlighted: false },
-    { name: 'Family', price: '$9', period: '/month', description: 'Everything for stress-free planning.', features: ['Up to 8 family members', 'Unlimited AI generations', 'Smart pantry tracking', 'Medical condition awareness', 'Advanced grocery optimization', 'Priority support'], cta: 'Start free trial', href: '/signup?plan=family', highlighted: true },
-    { name: 'Premium', price: '$19', period: '/month', description: 'For nutrition-conscious households.', features: ['Unlimited family members', 'Everything in Family', 'Nutrition insights', 'Pantry barcode scanning', 'Custom AI preferences', 'Export to PDF / CSV'], cta: 'Start free trial', href: '/signup?plan=premium', highlighted: false },
+    { name: 'Free', price: '$0', description: 'Preview the value with no friction.', features: ['Instant tonight meal preview', '2 extra swipes per day', '3-day weekly plan preview', 'No card required'], cta: 'Get started free', href: '/signup', highlighted: false },
+    { name: 'Pro', price: '$19', period: '/month', description: 'Unlock the full planning workflow.', features: ['Full 7-day planner', 'Smart grocery list', 'Pantry tracking', 'Insights dashboard', 'Unlimited swipes', 'Advanced planning tools'], cta: 'Upgrade to Pro', href: '/signup?plan=pro', highlighted: true },
   ]
   return (
     <section className="py-20 sm:py-24">
@@ -192,7 +191,7 @@ function PricingPreview() {
           <h2 className="text-3xl sm:text-4xl font-bold">Simple, family-friendly pricing</h2>
           <p className="mt-3 text-muted-foreground">All plans include a 14-day free trial.</p>
         </div>
-        <div className="grid sm:grid-cols-3 gap-6">
+        <div className="grid sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
           {tiers.map((tier) => (
             <div key={tier.name} className={`rounded-2xl border p-6 flex flex-col ${tier.highlighted ? 'border-primary bg-primary/5 shadow-lg ring-1 ring-primary/20' : 'border-border/60 bg-card'}`}>
               {tier.highlighted && <Badge className="w-fit mb-3 bg-primary text-white">Most popular</Badge>}

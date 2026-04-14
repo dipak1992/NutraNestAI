@@ -3,12 +3,14 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useOnboardingStore } from '@/lib/store'
+import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Settings, User, Home, Leaf, LogOut, Trash2 } from 'lucide-react'
+import { Settings, User, Home, Leaf, LogOut, Trash2, Crown } from 'lucide-react'
 import { getStageEmoji, stageLabelDisplay, ALLERGY_LABELS, CONDITION_LABELS } from '@/lib/utils'
 import { toast } from 'sonner'
 
@@ -24,6 +26,7 @@ const COOKING_TIME_OPTIONS = [
 export default function SettingsPage() {
   const router = useRouter()
   const supabase = createClient()
+  const { status } = usePaywallStatus()
   const { householdName, members, cuisinePreferences, maxCookingTime, setHouseholdName, setCuisinePreferences, setMaxCookingTime } = useOnboardingStore()
   const [signingOut, setSigningOut] = useState(false)
   const [nameInput, setNameInput] = useState(householdName)
@@ -144,6 +147,30 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="account" className="space-y-6">
+          <div className="glass-card rounded-xl border border-border/60 p-5 space-y-4">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className="font-semibold flex items-center gap-2">
+                  <Crown className="h-4 w-4 text-primary" />
+                  Current Plan
+                </h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {status.isPro
+                    ? 'Pro is active. Full planner, grocery list, pantry, and insights are unlocked.'
+                    : 'You are on Free. Upgrade to Pro to unlock the full weekly planner and advanced tools.'}
+                </p>
+              </div>
+              <Badge className={status.isPro ? 'bg-amber-100 text-amber-800 border-0' : 'bg-primary/10 text-primary border-0'}>
+                {status.tier}
+              </Badge>
+            </div>
+            {!status.isPro && (
+              <Button asChild>
+                <Link href="/pricing?intent=pro">Upgrade to Pro</Link>
+              </Button>
+            )}
+          </div>
+
           <div className="glass-card rounded-xl border border-border/60 p-5 space-y-4">
             <h2 className="font-semibold">Session</h2>
             <p className="text-sm text-muted-foreground">Sign out of your NutriNest account on this device.</p>

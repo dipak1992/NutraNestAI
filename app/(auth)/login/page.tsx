@@ -33,7 +33,8 @@ export default function LoginPage() {
       setLoading(false)
       return
     }
-    router.push('/dashboard')
+    const redirectTarget = new URLSearchParams(window.location.search).get('redirect') || '/dashboard'
+    router.push(redirectTarget)
     router.refresh()
   }
 

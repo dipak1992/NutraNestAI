@@ -7,6 +7,8 @@
 import { NextResponse } from 'next/server'
 import { generateSmartMeal } from '@/lib/engine/engine'
 import { buildGroceryList } from '@/lib/planner/grocery'
+import { getPaywallStatus } from '@/lib/paywall/server'
+import { FREE_PLAN_PREVIEW_DAYS } from '@/lib/paywall/config'
 import type { SmartMealRequest } from '@/lib/engine/types'
 import type { LearnedBoosts } from '@/lib/learning/types'
 import type { StoreFormat } from '@/lib/planner/types'
@@ -21,6 +23,15 @@ interface WeeklyPlanRequest {
 
 export async function POST(req: Request) {
   try {
+    const paywall = await getPaywallStatus()
+
+    if (!paywall.isAuthenticated) {
+      return NextResponse.json(
+        { error: 'Login required to generate a weekly plan' },
+        { status: 401 },
+      )
+    }
+
     const body = (await req.json()) as WeeklyPlanRequest
 
     if (!body.baseRequest?.household) {
@@ -60,7 +71,21 @@ export async function POST(req: Request) {
     // Build grocery list from all 7 meals combined
     const groceryList = buildGroceryList(meals, pantryItems, storeFormat, weekStart)
 
-    return NextResponse.json({ meals, groceryList })
+    if (!paywall.isPro) {
+      return NextResponse.json({
+        meals: meals.slice(0, FREE_PLAN_PREVIEW_DAYS),
+        groceryList: null,
+        isPreview: true,
+        previewDays: FREE_PLAN_PREVIEW_DAYS,
+      })
+    }
+
+    return NextResponse.json({
+      meals,
+      groceryList,
+      isPreview: false,
+      previewDays: 7,
+    })
   } catch (error) {
     console.error('[WeeklyPlan] Engine error:', error)
     return NextResponse.json(

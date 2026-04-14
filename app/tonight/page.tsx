@@ -51,19 +51,18 @@ function writeSwipeCount(count: number) {
 function LoadingPhase({ onComplete }: { onComplete: () => void }) {
   const [step, setStep] = useState(0)
   const steps = [
-    'Analyzing your family\'s needs...',
-    'Matching dietary requirements...',
-    'Selecting tonight\'s perfect dinner...',
-    'Building family-safe variations...',
-    'Your meal is ready!',
+    'Finding something quick and tasty…',
+    'Making it work for the whole family…',
+    'Adding the finishing touches…',
+    'Your dinner is sorted!',
   ]
 
   useEffect(() => {
     const timers = steps.map((_, i) =>
       setTimeout(() => {
         setStep(i)
-        if (i === steps.length - 1) setTimeout(onComplete, 600)
-      }, i * 700)
+        if (i === steps.length - 1) setTimeout(onComplete, 500)
+      }, i * 500)
     )
     return () => timers.forEach(clearTimeout)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -258,8 +257,8 @@ function TonightPageInner() {
   const meal = useMemo(() => getRandomTonightMeal(mode), [mode, mealRefreshKey])
 
   const modeLabels: Record<string, { title: string; emoji: string }> = {
-    quick: { title: 'Quick Demo', emoji: '✨' },
-    tired: { title: "I'm Tired Mode", emoji: '😴' },
+    quick: { title: 'Quick Pick', emoji: '✨' },
+    tired: { title: "No-think dinner", emoji: '😴' },
     pantry: { title: 'Use What I Have', emoji: '🥫' },
   }
 
@@ -467,7 +466,7 @@ function TonightPageInner() {
                   onClick={handleAnotherMeal}
                   className="gap-2"
                 >
-                  <RefreshCw className="h-3.5 w-3.5" /> Generate another meal
+                  <RefreshCw className="h-3.5 w-3.5" /> Try a different meal
                 </Button>
                 {swipesRemaining !== null && (
                   <p className="mt-2 text-xs text-muted-foreground">

@@ -1,14 +1,13 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Sparkles, ShieldCheck, Users, Calendar, ShoppingCart, ChevronRight, Check, Star, Zap, BookOpen, Soup, Lock, BadgeCheck, Heart, UserCheck, UtensilsCrossed } from 'lucide-react'
+import { Sparkles, ShieldCheck, Users, Calendar, ShoppingCart, ChevronRight, Check, Star, BookOpen, Soup, Lock, BadgeCheck, Heart, UserCheck, UtensilsCrossed } from 'lucide-react'
 import { PublicSiteHeader } from '@/components/layout/PublicSiteHeader'
 import { PublicSiteFooter } from '@/components/layout/PublicSiteFooter'
 
 function Hero() {
-  const modes = [
+  const secondaryModes = [
     { label: 'Just show me', emoji: '✨', href: '/tonight?mode=quick', description: 'No input needed' },
-    { label: "I don't want to think", emoji: '😴', href: '/tonight?mode=tired', description: 'Minimal effort meals' },
     { label: 'Use what I have', emoji: '🥫', href: '/tonight?mode=pantry', description: 'Pantry staples' },
     { label: 'Plan my week', emoji: '📅', href: '/onboarding', description: 'Full meal planning' },
   ]
@@ -25,28 +24,36 @@ function Hero() {
           <span className="text-gradient-sage">easy.</span>
         </h1>
         <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-3 leading-relaxed">
-          From one idea to a full meal plan for your whole family — in seconds.
+          Too tired to decide? We&apos;ll handle dinner — in seconds.
         </p>
-        <p className="text-sm text-muted-foreground mb-8">No credit card required. Takes less than 2 minutes.</p>
+        <p className="text-sm text-muted-foreground mb-8">No credit card required. No decisions needed.</p>
 
-        {/* Primary CTA */}
-        <Button asChild size="lg" className="text-base px-8 shadow-lg mb-8">
-          <Link href="/tonight?mode=quick">
-            <Zap className="mr-2 h-4 w-4" /> Try MealEase
+        {/* Primary CTA — featured "I don't want to think" card */}
+        <div className="max-w-md mx-auto mb-4">
+          <Link
+            href="/tonight?mode=tired"
+            className="glass-card flex items-center gap-4 w-full px-6 py-5 rounded-2xl border-2 border-primary/40 bg-primary/5 hover:bg-primary/10 hover:border-primary/60 hover:shadow-lg transition-all group text-left"
+          >
+            <span className="text-4xl flex-shrink-0">😴</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-base font-bold group-hover:text-primary transition-colors">I don&apos;t want to think</p>
+              <p className="text-sm text-muted-foreground mt-0.5">Just pick something simple for tonight →</p>
+            </div>
           </Link>
-        </Button>
+        </div>
 
-        {/* Mode Selector */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 max-w-2xl mx-auto mb-6">
-          {modes.map((m) => (
+        {/* Secondary modes */}
+        <p className="text-xs text-muted-foreground mb-3">Or choose a different approach:</p>
+        <div className="grid grid-cols-3 gap-2 max-w-md mx-auto mb-6">
+          {secondaryModes.map((m) => (
             <Link
               key={m.label}
               href={m.href}
-              className="glass-card rounded-xl p-3 sm:p-4 border border-border/60 hover:border-primary/40 hover:shadow-md transition-all group text-center"
+              className="glass-card rounded-xl p-3 border border-border/60 hover:border-primary/40 hover:shadow-md transition-all group text-center"
             >
-              <span className="text-2xl sm:text-3xl block mb-1.5">{m.emoji}</span>
-              <span className="text-sm font-semibold group-hover:text-primary transition-colors block">{m.label}</span>
-              <span className="text-xs text-muted-foreground">{m.description}</span>
+              <span className="text-2xl block mb-1">{m.emoji}</span>
+              <span className="text-xs font-semibold group-hover:text-primary transition-colors block">{m.label}</span>
+              <span className="text-[11px] text-muted-foreground">{m.description}</span>
             </Link>
           ))}
         </div>

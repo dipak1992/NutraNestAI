@@ -25,8 +25,18 @@ const SITUATIONS: {
   hint: string
   color: string
   bgHover: string
+  featured?: boolean
   inputPlaceholder?: string
 }[] = [
+  {
+    id: 'tired',
+    emoji: '😴',
+    label: "I don't want to think",
+    hint: 'Instant picks, no decisions',
+    color: 'border-violet-300 text-violet-800',
+    bgHover: 'hover:bg-violet-50',
+    featured: true,
+  },
   {
     id: 'ingredients',
     emoji: '🥫',
@@ -44,14 +54,6 @@ const SITUATIONS: {
     color: 'border-sky-300 text-sky-800',
     bgHover: 'hover:bg-sky-50',
     inputPlaceholder: 'e.g. creamy pasta with mushrooms…',
-  },
-  {
-    id: 'tired',
-    emoji: '😴',
-    label: "I don't want to think today",
-    hint: 'Instant picks, no fuss',
-    color: 'border-violet-300 text-violet-800',
-    bgHover: 'hover:bg-violet-50',
   },
 ]
 
@@ -210,7 +212,7 @@ export function DashboardClient({ userName }: Props) {
 
               <div className="mt-6 mb-3">
                 <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
-                  Or choose your situation
+                  What sounds good tonight?
                 </p>
               </div>
 
@@ -220,12 +222,16 @@ export function DashboardClient({ userName }: Props) {
                     key={s.id}
                     whileTap={{ scale: 0.97 }}
                     onClick={() => selectMode(s.id)}
-                    className={`flex items-center gap-4 w-full px-4 py-4 rounded-2xl border bg-background text-left transition-colors ${s.color} ${s.bgHover}`}
+                    className={`flex items-center gap-4 w-full text-left transition-colors rounded-2xl border bg-background ${s.color} ${s.bgHover} ${
+                      s.featured
+                        ? 'px-4 py-5 border-2 shadow-sm'
+                        : 'px-4 py-4'
+                    }`}
                   >
-                    <span className="text-2xl">{s.emoji}</span>
+                    <span className={s.featured ? 'text-3xl' : 'text-2xl'}>{s.emoji}</span>
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-sm">{s.label}</p>
-                      <p className="text-xs opacity-70 mt-0.5">{s.hint}</p>
+                      <p className={`font-semibold ${s.featured ? 'text-base' : 'text-sm'}`}>{s.label}</p>
+                      <p className={`opacity-70 mt-0.5 ${s.featured ? 'text-sm' : 'text-xs'}`}>{s.hint}</p>
                     </div>
                     <ChevronRight className="h-4 w-4 opacity-40 flex-shrink-0" />
                   </motion.button>
@@ -282,10 +288,10 @@ export function DashboardClient({ userName }: Props) {
             >
               <div className="mb-5">
                 <h2 className="text-lg font-bold text-foreground leading-snug">
-                  {activeMode?.emoji} {mode === 'tired' ? 'Here you go' : 'Your matches'}
+                  {activeMode?.emoji} {mode === 'tired' ? 'Here\u2019s something easy' : 'Your matches'}
                 </h2>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Swipe up or down to replace · Save what you love
+                  Swipe to replace · Save what you love
                 </p>
               </div>
 

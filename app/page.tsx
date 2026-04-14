@@ -2,7 +2,8 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Sparkles, ShieldCheck, Users, Calendar, ShoppingCart, ChevronRight, Check, Star, Zap, BookOpen, Soup, Lock, BadgeCheck, Heart, UserCheck, UtensilsCrossed } from 'lucide-react'
-import { MealEaseLogo } from '@/components/ui/MealEaseLogo'
+import { PublicSiteHeader } from '@/components/layout/PublicSiteHeader'
+import { PublicSiteFooter } from '@/components/layout/PublicSiteFooter'
 
 function Hero() {
   const modes = [
@@ -421,15 +422,7 @@ function GrowthContent() {
 export default function LandingPage() {
   return (
     <>
-      <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/90 backdrop-blur-sm">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <MealEaseLogo size="md" />
-          <div className="flex items-center gap-2">
-            <Button asChild variant="ghost" size="sm"><Link href="/login">Log in</Link></Button>
-            <Button asChild size="sm"><Link href="/signup">Try MealEase</Link></Button>
-          </div>
-        </div>
-      </header>
+      <PublicSiteHeader />
       <main>
         <Hero />
         <SocialProof />
@@ -453,19 +446,7 @@ export default function LandingPage() {
         </section>
         <FriendlyDisclaimer />
       </main>
-      <footer className="border-t border-border/60 bg-muted/20 py-10">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <MealEaseLogo size="sm" />
-          <p className="text-xs text-muted-foreground">&copy; {new Date().getFullYear()} MealEase. <span className="opacity-60">Powered by AI</span></p>
-          <div className="flex gap-4 text-sm text-muted-foreground">
-            <Link href="/meals" className="hover:text-foreground transition-colors">Meals</Link>
-            <Link href="/blog" className="hover:text-foreground transition-colors">Blog</Link>
-            <Link href="/pricing" className="hover:text-foreground transition-colors">Pricing</Link>
-            <Link href="/login" className="hover:text-foreground transition-colors">Log in</Link>
-            <Link href="/signup" className="hover:text-foreground transition-colors">Sign up</Link>
-          </div>
-        </div>
-      </footer>
+      <PublicSiteFooter />
     </>
   )
 }

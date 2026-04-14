@@ -1,0 +1,20 @@
+{
+  "framework": "nextjs",
+  "functions": {
+    "app/api/generate-plan/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/analyze-image/route.ts": {
+      "maxDuration": 30
+    },
+    "app/api/smart-meal/route.ts": {
+      "maxDuration": 30
+    },
+    "app/api/weekly-plan/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/regenerate-meal/route.ts": {
+      "maxDuration": 60
+    }
+  }
+}

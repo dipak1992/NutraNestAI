@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateMealPlan } from '@/lib/ai/meal-generator'
+import { rateLimit, rateLimitKeyFromRequest } from '@/lib/rate-limit'
+import { apiError, apiRateLimited } from '@/lib/api-response'
+import logger from '@/lib/logger'
 import type { AIGenerationRequest } from '@/types'
 
 export async function POST(req: NextRequest) {
+  const rl = rateLimit({ key: rateLimitKeyFromRequest(req), limit: 10, windowMs: 60_000 })
+  if (!rl.success) return apiRateLimited(rl.reset)
+
   try {
     const body = await req.json() as AIGenerationRequest
 
@@ -13,7 +19,7 @@ export async function POST(req: NextRequest) {
     const plan = await generateMealPlan(body)
     return NextResponse.json(plan)
   } catch (err) {
-    console.error('[generate-plan]', err)
-    return NextResponse.json({ error: 'Failed to generate meal plan' }, { status: 500 })
+    logger.error('[generate-plan] Unhandled error', { error: err instanceof Error ? err.message : String(err) })
+    return apiError('Failed to generate meal plan')
   }
 }

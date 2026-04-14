@@ -1,9 +1,15 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { generateSmartMeal } from '@/lib/engine/engine'
+import { rateLimit, rateLimitKeyFromRequest } from '@/lib/rate-limit'
+import { apiError, apiRateLimited } from '@/lib/api-response'
+import logger from '@/lib/logger'
 import type { SmartMealRequest } from '@/lib/engine/types'
 import type { LearnedBoosts } from '@/lib/learning/types'
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+  const rl = rateLimit({ key: rateLimitKeyFromRequest(req), limit: 30, windowMs: 60_000 })
+  if (!rl.success) return apiRateLimited(rl.reset)
+
   try {
     const body = (await req.json()) as SmartMealRequest & { learnedBoosts?: LearnedBoosts }
 
@@ -34,10 +40,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json(result)
   } catch (error) {
-    console.error('[SmartMeal] Engine error:', error)
-    return NextResponse.json(
-      { error: 'Failed to generate meal' },
-      { status: 500 },
-    )
+    logger.error('[smart-meal] Engine error', { error: error instanceof Error ? error.message : String(error) })
+    return apiError('Failed to generate meal')
   }
 }

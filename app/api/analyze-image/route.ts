@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { rateLimit, rateLimitKeyFromRequest } from '@/lib/rate-limit'
+import { apiError, apiRateLimited } from '@/lib/api-response'
+import logger from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -16,6 +19,9 @@ Respond ONLY with valid JSON in this exact format:
 {"type": "ingredients" | "inspiration" | "unknown", "result": "your comma-separated ingredients OR meal description OR empty string"}`
 
 export async function POST(req: NextRequest) {
+  const rl = rateLimit({ key: rateLimitKeyFromRequest(req), limit: 20, windowMs: 60_000 })
+  if (!rl.success) return apiRateLimited(rl.reset)
+
   try {
     const body = await req.json()
     const { image, mimeType } = body as { image?: string; mimeType?: string }
@@ -87,10 +93,7 @@ export async function POST(req: NextRequest) {
       result: parsed.result || '',
     })
   } catch (err) {
-    console.error('[analyze-image] Error:', err)
-    return NextResponse.json(
-      { error: 'Failed to analyze image' },
-      { status: 500 },
-    )
+    logger.error('[analyze-image] Error', { error: err instanceof Error ? err.message : String(err) })
+    return apiError('Failed to analyze image')
   }
 }

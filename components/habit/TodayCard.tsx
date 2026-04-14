@@ -91,7 +91,7 @@ export function TodayCard() {
       <div className="w-full rounded-3xl bg-muted/40 border border-border flex items-center justify-center h-44">
         <div className="flex flex-col items-center gap-2">
           <Loader2 className="h-5 w-5 animate-spin text-primary" />
-          <p className="text-xs text-muted-foreground">Finding tonight&apos;s meal…</p>
+          <p className="text-xs text-muted-foreground">Thinking about tonight…</p>
         </div>
       </div>
     )

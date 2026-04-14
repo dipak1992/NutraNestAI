@@ -69,7 +69,7 @@ export function EditMealModal({ meal, open, onClose, onSaved }: EditMealModalPro
       })
       onClose()
     } catch {
-      toast.error('Could not update — please try again.')
+      toast.error('Couldn\'t save changes — try again.')
     } finally {
       setLoading(false)
     }

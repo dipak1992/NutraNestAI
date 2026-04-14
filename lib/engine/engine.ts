@@ -182,9 +182,16 @@ export function generateSmartMeal(
     if (request.lowEnergy) {
       if (meal.energyDemand === 'low') {
         score += W.ENERGY_MATCH
-        reasons.push('Low-effort meal')
+        reasons.push('Low-effort — minimal prep, maximum ease')
+      } else if (meal.energyDemand === 'medium') {
+        score += Math.round(W.ENERGY_MISMATCH * 0.5)
       } else if (meal.energyDemand === 'high') {
         score += W.ENERGY_MISMATCH
+      }
+      // Bonus for simplified steps availability
+      if (meal.simplifiedSteps) {
+        score += 10
+        reasons.push('Simplified steps available')
       }
     }
 
@@ -322,8 +329,21 @@ function assembleMeal(
   // ── Steps (simplify for low energy) ───────────────────────
 
   let steps = meal.steps
+  let effectiveTagline = meal.tagline
   if (request.lowEnergy && meal.simplifiedSteps) {
     steps = meal.simplifiedSteps
+    effectiveTagline = `${meal.tagline} — simplified for you`
+  }
+
+  // ── Apply simplified swaps to ingredients for low energy ──
+
+  let effectiveIngredients = meal.ingredients
+  if (request.lowEnergy && meal.simplifiedSwaps?.length) {
+    effectiveIngredients = meal.ingredients.filter(i => {
+      return !meal.simplifiedSwaps!.some(swap =>
+        swap.from.toLowerCase().includes(i.name.toLowerCase())
+      )
+    })
   }
 
   // ── Variations ────────────────────────────────────────────
@@ -352,7 +372,7 @@ function assembleMeal(
   return {
     id: meal.id,
     title: meal.title,
-    tagline: meal.tagline,
+    tagline: effectiveTagline,
     description: meal.description,
     cuisineType: meal.cuisineTags[0],
     prepTime: meal.prepTime,
@@ -408,6 +428,20 @@ function buildVariations(meal: MealCandidate, request: SmartMealRequest): SmartV
       }
     }
 
+    // Populate allergen warnings from request allergens
+    const allergyWarnings: string[] = []
+    if (request.allergens?.length) {
+      for (const allergen of request.allergens) {
+        const terms = ALLERGEN_MAP[allergen] ?? [allergen]
+        const found = meal.ingredients.some(i =>
+          terms.some(t => i.name.toLowerCase().includes(t))
+        )
+        if (found) {
+          allergyWarnings.push(`Contains ${allergen} — meal was filtered but verify labels`)
+        }
+      }
+    }
+
     return {
       stage,
       label: meta.label,
@@ -418,7 +452,7 @@ function buildVariations(meal: MealCandidate, request: SmartMealRequest): SmartV
       safetyNotes,
       textureNotes: data.textureNotes,
       servingTip: data.servingTip,
-      allergyWarnings: [],
+      allergyWarnings,
     }
   })
 }

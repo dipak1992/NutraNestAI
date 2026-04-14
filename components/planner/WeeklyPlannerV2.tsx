@@ -159,7 +159,7 @@ export function WeeklyPlannerV2() {
         toast.success('Week planned!', { description: '7 meals + grocery list ready.' })
       }
     } catch {
-      toast.error('Could not generate plan — please try again.')
+      toast.error('Hmm, that didn\'t work. Give it another try?')
     } finally {
       setIsGeneratingWeek(false)
     }
@@ -222,7 +222,7 @@ export function WeeklyPlannerV2() {
 
         toast.success(`${DAY_FULL[dayIndex]} updated!`)
       } catch {
-        toast.error('Could not regenerate — try again.')
+        toast.error('That swap didn\'t go through — try once more.')
       } finally {
         setGeneratingDayIndex(null)
       }
@@ -290,7 +290,7 @@ export function WeeklyPlannerV2() {
         toast.success('Plan published!', { description: `Share: ${url}` })
       }
     } catch {
-      toast.error('Could not publish plan.')
+      toast.error('Couldn\'t share right now — try again in a moment.')
     }
   }, [plan, mealsPlanned, status.isPro])
 

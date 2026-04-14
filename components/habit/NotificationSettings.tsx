@@ -131,7 +131,7 @@ export function NotificationSettings() {
     setSavingPref(null)
     if (error) {
       setPrefs(p => ({ ...p, [key]: !next }))
-      toast.error('Failed to save preference')
+      toast.error('Couldn\'t save that — try again')
     } else {
       toast.success('Preference saved')
     }

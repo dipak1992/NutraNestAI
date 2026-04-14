@@ -8,7 +8,7 @@ import {
   animate,
   AnimatePresence,
 } from 'framer-motion'
-import { Clock, ChefHat, Users, Heart, RefreshCw, Shuffle, Loader2, ThumbsUp, ThumbsDown } from 'lucide-react'
+import { Clock, ChefHat, Users, Heart, RefreshCw, Shuffle, Loader2, ThumbsUp, ThumbsDown, ShieldCheck, Zap } from 'lucide-react'
 import type { SmartMealRequest, SmartMealResult } from '@/lib/engine/types'
 import { useLearningStore } from '@/lib/learning/store'
 
@@ -75,6 +75,18 @@ function CardFace({ meal }: { meal: SmartMealResult }) {
             <Users className="h-3 w-3" />
             {meal.servings}
           </div>
+          {meal.variations.length > 0 && (
+            <div className="flex items-center gap-1 bg-white/20 rounded-full px-2.5 py-1 text-white text-xs font-medium">
+              <ShieldCheck className="h-3 w-3" />
+              Kid-safe
+            </div>
+          )}
+          {meal.meta?.simplifiedForEnergy && (
+            <div className="flex items-center gap-1 bg-white/20 rounded-full px-2.5 py-1 text-white text-xs font-medium">
+              <Zap className="h-3 w-3" />
+              Low-effort
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -295,10 +307,16 @@ export function MealSwipeStack({ mode, input }: Props) {
   // ─── states ────────────────────────────────────────────────────────────────
 
   if (loading && meals.length === 0) {
+    const messages = [
+      'Finding something easy for tonight…',
+      'Matching meals to your kitchen…',
+      'Picking something the whole family will love…',
+    ]
+    const msg = messages[Math.floor(Date.now() / 3000) % messages.length]
     return (
       <div className="flex flex-col items-center justify-center gap-4 h-[520px]">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="text-muted-foreground text-sm">Finding the perfect meal…</p>
+        <p className="text-muted-foreground text-sm">{msg}</p>
       </div>
     )
   }
@@ -307,12 +325,15 @@ export function MealSwipeStack({ mode, input }: Props) {
     return (
       <div className="flex flex-col items-center justify-center gap-4 h-[520px]">
         <span className="text-5xl">🍽️</span>
-        <p className="font-semibold text-foreground">You&apos;ve seen all our suggestions!</p>
+        <p className="font-semibold text-foreground">That&apos;s all for now!</p>
+        <p className="text-sm text-muted-foreground text-center max-w-xs">
+          We&apos;re always adding new meals. Shuffle to see them again with fresh eyes.
+        </p>
         <button
           onClick={handleShuffle}
           className="px-6 py-2 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
         >
-          Start over
+          Shuffle again
         </button>
       </div>
     )

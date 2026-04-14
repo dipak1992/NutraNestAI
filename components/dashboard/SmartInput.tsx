@@ -64,7 +64,7 @@ export function SmartInput({ mode, placeholder, onSubmit }: SmartInputProps) {
 
         if (!res.ok) {
           const data = await res.json().catch(() => ({}))
-          throw new Error(data.error || 'Analysis failed')
+          throw new Error(data.error || 'Couldn\'t analyze that image — try another')
         }
 
         const data = (await res.json()) as {
@@ -87,7 +87,7 @@ export function SmartInput({ mode, placeholder, onSubmit }: SmartInputProps) {
           onSubmit(data.result, data.type as 'ingredients' | 'inspiration')
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Analysis failed')
+        setError(err instanceof Error ? err.message : 'Couldn\'t analyze that image — try typing instead')
         setPreview(null)
       } finally {
         setAnalyzing(false)

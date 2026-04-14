@@ -27,7 +27,7 @@ export function SaveMealButton({ meal, className }: SaveMealButtonProps) {
       })
       if (!res.ok) {
         const data = await res.json() as { error?: string }
-        throw new Error(data.error ?? 'Failed to save')
+        throw new Error(data.error ?? 'Couldn\'t save right now')
       }
       setSaved(true)
       toast.success('Meal saved!', { description: 'Find it under Saved Meals.' })

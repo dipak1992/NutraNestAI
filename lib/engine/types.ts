@@ -36,6 +36,9 @@ export interface SmartMealRequest {
   budget?: 'low' | 'medium' | 'high'
   maxCookTime?: number // minutes
   preferredProteins?: string[]
+
+  // Exclusion (for variety in swipe stacks)
+  excludeIds?: string[]
 }
 
 // ── Result ──────────────────────────────────────────────────

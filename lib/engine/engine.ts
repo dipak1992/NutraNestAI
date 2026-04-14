@@ -138,7 +138,14 @@ export function generateSmartMeal(request: SmartMealRequest): SmartMealResult {
 
   // ── 1. Score all candidates ──────────────────────────────
 
-  const scored = MEAL_DATABASE.map(meal => {
+  const candidates = request.excludeIds?.length
+    ? MEAL_DATABASE.filter(m => !request.excludeIds!.includes(m.id))
+    : MEAL_DATABASE
+
+  // Fall back to full database if all meals are excluded
+  const pool = candidates.length > 0 ? candidates : MEAL_DATABASE
+
+  const scored = pool.map(meal => {
     let score = 0
     const reasons: string[] = []
 

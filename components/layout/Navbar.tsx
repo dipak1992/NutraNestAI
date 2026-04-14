@@ -16,6 +16,7 @@ import {
   Leaf,
   LogOut,
   User,
+  Bookmark,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -35,6 +36,7 @@ const navLinks = [
   { href: '/planner', label: 'Meal Planner', icon: Calendar },
   { href: '/grocery-list', label: 'Grocery List', icon: ShoppingCart },
   { href: '/pantry', label: 'Pantry', icon: Package },
+  { href: '/saved', label: 'Saved', icon: Bookmark },
   { href: '/insights', label: 'Insights', icon: BarChart3 },
 ]
 

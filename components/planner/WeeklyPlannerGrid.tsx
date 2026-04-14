@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { SaveMealButton } from '@/components/content/SaveMealButton'
 
 // ── Cuisine visual map ────────────────────────────────────────
 
@@ -76,19 +77,22 @@ function MealDayCard({ meal, dayLabel, date, onRegenerate, isRegenerating }: Mea
           <h3 className="font-bold text-base leading-snug">{meal.title}</h3>
           <p className="text-muted-foreground text-sm mt-0.5 line-clamp-2">{meal.tagline}</p>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="flex-shrink-0 h-8 w-8"
-          onClick={onRegenerate}
-          disabled={isRegenerating}
-          title="Regenerate this day"
-        >
-          {isRegenerating
-            ? <Loader2 className="h-4 w-4 animate-spin" />
-            : <RefreshCw className="h-4 w-4" />
-          }
-        </Button>
+        <div className="flex items-center gap-0.5 flex-shrink-0">
+          <SaveMealButton meal={meal} />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={onRegenerate}
+            disabled={isRegenerating}
+            title="Regenerate this day"
+          >
+            {isRegenerating
+              ? <Loader2 className="h-4 w-4 animate-spin" />
+              : <RefreshCw className="h-4 w-4" />
+            }
+          </Button>
+        </div>
       </div>
 
       {/* Stats row */}

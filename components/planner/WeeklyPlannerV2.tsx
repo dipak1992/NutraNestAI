@@ -17,6 +17,7 @@ import {
   Loader2,
   CalendarDays,
   RefreshCcw,
+  Globe,
 } from 'lucide-react'
 import type { SmartMealRequest, SmartMealResult } from '@/lib/engine/types'
 import type { WeeklyPlan } from '@/lib/planner/types'
@@ -189,6 +190,33 @@ export function WeeklyPlannerV2() {
   }, [plan, groceryList, storeFormat, setGroceryList, router])
 
   const mealsPlanned = plan.days.filter((d) => d.meal !== null).length
+
+  // ── Publish plan as public shareable link ─────────────────
+  const handlePublishPlan = useCallback(async () => {
+    if (mealsPlanned === 0) {
+      toast.error('Generate your week first!')
+      return
+    }
+    try {
+      const res = await fetch('/api/content/plans', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan }),
+      })
+      if (!res.ok) throw new Error('Failed to publish')
+      const { slug } = await res.json() as { slug: string }
+      const url = `${window.location.origin}/share/plan/${slug}`
+      try {
+        await navigator.clipboard.writeText(url)
+        toast.success('Plan published! Link copied.', { description: url })
+      } catch {
+        toast.success('Plan published!', { description: `Share: ${url}` })
+      }
+    } catch {
+      toast.error('Could not publish plan.')
+    }
+  }, [plan, mealsPlanned])
+
   const weekLabel = buildDateLabel(plan.weekStart)
 
   return (
@@ -227,7 +255,12 @@ export function WeeklyPlannerV2() {
               Clear
             </Button>
           )}
-
+          {mealsPlanned > 0 && (
+            <Button variant="outline" size="sm" onClick={handlePublishPlan}>
+              <Globe className="h-4 w-4 mr-1.5" />
+              Publish plan
+            </Button>
+          )}
           <Button
             variant="default"
             size="sm"

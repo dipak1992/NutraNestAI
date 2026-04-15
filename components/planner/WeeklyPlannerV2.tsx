@@ -393,7 +393,7 @@ export function WeeklyPlannerV2() {
       {!paywallLoading && !status.isPro && (showPlannerLock || mealsPlanned > 0) && (
         <ProPaywallCard
           title="Your free preview stops after 3 dinners"
-          description="You’ve seen the value. Upgrade to Pro to unlock the remaining days, grocery list, and advanced planning tools."
+          description="You've seen the value. Start a 7-day free trial to unlock every day, the full grocery list, and Pantry Magic."
           isAuthenticated={status.isAuthenticated}
           redirectPath="/planner"
         />
@@ -413,8 +413,8 @@ export function WeeklyPlannerV2() {
       <PaywallDialog
         open={paywallOpen}
         onOpenChange={setPaywallOpen}
-        title="Unlock the full weekly planner"
-        description="Pro gives you the full 7-day plan, grocery list, and advanced household tools once you’ve seen the preview."
+        title="Ready to stop thinking about dinner?"
+        description="Unlock 7 days of personalized meals, a smart grocery list, and Pantry Magic — for less than one takeout order."
         isAuthenticated={status.isAuthenticated}
         redirectPath="/planner"
       />

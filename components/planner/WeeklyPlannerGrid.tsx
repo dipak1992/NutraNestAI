@@ -239,10 +239,79 @@ export interface WeeklyPlannerGridProps {
 function LockedDayCard({
   dayLabel,
   date,
+  meal,
+  onUpgradeClick,
 }: {
   dayLabel: string
   date: string
+  meal: SmartMealResult | null
+  onUpgradeClick?: () => void
 }) {
+  // If we have meal teaser data, render it blurred underneath a lock overlay
+  if (meal) {
+    const style = getStyle(meal.cuisineType)
+    return (
+      <div className="relative rounded-2xl overflow-hidden">
+        {/* Blurred meal preview underneath */}
+        <div
+          className={cn(
+            'rounded-2xl border-2 overflow-hidden pointer-events-none select-none',
+            style.bg,
+          )}
+          style={{ filter: 'blur(6px)', opacity: 0.65 }}
+          aria-hidden="true"
+        >
+          <div className="flex items-start gap-3 p-4">
+            <span className="text-4xl flex-shrink-0 leading-none mt-1">{style.emoji}</span>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                <Badge variant="secondary" className="text-xs">{dayLabel}</Badge>
+                <Badge variant="outline" className="text-xs capitalize">{meal.cuisineType}</Badge>
+                <Badge variant="outline" className="text-xs capitalize">{meal.difficulty}</Badge>
+              </div>
+              <h3 className="font-bold text-base leading-snug">{meal.title}</h3>
+              <p className="text-muted-foreground text-sm mt-0.5 line-clamp-2">{meal.tagline}</p>
+            </div>
+          </div>
+          <div className="flex gap-4 px-4 pb-3 text-sm text-muted-foreground">
+            <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{meal.totalTime}m</span>
+            <span className="flex items-center gap-1"><ChefHat className="h-3.5 w-3.5" />{meal.prepTime}m prep</span>
+            <span className="flex items-center gap-1"><Users className="h-3.5 w-3.5" />{meal.servings} servings</span>
+          </div>
+          <div className="border-t border-current/10 px-4 py-2 text-sm font-medium">
+            ••••••• ingredients to buy
+          </div>
+        </div>
+
+        {/* Lock overlay */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-background/30 via-background/50 to-background/85 backdrop-blur-[1px]">
+          <div className="mx-4 max-w-sm rounded-2xl bg-background/95 border border-amber-300/60 shadow-lg p-5 text-center backdrop-blur-sm">
+            <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500 text-white">
+              <Lock className="h-4 w-4" />
+            </div>
+            <p className="text-sm font-semibold text-foreground mb-1">
+              <span className="text-amber-700">{dayLabel}</span> is locked on Free
+            </p>
+            <p className="text-xs text-muted-foreground leading-relaxed mb-4">
+              Unlock this meal — <strong className="text-foreground">{meal.title}</strong> — plus the full grocery list with Pro.
+            </p>
+            <button
+              type="button"
+              onClick={onUpgradeClick}
+              className="w-full rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-semibold py-2.5 px-4 hover:opacity-90 transition-opacity"
+            >
+              Unlock all 7 days →
+            </button>
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              7-day free trial · cancel anytime
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Fallback — no teaser data
   return (
     <div className="rounded-2xl border-2 border-dashed border-amber-300/80 bg-gradient-to-br from-amber-50 to-background px-6 py-10 text-center">
       <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-500 text-white shadow-sm">
@@ -252,9 +321,13 @@ function LockedDayCard({
       <p className="mt-2 text-sm text-muted-foreground">
         This day is part of the Pro-only weekly plan unlock.
       </p>
-      <p className="mt-1 text-xs text-muted-foreground">
-        Upgrade to reveal the remaining meals, grocery list, and advanced tools.
-      </p>
+      <button
+        type="button"
+        onClick={onUpgradeClick}
+        className="mt-4 rounded-xl bg-amber-500 text-white text-sm font-semibold py-2 px-4 hover:bg-amber-600"
+      >
+        Start 7-day free trial
+      </button>
     </div>
   )
 }
@@ -323,6 +396,8 @@ export function WeeklyPlannerGrid({
             <LockedDayCard
               dayLabel={DAY_FULL[day.dayIndex]}
               date={dateLabel}
+              meal={day.meal}
+              onUpgradeClick={() => onLockedDayClick?.(day.dayIndex)}
             />
           )
         }

@@ -1,0 +1,74 @@
+// ============================================================
+// API: POST /api/paywall/start-trial
+// Starts a 7-day free Pro trial by setting temp_pro_until.
+// One-time only per user.
+// ============================================================
+
+import { NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
+
+const TRIAL_DAYS = 7
+
+export async function POST() {
+  try {
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      return NextResponse.json({ error: 'Login required to start trial' }, { status: 401 })
+    }
+
+    // Check existing profile
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('subscription_tier, temp_pro_until, trial_started_at')
+      .eq('id', user.id)
+      .maybeSingle()
+
+    // Already Pro → no trial needed
+    if (profile?.subscription_tier === 'pro') {
+      return NextResponse.json(
+        { error: 'You already have Pro. No trial needed.' },
+        { status: 400 },
+      )
+    }
+
+    // Already started a trial before
+    if (profile?.trial_started_at) {
+      return NextResponse.json(
+        { error: 'You\'ve already used your free trial. Upgrade to continue with Pro.' },
+        { status: 400 },
+      )
+    }
+
+    const now = new Date()
+    const trialEnd = new Date(now.getTime() + TRIAL_DAYS * 24 * 60 * 60 * 1000)
+
+    const { error: upsertError } = await supabase.from('profiles').upsert(
+      {
+        id: user.id,
+        email: user.email ?? null,
+        subscription_tier: 'free',
+        temp_pro_until: trialEnd.toISOString(),
+        trial_started_at: now.toISOString(),
+      },
+      { onConflict: 'id' },
+    )
+
+    if (upsertError) {
+      console.error('[start-trial] upsert error:', upsertError)
+      return NextResponse.json({ error: 'Could not start trial. Try again.' }, { status: 500 })
+    }
+
+    return NextResponse.json({
+      success: true,
+      tempProUntil: trialEnd.toISOString(),
+      trialDays: TRIAL_DAYS,
+    })
+  } catch (err) {
+    console.error('[start-trial] unexpected error:', err)
+    return NextResponse.json({ error: 'Unexpected error' }, { status: 500 })
+  }
+}

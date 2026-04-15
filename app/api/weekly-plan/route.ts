@@ -72,11 +72,28 @@ export async function POST(req: Request) {
     const groceryList = buildGroceryList(meals, pantryItems, storeFormat, weekStart)
 
     if (!paywall.isPro) {
+      const previewDays = paywall.effectivePlanPreviewDays ?? FREE_PLAN_PREVIEW_DAYS
+      // Strip locked meals to a teaser payload — enough to render a blurred
+      // card (title, cuisine, time) but not enough to cook from.
+      const teaseredMeals = meals.map((meal, i) => {
+        if (i < previewDays) return meal
+        return {
+          ...meal,
+          description: '',
+          ingredients: [],
+          steps: [],
+          variations: [],
+          shoppingList: [],
+          leftoverTip: null,
+          estimatedCost: 0,
+          isLocked: true,
+        }
+      })
       return NextResponse.json({
-        meals: meals.slice(0, FREE_PLAN_PREVIEW_DAYS),
+        meals: teaseredMeals,
         groceryList: null,
         isPreview: true,
-        previewDays: FREE_PLAN_PREVIEW_DAYS,
+        previewDays,
       })
     }
 

@@ -1,4 +1,9 @@
+'use client'
+
+import { useState, useCallback } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { Crown, Lock, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -21,6 +26,28 @@ export function ProPaywallCard({
 }: ProPaywallCardProps) {
   const signupHref = `/signup?redirect=${encodeURIComponent(redirectPath)}`
   const loginHref = `/login?redirect=${encodeURIComponent(redirectPath)}`
+  const router = useRouter()
+  const [isStartingTrial, setIsStartingTrial] = useState(false)
+
+  const handleStartTrial = useCallback(async () => {
+    setIsStartingTrial(true)
+    try {
+      const res = await fetch('/api/paywall/start-trial', { method: 'POST' })
+      const data = await res.json()
+      if (!res.ok) {
+        toast.error(data.error || 'Could not start trial')
+        return
+      }
+      toast.success('Your 7-day Pro trial is active!', {
+        description: 'Enjoy full access to every feature.',
+      })
+      router.refresh()
+    } catch {
+      toast.error('Something went wrong. Try again.')
+    } finally {
+      setIsStartingTrial(false)
+    }
+  }, [router])
 
   return (
     <div className="rounded-2xl border border-amber-300/70 bg-gradient-to-br from-amber-50 via-background to-rose-50 p-5 sm:p-6 shadow-sm">
@@ -51,12 +78,19 @@ export function ProPaywallCard({
       <div className="mt-5 flex flex-col gap-2 sm:flex-row">
         {isAuthenticated ? (
           <>
-            <Button asChild>
-              <Link href="/pricing?intent=pro">Upgrade to Pro</Link>
+            <Button
+              onClick={handleStartTrial}
+              disabled={isStartingTrial}
+              className="gradient-sage border-0 text-white hover:opacity-90"
+            >
+              {isStartingTrial ? 'Starting trial…' : 'Start 7-day free trial'}
             </Button>
             <Button asChild variant="outline">
-              <Link href="/pricing">See what Pro includes</Link>
+              <Link href="/pricing">See plans & pricing</Link>
             </Button>
+            <p className="text-center text-[11px] text-muted-foreground sm:text-left">
+              No credit card required
+            </p>
           </>
         ) : (
           <>

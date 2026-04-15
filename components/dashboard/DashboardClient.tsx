@@ -233,7 +233,7 @@ export function DashboardClient({ userName }: Props) {
   const initial = firstName.charAt(0).toUpperCase()
 
   return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, #f0fdf4 0%, #ffffff 28%, #ffffff 100%)' }}>
+    <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, #fef7f0 0%, #f0fdf4 15%, #ffffff 40%, #ffffff 100%)' }}>
       {/* ── Top bar — only shown when a mode is active (Back button) ── */}
       {mode && (
         <div className="sticky top-16 z-40 bg-white/80 backdrop-blur-md border-b border-black/5">
@@ -276,10 +276,10 @@ export function DashboardClient({ userName }: Props) {
                   <StreakBadge />
                 </div>
                 <h1 className="text-2xl font-bold text-foreground leading-tight tracking-tight">
-                  What do you want right now?
+                  What sounds good tonight?
                 </h1>
                 <p className="text-sm text-muted-foreground mt-1.5">
-                  We&apos;ll make it simple.
+                  Too tired to decide? We&apos;ll handle it.
                 </p>
 
                 {/* Family profile chip */}
@@ -305,118 +305,81 @@ export function DashboardClient({ userName }: Props) {
                 </div>
               </div>
 
-              {/* ── HERO BUTTON ── */}
+              {/* ── HERO CTA — glass card style matching landing page ── */}
               <motion.button
                 whileTap={{ scale: 0.97 }}
                 whileHover={{ scale: 1.01, transition: { duration: 0.15 } }}
                 onClick={() => selectMode('tired')}
-                className="w-full flex items-center gap-4 px-5 rounded-2xl text-white text-left mb-3"
-                style={{
-                  minHeight: '72px',
-                  background: 'linear-gradient(135deg, #10b981 0%, #059669 60%, #047857 100%)',
-                  boxShadow: '0 8px 28px rgba(16, 185, 129, 0.38), 0 2px 8px rgba(0,0,0,0.08)',
-                }}
+                className="glass-card flex items-center gap-4 w-full px-6 py-5 rounded-2xl border-2 border-primary/40 bg-primary/5 hover:bg-primary/10 hover:border-primary/60 hover:shadow-lg transition-all group text-left mb-4"
               >
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/20 flex-shrink-0">
-                  <Zap className="h-6 w-6 text-white" />
-                </div>
+                <span className="text-4xl flex-shrink-0">😴</span>
                 <div className="flex-1 min-w-0">
-                  <p className="font-bold text-[17px] leading-tight">I don&apos;t want to think</p>
-                  <p className="text-white/75 text-sm mt-0.5">We&apos;ll handle dinner for you</p>
+                  <p className="text-base font-bold group-hover:text-primary transition-colors">I don&apos;t want to think</p>
+                  <p className="text-sm text-muted-foreground mt-0.5">Just pick something simple for tonight →</p>
                 </div>
-                <ChevronRight className="h-5 w-5 text-white/60 flex-shrink-0" />
               </motion.button>
 
-              {/* ── Secondary cards ── */}
-              <div className="flex flex-col gap-3">
-                {/* Use what I have */}
+              {/* ── Surprise me — accent card with gradient ── */}
+              <motion.button
+                whileTap={{ scale: 0.97 }}
+                whileHover={{ scale: 1.01, transition: { duration: 0.15 } }}
+                onClick={() => selectMode('smart')}
+                className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-left mb-5 transition-all hover:shadow-md"
+                style={{
+                  background: 'linear-gradient(135deg, #ede9fe 0%, #f5f3ff 50%, #fef3c7 100%)',
+                  border: '1px solid rgba(167, 139, 250, 0.3)',
+                }}
+              >
+                <span className="text-3xl flex-shrink-0">🎲</span>
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-sm text-violet-900">Surprise me</p>
+                  <p className="text-xs text-violet-600/80 mt-0.5">Something you&apos;ll love, picked just for you</p>
+                </div>
+                <Sparkles className="h-5 w-5 text-violet-400 flex-shrink-0" />
+              </motion.button>
+
+              {/* ── Secondary modes — 2×2 grid like landing page ── */}
+              <p className="text-xs text-muted-foreground mb-3">Or choose a different approach:</p>
+              <div className="grid grid-cols-2 gap-2.5">
                 <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  whileHover={{ y: -1, transition: { duration: 0.15 } }}
+                  whileTap={{ scale: 0.96 }}
                   onClick={() => selectMode('ingredients')}
-                  className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl bg-white border border-gray-100 shadow-sm text-left hover:shadow-md transition-shadow"
+                  className="glass-card rounded-xl p-4 border border-border/60 hover:border-primary/40 hover:shadow-md transition-all group text-center"
                 >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 flex-shrink-0">
-                    <Camera className="h-5 w-5 text-emerald-600" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm text-foreground">Use what I have</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">Snap your fridge or pantry</p>
-                  </div>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground/50 flex-shrink-0" />
+                  <span className="text-2xl block mb-1.5">🥫</span>
+                  <span className="text-xs font-semibold group-hover:text-primary transition-colors block">Use what I have</span>
+                  <span className="text-[11px] text-muted-foreground">Snap your fridge</span>
                 </motion.button>
 
-                {/* Surprise me */}
                 <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  whileHover={{ y: -1, transition: { duration: 0.15 } }}
-                  onClick={() => selectMode('smart')}
-                  className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl bg-white border border-gray-100 shadow-sm text-left hover:shadow-md transition-shadow"
-                >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-50 flex-shrink-0">
-                    <Sparkles className="h-5 w-5 text-violet-500" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm text-foreground">Surprise me</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">Something you&apos;ll love</p>
-                  </div>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground/50 flex-shrink-0" />
-                </motion.button>
-
-                {/* Get inspired */}
-                <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  whileHover={{ y: -1, transition: { duration: 0.15 } }}
+                  whileTap={{ scale: 0.96 }}
                   onClick={() => selectMode('inspiration')}
-                  className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl bg-white border border-gray-100 shadow-sm text-left hover:shadow-md transition-shadow"
+                  className="glass-card rounded-xl p-4 border border-border/60 hover:border-primary/40 hover:shadow-md transition-all group text-center"
                 >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 flex-shrink-0">
-                    <Sparkles className="h-5 w-5 text-sky-500" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm text-foreground">Get inspired</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">Tell us what sounds good</p>
-                  </div>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground/50 flex-shrink-0" />
+                  <span className="text-2xl block mb-1.5">✨</span>
+                  <span className="text-xs font-semibold group-hover:text-primary transition-colors block">Get inspired</span>
+                  <span className="text-[11px] text-muted-foreground">AI picks for you</span>
                 </motion.button>
 
-                {/* Baby & Kids */}
-                <motion.div
-                  whileTap={{ scale: 0.97 }}
-                  whileHover={{ y: -1, transition: { duration: 0.15 } }}
-                >
+                <motion.div whileTap={{ scale: 0.96 }}>
                   <Link
                     href="/kids"
-                    className="flex items-center gap-4 px-5 py-4 rounded-2xl bg-white border border-gray-100 shadow-sm text-left hover:shadow-md transition-shadow"
+                    className="glass-card rounded-xl p-4 border border-border/60 hover:border-primary/40 hover:shadow-md transition-all group text-center block"
                   >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-pink-50 flex-shrink-0">
-                      <Baby className="h-5 w-5 text-pink-500" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-sm text-foreground">Baby &amp; Kids</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">Age-safe meals for little ones</p>
-                    </div>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground/50 flex-shrink-0" />
+                    <span className="text-2xl block mb-1.5">👶</span>
+                    <span className="text-xs font-semibold group-hover:text-primary transition-colors block">Baby &amp; Kids</span>
+                    <span className="text-[11px] text-muted-foreground">Age-safe meals</span>
                   </Link>
                 </motion.div>
 
-                {/* Plan my week */}
-                <motion.div
-                  whileTap={{ scale: 0.97 }}
-                  whileHover={{ y: -1, transition: { duration: 0.15 } }}
-                >
+                <motion.div whileTap={{ scale: 0.96 }}>
                   <Link
                     href="/planner"
-                    className="flex items-center gap-4 px-5 py-4 rounded-2xl bg-white border border-gray-100 shadow-sm text-left hover:shadow-md transition-shadow"
+                    className="glass-card rounded-xl p-4 border border-border/60 hover:border-primary/40 hover:shadow-md transition-all group text-center block"
                   >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 flex-shrink-0">
-                      <CalendarDays className="h-5 w-5 text-sky-500" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-sm text-foreground">Plan my week</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">Meals for the whole week</p>
-                    </div>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground/50 flex-shrink-0" />
+                    <span className="text-2xl block mb-1.5">📅</span>
+                    <span className="text-xs font-semibold group-hover:text-primary transition-colors block">Plan my week</span>
+                    <span className="text-[11px] text-muted-foreground">Full meal planning</span>
                   </Link>
                 </motion.div>
               </div>

@@ -217,10 +217,10 @@ export function MealSwipeStack({ mode, input }: Props) {
   const [topIdx, setTopIdx] = useState(0)
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
-  const [empty, setEmpty] = useState(false)
   const [feedbackFlash, setFeedbackFlash] = useState<'like' | 'reject' | null>(null)
   const [selectedMeal, setSelectedMeal] = useState<SmartMealResult | null>(null)
   const seenIds = useRef<string[]>([])
+  const shuffleCount = useRef(0)
   const { recordLike, recordReject, recordSave, getBoosts } = useLearningStore()
 
   async function loadMeals(count: number) {
@@ -244,33 +244,41 @@ export function MealSwipeStack({ mode, input }: Props) {
 
   // initial load
   useEffect(() => {
-    loadMeals(3)
+    loadMeals(5)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // prefetch when running low
   const visibleRemaining = meals.length - topIdx
   useEffect(() => {
-    if (!loading && visibleRemaining <= 2 && meals.length > 0) {
-      loadMeals(2)
+    if (!loading && visibleRemaining <= 3 && meals.length > 0) {
+      loadMeals(3)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visibleRemaining, loading])
 
+  // auto-shuffle when exhausted (up to 2 times)
+  useEffect(() => {
+    if (!loading && meals.length > 0 && topIdx >= meals.length && shuffleCount.current < 2) {
+      shuffleCount.current++
+      seenIds.current = []
+      setMeals([])
+      setTopIdx(0)
+      loadMeals(5)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [topIdx, meals.length, loading])
+
   function handleDismiss() {
-    setTopIdx(prev => {
-      const next = prev + 1
-      if (next >= meals.length && !loading) setEmpty(true)
-      return next
-    })
+    setTopIdx(prev => prev + 1)
   }
 
   function handleShuffle() {
     seenIds.current = []
+    shuffleCount.current = 0
     setMeals([])
     setTopIdx(0)
-    setEmpty(false)
-    loadMeals(3)
+    loadMeals(5)
   }
 
   function toggleSave(id: string) {
@@ -336,7 +344,7 @@ export function MealSwipeStack({ mode, input }: Props) {
     )
   }
 
-  if (empty || (topIdx >= meals.length && !loading)) {
+  if (topIdx >= meals.length && !loading && shuffleCount.current >= 2) {
     return (
       <div className="flex flex-col items-center justify-center gap-4 h-[520px]">
         <span className="text-5xl">🍽️</span>

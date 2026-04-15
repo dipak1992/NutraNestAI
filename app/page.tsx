@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Sparkles, ShieldCheck, Users, Calendar, ShoppingCart, ChevronRight, Check, Star, BookOpen, Soup, Lock, BadgeCheck, Heart, UserCheck, UtensilsCrossed } from 'lucide-react'
+import { Sparkles, ShieldCheck, Users, Calendar, ShoppingCart, ChevronRight, Check, Star, BookOpen, Soup, Lock, BadgeCheck, Heart, UserCheck, UtensilsCrossed, Clock } from 'lucide-react'
 import { PublicSiteHeader } from '@/components/layout/PublicSiteHeader'
 import { PublicSiteFooter } from '@/components/layout/PublicSiteFooter'
 
@@ -13,57 +13,130 @@ function Hero() {
   ]
 
   return (
-    <section className="relative overflow-hidden gradient-hero py-24 sm:py-32">
-      <div className="mx-auto max-w-4xl px-4 sm:px-6 text-center">
-        <Badge className="mb-6 bg-primary/10 text-primary border-primary/20 hover:bg-primary/10">
-          <Sparkles className="mr-1.5 h-3.5 w-3.5" />
-          Smart meal planning for real families
-        </Badge>
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight mb-4">
-          Make family meals{' '}
-          <span className="text-gradient-sage">easy.</span>
-        </h1>
-        <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-3 leading-relaxed">
-          Too tired to decide? We&apos;ll handle dinner — in seconds.
-        </p>
-        <p className="text-sm text-muted-foreground mb-8">No credit card required. No decisions needed.</p>
-
-        {/* Primary CTA — featured "I don't want to think" card */}
-        <div className="max-w-md mx-auto mb-4">
-          <Link
-            href="/tonight?mode=tired"
-            className="glass-card flex items-center gap-4 w-full px-6 py-5 rounded-2xl border-2 border-primary/40 bg-primary/5 hover:bg-primary/10 hover:border-primary/60 hover:shadow-lg transition-all group text-left"
+    <section className="relative overflow-hidden gradient-hero py-16 sm:py-24">
+      {/* Decorative food emoji backdrop */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden select-none">
+        {['🍋', '🫑', '🧄', '🍅', '🥦', '🧅', '🫒', '🥕'].map((emoji, i) => (
+          <span
+            key={i}
+            className="absolute text-4xl opacity-[0.06]"
+            style={{
+              top: `${[12, 70, 30, 85, 15, 60, 42, 78][i]}%`,
+              left: `${[5, 90, 82, 8, 55, 3, 72, 48][i]}%`,
+              transform: `rotate(${[-15, 20, -8, 25, 12, -20, 5, -12][i]}deg)`,
+              fontSize: `${[3, 2.5, 3.5, 2, 3, 2.5, 3.5, 2][i]}rem`,
+            }}
           >
-            <span className="text-4xl flex-shrink-0">😴</span>
-            <div className="flex-1 min-w-0">
-              <p className="text-base font-bold group-hover:text-primary transition-colors">I don&apos;t want to think</p>
-              <p className="text-sm text-muted-foreground mt-0.5">Just pick something simple for tonight →</p>
+            {emoji}
+          </span>
+        ))}
+      </div>
+
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          {/* Left: headline + CTAs */}
+          <div className="text-center lg:text-left">
+            <Badge className="mb-6 bg-primary/10 text-primary border-primary/20 hover:bg-primary/10">
+              <Sparkles className="mr-1.5 h-3.5 w-3.5" />
+              Smart meal planning for real families
+            </Badge>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight mb-4">
+              Make family meals{' '}
+              <span className="text-gradient-sage">easy.</span>
+            </h1>
+            <p className="text-lg sm:text-xl text-muted-foreground max-w-xl mb-3 leading-relaxed">
+              Too tired to decide? We&apos;ll handle dinner — in seconds.
+            </p>
+            <p className="text-sm text-muted-foreground mb-8">No credit card required. No decisions needed.</p>
+
+            {/* Primary CTA */}
+            <div className="max-w-md mx-auto lg:mx-0 mb-4">
+              <Link
+                href="/tonight?mode=tired"
+                className="glass-card flex items-center gap-4 w-full px-6 py-5 rounded-2xl border-2 border-primary/40 bg-primary/5 hover:bg-primary/10 hover:border-primary/60 hover:shadow-lg transition-all group text-left"
+              >
+                <span className="text-4xl flex-shrink-0">😴</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-base font-bold group-hover:text-primary transition-colors">I don&apos;t want to think</p>
+                  <p className="text-sm text-muted-foreground mt-0.5">Just pick something simple for tonight →</p>
+                </div>
+              </Link>
             </div>
-          </Link>
-        </div>
 
-        {/* Secondary modes */}
-        <p className="text-xs text-muted-foreground mb-3">Or choose a different approach:</p>
-        <div className="grid grid-cols-3 gap-2 max-w-md mx-auto mb-6">
-          {secondaryModes.map((m) => (
-            <Link
-              key={m.label}
-              href={m.href}
-              className="glass-card rounded-xl p-3 border border-border/60 hover:border-primary/40 hover:shadow-md transition-all group text-center"
-            >
-              <span className="text-2xl block mb-1">{m.emoji}</span>
-              <span className="text-xs font-semibold group-hover:text-primary transition-colors block">{m.label}</span>
-              <span className="text-[11px] text-muted-foreground">{m.description}</span>
-            </Link>
-          ))}
-        </div>
+            {/* Secondary modes */}
+            <p className="text-xs text-muted-foreground mb-3 text-center lg:text-left">Or choose a different approach:</p>
+            <div className="grid grid-cols-3 gap-2 max-w-md mx-auto lg:mx-0 mb-6">
+              {secondaryModes.map((m) => (
+                <Link
+                  key={m.label}
+                  href={m.href}
+                  className="glass-card rounded-xl p-3 border border-border/60 hover:border-primary/40 hover:shadow-md transition-all group text-center"
+                >
+                  <span className="text-2xl block mb-1">{m.emoji}</span>
+                  <span className="text-xs font-semibold group-hover:text-primary transition-colors block">{m.label}</span>
+                  <span className="text-[11px] text-muted-foreground">{m.description}</span>
+                </Link>
+              ))}
+            </div>
 
-        <div className="flex flex-col sm:flex-row gap-2 justify-center items-center text-sm text-muted-foreground">
-          <span>Already have an account?</span>
-          <div className="flex gap-3">
-            <Link href="/login" className="text-primary hover:underline font-medium">Sign in</Link>
-            <span>·</span>
-            <Link href="/signup" className="text-primary hover:underline font-medium">Create account</Link>
+            <div className="flex flex-col sm:flex-row gap-2 justify-center lg:justify-start items-center text-sm text-muted-foreground">
+              <span>Already have an account?</span>
+              <div className="flex gap-3">
+                <Link href="/login" className="text-primary hover:underline font-medium">Sign in</Link>
+                <span>·</span>
+                <Link href="/signup" className="text-primary hover:underline font-medium">Create account</Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: meal preview mockup */}
+          <div className="hidden lg:block" aria-hidden>
+            <div className="relative">
+              {/* Soft glow behind the card */}
+              <div className="absolute -inset-4 bg-primary/8 rounded-3xl blur-2xl" />
+              <div className="relative glass-card rounded-2xl border border-primary/20 shadow-2xl overflow-hidden">
+                {/* Mock header */}
+                <div className="bg-primary/5 border-b border-border/40 px-5 py-4 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="h-6 w-6 rounded bg-primary text-white flex items-center justify-center text-xs font-bold">M</div>
+                    <span className="text-sm font-bold text-gradient-sage">MealEase</span>
+                  </div>
+                  <span className="text-xs text-muted-foreground">Tonight&apos;s dinner →</span>
+                </div>
+                {/* Mock meal card */}
+                <div className="p-5">
+                  <div className="mb-4">
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200 font-medium">😴 No-Think Dinner</span>
+                  </div>
+                  <h3 className="text-xl font-bold mb-1">One-Pan Lemon Herb Chicken</h3>
+                  <p className="text-sm text-muted-foreground mb-4">Golden, juicy, and on the table in 30 minutes</p>
+                  <div className="flex gap-4 text-xs text-muted-foreground mb-4">
+                    <span className="flex items-center gap-1"><Clock className="h-3 w-3 text-primary" /> 30 min</span>
+                    <span className="flex items-center gap-1"><Users className="h-3 w-3 text-primary" /> Serves 4</span>
+                    <span className="flex items-center gap-1"><ShieldCheck className="h-3 w-3 text-primary" /> Family-safe</span>
+                  </div>
+                  {/* Mini ingredient list */}
+                  <div className="rounded-xl border border-border/50 divide-y divide-border/30 text-xs mb-4">
+                    {[['Chicken thighs', '4 pieces'], ['Baby potatoes', '1 lb'], ['Lemon', '2 whole'], ['Fresh thyme', '4 sprigs']].map(([name, qty]) => (
+                      <div key={name} className="flex justify-between px-3 py-2">
+                        <span>{name}</span>
+                        <span className="text-muted-foreground font-mono">{qty}</span>
+                      </div>
+                    ))}
+                  </div>
+                  {/* Family variations */}
+                  <p className="text-xs font-semibold text-muted-foreground mb-2">Family variations</p>
+                  <div className="flex gap-2">
+                    {[['🧑', 'Adult'], ['👦', 'Kid'], ['👶', 'Toddler'], ['🍼', 'Baby']].map(([emoji, label]) => (
+                      <div key={label} className="flex-1 text-center rounded-lg bg-muted/40 py-2 px-1">
+                        <div className="text-base">{emoji}</div>
+                        <div className="text-[10px] text-muted-foreground mt-0.5">{label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

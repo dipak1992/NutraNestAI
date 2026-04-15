@@ -6,6 +6,7 @@ const footerLinks = [
   { href: '/terms', label: 'Terms' },
   { href: '/about', label: 'About' },
   { href: '/pricing', label: 'Pricing' },
+  { href: '/blog', label: 'Blog' },
 ]
 
 export function PublicSiteFooter() {

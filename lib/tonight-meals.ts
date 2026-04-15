@@ -491,9 +491,37 @@ export const TONIGHT_MEALS = {
   pantry: PANTRY_MEALS,
 }
 
+const SEEN_KEY = 'mealease-tonight-seen'
+
+function getSeenIds(mode: string): string[] {
+  if (typeof window === 'undefined') return []
+  try {
+    const raw = sessionStorage.getItem(`${SEEN_KEY}-${mode}`)
+    return raw ? (JSON.parse(raw) as string[]) : []
+  } catch {
+    return []
+  }
+}
+
+function recordSeen(mode: string, id: string, poolSize: number) {
+  if (typeof window === 'undefined') return
+  try {
+    const seen = getSeenIds(mode)
+    const updated = [...seen, id].slice(-(poolSize - 1)) // keep at most pool-1 so there's always a fresh option
+    sessionStorage.setItem(`${SEEN_KEY}-${mode}`, JSON.stringify(updated))
+  } catch {
+    // ignore storage errors
+  }
+}
+
 export function getRandomTonightMeal(mode: 'quick' | 'tired' | 'pantry'): TonightMeal {
   const pool = TONIGHT_MEALS[mode]
-  return pool[Math.floor(Math.random() * pool.length)]
+  const seen = getSeenIds(mode)
+  const unseen = pool.filter((m) => !seen.includes(m.id))
+  const candidates = unseen.length > 0 ? unseen : pool
+  const pick = candidates[Math.floor(Math.random() * candidates.length)]
+  recordSeen(mode, pick.id, pool.length)
+  return pick
 }
 
 export function getTonightMealById(id: string): TonightMeal | null {

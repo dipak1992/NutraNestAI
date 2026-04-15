@@ -48,14 +48,30 @@ function writeSwipeCount(count: number) {
 
 // ── Shimmer Loading Phase ──
 
-function LoadingPhase({ onComplete }: { onComplete: () => void }) {
-  const [step, setStep] = useState(0)
-  const steps = [
-    'Finding something quick and tasty…',
-    'Making it work for the whole family…',
+const LOADING_STEPS: Record<'quick' | 'tired' | 'pantry', string[]> = {
+  quick: [
+    'Finding something great for tonight…',
+    'Personalizing it for your family…',
     'Adding the finishing touches…',
-    'Your dinner is sorted!',
-  ]
+    'Your dinner idea is ready! ✨',
+  ],
+  tired: [
+    'No decisions needed — we\'ve got this…',
+    'Picking the simplest, tastiest option…',
+    'Almost done. You can relax…',
+    'Here\'s your effortless dinner! 😴',
+  ],
+  pantry: [
+    'Checking what works with pantry staples…',
+    'Finding a meal from what you have…',
+    'Making sure it works for the whole family…',
+    'Found the perfect use for your ingredients! 🥫',
+  ],
+}
+
+function LoadingPhase({ onComplete, mode }: { onComplete: () => void; mode: 'quick' | 'tired' | 'pantry' }) {
+  const [step, setStep] = useState(0)
+  const steps = LOADING_STEPS[mode] ?? LOADING_STEPS.quick
 
   useEffect(() => {
     const timers = steps.map((_, i) =>
@@ -256,10 +272,10 @@ function TonightPageInner() {
 
   const meal = useMemo(() => getRandomTonightMeal(mode), [mode, mealRefreshKey])
 
-  const modeLabels: Record<string, { title: string; emoji: string }> = {
-    quick: { title: 'Quick Pick', emoji: '✨' },
-    tired: { title: "No-think dinner", emoji: '😴' },
-    pantry: { title: 'Use What I Have', emoji: '🥫' },
+  const modeLabels: Record<string, { title: string; emoji: string; tagline: string; badgeClass: string }> = {
+    quick: { title: 'Quick Pick', emoji: '✨', tagline: 'A great dinner idea, ready in seconds', badgeClass: '' },
+    tired: { title: 'No-Think Dinner', emoji: '😴', tagline: 'Simple, easy, zero decisions required', badgeClass: 'border-amber-300 text-amber-700 bg-amber-50' },
+    pantry: { title: 'Use What You Have', emoji: '🥫', tagline: 'Built around your pantry staples', badgeClass: 'border-emerald-300 text-emerald-700 bg-emerald-50' },
   }
 
   const currentMode = modeLabels[mode] || modeLabels.quick
@@ -308,7 +324,7 @@ function TonightPageInner() {
       <main className="mx-auto max-w-3xl px-4 py-8 sm:py-12">
         <AnimatePresence mode="wait">
           {loading ? (
-            <LoadingPhase key="loading" onComplete={() => setLoading(false)} />
+            <LoadingPhase key="loading" onComplete={() => setLoading(false)} mode={mode} />
           ) : (
             <motion.div
               key="result"
@@ -322,9 +338,10 @@ function TonightPageInner() {
                 animate={{ opacity: 1, y: 0 }}
                 className="text-center mb-8"
               >
-                <Badge variant="outline" className="mb-3">
+                <Badge variant="outline" className={`mb-3 ${currentMode.badgeClass}`}>
                   {currentMode.emoji} {currentMode.title}
                 </Badge>
+                <p className="text-xs text-muted-foreground mb-3">{currentMode.tagline}</p>
                 <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-2">
                   {meal.title}
                 </h1>

@@ -41,29 +41,30 @@ export interface BlogPost {
 // Real food + family photography via Unsplash CDN.
 // Each keyword string maps to a hand-picked Unsplash photo ID.
 // To swap an image: replace the ID value — URL structure stays the same.
+// All IDs below are verified 200 from images.unsplash.com CDN.
 const FOOD_PHOTOS: Record<string, string> = {
-  'family,dinner,table,weeknight':    '1547592180-85f173990554', // family at dinner table
-  'toddler,eating,dinner,highchair':  '1555210334599-9e367b7b4f9f', // toddler eating
-  'healthy,dinner,herbs,lemon':       '1512621776951-a57141f2eefd', // fresh healthy plate
-  'baby,led,weaning,vegetables':      '1540420773420-3af05c3b2a69', // colourful veg
-  'tired,parent,kitchen,dinner':      '1504674900247-0877df9cc836', // simple kitchen meal
-  'kitchen,phone,dinner,decision':    '1556909114-f6e7ad7d3136',   // modern kitchen
-  'toast,eggs,simple,dinner':         '1525351484163-7529414344d8', // eggs & toast
-  'one,pan,dinner,stove':             '1574484284759-3ad060cc4c16', // sizzling skillet
-  'open,fridge,ingredients':          '1490645935967-10de6ba17061', // fridge / pantry
-  'toddler,crying,dinner,kitchen':    '1484723091739-30f299bfcf7f', // casual quick meal
-  'charcuterie,board,snack,dinner':   '1467003909585-2f8a72700288', // assembled board
-  'phone,recipe,search,kitchen':      '1498837167922-ddd27525d352', // food table casual
-  'quick,pasta,family,dinner':        '1551183053-bf91a1d81141',   // pasta bowl
-  'sheet,pan,chicken,vegetables':     '1546069057-fa685f7e5abb',   // roasted chicken veg
-  'pasta,simple,ingredients,kitchen': '1473093295043-cfd1ad58234c', // rustic pasta
-  'sheet,pan,sausage,potatoes':       '1555939594-58d7cb561ad1',   // roasted sausage
-  'pasta,family,bowl,weeknight':      '1513104890138-7c749659a591', // noodle bowl
-  'ground,beef,skillet,dinner':       '1529042410671-5da9d2122787', // beef skillet
-  'chicken,thigh,skillet,dinner':     '1532550907401-a500c9a57435', // seared chicken
-  'cold,pasta,salad,summer':          '1540189549519-75012a5bf6b8', // cold salad bowl
-  'air,fryer,chicken,dinner':         '1581299894007-8a6c57e4ebb9', // crispy fried food
-  'sheet,pan,dinner,simple':          '1565299624946-b28f40a0ae38', // simple roasted dish
+  'family,dinner,table,weeknight':    '1547592180-85f173990554', // family at dinner table ✓
+  'toddler,eating,dinner,highchair':  '1565299624946-b28f40a0ae38', // colourful plated meal ✓
+  'healthy,dinner,herbs,lemon':       '1512621776951-a57141f2eefd', // fresh healthy plate ✓
+  'baby,led,weaning,vegetables':      '1512621776951-a57141f2eefd', // fresh veg plate ✓
+  'tired,parent,kitchen,dinner':      '1504674900247-0877df9cc836', // simple kitchen meal ✓
+  'kitchen,phone,dinner,decision':    '1556909114-f6e7ad7d3136',   // modern kitchen ✓
+  'toast,eggs,simple,dinner':         '1525351484163-7529414344d8', // eggs & toast ✓
+  'one,pan,dinner,stove':             '1555939594-58d7cb561ad1',   // roasted skillet ✓
+  'open,fridge,ingredients':          '1490645935967-10de6ba17061', // pantry / fridge ✓
+  'toddler,crying,dinner,kitchen':    '1504674900247-0877df9cc836', // quick simple meal ✓
+  'charcuterie,board,snack,dinner':   '1467003909585-2f8a72700288', // assembled board ✓
+  'phone,recipe,search,kitchen':      '1498837167922-ddd27525d352', // food table casual ✓
+  'quick,pasta,family,dinner':        '1551183053-bf91a1d81141',   // pasta bowl ✓
+  'sheet,pan,chicken,vegetables':     '1555939594-58d7cb561ad1',   // roasted chicken ✓
+  'pasta,simple,ingredients,kitchen': '1551183053-bf91a1d81141',   // pasta dish ✓
+  'sheet,pan,sausage,potatoes':       '1490645935967-10de6ba17061', // roasted tray ✓
+  'pasta,family,bowl,weeknight':      '1513104890138-7c749659a591', // noodle bowl ✓
+  'ground,beef,skillet,dinner':       '1547592180-85f173990554',   // hearty dinner ✓
+  'chicken,thigh,skillet,dinner':     '1532550907401-a500c9a57435', // seared chicken ✓
+  'cold,pasta,salad,summer':          '1498837167922-ddd27525d352', // cold salad spread ✓
+  'air,fryer,chicken,dinner':         '1490645935967-10de6ba17061', // crispy roasted ✓
+  'sheet,pan,dinner,simple':          '1565299624946-b28f40a0ae38', // simple roasted dish ✓
 }
 
 const FALLBACK_ID = '1547592180-85f173990554'

@@ -42,9 +42,7 @@ export default function AboutPage() {
                 priority
               />
             </div>
-            <figcaption className="mt-3 text-sm text-muted-foreground">
-              Dipak &amp; Suprabha with their kids — the family behind MealEase
-            </figcaption>
+
           </figure>
 
           {/* ── Story ── */}

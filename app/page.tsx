@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { PublicSiteHeader } from '@/components/layout/PublicSiteHeader'
 import { PublicSiteFooter } from '@/components/layout/PublicSiteFooter'
+import { FamilyIntelligence } from '@/components/landing/FamilyIntelligence'
 
 // All Unsplash IDs curl-verified 200 before use
 const U = (id: string) =>
@@ -26,7 +27,7 @@ function Hero() {
   const secondaryModes = [
     { label: 'Get inspired',   emoji: '✨', href: '/tonight?mode=inspiration', description: 'AI picks for you' },
     { label: 'Use what I have',emoji: '🥫', href: '/tonight?mode=pantry',      description: 'Snap your fridge' },
-    { label: 'Baby & Kids',    emoji: '👶', href: '/kids',                      description: 'Age-safe meals' },
+    { label: 'Baby & Kids',    emoji: '👶', href: '#family',                     description: 'Age-safe meals' },
     { label: 'Plan my week',   emoji: '📅', href: '/onboarding',               description: 'Full meal planning' },
   ]
 
@@ -571,6 +572,7 @@ export default function LandingPage() {
         <Hero />
         <SocialProof />
         <ProblemSolution />
+        <FamilyIntelligence />
         <Features />
         <Testimonials />
         <TrustBadges />

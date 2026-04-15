@@ -8,9 +8,10 @@ import {
   animate,
   AnimatePresence,
 } from 'framer-motion'
-import { Clock, ChefHat, Users, Heart, RefreshCw, Shuffle, Loader2, ThumbsUp, ThumbsDown, ShieldCheck, Zap, Brain } from 'lucide-react'
+import { Clock, ChefHat, Users, Heart, RefreshCw, Shuffle, Loader2, ThumbsUp, ThumbsDown, ShieldCheck, Zap, Brain, ChevronRight } from 'lucide-react'
 import type { SmartMealRequest, SmartMealResult } from '@/lib/engine/types'
 import { useLearningStore } from '@/lib/learning/store'
+import { MealResultCard } from './MealResultCard'
 
 // ─── Card style map by cuisine ───────────────────────────────────────────────
 
@@ -218,6 +219,7 @@ export function MealSwipeStack({ mode, input }: Props) {
   const [loading, setLoading] = useState(true)
   const [empty, setEmpty] = useState(false)
   const [feedbackFlash, setFeedbackFlash] = useState<'like' | 'reject' | null>(null)
+  const [selectedMeal, setSelectedMeal] = useState<SmartMealResult | null>(null)
   const seenIds = useRef<string[]>([])
   const { recordLike, recordReject, recordSave, getBoosts } = useLearningStore()
 
@@ -390,6 +392,20 @@ export function MealSwipeStack({ mode, input }: Props) {
         ) : null
       })()}
 
+      {/* Cook this — primary CTA */}
+      <motion.button
+        whileTap={{ scale: 0.97 }}
+        onClick={() => setSelectedMeal(topMeal)}
+        className="w-full flex items-center justify-center gap-2 h-14 rounded-2xl text-white font-semibold text-base"
+        style={{
+          background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+          boxShadow: '0 6px 20px rgba(16, 185, 129, 0.30)',
+        }}
+      >
+        Cook this
+        <ChevronRight className="h-4 w-4" />
+      </motion.button>
+
       {/* action bar */}
       <div className="flex items-center justify-center gap-3">
         {/* Reject */}
@@ -450,6 +466,20 @@ export function MealSwipeStack({ mode, input }: Props) {
           Shuffle
         </motion.button>
       </div>
+
+      {/* Meal detail overlay */}
+      <AnimatePresence>
+        {selectedMeal && (
+          <MealResultCard
+            meal={selectedMeal}
+            mode={mode}
+            isSaved={savedIds.has(selectedMeal.id)}
+            onSave={() => toggleSave(selectedMeal.id)}
+            onSwap={() => { setSelectedMeal(null); handleDismiss() }}
+            onClose={() => setSelectedMeal(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   )
 }

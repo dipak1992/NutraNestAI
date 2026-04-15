@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { useOnboardingStore } from '@/lib/store'
+import { useOnboardingStore, useLightOnboardingStore } from '@/lib/store'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -28,7 +28,8 @@ export default function SettingsPage() {
   const router = useRouter()
   const supabase = createClient()
   const { status } = usePaywallStatus()
-  const { householdName, members, cuisinePreferences, maxCookingTime, setHouseholdName, setCuisinePreferences, setMaxCookingTime } = useOnboardingStore()
+  const { state: { householdName, members, cuisinePreferences }, updateState } = useOnboardingStore()
+  const { cookingTimeMinutes, setCookingTimeMinutes } = useLightOnboardingStore()
   const [signingOut, setSigningOut] = useState(false)
   const [nameInput, setNameInput] = useState(householdName)
 
@@ -45,14 +46,14 @@ export default function SettingsPage() {
 
   function saveName() {
     if (nameInput.trim()) {
-      setHouseholdName(nameInput.trim())
+      updateState({ householdName: nameInput.trim() })
       toast.success('Household name updated')
     }
   }
 
   function toggleCuisine(c: string) {
     const current = cuisinePreferences ?? []
-    setCuisinePreferences(current.includes(c) ? current.filter((x) => x !== c) : [...current, c])
+    updateState({ cuisinePreferences: current.includes(c) ? current.filter((x) => x !== c) : [...current, c] })
   }
 
   return (
@@ -138,8 +139,8 @@ export default function SettingsPage() {
               {COOKING_TIME_OPTIONS.map((opt) => (
                 <button
                   key={opt.value}
-                  onClick={() => setMaxCookingTime(opt.value)}
-                  className={`px-4 py-2 rounded-full text-sm transition-colors ${maxCookingTime === opt.value ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80 text-foreground'}`}
+                  onClick={() => setCookingTimeMinutes(opt.value)}
+                  className={`px-4 py-2 rounded-full text-sm transition-colors ${cookingTimeMinutes === opt.value ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80 text-foreground'}`}
                 >
                   {opt.label}
                 </button>

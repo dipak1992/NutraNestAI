@@ -63,10 +63,11 @@ export default function LoginPage() {
     const supabase = createClient()
     const redirectTarget = new URLSearchParams(window.location.search).get('redirect') || '/dashboard'
     // Note: Google provider must be enabled in Supabase dashboard → Authentication → Providers → Google
+    // redirectTo must exactly match an allowed URL in Supabase dashboard (no query params)
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectTarget)}`,
+        redirectTo: `${window.location.origin}/auth/callback`,
       },
     })
     setGoogleLoading(false)

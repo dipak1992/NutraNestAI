@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Badge } from '@/components/ui/badge'
-import { getAllBlogPosts, getBlogPostBySlug } from '@/lib/content/blog'
+import { getAllBlogPosts, getBlogPostBySlug, getRelatedPosts } from '@/lib/content/blog'
 import { absoluteUrl } from '@/lib/seo'
 
 type Props = {
@@ -32,18 +32,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     keywords: post.tags,
     openGraph: {
-      title: post.title,
+      title: post.metaTitle ?? post.title,
       description: post.description,
       type: 'article',
       url: absoluteUrl(`/blog/${post.slug}`),
       siteName: 'MealEase',
       publishedTime: post.publishedAt,
       modifiedTime: post.updatedAt ?? post.publishedAt,
+      images: post.heroImage ? [{ url: post.heroImage, alt: post.heroImageAlt }] : undefined,
     },
     twitter: {
       card: 'summary_large_image',
-      title: post.title,
+      title: post.metaTitle ?? post.title,
       description: post.description,
+      images: post.heroImage ? [post.heroImage] : undefined,
     },
   }
 }
@@ -56,11 +58,14 @@ export default async function BlogPostPage({ params }: Props) {
     notFound()
   }
 
+  const related = getRelatedPosts(post.slug, 3)
+
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
     headline: post.title,
     description: post.description,
+    image: post.heroImage ? [post.heroImage] : undefined,
     datePublished: post.publishedAt,
     dateModified: post.updatedAt ?? post.publishedAt,
     author: {
@@ -110,6 +115,17 @@ export default async function BlogPostPage({ params }: Props) {
               </Badge>
             ))}
           </div>
+          {post.heroImage && (
+            <figure className="mt-8 overflow-hidden rounded-2xl border border-border/60 bg-muted">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={post.heroImage}
+                alt={post.heroImageAlt}
+                className="w-full h-auto object-cover aspect-[16/9]"
+                loading="eager"
+              />
+            </figure>
+          )}
         </header>
 
         <div className="space-y-10">
@@ -146,8 +162,56 @@ export default async function BlogPostPage({ params }: Props) {
           )}
         </div>
 
+        {post.internalLinks && post.internalLinks.length > 0 && (
+          <section className="mt-12">
+            <h2 className="text-xl font-semibold mb-3">Keep reading</h2>
+            <ul className="space-y-2">
+              {post.internalLinks.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className="text-primary hover:underline">
+                    → {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {related.length > 0 && (
+          <section className="mt-12">
+            <h2 className="text-xl font-semibold mb-4">Related articles</h2>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {related.map((r) => (
+                <Link
+                  key={r.slug}
+                  href={`/blog/${r.slug}`}
+                  className="group rounded-2xl border border-border/60 bg-card overflow-hidden hover:border-primary/60 transition-colors"
+                >
+                  {r.heroImage && (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                      src={r.heroImage}
+                      alt={r.heroImageAlt}
+                      className="w-full aspect-[16/9] object-cover"
+                      loading="lazy"
+                    />
+                  )}
+                  <div className="p-4">
+                    <Badge variant="secondary" className="mb-2">
+                      {r.category}
+                    </Badge>
+                    <h3 className="font-semibold leading-snug group-hover:text-primary">
+                      {r.title}
+                    </h3>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
         <footer className="mt-12 border-t border-border/60 pt-6 text-sm text-muted-foreground">
-          Want personalized weekly meals instead of generic advice?{' '}
+          {post.ctaText ?? 'Want personalized weekly meals instead of generic advice?'}{' '}
           <Link href="/signup" className="font-medium text-primary hover:underline">
             Build your plan with MealEase
           </Link>

@@ -24,36 +24,48 @@ export default function BlogIndexPage() {
         </p>
       </div>
 
-      <div className="space-y-5">
+      <div className="grid gap-6 sm:grid-cols-2">
         {posts.map((post) => (
-          <article key={post.slug} className="rounded-2xl border border-border/60 bg-card p-6">
-            <div className="flex flex-wrap items-center gap-2 mb-3">
-              <Badge variant="secondary">{post.category}</Badge>
-              <span className="text-xs text-muted-foreground">
-                {new Date(post.publishedAt).toLocaleDateString('en-US', {
-                  month: 'long',
-                  day: 'numeric',
-                  year: 'numeric',
-                })}
-              </span>
-              <span className="text-xs text-muted-foreground">· {post.readingTime}</span>
-            </div>
-            <h2 className="text-2xl font-semibold mb-2">
-              <Link href={`/blog/${post.slug}`} className="hover:text-primary transition-colors">
-                {post.title}
+          <article
+            key={post.slug}
+            className="rounded-2xl border border-border/60 bg-card overflow-hidden flex flex-col"
+          >
+            {post.heroImage && (
+              <Link href={`/blog/${post.slug}`} className="block">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={post.heroImage}
+                  alt={post.heroImageAlt}
+                  className="w-full aspect-[16/9] object-cover"
+                  loading="lazy"
+                />
               </Link>
-            </h2>
-            <p className="text-muted-foreground leading-relaxed mb-4">{post.excerpt}</p>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {post.tags.map((tag) => (
-                <Badge key={tag} variant="outline">
-                  {tag}
-                </Badge>
-              ))}
+            )}
+            <div className="p-6 flex flex-col flex-1">
+              <div className="flex flex-wrap items-center gap-2 mb-3">
+                <Badge variant="secondary">{post.category}</Badge>
+                <span className="text-xs text-muted-foreground">
+                  {new Date(post.publishedAt).toLocaleDateString('en-US', {
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })}
+                </span>
+                <span className="text-xs text-muted-foreground">· {post.readingTime}</span>
+              </div>
+              <h2 className="text-xl font-semibold mb-2">
+                <Link href={`/blog/${post.slug}`} className="hover:text-primary transition-colors">
+                  {post.title}
+                </Link>
+              </h2>
+              <p className="text-muted-foreground leading-relaxed mb-4 flex-1">{post.excerpt}</p>
+              <Link
+                href={`/blog/${post.slug}`}
+                className="text-sm font-medium text-primary hover:underline"
+              >
+                Read article →
+              </Link>
             </div>
-            <Link href={`/blog/${post.slug}`} className="text-sm font-medium text-primary hover:underline">
-              Read article →
-            </Link>
           </article>
         ))}
       </div>

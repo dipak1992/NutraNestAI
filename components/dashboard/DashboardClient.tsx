@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { ArrowLeft, ChevronRight, Zap, Camera, Sparkles, CalendarDays, BookMarked, FlameKindling } from 'lucide-react'
+import { MealEaseLogo } from '@/components/ui/MealEaseLogo'
 import { MealSwipeStack } from '@/components/dashboard/MealSwipeStack'
 import { SmartInput } from '@/components/dashboard/SmartInput'
 import { DEMO_WEEKLY_PLAN } from '@/lib/demo-data'
@@ -250,9 +251,8 @@ export function DashboardClient({ userName }: Props) {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.15 }}
-                className="text-gradient-sage font-bold text-lg"
               >
-                MealEase
+                <MealEaseLogo size="sm" />
               </motion.span>
             )}
           </AnimatePresence>

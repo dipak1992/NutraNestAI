@@ -22,6 +22,15 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/',
   },
+  icons: {
+    icon: [
+      { url: '/icon', type: 'image/png', sizes: '32x32' },
+    ],
+    apple: [
+      { url: '/apple-icon', type: 'image/png', sizes: '180x180' },
+    ],
+    shortcut: '/icon',
+  },
   openGraph: {
     title: 'MealEase – Make family meals easy',
     description: 'From one idea to a full meal plan for your whole family — in seconds.',

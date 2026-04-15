@@ -8,7 +8,7 @@ import {
   animate,
   AnimatePresence,
 } from 'framer-motion'
-import { Clock, ChefHat, Users, Heart, RefreshCw, Shuffle, Loader2, ThumbsUp, ThumbsDown, ShieldCheck, Zap } from 'lucide-react'
+import { Clock, ChefHat, Users, Heart, RefreshCw, Shuffle, Loader2, ThumbsUp, ThumbsDown, ShieldCheck, Zap, Brain } from 'lucide-react'
 import type { SmartMealRequest, SmartMealResult } from '@/lib/engine/types'
 import { useLearningStore } from '@/lib/learning/store'
 
@@ -173,7 +173,7 @@ function DraggableCard({
 // ─── API helpers ──────────────────────────────────────────────────────────────
 
 function buildRequest(
-  mode: 'ingredients' | 'inspiration' | 'tired',
+  mode: 'ingredients' | 'inspiration' | 'tired' | 'smart',
   input: string,
   excludeIds: string[],
 ): SmartMealRequest {
@@ -207,7 +207,7 @@ async function fetchMeal(req: SmartMealRequest & { learnedBoosts?: unknown }): P
 // ─── Main component ───────────────────────────────────────────────────────────
 
 interface Props {
-  mode: 'ingredients' | 'inspiration' | 'tired'
+  mode: 'ingredients' | 'inspiration' | 'tired' | 'smart'
   input: string
 }
 
@@ -307,16 +307,29 @@ export function MealSwipeStack({ mode, input }: Props) {
   // ─── states ────────────────────────────────────────────────────────────────
 
   if (loading && meals.length === 0) {
-    const messages = [
-      'Finding something easy for tonight…',
-      'Matching meals to your kitchen…',
-      'Picking something the whole family will love…',
-    ]
+    const boosts = getBoosts()
+    const hasLearning = boosts && Object.keys(boosts.cuisineBoost).length > 0
+    const messages = hasLearning
+      ? [
+          'Learning what works for you…',
+          'Matching to your taste preferences…',
+          'Picking meals you\'ll love…',
+        ]
+      : [
+          'Finding something easy for tonight…',
+          'Matching meals to your kitchen…',
+          'Picking something the whole family will love…',
+        ]
     const msg = messages[Math.floor(Date.now() / 3000) % messages.length]
     return (
       <div className="flex flex-col items-center justify-center gap-4 h-[520px]">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
         <p className="text-muted-foreground text-sm">{msg}</p>
+        {hasLearning && (
+          <span className="flex items-center gap-1.5 text-xs text-primary/70 bg-primary/5 border border-primary/10 rounded-full px-3 py-1">
+            <Brain className="h-3 w-3" /> Personalized for you
+          </span>
+        )}
       </div>
     )
   }
@@ -361,12 +374,21 @@ export function MealSwipeStack({ mode, input }: Props) {
         </AnimatePresence>
       </div>
 
-      {/* selection reason */}
+      {/* selection reason + learning badge */}
       {topMeal.meta?.selectionReason && (
         <p className="text-center text-xs text-muted-foreground px-4 leading-relaxed">
           {topMeal.meta.selectionReason}
         </p>
       )}
+      {(() => {
+        const boosts = getBoosts()
+        const hasLearning = boosts && Object.keys(boosts.cuisineBoost).length > 0
+        return hasLearning ? (
+          <p className="text-center text-xs text-primary/60 flex items-center justify-center gap-1 mt-1">
+            <Brain className="h-3 w-3" /> Based on your preferences
+          </p>
+        ) : null
+      })()}
 
       {/* action bar */}
       <div className="flex items-center justify-center gap-3">

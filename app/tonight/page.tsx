@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useEffect, useState, useMemo, useCallback } from 'react'
+import { Suspense, useEffect, useState, useRef, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -8,14 +8,14 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { PaywallDialog } from '@/components/paywall/PaywallDialog'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
+import { useLearningStore } from '@/lib/learning/store'
 import {
   Clock, ChefHat, DollarSign, Users, ShieldCheck, Sparkles, ChevronDown,
   ChevronRight, Lock, Leaf, RefreshCw, ArrowLeft, CheckCircle2, AlertTriangle,
+  Brain,
 } from 'lucide-react'
-import {
-  getRandomTonightMeal, BLURRED_PLAN_PREVIEW,
-  type TonightMeal, type TonightMealVariation,
-} from '@/lib/tonight-meals'
+import { BLURRED_PLAN_PREVIEW } from '@/lib/tonight-meals'
+import type { SmartMealResult } from '@/lib/engine/types'
 
 const TONIGHT_SWIPE_STORAGE_KEY = 'nutrinest-tonight-swipes'
 
@@ -69,9 +69,32 @@ const LOADING_STEPS: Record<'quick' | 'tired' | 'pantry', string[]> = {
   ],
 }
 
-function LoadingPhase({ onComplete, mode }: { onComplete: () => void; mode: 'quick' | 'tired' | 'pantry' }) {
+const LEARNING_LOADING_STEPS: Record<'quick' | 'tired' | 'pantry', string[]> = {
+  quick: [
+    'Checking what you\'ve loved before…',
+    'Matching to your taste preferences…',
+    'Picking a meal you\'ll love…',
+    'Personalized dinner ready! 🧠',
+  ],
+  tired: [
+    'We know what you like — no thinking needed…',
+    'Finding your easiest favorites…',
+    'Almost done. You can relax…',
+    'Your perfect easy dinner! 😴',
+  ],
+  pantry: [
+    'Remembering your flavor preferences…',
+    'Finding a meal you\'ll actually enjoy…',
+    'Making sure it works for everyone…',
+    'Personalized pantry meal ready! 🧠',
+  ],
+}
+
+function LoadingPhase({ onComplete, mode, hasLearning }: { onComplete: () => void; mode: 'quick' | 'tired' | 'pantry'; hasLearning: boolean }) {
   const [step, setStep] = useState(0)
-  const steps = LOADING_STEPS[mode] ?? LOADING_STEPS.quick
+  const steps = hasLearning
+    ? (LEARNING_LOADING_STEPS[mode] ?? LEARNING_LOADING_STEPS.quick)
+    : (LOADING_STEPS[mode] ?? LOADING_STEPS.quick)
 
   useEffect(() => {
     const timers = steps.map((_, i) =>
@@ -125,7 +148,16 @@ function LoadingPhase({ onComplete, mode }: { onComplete: () => void; mode: 'qui
 
 // ── Variation Card ──
 
-function VariationCard({ variation, index }: { variation: TonightMealVariation; index: number }) {
+interface VariationProps {
+  emoji: string
+  label: string
+  title: string
+  modifications: string[]
+  safetyNotes: string[]
+  servingTip: string
+}
+
+function VariationCard({ variation, index }: { variation: VariationProps; index: number }) {
   const [expanded, setExpanded] = useState(false)
 
   return (
@@ -263,14 +295,46 @@ function TonightPageInner() {
   const [loading, setLoading] = useState(true)
   const { status } = usePaywallStatus()
   const [swipesUsed, setSwipesUsed] = useState(0)
-  const [mealRefreshKey, setMealRefreshKey] = useState(0)
   const [paywallOpen, setPaywallOpen] = useState(false)
+  const [meal, setMeal] = useState<SmartMealResult | null>(null)
+  const seenIdsRef = useRef<string[]>([])
+  const { getBoosts } = useLearningStore()
+  const hasLearning = !!getBoosts()?.cuisineBoost && Object.keys(getBoosts()?.cuisineBoost ?? {}).length > 0
 
   useEffect(() => {
     setSwipesUsed(readSwipeCount())
   }, [])
 
-  const meal = useMemo(() => getRandomTonightMeal(mode), [mode, mealRefreshKey])
+  const fetchMeal = useCallback(async () => {
+    setLoading(true)
+    try {
+      const boosts = getBoosts()
+      const body = {
+        household: { adultsCount: 2, kidsCount: 1, toddlersCount: 0, babiesCount: 0 },
+        lowEnergy: mode === 'tired',
+        maxCookTime: mode === 'quick' ? 30 : mode === 'tired' ? 20 : undefined,
+        excludeIds: seenIdsRef.current,
+        ...(boosts ? { learnedBoosts: boosts } : {}),
+      }
+      const res = await fetch('/api/smart-meal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+      if (res.ok) {
+        const data = await res.json() as SmartMealResult
+        setMeal(data)
+        seenIdsRef.current = [...seenIdsRef.current, data.id]
+      }
+    } catch {
+      // Silently fail — loading will complete and show empty state
+    }
+  }, [mode, getBoosts])
+
+  // Fetch on mount and mode change
+  useEffect(() => {
+    fetchMeal()
+  }, [mode]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const modeLabels: Record<string, { title: string; emoji: string; tagline: string; badgeClass: string }> = {
     quick: { title: 'Quick Pick', emoji: '✨', tagline: 'A great dinner idea, ready in seconds', badgeClass: '' },
@@ -282,7 +346,7 @@ function TonightPageInner() {
 
   const handleAnotherMeal = useCallback(() => {
     if (status.isPro) {
-      setMealRefreshKey((current) => current + 1)
+      fetchMeal()
       return
     }
 
@@ -294,8 +358,8 @@ function TonightPageInner() {
 
     writeSwipeCount(nextSwipeCount)
     setSwipesUsed(nextSwipeCount)
-    setMealRefreshKey((current) => current + 1)
-  }, [status.freeTonightSwipeLimit, status.isPro, swipesUsed])
+    fetchMeal()
+  }, [status.freeTonightSwipeLimit, status.isPro, swipesUsed, fetchMeal])
 
   const swipesRemaining = status.isPro
     ? null
@@ -324,8 +388,8 @@ function TonightPageInner() {
       <main className="mx-auto max-w-3xl px-4 py-8 sm:py-12">
         <AnimatePresence mode="wait">
           {loading ? (
-            <LoadingPhase key="loading" onComplete={() => setLoading(false)} mode={mode} />
-          ) : (
+            <LoadingPhase key="loading" onComplete={() => setLoading(false)} mode={mode} hasLearning={hasLearning} />
+          ) : meal ? (
             <motion.div
               key="result"
               initial={{ opacity: 0 }}
@@ -341,6 +405,11 @@ function TonightPageInner() {
                 <Badge variant="outline" className={`mb-3 ${currentMode.badgeClass}`}>
                   {currentMode.emoji} {currentMode.title}
                 </Badge>
+                {hasLearning && (
+                  <Badge variant="outline" className="mb-3 ml-2 border-purple-300 text-purple-700 bg-purple-50">
+                    <Brain className="mr-1 h-3 w-3" /> Based on your preferences
+                  </Badge>
+                )}
                 <p className="text-xs text-muted-foreground mb-3">{currentMode.tagline}</p>
                 <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-2">
                   {meal.title}
@@ -515,6 +584,18 @@ function TonightPageInner() {
                 </Button>
                 <p className="mt-2 text-xs text-muted-foreground">Free plan · No credit card required</p>
               </motion.div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="error"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="min-h-[50vh] flex flex-col items-center justify-center text-center px-4"
+            >
+              <p className="text-muted-foreground mb-4">Couldn&apos;t load a meal right now. Please try again.</p>
+              <Button variant="outline" size="sm" onClick={() => fetchMeal()} className="gap-2">
+                <RefreshCw className="h-3.5 w-3.5" /> Try again
+              </Button>
             </motion.div>
           )}
         </AnimatePresence>

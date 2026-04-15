@@ -16,7 +16,7 @@ import { StreakBadge } from '@/components/habit/StreakBadge'
 const DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 const DAY_ABBR  = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
-type SituationMode = 'ingredients' | 'inspiration' | 'tired' | null
+type SituationMode = 'ingredients' | 'inspiration' | 'tired' | 'smart' | null
 
 const SITUATIONS: {
   id: Exclude<SituationMode, null>
@@ -32,7 +32,7 @@ const SITUATIONS: {
     id: 'tired',
     emoji: '😴',
     label: "I don't want to think",
-    hint: 'Instant picks, no decisions',
+    hint: 'Instant low-effort picks, zero decisions',
     color: 'border-violet-300 text-violet-800',
     bgHover: 'hover:bg-violet-50',
     featured: true,
@@ -40,20 +40,28 @@ const SITUATIONS: {
   {
     id: 'ingredients',
     emoji: '🥫',
-    label: 'I have ingredients',
-    hint: 'Tell me what you have',
+    label: 'Use what I have',
+    hint: 'Snap a photo or list your ingredients',
     color: 'border-emerald-300 text-emerald-800',
     bgHover: 'hover:bg-emerald-50',
     inputPlaceholder: 'e.g. chicken, broccoli, garlic, pasta…',
   },
   {
     id: 'inspiration',
-    emoji: '📸',
-    label: 'I saw a meal I like',
-    hint: "Describe it, I'll match it",
+    emoji: '✨',
+    label: 'Get inspired',
+    hint: 'Inspired by your taste & what you love',
     color: 'border-sky-300 text-sky-800',
     bgHover: 'hover:bg-sky-50',
-    inputPlaceholder: 'e.g. creamy pasta with mushrooms…',
+    inputPlaceholder: 'e.g. creamy pasta with mushrooms… or upload a photo',
+  },
+  {
+    id: 'smart',
+    emoji: '🧠',
+    label: 'Smart for you',
+    hint: 'Personalized picks based on your patterns',
+    color: 'border-amber-300 text-amber-800',
+    bgHover: 'hover:bg-amber-50',
   },
 ]
 
@@ -128,8 +136,8 @@ export function DashboardClient({ userName }: Props) {
     setMode(id)
     setInput('')
     setSubmitted(false)
-    // tired mode — skip input step
-    if (id === 'tired') setSubmitted(true)
+    // tired & smart modes — skip input step
+    if (id === 'tired' || id === 'smart') setSubmitted(true)
   }
 
   function handleBack() {
@@ -288,15 +296,15 @@ export function DashboardClient({ userName }: Props) {
             >
               <div className="mb-5">
                 <h2 className="text-lg font-bold text-foreground leading-snug">
-                  {activeMode?.emoji} {mode === 'tired' ? 'Here\u2019s something easy' : 'Your matches'}
+                  {activeMode?.emoji} {mode === 'tired' ? 'Here\u2019s something easy' : mode === 'smart' ? 'Picked for you' : 'Your matches'}
                 </h2>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Swipe to replace · Save what you love
+                  {mode === 'smart' ? 'Based on your taste · Swipe to explore' : 'Swipe to replace · Save what you love'}
                 </p>
               </div>
 
               <MealSwipeStack
-                mode={mode as 'ingredients' | 'inspiration' | 'tired'}
+                mode={mode as 'ingredients' | 'inspiration' | 'tired' | 'smart'}
                 input={input}
               />
             </motion.div>

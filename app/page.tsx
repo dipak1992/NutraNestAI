@@ -7,7 +7,7 @@ import { PublicSiteFooter } from '@/components/layout/PublicSiteFooter'
 
 function Hero() {
   const secondaryModes = [
-    { label: 'Just show me', emoji: '✨', href: '/tonight?mode=quick', description: 'No input needed' },
+    { label: 'Get inspired', emoji: '✨', href: '/tonight?mode=quick', description: 'AI picks for you' },
     { label: 'Use what I have', emoji: '🥫', href: '/tonight?mode=pantry', description: 'Pantry staples' },
     { label: 'Plan my week', emoji: '📅', href: '/onboarding', description: 'Full meal planning' },
   ]

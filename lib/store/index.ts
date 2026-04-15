@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { AIGeneratedPlan, HouseholdMember, OnboardingState } from '@/types'
+import type { AIGeneratedPlan, HouseholdMember, OnboardingState, KidsAgeGroup } from '@/types'
 
 // ─── Planner Store ────────────────────────────────────────────────────────────
 
@@ -122,6 +122,7 @@ export type HouseholdType = 'solo' | 'couple' | 'family'
 export interface LightOnboardingData {
   householdType: HouseholdType | null
   hasKids: boolean | null
+  kidsAgeGroup: KidsAgeGroup | null
   pickyEater: boolean
   cuisines: string[]
   dislikedFoods: string[]
@@ -135,6 +136,7 @@ export interface LightOnboardingData {
 type LightOnboardingStore = LightOnboardingData & {
   setHouseholdType: (type: HouseholdType | null) => void
   setHasKids: (hasKids: boolean | null) => void
+  setKidsAgeGroup: (v: KidsAgeGroup | null) => void
   setPickyEater: (v: boolean) => void
   setCuisines: (v: string[]) => void
   setDislikedFoods: (v: string[]) => void
@@ -149,6 +151,7 @@ type LightOnboardingStore = LightOnboardingData & {
 const initialLightOnboarding: LightOnboardingData = {
   householdType: null,
   hasKids: null,
+  kidsAgeGroup: null,
   pickyEater: false,
   cuisines: [],
   dislikedFoods: [],
@@ -165,6 +168,7 @@ export const useLightOnboardingStore = create<LightOnboardingStore>()(
       ...initialLightOnboarding,
       setHouseholdType: (householdType) => set({ householdType }),
       setHasKids: (hasKids) => set({ hasKids }),
+      setKidsAgeGroup: (kidsAgeGroup) => set({ kidsAgeGroup }),
       setPickyEater: (pickyEater) => set({ pickyEater }),
       setCuisines: (cuisines) => set({ cuisines }),
       setDislikedFoods: (dislikedFoods) => set({ dislikedFoods }),

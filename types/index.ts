@@ -450,3 +450,82 @@ export interface RegenerateModifier {
   icon: string;
   category: 'speed' | 'diet' | 'family' | 'budget' | 'method';
 }
+
+// ============================================================
+// Goals & Smart Features
+// ============================================================
+
+export type UserGoal =
+  | 'weight_loss'
+  | 'muscle_gain'
+  | 'budget'
+  | 'family'
+  | 'lazy';
+
+export const USER_GOAL_META: Record<UserGoal, { label: string; emoji: string; hint: string }> = {
+  weight_loss:  { label: 'Weight loss',  emoji: '🏃', hint: 'Lower calorie, balanced meals' },
+  muscle_gain:  { label: 'Muscle gain',  emoji: '💪', hint: 'High protein, nutrient-dense' },
+  budget:       { label: 'Budget',       emoji: '💰', hint: 'Max flavor, minimum spend' },
+  family:       { label: 'Family',       emoji: '👨‍👩‍👧‍👦', hint: 'Everyone eats the same base meal' },
+  lazy:         { label: 'Lazy mode',    emoji: '🛋️', hint: '5-ingredient, one-pot, zero effort' },
+};
+
+export type SmartChipId =
+  | 'too_expensive'
+  | 'too_much_cooking'
+  | 'more_protein'
+  | 'kid_friendly'
+  | 'less_spicy'
+  | 'easier_texture'
+  | 'picky_safe'
+  | 'faster';
+
+export interface SmartChip {
+  id: SmartChipId;
+  label: string;
+  emoji: string;
+  /** Only show when household has kids */
+  familyOnly?: boolean;
+}
+
+export const SMART_CHIPS: SmartChip[] = [
+  { id: 'too_expensive',     label: 'Too expensive',     emoji: '💸' },
+  { id: 'too_much_cooking',  label: 'Too much cooking',  emoji: '😩' },
+  { id: 'more_protein',      label: 'More protein',      emoji: '🥩' },
+  { id: 'kid_friendly',      label: 'Kid-friendly',      emoji: '🧒' },
+  { id: 'less_spicy',        label: 'Less spicy',        emoji: '🌶️', familyOnly: true },
+  { id: 'easier_texture',    label: 'Easier to eat',     emoji: '🥄', familyOnly: true },
+  { id: 'picky_safe',        label: 'Picky-eater safe',  emoji: '🛡️', familyOnly: true },
+  { id: 'faster',            label: 'Faster',            emoji: '⏱️' },
+];
+
+// ============================================================
+// Meal Badges — auto-computed from meal + household context
+// ============================================================
+
+export type MealBadgeId =
+  | 'kid_friendly'
+  | 'mild'
+  | 'easy_to_eat'
+  | 'family_tested'
+  | 'picky_approved'
+  | 'quick_win';
+
+export interface MealBadge {
+  id: MealBadgeId;
+  label: string;
+  emoji: string;
+}
+
+export type KidsAgeGroup = 'baby' | 'toddler' | 'mixed' | 'school_age';
+
+export interface ShareableCard {
+  title: string;
+  subtitle: string;
+  mealTitle: string;
+  cuisineEmoji: string;
+  totalTime: number;
+  difficulty: string;
+  servings: number;
+  gradient: string;
+}

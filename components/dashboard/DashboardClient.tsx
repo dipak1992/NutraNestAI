@@ -3,70 +3,55 @@
 import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
-import { ArrowLeft, ChevronRight, Zap, Camera, Sparkles, CalendarDays, BookMarked, FlameKindling, Baby } from 'lucide-react'
+import { ArrowLeft, Zap, Sparkles, CalendarDays, FlameKindling, ChevronRight, BookMarked } from 'lucide-react'
 import { MealSwipeStack } from '@/components/dashboard/MealSwipeStack'
 import { SmartInput } from '@/components/dashboard/SmartInput'
-import { DEMO_WEEKLY_PLAN } from '@/lib/demo-data'
+import { QuickSuggestion } from '@/components/dashboard/QuickSuggestion'
+import { MilestoneBanner } from '@/components/dashboard/MilestoneBanner'
+import { StreakBadge } from '@/components/habit/StreakBadge'
 import { TodayCard } from '@/components/habit/TodayCard'
 import { InsightCards } from '@/components/habit/InsightCards'
-import { StreakBadge } from '@/components/habit/StreakBadge'
-import { MilestoneBanner } from '@/components/dashboard/MilestoneBanner'
 import { useOnboardingStore, useLightOnboardingStore } from '@/lib/store'
 import { useLearningStore } from '@/lib/learning/store'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
+import { DEMO_WEEKLY_PLAN } from '@/lib/demo-data'
 import type { LifeStage } from '@/types'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-const DAY_ABBR  = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-
-type SituationMode = 'ingredients' | 'inspiration' | 'tired' | 'smart' | null
+type SituationMode = 'tired' | 'ingredients' | 'smart' | 'planner' | null
 
 const SITUATIONS: {
   id: Exclude<SituationMode, null>
   emoji: string
   label: string
   hint: string
-  color: string
-  bgHover: string
-  featured?: boolean
   inputPlaceholder?: string
 }[] = [
   {
     id: 'tired',
-    emoji: '😴',
+    emoji: '⚡',
     label: "I don't want to think",
-    hint: 'Instant low-effort picks, zero decisions',
-    color: 'border-violet-300 text-violet-800',
-    bgHover: 'hover:bg-violet-50',
-    featured: true,
+    hint: 'One tap — dinner decided',
   },
   {
     id: 'ingredients',
     emoji: '🥫',
     label: 'Use what I have',
-    hint: 'Snap a photo or list your ingredients',
-    color: 'border-emerald-300 text-emerald-800',
-    bgHover: 'hover:bg-emerald-50',
+    hint: 'Snap your fridge or list ingredients',
     inputPlaceholder: 'e.g. chicken, broccoli, garlic, pasta…',
   },
   {
-    id: 'inspiration',
+    id: 'smart',
     emoji: '✨',
-    label: 'Get inspired',
-    hint: 'Inspired by your taste & what you love',
-    color: 'border-sky-300 text-sky-800',
-    bgHover: 'hover:bg-sky-50',
-    inputPlaceholder: 'e.g. creamy pasta with mushrooms… or upload a photo',
+    label: 'Surprise me',
+    hint: 'Something you\u2019ll love, picked just for you',
   },
   {
-    id: 'smart',
-    emoji: '🧠',
-    label: 'Smart for you',
-    hint: 'Personalized picks based on your patterns',
-    color: 'border-amber-300 text-amber-800',
-    bgHover: 'hover:bg-amber-50',
+    id: 'planner',
+    emoji: '📅',
+    label: 'Plan my week',
+    hint: '7 dinners, zero repeats',
   },
 ]
 
@@ -84,79 +69,6 @@ function stageToEmoji(stage: LifeStage): string {
   if (stage === 'toddler') return '🧒'
   if (stage === 'kid')    return '👦'
   return '🧑'
-}
-
-// ─── Week strip ───────────────────────────────────────────────────────────────
-
-function WeekStrip() {
-  const todayIdx = (new Date().getDay() + 6) % 7 // Mon=0 … Sun=6
-  const days = DEMO_WEEKLY_PLAN.days
-
-  const unplannedAfterToday = DAY_ABBR.slice(todayIdx + 1).filter((_, i) => {
-    const day = days[todayIdx + 1 + i]
-    return !day?.meals?.length
-  }).length
-
-  return (
-    <div className="mt-8">
-      <div className="flex items-center justify-between mb-3 px-1">
-        <h3 className="text-sm font-semibold text-foreground">This Week</h3>
-        <Link href="/planner" className="text-xs text-primary flex items-center gap-0.5 hover:underline">
-          Full plan <ChevronRight className="h-3 w-3" />
-        </Link>
-      </div>
-
-      {unplannedAfterToday >= 3 && (
-        <div className="flex items-center gap-2 mb-3 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">
-          <span className="text-amber-500 text-sm">📅</span>
-          <p className="text-xs text-amber-800 font-medium">
-            {unplannedAfterToday} days this week still need dinners.{' '}
-            <Link href="/planner" className="underline underline-offset-2">Plan ahead →</Link>
-          </p>
-        </div>
-      )}
-
-      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
-        {DAY_ABBR.map((abbr, i) => {
-          const day = days[i]
-          const isToday = i === todayIdx
-          const isPast = i < todayIdx
-          const hasMeal = !!(day?.meals?.length)
-          const mealName = day?.meals?.[0]?.title ?? '—'
-
-          // Status dot color
-          let dotClass = 'bg-border' // unplanned future
-          if (isPast && hasMeal) dotClass = 'bg-emerald-400'
-          else if (isPast && !hasMeal) dotClass = 'bg-muted-foreground/30'
-          else if (isToday) dotClass = 'bg-primary'
-          else if (hasMeal) dotClass = 'bg-sky-400'
-
-          return (
-            <Link
-              key={i}
-              href="/planner"
-              className={`flex-shrink-0 flex flex-col items-center gap-1 px-3 py-2.5 rounded-xl border text-center min-w-[72px] transition-colors ${
-                isToday
-                  ? 'bg-primary/10 border-primary/30 text-primary'
-                  : isPast
-                  ? 'bg-muted/40 border-border/40 text-muted-foreground/60'
-                  : 'bg-background border-border text-muted-foreground hover:bg-muted'
-              }`}
-            >
-              <span className="text-[11px] font-semibold uppercase tracking-wide">{abbr}</span>
-              <span
-                className={`text-[11px] leading-tight w-full truncate ${isToday ? 'text-primary/90 font-medium' : ''}`}
-                title={DAY_NAMES[i]}
-              >
-                {mealName.length > 12 ? mealName.slice(0, 11) + '…' : mealName}
-              </span>
-              <span className={`w-1.5 h-1.5 rounded-full mt-0.5 ${dotClass}`} />
-            </Link>
-          )
-        })}
-      </div>
-    </div>
-  )
 }
 
 // ─── Main component ───────────────────────────────────────────────────────────
@@ -353,7 +265,7 @@ export function DashboardClient({ userName }: Props) {
 
                 <motion.button
                   whileTap={{ scale: 0.96 }}
-                  onClick={() => selectMode('inspiration')}
+                  onClick={() => selectMode('smart')}
                   className="glass-card rounded-xl p-4 border border-border/60 hover:border-primary/40 hover:shadow-md transition-all group text-center"
                 >
                   <span className="text-2xl block mb-1.5">✨</span>
@@ -452,8 +364,6 @@ export function DashboardClient({ userName }: Props) {
                 <TodayCard />
                 <InsightCards />
               </div>
-
-              <WeekStrip />
 
               {/* Bottom CTA */}
               <div className="mt-8 rounded-2xl overflow-hidden border border-border/60">

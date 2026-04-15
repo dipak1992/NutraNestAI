@@ -21,6 +21,7 @@ interface LearningActions {
   recordLike: (meal: SmartMealResult) => void
   recordReject: (meal: SmartMealResult) => void
   recordSave: (meal: SmartMealResult) => void
+  recordChipSwap: (meal: SmartMealResult, chipId: string) => void
   getSignal: () => PreferenceSignal | null
   getBoosts: () => LearnedBoosts | null
   clearHistory: () => void
@@ -28,7 +29,8 @@ interface LearningActions {
 
 type LearningStore = LearningState & LearningActions
 
-function mealToFeedback(meal: SmartMealResult, action: 'like' | 'reject' | 'save'): MealFeedback {
+function mealToFeedback(meal: SmartMealResult, action: 'like' | 'reject' | 'save', chipUsed?: string, hadKidsPresent?: boolean): MealFeedback {
+  const now = new Date()
   return {
     mealId: meal.id,
     title: meal.title,
@@ -41,6 +43,10 @@ function mealToFeedback(meal: SmartMealResult, action: 'like' | 'reject' | 'save
     totalTime: meal.totalTime,
     action,
     timestamp: Date.now(),
+    hourOfDay: now.getHours(),
+    dayOfWeek: now.getDay(),
+    chipUsed,
+    hadKidsPresent,
   }
 }
 
@@ -75,6 +81,14 @@ export const useLearningStore = create<LearningStore>()(
 
       recordSave: (meal) => {
         const fb = mealToFeedback(meal, 'save')
+        set(s => {
+          const history = [...s.feedbackHistory, fb].slice(-MAX_HISTORY)
+          return { feedbackHistory: history, ...recompute(history) }
+        })
+      },
+
+      recordChipSwap: (meal, chipId) => {
+        const fb = mealToFeedback(meal, 'reject', chipId)
         set(s => {
           const history = [...s.feedbackHistory, fb].slice(-MAX_HISTORY)
           return { feedbackHistory: history, ...recompute(history) }

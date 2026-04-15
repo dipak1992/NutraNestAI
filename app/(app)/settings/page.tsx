@@ -29,7 +29,7 @@ export default function SettingsPage() {
   const supabase = createClient()
   const { status } = usePaywallStatus()
   const { state: { householdName, members, cuisinePreferences }, updateState } = useOnboardingStore()
-  const { cookingTimeMinutes, setCookingTimeMinutes } = useLightOnboardingStore()
+  const { cookingTimeMinutes, setCookingTimeMinutes, hasKids, kidsAgeGroup, setKidsAgeGroup } = useLightOnboardingStore()
   const [signingOut, setSigningOut] = useState(false)
   const [nameInput, setNameInput] = useState(householdName)
 
@@ -112,6 +112,33 @@ export default function SettingsPage() {
               Edit Members in Onboarding
             </Button>
           </div>
+
+          {hasKids && (
+            <div className="glass-card rounded-xl border border-border/60 p-5 space-y-3">
+              <h2 className="font-semibold text-sm">Kids Age Group</h2>
+              <p className="text-xs text-muted-foreground">Helps us suggest meals that match your children&apos;s eating stage.</p>
+              <div className="flex flex-wrap gap-2">
+                {([
+                  { value: 'baby', label: '🍼 Baby', desc: '< 1 yr' },
+                  { value: 'toddler', label: '🥄 Toddler', desc: '1–3 yr' },
+                  { value: 'school_age', label: '🎒 School Age', desc: '4+ yr' },
+                  { value: 'mixed', label: '👨‍👩‍👧‍👦 Mixed ages', desc: '' },
+                ] as const).map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setKidsAgeGroup(kidsAgeGroup === opt.value ? null : opt.value)}
+                    className={`px-3 py-1.5 rounded-full text-xs transition-colors ${
+                      kidsAgeGroup === opt.value
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-muted hover:bg-muted/80 text-foreground'
+                    }`}
+                  >
+                    {opt.label}{opt.desc ? ` (${opt.desc})` : ''}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="preferences" className="space-y-6">

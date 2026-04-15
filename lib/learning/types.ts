@@ -13,6 +13,14 @@ export interface MealFeedback {
   totalTime: number
   action: 'like' | 'reject' | 'save'
   timestamp: number
+  /** Hour of day (0-23) when feedback was given */
+  hourOfDay?: number
+  /** Day of week (0=Sun, 6=Sat) */
+  dayOfWeek?: number
+  /** Smart chip that triggered this swap, if any */
+  chipUsed?: string
+  /** Whether kids were present in the household when this meal was rated */
+  hadKidsPresent?: boolean
 }
 
 /** Aggregated preference signal derived from feedback history */
@@ -31,6 +39,11 @@ export interface PreferenceSignal {
   preferredDifficulty: 'easy' | 'moderate' | 'hard' | null
   preferredTimeRange: { min: number; max: number } | null
   pickyScore: number // 0-1, higher = pickier (lots of rejects)
+
+  // Time-context patterns
+  weekdayAvgTime: number | null   // avg cook time liked on Mon-Fri
+  weekendAvgTime: number | null   // avg cook time liked on Sat-Sun
+  chipSignals: Record<string, number> // chip id → frequency count
 
   // Metadata
   totalInteractions: number

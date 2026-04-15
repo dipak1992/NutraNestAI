@@ -31,11 +31,16 @@ const W = {
   BUDGET_OVER: -15,
   TIME_OVER: -40,
   PROTEIN: 15,
-  KID_FRIENDLY: 2,
+  KID_FRIENDLY: 5,
   PICKY_DISLIKED: -25,
   HOUSEHOLD_FIT: 10,
   ALLERGEN: -10000,
   DIETARY: -10000,
+  // Family intelligence weights
+  SPICY_PENALTY: -18,        // penalise spicy meals when kids present
+  COMPLEX_PENALTY: -10,      // penalise hard meals when toddlers/babies present
+  SIMPLE_TEXTURE_BONUS: 8,   // bonus for easy-texture meals with young kids
+  REPEAT_FRIENDLY: 6,        // bonus for meals previously liked with kids present
 }
 
 // ── Allergen → Ingredient Terms ─────────────────────────────
@@ -229,8 +234,35 @@ export function generateSmartMeal(
     }
 
     // Kid-friendliness (when kids/toddlers present)
-    if (request.household.kidsCount + request.household.toddlersCount > 0) {
+    const hasYoungKids = request.household.kidsCount + request.household.toddlersCount > 0
+    const hasVeryYoung = request.household.toddlersCount + request.household.babiesCount > 0
+    if (hasYoungKids) {
       score += meal.kidFriendlyScore * W.KID_FRIENDLY
+      if (meal.kidFriendlyScore >= 8) reasons.push('Kid-friendly favourite')
+
+      // Penalise spicy / heat-heavy meals
+      const isSpicy = meal.tags.some(t =>
+        t === 'spicy' || t === 'hot' || t === 'thai-spicy' || t === 'cajun'
+      ) || meal.ingredients.some(i => {
+        const n = i.name.toLowerCase()
+        return n.includes('chili') || n.includes('jalapeño') || n.includes('sriracha') ||
+               n.includes('cayenne') || n.includes('hot sauce') || n.includes('habanero')
+      })
+      if (isSpicy) {
+        score += W.SPICY_PENALTY
+        reasons.push('Reduced — spicy ingredients with kids')
+      }
+
+      // Penalise complex meals when very young kids present
+      if (hasVeryYoung && meal.difficulty === 'hard') {
+        score += W.COMPLEX_PENALTY
+      }
+
+      // Bonus for simple-texture, easy meals with young kids
+      if (hasVeryYoung && meal.difficulty === 'easy' && meal.kidFriendlyScore >= 7) {
+        score += W.SIMPLE_TEXTURE_BONUS
+        reasons.push('Easy texture for little ones')
+      }
     }
 
     // Picky eater penalty

@@ -109,6 +109,22 @@ export function computePreferenceSignal(history: MealFeedback[]): PreferenceSign
   // Picky score = reject ratio
   const pickyScore = total > 0 ? rejects.length / total : 0
 
+  // Time-context: weekday vs weekend cooking-time preferences
+  const weekdayLikes = likes.filter(f => f.dayOfWeek != null && f.dayOfWeek >= 1 && f.dayOfWeek <= 5)
+  const weekendLikes = likes.filter(f => f.dayOfWeek != null && (f.dayOfWeek === 0 || f.dayOfWeek === 6))
+  const weekdayAvgTime = weekdayLikes.length >= 2
+    ? Math.round(weekdayLikes.reduce((s, f) => s + f.totalTime, 0) / weekdayLikes.length)
+    : null
+  const weekendAvgTime = weekendLikes.length >= 2
+    ? Math.round(weekendLikes.reduce((s, f) => s + f.totalTime, 0) / weekendLikes.length)
+    : null
+
+  // Chip signals: count how often each chip is used
+  const chipSignals: Record<string, number> = {}
+  for (const f of recent) {
+    if (f.chipUsed) chipSignals[f.chipUsed] = (chipSignals[f.chipUsed] ?? 0) + 1
+  }
+
   return {
     cuisineAffinities,
     proteinAffinities,
@@ -119,6 +135,9 @@ export function computePreferenceSignal(history: MealFeedback[]): PreferenceSign
     preferredDifficulty,
     preferredTimeRange,
     pickyScore,
+    weekdayAvgTime,
+    weekendAvgTime,
+    chipSignals,
     totalInteractions: total,
     lastUpdated: Date.now(),
   }

@@ -15,6 +15,7 @@ import {
   Brain,
 } from 'lucide-react'
 import { BLURRED_PLAN_PREVIEW } from '@/lib/tonight-meals'
+import { SmartInput } from '@/components/dashboard/SmartInput'
 import type { SmartMealResult } from '@/lib/engine/types'
 
 const TONIGHT_SWIPE_STORAGE_KEY = 'nutrinest-tonight-swipes'
@@ -48,7 +49,7 @@ function writeSwipeCount(count: number) {
 
 // ── Shimmer Loading Phase ──
 
-const LOADING_STEPS: Record<'quick' | 'tired' | 'pantry', string[]> = {
+const LOADING_STEPS: Record<string, string[]> = {
   quick: [
     'Finding something great for tonight…',
     'Personalizing it for your family…',
@@ -62,14 +63,26 @@ const LOADING_STEPS: Record<'quick' | 'tired' | 'pantry', string[]> = {
     'Here\'s your effortless dinner! 😴',
   ],
   pantry: [
-    'Checking what works with pantry staples…',
+    'Checking what works with your ingredients…',
     'Finding a meal from what you have…',
     'Making sure it works for the whole family…',
     'Found the perfect use for your ingredients! 🥫',
   ],
+  smart: [
+    'Learning what works for you…',
+    'Analyzing your taste patterns…',
+    'Picking a meal you\'ll love…',
+    'Your personalized dinner is ready! 🧠',
+  ],
+  inspiration: [
+    'Exploring flavors and ideas…',
+    'Finding something exciting for tonight…',
+    'Adding creative touches…',
+    'Here\'s your inspired dinner! ✨',
+  ],
 }
 
-const LEARNING_LOADING_STEPS: Record<'quick' | 'tired' | 'pantry', string[]> = {
+const LEARNING_LOADING_STEPS: Record<string, string[]> = {
   quick: [
     'Checking what you\'ve loved before…',
     'Matching to your taste preferences…',
@@ -88,9 +101,21 @@ const LEARNING_LOADING_STEPS: Record<'quick' | 'tired' | 'pantry', string[]> = {
     'Making sure it works for everyone…',
     'Personalized pantry meal ready! 🧠',
   ],
+  smart: [
+    'Reviewing your meal history…',
+    'Matching to your favorite cuisines…',
+    'Personalizing just for you…',
+    'Your smart dinner pick is ready! 🧠',
+  ],
+  inspiration: [
+    'Blending your favorites with new ideas…',
+    'Finding something exciting you\'ll love…',
+    'Adding your preferred flavors…',
+    'Inspired & personalized! ✨🧠',
+  ],
 }
 
-function LoadingPhase({ onComplete, mode, hasLearning }: { onComplete: () => void; mode: 'quick' | 'tired' | 'pantry'; hasLearning: boolean }) {
+function LoadingPhase({ onComplete, mode, hasLearning }: { onComplete: () => void; mode: string; hasLearning: boolean }) {
   const [step, setStep] = useState(0)
   const steps = hasLearning
     ? (LEARNING_LOADING_STEPS[mode] ?? LEARNING_LOADING_STEPS.quick)
@@ -291,8 +316,11 @@ function BlurredPlanPreview() {
 
 function TonightPageInner() {
   const searchParams = useSearchParams()
-  const mode = (searchParams.get('mode') as 'quick' | 'tired' | 'pantry') || 'quick'
-  const [loading, setLoading] = useState(true)
+  const mode = (searchParams.get('mode') as 'quick' | 'tired' | 'pantry' | 'smart' | 'inspiration') || 'quick'
+  const needsInput = mode === 'pantry' || mode === 'inspiration'
+  const [loading, setLoading] = useState(!needsInput)
+  const [userInput, setUserInput] = useState('')
+  const [inputSubmitted, setInputSubmitted] = useState(false)
   const { status } = usePaywallStatus()
   const [swipesUsed, setSwipesUsed] = useState(0)
   const [paywallOpen, setPaywallOpen] = useState(false)
@@ -302,19 +330,33 @@ function TonightPageInner() {
   const hasLearning = !!getBoosts()?.cuisineBoost && Object.keys(getBoosts()?.cuisineBoost ?? {}).length > 0
 
   useEffect(() => {
+    // Restore seen IDs from session storage for variety across navigations
+    try {
+      const stored = sessionStorage.getItem('tonight-seen-ids')
+      if (stored) seenIdsRef.current = JSON.parse(stored)
+    } catch {}
     setSwipesUsed(readSwipeCount())
   }, [])
 
-  const fetchMeal = useCallback(async () => {
+  const fetchMeal = useCallback(async (ingredientText?: string) => {
     setLoading(true)
     try {
       const boosts = getBoosts()
-      const body = {
+      const body: Record<string, unknown> = {
         household: { adultsCount: 2, kidsCount: 1, toddlersCount: 0, babiesCount: 0 },
         lowEnergy: mode === 'tired',
         maxCookTime: mode === 'quick' ? 30 : mode === 'tired' ? 20 : undefined,
         excludeIds: seenIdsRef.current,
         ...(boosts ? { learnedBoosts: boosts } : {}),
+      }
+      if (mode === 'smart' && boosts) {
+        body.prioritizeLearning = true
+      }
+      if (mode === 'pantry' && ingredientText) {
+        body.pantryItems = ingredientText.split(',').map((s: string) => s.trim()).filter(Boolean)
+      }
+      if (mode === 'inspiration' && ingredientText) {
+        body.inspirationMeal = ingredientText
       }
       const res = await fetch('/api/smart-meal', {
         method: 'POST',
@@ -325,28 +367,39 @@ function TonightPageInner() {
         const data = await res.json() as SmartMealResult
         setMeal(data)
         seenIdsRef.current = [...seenIdsRef.current, data.id]
+        try { sessionStorage.setItem('tonight-seen-ids', JSON.stringify(seenIdsRef.current)) } catch {}
       }
     } catch {
       // Silently fail — loading will complete and show empty state
     }
   }, [mode, getBoosts])
 
-  // Fetch on mount and mode change
+  // Fetch on mount and mode change (skip if mode needs user input first)
   useEffect(() => {
-    fetchMeal()
-  }, [mode]) // eslint-disable-line react-hooks/exhaustive-deps
+    if (!needsInput) {
+      fetchMeal()
+    }
+  }, [mode, needsInput]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleInputSubmit = useCallback((value: string) => {
+    setUserInput(value)
+    setInputSubmitted(true)
+    fetchMeal(value)
+  }, [fetchMeal])
 
   const modeLabels: Record<string, { title: string; emoji: string; tagline: string; badgeClass: string }> = {
     quick: { title: 'Quick Pick', emoji: '✨', tagline: 'A great dinner idea, ready in seconds', badgeClass: '' },
     tired: { title: 'No-Think Dinner', emoji: '😴', tagline: 'Simple, easy, zero decisions required', badgeClass: 'border-amber-300 text-amber-700 bg-amber-50' },
-    pantry: { title: 'Use What You Have', emoji: '🥫', tagline: 'Built around your pantry staples', badgeClass: 'border-emerald-300 text-emerald-700 bg-emerald-50' },
+    pantry: { title: 'Use What You Have', emoji: '🥫', tagline: 'Tell us what\'s in your fridge', badgeClass: 'border-emerald-300 text-emerald-700 bg-emerald-50' },
+    smart: { title: 'Smart for You', emoji: '🧠', tagline: 'Personalized to your taste patterns', badgeClass: 'border-purple-300 text-purple-700 bg-purple-50' },
+    inspiration: { title: 'Get Inspired', emoji: '✨', tagline: 'Tell us what you\'re craving', badgeClass: 'border-pink-300 text-pink-700 bg-pink-50' },
   }
 
   const currentMode = modeLabels[mode] || modeLabels.quick
 
   const handleAnotherMeal = useCallback(() => {
     if (status.isPro) {
-      fetchMeal()
+      fetchMeal(userInput || undefined)
       return
     }
 
@@ -358,8 +411,8 @@ function TonightPageInner() {
 
     writeSwipeCount(nextSwipeCount)
     setSwipesUsed(nextSwipeCount)
-    fetchMeal()
-  }, [status.freeTonightSwipeLimit, status.isPro, swipesUsed, fetchMeal])
+    fetchMeal(userInput || undefined)
+  }, [status.freeTonightSwipeLimit, status.isPro, swipesUsed, fetchMeal, userInput])
 
   const swipesRemaining = status.isPro
     ? null
@@ -387,7 +440,38 @@ function TonightPageInner() {
 
       <main className="mx-auto max-w-3xl px-4 py-8 sm:py-12">
         <AnimatePresence mode="wait">
-          {loading ? (
+          {needsInput && !inputSubmitted ? (
+            <motion.div
+              key="input"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="text-center"
+            >
+              <Badge variant="outline" className={`mb-3 ${currentMode.badgeClass}`}>
+                {currentMode.emoji} {currentMode.title}
+              </Badge>
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-2">
+                {mode === 'pantry' ? 'What\u2019s in your fridge?' : 'What are you craving?'}
+              </h1>
+              <p className="text-muted-foreground mb-6">
+                {mode === 'pantry'
+                  ? 'Snap a photo or type what you have \u2014 we\u2019ll find the perfect meal.'
+                  : 'Describe a dish or vibe and we\u2019ll find something you\u2019ll love.'}
+              </p>
+              <div className="max-w-md mx-auto">
+                <SmartInput
+                  mode={mode === 'pantry' ? 'ingredients' : 'inspiration'}
+                  placeholder={
+                    mode === 'pantry'
+                      ? 'e.g. chicken, broccoli, garlic, pasta\u2026'
+                      : 'e.g. creamy pasta with mushrooms\u2026'
+                  }
+                  onSubmit={(value) => handleInputSubmit(value)}
+                />
+              </div>
+            </motion.div>
+          ) : loading ? (
             <LoadingPhase key="loading" onComplete={() => setLoading(false)} mode={mode} hasLearning={hasLearning} />
           ) : meal ? (
             <motion.div

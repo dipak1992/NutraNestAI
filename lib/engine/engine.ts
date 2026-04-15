@@ -275,16 +275,33 @@ export function generateSmartMeal(
     return { meal, score, reasons }
   })
 
-  // ── 2. Sort by score, random tiebreaker ──────────────────
+  // ── 2. Sort by score with weighted random selection ──────
 
-  scored.sort((a, b) => {
-    if (b.score !== a.score) return b.score - a.score
-    return Math.random() - 0.5
-  })
+  // Filter out eliminated meals (allergens/dietary)
+  const viable = scored.filter(s => s.score > -1000)
+  const pool2 = viable.length > 0 ? viable : scored
 
-  // ── 3. Select best viable candidate ──────────────────────
+  // Weighted random: pick from top candidates proportionally
+  // This ensures variety while still favoring higher-scored meals
+  pool2.sort((a, b) => b.score - a.score)
+  const topScore = pool2[0].score
+  const minScore = pool2[pool2.length - 1].score
+  const range = Math.max(topScore - minScore, 1)
 
-  const best = scored.find(s => s.score > -1000) ?? scored[0]
+  // Normalize scores to weights (0.1 to 1.0) and apply randomization
+  const weighted = pool2.map(s => ({
+    ...s,
+    weight: 0.1 + 0.9 * ((s.score - minScore) / range),
+  }))
+
+  // Weighted random pick
+  const totalWeight = weighted.reduce((sum, w) => sum + w.weight, 0)
+  let rand = Math.random() * totalWeight
+  let best = weighted[0]
+  for (const w of weighted) {
+    rand -= w.weight
+    if (rand <= 0) { best = w; break }
+  }
 
   return assembleMeal(best.meal, request, pantry, locality, best.score, best.reasons)
 }

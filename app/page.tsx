@@ -7,8 +7,9 @@ import { PublicSiteFooter } from '@/components/layout/PublicSiteFooter'
 
 function Hero() {
   const secondaryModes = [
-    { label: 'Get inspired', emoji: '✨', href: '/tonight?mode=quick', description: 'AI picks for you' },
-    { label: 'Use what I have', emoji: '🥫', href: '/tonight?mode=pantry', description: 'Pantry staples' },
+    { label: 'Get inspired', emoji: '✨', href: '/tonight?mode=inspiration', description: 'AI picks for you' },
+    { label: 'Use what I have', emoji: '🥫', href: '/tonight?mode=pantry', description: 'Snap your fridge' },
+    { label: 'Smart for you', emoji: '🧠', href: '/tonight?mode=smart', description: 'Learns your taste' },
     { label: 'Plan my week', emoji: '📅', href: '/onboarding', description: 'Full meal planning' },
   ]
 
@@ -65,7 +66,7 @@ function Hero() {
 
             {/* Secondary modes */}
             <p className="text-xs text-muted-foreground mb-3 text-center lg:text-left">Or choose a different approach:</p>
-            <div className="grid grid-cols-3 gap-2 max-w-md mx-auto lg:mx-0 mb-6">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 max-w-md mx-auto lg:mx-0 mb-6">
               {secondaryModes.map((m) => (
                 <Link
                   key={m.label}

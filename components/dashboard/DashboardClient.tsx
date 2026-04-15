@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
-import { ArrowLeft, ChevronRight } from 'lucide-react'
+import { ArrowLeft, ChevronRight, Zap, Camera, Sparkles, CalendarDays } from 'lucide-react'
 import { MealSwipeStack } from '@/components/dashboard/MealSwipeStack'
 import { SmartInput } from '@/components/dashboard/SmartInput'
 import { DEMO_WEEKLY_PLAN } from '@/lib/demo-data'
@@ -155,11 +155,13 @@ export function DashboardClient({ userName }: Props) {
     setSubmitted(true)
   }
 
+  const initial = firstName.charAt(0).toUpperCase()
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, #f0fdf4 0%, #ffffff 28%, #ffffff 100%)' }}>
       {/* ── Top bar ── */}
-      <div className="sticky top-0 z-40 bg-background/90 backdrop-blur-sm border-b border-border">
-        <div className="flex items-center h-14 px-4 max-w-lg mx-auto">
+      <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-black/5">
+        <div className="flex items-center justify-between h-14 px-5 max-w-lg mx-auto">
           <AnimatePresence mode="wait">
             {mode ? (
               <motion.button
@@ -181,82 +183,140 @@ export function DashboardClient({ userName }: Props) {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.15 }}
-                className="text-gradient-sage font-bold text-base"
+                className="text-gradient-sage font-bold text-lg"
               >
                 MealEase
               </motion.span>
+            )}
+          </AnimatePresence>
+
+          <AnimatePresence>
+            {!mode && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex items-center gap-2.5"
+              >
+                <StreakBadge />
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-semibold text-sm select-none">
+                  {initial}
+                </div>
+              </motion.div>
             )}
           </AnimatePresence>
         </div>
       </div>
 
       {/* ── Content ── */}
-      <div className="max-w-lg mx-auto px-4 py-6">
+      <div className="max-w-lg mx-auto px-5 py-6">
         <AnimatePresence mode="wait">
 
-          {/* ── Situation selector ── */}
+          {/* ── Home screen ── */}
           {!mode && (
             <motion.div
               key="selector"
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.22 }}
             >
-              <div className="mb-5 flex items-start justify-between">
-                <div>
-                  <p className="text-muted-foreground text-sm mb-0.5">
-                    {getGreeting()}, {firstName}
-                  </p>
-                  <h1 className="text-2xl font-bold text-foreground leading-tight">
-                    What&apos;s for dinner?
-                  </h1>
-                </div>
-                <StreakBadge />
-              </div>
-
-              <TodayCard />
-              <InsightCards />
-
-              <div className="mt-6 mb-3">
-                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
-                  What sounds good tonight?
+              {/* Greeting + Title */}
+              <div className="mb-7">
+                <p className="text-sm text-muted-foreground mb-1">
+                  {getGreeting()}, {firstName}
+                </p>
+                <h1 className="text-2xl font-bold text-foreground leading-tight tracking-tight">
+                  What do you want right now?
+                </h1>
+                <p className="text-sm text-muted-foreground mt-1.5">
+                  We&apos;ll make it simple.
                 </p>
               </div>
 
+              {/* ── HERO BUTTON ── */}
+              <motion.button
+                whileTap={{ scale: 0.97 }}
+                whileHover={{ scale: 1.01, transition: { duration: 0.15 } }}
+                onClick={() => selectMode('tired')}
+                className="w-full flex items-center gap-4 px-5 rounded-2xl text-white text-left mb-3"
+                style={{
+                  minHeight: '72px',
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 60%, #047857 100%)',
+                  boxShadow: '0 8px 28px rgba(16, 185, 129, 0.38), 0 2px 8px rgba(0,0,0,0.08)',
+                }}
+              >
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/20 flex-shrink-0">
+                  <Zap className="h-6 w-6 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-[17px] leading-tight">I don&apos;t want to think</p>
+                  <p className="text-white/75 text-sm mt-0.5">We&apos;ll handle dinner for you</p>
+                </div>
+                <ChevronRight className="h-5 w-5 text-white/60 flex-shrink-0" />
+              </motion.button>
+
+              {/* ── Secondary cards ── */}
               <div className="flex flex-col gap-3">
-                {SITUATIONS.map(s => (
-                  <motion.button
-                    key={s.id}
-                    whileTap={{ scale: 0.97 }}
-                    onClick={() => selectMode(s.id)}
-                    className={`flex items-center gap-4 w-full text-left transition-colors rounded-2xl border bg-background ${s.color} ${s.bgHover} ${
-                      s.featured
-                        ? 'px-4 py-5 border-2 shadow-sm'
-                        : 'px-4 py-4'
-                    }`}
-                  >
-                    <span className={s.featured ? 'text-3xl' : 'text-2xl'}>{s.emoji}</span>
-                    <div className="flex-1 min-w-0">
-                      <p className={`font-semibold ${s.featured ? 'text-base' : 'text-sm'}`}>{s.label}</p>
-                      <p className={`opacity-70 mt-0.5 ${s.featured ? 'text-sm' : 'text-xs'}`}>{s.hint}</p>
-                    </div>
-                    <ChevronRight className="h-4 w-4 opacity-40 flex-shrink-0" />
-                  </motion.button>
-                ))}
+                {/* Use what I have */}
+                <motion.button
+                  whileTap={{ scale: 0.97 }}
+                  whileHover={{ y: -1, transition: { duration: 0.15 } }}
+                  onClick={() => selectMode('ingredients')}
+                  className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl bg-white border border-gray-100 shadow-sm text-left hover:shadow-md transition-shadow"
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 flex-shrink-0">
+                    <Camera className="h-5 w-5 text-emerald-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm text-foreground">Use what I have</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Snap your fridge or pantry</p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground/50 flex-shrink-0" />
+                </motion.button>
+
+                {/* Surprise me */}
+                <motion.button
+                  whileTap={{ scale: 0.97 }}
+                  whileHover={{ y: -1, transition: { duration: 0.15 } }}
+                  onClick={() => selectMode('smart')}
+                  className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl bg-white border border-gray-100 shadow-sm text-left hover:shadow-md transition-shadow"
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-50 flex-shrink-0">
+                    <Sparkles className="h-5 w-5 text-violet-500" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm text-foreground">Surprise me</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Something you&apos;ll love</p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground/50 flex-shrink-0" />
+                </motion.button>
 
                 {/* Plan my week */}
-                <Link
-                  href="/planner"
-                  className="flex items-center gap-4 w-full px-4 py-4 rounded-2xl border border-dashed border-border bg-background text-left hover:bg-muted transition-colors"
+                <motion.div
+                  whileTap={{ scale: 0.97 }}
+                  whileHover={{ y: -1, transition: { duration: 0.15 } }}
                 >
-                  <span className="text-2xl">📅</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm text-foreground">Plan my week</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">Build a full 7-day meal plan</p>
-                  </div>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                </Link>
+                  <Link
+                    href="/planner"
+                    className="flex items-center gap-4 px-5 py-4 rounded-2xl bg-white border border-gray-100 shadow-sm text-left hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 flex-shrink-0">
+                      <CalendarDays className="h-5 w-5 text-sky-500" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm text-foreground">Plan my week</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">Meals for the whole week</p>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground/50 flex-shrink-0" />
+                  </Link>
+                </motion.div>
+              </div>
+
+              {/* TodayCard + InsightCards */}
+              <div className="mt-8">
+                <TodayCard />
+                <InsightCards />
               </div>
 
               <WeekStrip />

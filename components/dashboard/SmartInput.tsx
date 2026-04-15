@@ -8,11 +8,13 @@ interface SmartInputProps {
   mode: 'ingredients' | 'inspiration'
   placeholder: string
   onSubmit: (value: string, detectedMode?: 'ingredients' | 'inspiration') => void
+  allowPhoto?: boolean
+  onPhotoBlocked?: () => void
 }
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10 MB
 
-export function SmartInput({ mode, placeholder, onSubmit }: SmartInputProps) {
+export function SmartInput({ mode, placeholder, onSubmit, allowPhoto = true, onPhotoBlocked }: SmartInputProps) {
   const [text, setText] = useState('')
   const [preview, setPreview] = useState<string | null>(null)
   const [analyzing, setAnalyzing] = useState(false)
@@ -200,10 +202,13 @@ export function SmartInput({ mode, placeholder, onSubmit }: SmartInputProps) {
         {/* Camera / upload button */}
         <button
           type="button"
-          onClick={() => fileRef.current?.click()}
+          onClick={() => {
+            if (!allowPhoto && onPhotoBlocked) { onPhotoBlocked(); return }
+            fileRef.current?.click()
+          }}
           disabled={analyzing}
           className="absolute right-3 top-3 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40"
-          title="Upload a photo"
+          title={allowPhoto ? 'Upload a photo' : 'Pro feature — upgrade to use photo analysis'}
         >
           {analyzing ? (
             <Loader2 className="h-5 w-5 animate-spin" />
@@ -224,12 +229,18 @@ export function SmartInput({ mode, placeholder, onSubmit }: SmartInputProps) {
       {!text && !preview && !analyzing && (
         <div
           onDragOver={e => e.preventDefault()}
-          onDrop={handleDrop}
+          onDrop={e => {
+            if (!allowPhoto && onPhotoBlocked) { e.preventDefault(); onPhotoBlocked(); return }
+            handleDrop(e)
+          }}
           className="flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-border/60 text-muted-foreground/60 text-xs cursor-pointer hover:border-primary/30 hover:text-muted-foreground transition-colors"
-          onClick={() => fileRef.current?.click()}
+          onClick={() => {
+            if (!allowPhoto && onPhotoBlocked) { onPhotoBlocked(); return }
+            fileRef.current?.click()
+          }}
         >
           <ImageIcon className="h-4 w-4" />
-          Or drop / tap to upload a photo
+          {allowPhoto ? 'Or drop / tap to upload a photo' : '📸 Photo analysis — Pro feature'}
         </div>
       )}
 

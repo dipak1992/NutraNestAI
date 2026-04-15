@@ -68,12 +68,6 @@ const LOADING_STEPS: Record<string, string[]> = {
     'Making sure it works for the whole family…',
     'Found the perfect use for your ingredients! 🥫',
   ],
-  smart: [
-    'Learning what works for you…',
-    'Analyzing your taste patterns…',
-    'Picking a meal you\'ll love…',
-    'Your personalized dinner is ready! 🧠',
-  ],
   inspiration: [
     'Exploring flavors and ideas…',
     'Finding something exciting for tonight…',
@@ -100,12 +94,6 @@ const LEARNING_LOADING_STEPS: Record<string, string[]> = {
     'Finding a meal you\'ll actually enjoy…',
     'Making sure it works for everyone…',
     'Personalized pantry meal ready! 🧠',
-  ],
-  smart: [
-    'Reviewing your meal history…',
-    'Matching to your favorite cuisines…',
-    'Personalizing just for you…',
-    'Your smart dinner pick is ready! 🧠',
   ],
   inspiration: [
     'Blending your favorites with new ideas…',
@@ -316,7 +304,7 @@ function BlurredPlanPreview() {
 
 function TonightPageInner() {
   const searchParams = useSearchParams()
-  const mode = (searchParams.get('mode') as 'quick' | 'tired' | 'pantry' | 'smart' | 'inspiration') || 'quick'
+  const mode = (searchParams.get('mode') as 'quick' | 'tired' | 'pantry' | 'inspiration') || 'quick'
   const needsInput = mode === 'pantry' || mode === 'inspiration'
   const [loading, setLoading] = useState(!needsInput)
   const [userInput, setUserInput] = useState('')
@@ -348,9 +336,6 @@ function TonightPageInner() {
         maxCookTime: mode === 'quick' ? 30 : mode === 'tired' ? 20 : undefined,
         excludeIds: seenIdsRef.current,
         ...(boosts ? { learnedBoosts: boosts } : {}),
-      }
-      if (mode === 'smart' && boosts) {
-        body.prioritizeLearning = true
       }
       if (mode === 'pantry' && ingredientText) {
         body.pantryItems = ingredientText.split(',').map((s: string) => s.trim()).filter(Boolean)
@@ -391,7 +376,6 @@ function TonightPageInner() {
     quick: { title: 'Quick Pick', emoji: '✨', tagline: 'A great dinner idea, ready in seconds', badgeClass: '' },
     tired: { title: 'No-Think Dinner', emoji: '😴', tagline: 'Simple, easy, zero decisions required', badgeClass: 'border-amber-300 text-amber-700 bg-amber-50' },
     pantry: { title: 'Use What You Have', emoji: '🥫', tagline: 'Tell us what\'s in your fridge', badgeClass: 'border-emerald-300 text-emerald-700 bg-emerald-50' },
-    smart: { title: 'Smart for You', emoji: '🧠', tagline: 'Personalized to your taste patterns', badgeClass: 'border-purple-300 text-purple-700 bg-purple-50' },
     inspiration: { title: 'Get Inspired', emoji: '✨', tagline: 'Tell us what you\'re craving', badgeClass: 'border-pink-300 text-pink-700 bg-pink-50' },
   }
 
@@ -467,8 +451,8 @@ function TonightPageInner() {
                       ? 'e.g. chicken, broccoli, garlic, pasta\u2026'
                       : 'e.g. creamy pasta with mushrooms\u2026'
                   }
-                  onSubmit={(value) => handleInputSubmit(value)}
-                />
+                  onSubmit={(value) => handleInputSubmit(value)}                  allowPhoto={status.isPro}
+                  onPhotoBlocked={() => setPaywallOpen(true)}                />
               </div>
             </motion.div>
           ) : loading ? (

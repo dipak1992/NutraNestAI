@@ -9,7 +9,7 @@ function Hero() {
   const secondaryModes = [
     { label: 'Get inspired', emoji: '✨', href: '/tonight?mode=inspiration', description: 'AI picks for you' },
     { label: 'Use what I have', emoji: '🥫', href: '/tonight?mode=pantry', description: 'Snap your fridge' },
-    { label: 'Smart for you', emoji: '🧠', href: '/tonight?mode=smart', description: 'Learns your taste' },
+    { label: 'Baby & Kids', emoji: '👶', href: '/kids', description: 'Age-safe meals' },
     { label: 'Plan my week', emoji: '📅', href: '/onboarding', description: 'Full meal planning' },
   ]
 
@@ -413,8 +413,8 @@ function FriendlyDisclaimer() {
 
 function PricingPreview() {
   const tiers = [
-    { name: 'Free', price: '$0', description: 'Preview the value with no friction.', features: ['Instant tonight meal preview', '2 extra swipes per day', '3-day weekly plan preview', 'No card required'], cta: 'Get started free', href: '/signup', highlighted: false },
-    { name: 'Pro', price: '$19', period: '/month', description: 'Unlock the full planning workflow.', features: ['Full 7-day planner', 'Smart grocery list', 'Pantry tracking', 'Insights dashboard', 'Unlimited swipes', 'Advanced planning tools'], cta: 'Upgrade to Pro', href: '/signup?plan=pro', highlighted: true },
+    { name: 'Free', price: '$0', description: 'Preview the value with no friction.', features: ['Instant tonight meal preview', '2 extra swipes per day', '3 baby & kids recipes per day', '3-day weekly plan preview', 'No card required'], cta: 'Get started free', href: '/signup', highlighted: false },
+    { name: 'Pro', price: '$19', period: '/month', description: 'Unlock the full planning workflow.', features: ['Full 7-day planner', 'Smart grocery list', 'Pantry tracking', 'Insights dashboard', 'Unlimited swipes', 'Unlimited kids recipes', 'Weekly kids meal plan', 'Photo-to-recipe', 'Advanced planning tools'], cta: 'Upgrade to Pro', href: '/signup?plan=pro', highlighted: true },
   ]
   return (
     <section className="py-20 sm:py-24">

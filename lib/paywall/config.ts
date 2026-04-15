@@ -2,6 +2,7 @@ import type { SubscriptionTier } from '@/types'
 
 export const FREE_TONIGHT_SWIPE_LIMIT = 2
 export const FREE_PLAN_PREVIEW_DAYS = 3
+export const FREE_KIDS_RECIPE_LIMIT = 3
 
 export const PRO_UNLOCKS = [
   'Full 7-day weekly planner',

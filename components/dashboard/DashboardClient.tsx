@@ -1,15 +1,18 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
-import { ArrowLeft, ChevronRight, Zap, Camera, Sparkles, CalendarDays } from 'lucide-react'
+import { ArrowLeft, ChevronRight, Zap, Camera, Sparkles, CalendarDays, BookMarked, FlameKindling } from 'lucide-react'
 import { MealSwipeStack } from '@/components/dashboard/MealSwipeStack'
 import { SmartInput } from '@/components/dashboard/SmartInput'
 import { DEMO_WEEKLY_PLAN } from '@/lib/demo-data'
 import { TodayCard } from '@/components/habit/TodayCard'
 import { InsightCards } from '@/components/habit/InsightCards'
 import { StreakBadge } from '@/components/habit/StreakBadge'
+import { useOnboardingStore, useLightOnboardingStore } from '@/lib/store'
+import { useLearningStore } from '@/lib/learning/store'
+import type { LifeStage } from '@/types'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -65,7 +68,7 @@ const SITUATIONS: {
   },
 ]
 
-// ─── Greeting ────────────────────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function getGreeting(): string {
   const h = new Date().getHours()
@@ -74,11 +77,23 @@ function getGreeting(): string {
   return 'Good evening'
 }
 
+function stageToEmoji(stage: LifeStage): string {
+  if (stage === 'baby')   return '👶'
+  if (stage === 'toddler') return '🧒'
+  if (stage === 'kid')    return '👦'
+  return '🧑'
+}
+
 // ─── Week strip ───────────────────────────────────────────────────────────────
 
 function WeekStrip() {
   const todayIdx = (new Date().getDay() + 6) % 7 // Mon=0 … Sun=6
   const days = DEMO_WEEKLY_PLAN.days
+
+  const unplannedAfterToday = DAY_ABBR.slice(todayIdx + 1).filter((_, i) => {
+    const day = days[todayIdx + 1 + i]
+    return !day?.meals?.length
+  }).length
 
   return (
     <div className="mt-8">
@@ -88,11 +103,32 @@ function WeekStrip() {
           Full plan <ChevronRight className="h-3 w-3" />
         </Link>
       </div>
+
+      {unplannedAfterToday >= 3 && (
+        <div className="flex items-center gap-2 mb-3 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">
+          <span className="text-amber-500 text-sm">📅</span>
+          <p className="text-xs text-amber-800 font-medium">
+            {unplannedAfterToday} days this week still need dinners.{' '}
+            <Link href="/planner" className="underline underline-offset-2">Plan ahead →</Link>
+          </p>
+        </div>
+      )}
+
       <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
         {DAY_ABBR.map((abbr, i) => {
           const day = days[i]
           const isToday = i === todayIdx
+          const isPast = i < todayIdx
+          const hasMeal = !!(day?.meals?.length)
           const mealName = day?.meals?.[0]?.title ?? '—'
+
+          // Status dot color
+          let dotClass = 'bg-border' // unplanned future
+          if (isPast && hasMeal) dotClass = 'bg-emerald-400'
+          else if (isPast && !hasMeal) dotClass = 'bg-muted-foreground/30'
+          else if (isToday) dotClass = 'bg-primary'
+          else if (hasMeal) dotClass = 'bg-sky-400'
+
           return (
             <Link
               key={i}
@@ -100,6 +136,8 @@ function WeekStrip() {
               className={`flex-shrink-0 flex flex-col items-center gap-1 px-3 py-2.5 rounded-xl border text-center min-w-[72px] transition-colors ${
                 isToday
                   ? 'bg-primary/10 border-primary/30 text-primary'
+                  : isPast
+                  ? 'bg-muted/40 border-border/40 text-muted-foreground/60'
                   : 'bg-background border-border text-muted-foreground hover:bg-muted'
               }`}
             >
@@ -110,6 +148,7 @@ function WeekStrip() {
               >
                 {mealName.length > 12 ? mealName.slice(0, 11) + '…' : mealName}
               </span>
+              <span className={`w-1.5 h-1.5 rounded-full mt-0.5 ${dotClass}`} />
             </Link>
           )
         })}
@@ -131,6 +170,34 @@ export function DashboardClient({ userName }: Props) {
 
   const firstName = userName.includes('@') ? userName.split('@')[0] : userName
   const activeMode = SITUATIONS.find(s => s.id === mode)
+
+  // ── Stores ──────────────────────────────────────────────────────────────────
+  const { state: { members } } = useOnboardingStore()
+  const { hasKids, householdType } = useLightOnboardingStore()
+  const { feedbackHistory } = useLearningStore()
+
+  // ── Derived stats ────────────────────────────────────────────────────────────
+  const savedCount = useMemo(() =>
+    (feedbackHistory ?? []).filter((f: { action?: string; saved?: boolean }) =>
+      f.action === 'save' || f.saved === true
+    ).length,
+    [feedbackHistory]
+  )
+
+  const mealsPlannedCount = useMemo(() =>
+    DEMO_WEEKLY_PLAN.days.filter(d => d?.meals?.length > 0).length,
+    []
+  )
+
+  // ── Family emojis ─────────────────────────────────────────────────────────
+  const familyEmojis = useMemo(() => {
+    if (members && members.length > 0) {
+      return members.slice(0, 5).map(m => stageToEmoji(m.stage))
+    }
+    const base: string[] = householdType === 'solo' ? ['🧑'] : ['🧑', '🧑']
+    if (hasKids) base.push('🧒')
+    return base
+  }, [members, hasKids, householdType])
 
   function selectMode(id: Exclude<SituationMode, null>) {
     setMode(id)
@@ -232,6 +299,28 @@ export function DashboardClient({ userName }: Props) {
                 <p className="text-sm text-muted-foreground mt-1.5">
                   We&apos;ll make it simple.
                 </p>
+
+                {/* Family profile chip */}
+                <div className="flex items-center gap-2 mt-3">
+                  <div className="flex -space-x-1">
+                    {familyEmojis.map((emoji, i) => (
+                      <span
+                        key={i}
+                        className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50 border-2 border-white text-base ring-1 ring-border/20"
+                        title={`Member ${i + 1}`}
+                      >
+                        {emoji}
+                      </span>
+                    ))}
+                  </div>
+                  <span className="text-xs text-muted-foreground font-medium">
+                    Family profile active
+                  </span>
+                  <span className="ml-auto flex items-center gap-1 text-[11px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-0.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    Personalized
+                  </span>
+                </div>
               </div>
 
               {/* ── HERO BUTTON ── */}
@@ -313,6 +402,35 @@ export function DashboardClient({ userName }: Props) {
                 </motion.div>
               </div>
 
+              {/* "Your family is covered" strip */}
+              <div className="mt-6 flex items-center gap-3 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100 px-4 py-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 flex-shrink-0">
+                  <span className="text-lg">✅</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-emerald-900">Your family is covered</p>
+                  <p className="text-xs text-emerald-700/80 mt-0.5">
+                    Every meal adapts to your household — ages, allergies, and all.
+                  </p>
+                </div>
+              </div>
+
+              {/* Quick stats bar */}
+              <div className="mt-4 grid grid-cols-3 gap-2">
+                <div className="flex flex-col items-center gap-0.5 rounded-xl bg-white border border-border/60 py-2.5 px-2 text-center">
+                  <span className="text-lg font-bold text-foreground">{mealsPlannedCount}</span>
+                  <span className="text-[10px] text-muted-foreground font-medium leading-tight">meals this<br/>week</span>
+                </div>
+                <div className="flex flex-col items-center gap-0.5 rounded-xl bg-white border border-border/60 py-2.5 px-2 text-center">
+                  <span className="text-lg font-bold text-foreground">{savedCount}</span>
+                  <span className="text-[10px] text-muted-foreground font-medium leading-tight">meals<br/>saved</span>
+                </div>
+                <div className="flex flex-col items-center gap-0.5 rounded-xl bg-white border border-border/60 py-2.5 px-2 text-center">
+                  <FlameKindling className="h-5 w-5 text-orange-500" />
+                  <span className="text-[10px] text-muted-foreground font-medium leading-tight">streak<br/>active</span>
+                </div>
+              </div>
+
               {/* TodayCard + InsightCards */}
               <div className="mt-8">
                 <TodayCard />
@@ -320,6 +438,35 @@ export function DashboardClient({ userName }: Props) {
               </div>
 
               <WeekStrip />
+
+              {/* Bottom CTA */}
+              <div className="mt-8 rounded-2xl overflow-hidden border border-border/60">
+                <div
+                  className="relative px-5 py-5"
+                  style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' }}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 flex-shrink-0">
+                      <BookMarked className="h-5 w-5 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-white text-sm leading-snug">
+                        Build your full week in one tap
+                      </p>
+                      <p className="text-white/60 text-xs mt-1 leading-relaxed">
+                        7 dinners, all age-adapted, zero repeats — ready in seconds.
+                      </p>
+                    </div>
+                  </div>
+                  <Link
+                    href="/planner"
+                    className="mt-4 flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-white text-gray-900 text-sm font-semibold hover:bg-white/90 transition-colors"
+                  >
+                    Plan my week
+                    <ChevronRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              </div>
             </motion.div>
           )}
 

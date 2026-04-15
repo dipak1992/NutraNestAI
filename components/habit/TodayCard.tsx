@@ -9,15 +9,15 @@ import { MicroFeedback } from './MicroFeedback'
 
 // ── Card style map (mirrors MealSwipeStack) ───────────────────────────────────
 
-const CARD_STYLES: Record<string, { bg: string; emoji: string }> = {
-  italian:       { bg: 'from-rose-500 via-orange-400 to-amber-300',   emoji: '🍝' },
-  mexican:       { bg: 'from-amber-500 via-yellow-400 to-lime-300',    emoji: '🌮' },
-  asian:         { bg: 'from-teal-600 via-emerald-500 to-green-400',   emoji: '🥢' },
-  american:      { bg: 'from-orange-500 via-amber-400 to-yellow-300',  emoji: '🍔' },
-  indian:        { bg: 'from-orange-600 via-amber-500 to-yellow-300',  emoji: '🍛' },
-  mediterranean: { bg: 'from-sky-500 via-teal-400 to-emerald-300',     emoji: '🥗' },
-  comfort:       { bg: 'from-emerald-500 via-teal-400 to-cyan-300',    emoji: '🫕' },
-  global:        { bg: 'from-violet-500 via-purple-400 to-indigo-300', emoji: '🌏' },
+const CARD_STYLES: Record<string, { bg: string; emoji: string; photoId: string }> = {
+  italian:       { bg: 'from-rose-600 via-orange-500 to-amber-400',   emoji: '🍝', photoId: '1551183053-bf91a1d81141' },
+  mexican:       { bg: 'from-amber-600 via-yellow-500 to-lime-400',    emoji: '🌮', photoId: '1547592180-85f173990554' },
+  asian:         { bg: 'from-teal-700 via-emerald-600 to-green-500',   emoji: '🥢', photoId: '1512621776951-a57141f2eefd' },
+  american:      { bg: 'from-orange-600 via-amber-500 to-yellow-400',  emoji: '🍔', photoId: '1555939594-58d7cb561ad1' },
+  indian:        { bg: 'from-orange-700 via-amber-600 to-yellow-400',  emoji: '🍛', photoId: '1504674900247-0877df9cc836' },
+  mediterranean: { bg: 'from-sky-600 via-teal-500 to-emerald-400',     emoji: '🥗', photoId: '1467003909585-2f8a72700288' },
+  comfort:       { bg: 'from-emerald-600 via-teal-500 to-cyan-400',    emoji: '🫕', photoId: '1513104890138-7c749659a591' },
+  global:        { bg: 'from-violet-600 via-purple-500 to-indigo-400', emoji: '🌏', photoId: '1490645935967-10de6ba17061' },
 }
 
 function getCardStyle(cuisine?: string) {
@@ -99,7 +99,8 @@ export function TodayCard() {
 
   if (!meal) return null
 
-  const { bg, emoji } = getCardStyle(meal.cuisineType)
+  const { bg, emoji, photoId } = getCardStyle(meal.cuisineType)
+  const photoUrl = `https://images.unsplash.com/photo-${photoId}?w=800&q=75&auto=format&fit=crop`
 
   return (
     <div className="w-full">
@@ -127,18 +128,21 @@ export function TodayCard() {
           className={`relative w-full rounded-3xl overflow-hidden bg-gradient-to-br ${bg}`}
           style={{ minHeight: 188 }}
         >
-          {/* Dot pattern */}
-          <div
-            className="absolute inset-0 opacity-[0.08]"
-            style={{
-              backgroundImage: 'radial-gradient(circle, white 1.5px, transparent 0)',
-              backgroundSize: '24px 24px',
-            }}
+          {/* Food photo */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={photoUrl}
+            alt={meal.title}
+            className="absolute inset-0 w-full h-full object-cover"
+            loading="lazy"
           />
+
+          {/* Color-tinted overlay so the gradient palette still shows */}
+          <div className={`absolute inset-0 bg-gradient-to-br ${bg} opacity-60`} />
 
           {/* Large emoji */}
           <span
-            className="absolute top-3 right-4 opacity-55 leading-none select-none pointer-events-none"
+            className="absolute top-3 right-4 opacity-70 leading-none select-none pointer-events-none drop-shadow-sm"
             style={{ fontSize: 76 }}
           >
             {emoji}

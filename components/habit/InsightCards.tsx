@@ -60,26 +60,29 @@ export function InsightCards() {
     return results.slice(0, 3)
   }, [feedbackHistory, getSignal])
 
-  if (insights.length === 0) {
-    return (
-      <div className="flex items-center gap-2 px-1 mt-3">
-        <span className="text-xs text-muted-foreground bg-muted/50 border border-border rounded-full px-3 py-1.5">
-          🧠 MealEase learns your taste — like or skip meals to personalize
-        </span>
-      </div>
-    )
-  }
-
   return (
-    <div className="flex items-center gap-2 mt-3 overflow-x-auto pb-0.5 scrollbar-none">
-      {insights.map((text, i) => (
-        <span
-          key={i}
-          className="shrink-0 text-xs text-foreground/80 bg-primary/8 border border-primary/15 rounded-full px-3 py-1.5 font-medium"
-        >
-          {text}
-        </span>
-      ))}
+    <div className="mt-4 rounded-2xl border border-border/60 bg-card p-4">
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-base">🧠</span>
+        <h3 className="text-sm font-semibold text-foreground">What MealEase knows about you</h3>
+      </div>
+
+      {insights.length === 0 ? (
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Like or skip meals a few times and MealEase starts learning your taste — faster picks, fewer meh dinners.
+        </p>
+      ) : (
+        <div className="flex flex-col gap-2">
+          {insights.map((text, i) => (
+            <div
+              key={i}
+              className="text-sm text-foreground/85 bg-primary/5 border border-primary/10 rounded-xl px-3 py-2 font-medium"
+            >
+              {text}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

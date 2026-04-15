@@ -35,14 +35,19 @@ function Hero() {
       {/* Real food photo backdrop */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={HERO_IMG} alt="" className="w-full h-full object-cover opacity-[0.14]" />
-        <div className="absolute inset-0 bg-gradient-to-br from-background/90 via-background/70 to-background/95" />
+        <img src={HERO_IMG} alt="" className="w-full h-full object-cover opacity-30" />
+        {/* Directional veil — heavier on left (text readable), opens up right so food shows */}
+        <div className="absolute inset-0 bg-gradient-to-r from-background/85 via-background/55 to-background/25" />
+        {/* Warm amber glow from bottom-left — makes it feel like a candlelit table */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-amber-100/40 via-transparent to-transparent" />
+        {/* Sage accent from top-right for brand color echo */}
+        <div className="absolute inset-0 bg-gradient-to-bl from-emerald-50/30 via-transparent to-transparent" />
       </div>
 
       {/* Decorative emoji layer */}
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden select-none">
         {['🍋','🫑','🧄','🍅','🥦','🧅','🫒','🥕'].map((emoji, i) => (
-          <span key={i} className="absolute opacity-[0.05]" style={{
+          <span key={i} className="absolute opacity-[0.12]" style={{
             top:  `${[12,70,30,85,15,60,42,78][i]}%`,
             left: `${[5,90,82,8,55,3,72,48][i]}%`,
             transform: `rotate(${[-15,20,-8,25,12,-20,5,-12][i]}deg)`,

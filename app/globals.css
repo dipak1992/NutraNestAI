@@ -155,7 +155,10 @@
     background: linear-gradient(135deg, oklch(0.66 0.17 145), oklch(0.58 0.18 145));
   }
   .gradient-hero {
-    background: linear-gradient(160deg, oklch(0.99 0.004 155) 0%, oklch(0.978 0.012 150) 50%, oklch(0.967 0.022 145) 100%);
+    background: linear-gradient(160deg,
+      oklch(0.987 0.014 85) 0%,
+      oklch(0.976 0.018 120) 40%,
+      oklch(0.966 0.028 145) 100%);
   }
   .glass-card {
     background: rgba(255, 255, 255, 0.72);

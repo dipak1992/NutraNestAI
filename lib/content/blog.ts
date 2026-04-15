@@ -38,11 +38,11 @@ export interface BlogPost {
   faq?: BlogFaq[]
 }
 
-// loremflickr.com returns real category-matched photos and is reliably available.
-// The `lock` param makes each URL deterministic (same image every load).
+// picsum.photos is 100% reliable and returns a consistent image per seed.
+// The seed is derived from the keyword string so each post gets a unique image.
 const UNSPLASH = (keywords: string, lock = 1) => {
-  const cats = keywords.replace(/\s+/g, ',')
-  return `https://loremflickr.com/1600/900/${cats}?lock=${lock}`
+  const seed = keywords.replace(/[^a-z0-9]/gi, '-').toLowerCase() + '-' + lock
+  return `https://picsum.photos/seed/${seed}/1600/900`
 }
 
 const DEFAULT_AUTHOR = {

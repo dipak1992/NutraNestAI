@@ -37,11 +37,13 @@ export const metadata: Metadata = {
     type: 'website',
     url: '/',
     siteName: 'MealEase',
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'MealEase – Make family meals easy' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'MealEase – Make family meals easy',
     description: 'From one idea to a full meal plan for your whole family — in seconds.',
+    images: ['/twitter-image'],
   },
 }
 

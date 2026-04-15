@@ -3,8 +3,7 @@
 import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
-import { ArrowLeft, ChevronRight, Zap, Camera, Sparkles, CalendarDays, BookMarked, FlameKindling } from 'lucide-react'
-import { MealEaseLogo } from '@/components/ui/MealEaseLogo'
+import { ArrowLeft, ChevronRight, Zap, Camera, Sparkles, CalendarDays, BookMarked, FlameKindling, Baby } from 'lucide-react'
 import { MealSwipeStack } from '@/components/dashboard/MealSwipeStack'
 import { SmartInput } from '@/components/dashboard/SmartInput'
 import { DEMO_WEEKLY_PLAN } from '@/lib/demo-data'
@@ -235,53 +234,25 @@ export function DashboardClient({ userName }: Props) {
 
   return (
     <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, #f0fdf4 0%, #ffffff 28%, #ffffff 100%)' }}>
-      {/* ── Top bar ── */}
-      <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-black/5">
-        <div className="flex items-center justify-between h-14 px-5 max-w-lg mx-auto">
-          <AnimatePresence mode="wait">
-            {mode ? (
-              <motion.button
-                key="back"
-                initial={{ opacity: 0, x: -8 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -8 }}
-                transition={{ duration: 0.15 }}
-                onClick={handleBack}
-                className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Back
-              </motion.button>
-            ) : (
-              <motion.span
-                key="logo"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.15 }}
-              >
-                <MealEaseLogo size="sm" />
-              </motion.span>
-            )}
-          </AnimatePresence>
-
-          <AnimatePresence>
-            {!mode && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="flex items-center gap-2.5"
-              >
-                <StreakBadge />
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-semibold text-sm select-none">
-                  {initial}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+      {/* ── Top bar — only shown when a mode is active (Back button) ── */}
+      {mode && (
+        <div className="sticky top-16 z-40 bg-white/80 backdrop-blur-md border-b border-black/5">
+          <div className="flex items-center justify-between h-14 px-5 max-w-lg mx-auto">
+            <motion.button
+              key="back"
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -8 }}
+              transition={{ duration: 0.15 }}
+              onClick={handleBack}
+              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </motion.button>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ── Content ── */}
       <div className="max-w-lg mx-auto px-5 py-6">
@@ -298,9 +269,12 @@ export function DashboardClient({ userName }: Props) {
             >
               {/* Greeting + Title */}
               <div className="mb-7">
-                <p className="text-sm text-muted-foreground mb-1">
-                  {getGreeting()}, {firstName}
-                </p>
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-sm text-muted-foreground">
+                    {getGreeting()}, {firstName}
+                  </p>
+                  <StreakBadge />
+                </div>
                 <h1 className="text-2xl font-bold text-foreground leading-tight tracking-tight">
                   What do you want right now?
                 </h1>
@@ -388,6 +362,43 @@ export function DashboardClient({ userName }: Props) {
                   </div>
                   <ChevronRight className="h-4 w-4 text-muted-foreground/50 flex-shrink-0" />
                 </motion.button>
+
+                {/* Get inspired */}
+                <motion.button
+                  whileTap={{ scale: 0.97 }}
+                  whileHover={{ y: -1, transition: { duration: 0.15 } }}
+                  onClick={() => selectMode('inspiration')}
+                  className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl bg-white border border-gray-100 shadow-sm text-left hover:shadow-md transition-shadow"
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 flex-shrink-0">
+                    <Sparkles className="h-5 w-5 text-sky-500" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm text-foreground">Get inspired</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Tell us what sounds good</p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground/50 flex-shrink-0" />
+                </motion.button>
+
+                {/* Baby & Kids */}
+                <motion.div
+                  whileTap={{ scale: 0.97 }}
+                  whileHover={{ y: -1, transition: { duration: 0.15 } }}
+                >
+                  <Link
+                    href="/kids"
+                    className="flex items-center gap-4 px-5 py-4 rounded-2xl bg-white border border-gray-100 shadow-sm text-left hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-pink-50 flex-shrink-0">
+                      <Baby className="h-5 w-5 text-pink-500" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm text-foreground">Baby &amp; Kids</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">Age-safe meals for little ones</p>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground/50 flex-shrink-0" />
+                  </Link>
+                </motion.div>
 
                 {/* Plan my week */}
                 <motion.div

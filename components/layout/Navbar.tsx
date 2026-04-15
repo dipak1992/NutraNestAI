@@ -95,7 +95,7 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
           <Badge
             variant="outline"
             className={cn(
-              'hidden sm:inline-flex capitalize',
+              'inline-flex capitalize',
               isPro
                 ? 'border-amber-300 bg-amber-50 text-amber-800'
                 : 'border-primary/20 bg-primary/5 text-primary',

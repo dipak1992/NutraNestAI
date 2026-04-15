@@ -38,8 +38,12 @@ export interface BlogPost {
   faq?: BlogFaq[]
 }
 
-const UNSPLASH = (keywords: string) =>
-  `https://source.unsplash.com/1600x900/?${encodeURIComponent(keywords)}`
+// loremflickr.com returns real category-matched photos and is reliably available.
+// The `lock` param makes each URL deterministic (same image every load).
+const UNSPLASH = (keywords: string, lock = 1) => {
+  const cats = keywords.replace(/\s+/g, ',')
+  return `https://loremflickr.com/1600/900/${cats}?lock=${lock}`
+}
 
 const DEFAULT_AUTHOR = {
   name: 'MealEase Editorial',

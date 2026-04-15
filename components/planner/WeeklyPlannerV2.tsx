@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { useWeeklyPlanStore } from '@/lib/planner/store'
-import { useLightOnboardingStore } from '@/lib/store'
+import { useOnboardingStore, useLightOnboardingStore } from '@/lib/store'
 import { useLearningStore } from '@/lib/learning/store'
 import { buildGroceryList } from '@/lib/planner/grocery'
 import { DAY_FULL } from '@/lib/planner/types'
@@ -80,7 +80,30 @@ export function WeeklyPlannerV2() {
   } = useLightOnboardingStore()
 
   const getBoosts = useLearningStore((s) => s.getBoosts)
+  const feedbackHistory = useLearningStore((s) => s.feedbackHistory)
+  const { state: { members } } = useOnboardingStore()
   const mealsPlanned = plan.days.filter((d) => d.meal !== null).length
+
+  // ── Personalized paywall copy ─────────────────────────────
+  const memberCount = members?.length || (householdType === 'solo' ? 1 : householdType === 'couple' ? 2 : 3)
+  const savedMeals = (feedbackHistory ?? []).filter((f: { action?: string }) => f.action === 'save').length
+  const explored = (feedbackHistory ?? []).length
+
+  const personalizedInlineTitle = memberCount > 1
+    ? `Your free preview covers 3 dinners — but your family of ${memberCount} deserves the full week`
+    : 'Your free preview stops after 3 dinners'
+
+  const personalizedInlineDesc = savedMeals > 0
+    ? `You've saved ${savedMeals} meal${savedMeals !== 1 ? 's' : ''} so far. Start a 7-day free trial to build a full week around them — with the grocery list and Pantry Magic included.`
+    : 'You\'ve seen the value. Start a 7-day free trial to unlock every day, the full grocery list, and Pantry Magic.'
+
+  const personalizedDialogTitle = memberCount > 1
+    ? `${memberCount} mouths to feed — let MealEase handle the whole week`
+    : 'Ready to stop thinking about dinner?'
+
+  const personalizedDialogDesc = explored > 0
+    ? `You've explored ${explored} meal${explored !== 1 ? 's' : ''}${savedMeals > 0 ? ` and saved ${savedMeals}` : ''}. Unlock 7 days of personalized meals, a smart grocery list, and Pantry Magic — for less than one takeout order.`
+    : 'Unlock 7 days of personalized meals, a smart grocery list, and Pantry Magic — for less than one takeout order.'
 
   useEffect(() => {
     if (!status.isPro && selectedDayIndex >= (status.effectivePlanPreviewDays ?? 3)) {
@@ -392,8 +415,8 @@ export function WeeklyPlannerV2() {
 
       {!paywallLoading && !status.isPro && (showPlannerLock || mealsPlanned > 0) && (
         <ProPaywallCard
-          title="Your free preview stops after 3 dinners"
-          description="You've seen the value. Start a 7-day free trial to unlock every day, the full grocery list, and Pantry Magic."
+          title={personalizedInlineTitle}
+          description={personalizedInlineDesc}
           isAuthenticated={status.isAuthenticated}
           redirectPath="/planner"
         />
@@ -413,8 +436,8 @@ export function WeeklyPlannerV2() {
       <PaywallDialog
         open={paywallOpen}
         onOpenChange={setPaywallOpen}
-        title="Ready to stop thinking about dinner?"
-        description="Unlock 7 days of personalized meals, a smart grocery list, and Pantry Magic — for less than one takeout order."
+        title={personalizedDialogTitle}
+        description={personalizedDialogDesc}
         isAuthenticated={status.isAuthenticated}
         redirectPath="/planner"
       />

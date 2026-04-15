@@ -11,8 +11,10 @@ import { DEMO_WEEKLY_PLAN } from '@/lib/demo-data'
 import { TodayCard } from '@/components/habit/TodayCard'
 import { InsightCards } from '@/components/habit/InsightCards'
 import { StreakBadge } from '@/components/habit/StreakBadge'
+import { MilestoneBanner } from '@/components/dashboard/MilestoneBanner'
 import { useOnboardingStore, useLightOnboardingStore } from '@/lib/store'
 import { useLearningStore } from '@/lib/learning/store'
+import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 import type { LifeStage } from '@/types'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -176,6 +178,7 @@ export function DashboardClient({ userName }: Props) {
   const { state: { members } } = useOnboardingStore()
   const { hasKids, householdType } = useLightOnboardingStore()
   const { feedbackHistory } = useLearningStore()
+  const { status: paywallStatus } = usePaywallStatus()
 
   // ── Derived stats ────────────────────────────────────────────────────────────
   const savedCount = useMemo(() =>
@@ -188,6 +191,11 @@ export function DashboardClient({ userName }: Props) {
   const mealsPlannedCount = useMemo(() =>
     DEMO_WEEKLY_PLAN.days.filter(d => d?.meals?.length > 0).length,
     []
+  )
+
+  const totalInteractions = useMemo(() =>
+    (feedbackHistory ?? []).length,
+    [feedbackHistory]
   )
 
   // ── Family emojis ─────────────────────────────────────────────────────────
@@ -429,6 +437,40 @@ export function DashboardClient({ userName }: Props) {
                   <FlameKindling className="h-5 w-5 text-orange-500" />
                   <span className="text-[10px] text-muted-foreground font-medium leading-tight">streak<br/>active</span>
                 </div>
+              </div>
+
+              {/* Value Accumulator — free users only */}
+              {!paywallStatus.isPro && totalInteractions > 0 && (
+                <div className="mt-4 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-amber-50 p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 flex-shrink-0">
+                      <Sparkles className="h-5 w-5 text-emerald-600" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-foreground">
+                        You&apos;ve explored {totalInteractions} meal{totalInteractions !== 1 ? 's' : ''} with MealEase
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                        {savedCount > 0
+                          ? `${savedCount} saved to your favorites. `
+                          : ''}
+                        Pro members save an average of 4.2 hours per week on meal planning.
+                      </p>
+                    </div>
+                  </div>
+                  <Link
+                    href="/pricing"
+                    className="mt-3 flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition-colors"
+                  >
+                    See your Pro preview
+                    <ChevronRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              )}
+
+              {/* Milestone offer — free users only */}
+              <div className="mt-4">
+                <MilestoneBanner isPro={paywallStatus.isPro} />
               </div>
 
               {/* TodayCard + InsightCards */}

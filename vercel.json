@@ -24,11 +24,11 @@
     },
     {
       "path": "/api/email/reminders?type=weekly",
-      "schedule": "0 9 * * MON"
+      "schedule": "0 9 * * 1"
     },
     {
       "path": "/api/email/reminders?type=admin-summary",
-      "schedule": "0 10 * * MON"
+      "schedule": "0 10 * * 1"
     }
   ]
 }

@@ -133,10 +133,12 @@
   }
   body {
     @apply bg-background text-foreground;
+    -webkit-tap-highlight-color: transparent;
   }
   html {
     @apply font-sans;
     scroll-behavior: smooth;
+    touch-action: manipulation;
   }
   h1, h2, h3, h4, h5, h6 {
     @apply font-semibold tracking-tight;
@@ -161,13 +163,9 @@
       oklch(0.966 0.028 145) 100%);
   }
   .glass-card {
-    background: rgba(255, 255, 255, 0.72);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
-    isolation: isolate;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   }
   .text-gradient-sage {
     background: linear-gradient(135deg, oklch(0.58 0.18 145), oklch(0.46 0.2 148));

@@ -278,7 +278,7 @@ function BlurredPlanPreview() {
         </div>
 
         {/* Overlay CTA */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/60 backdrop-blur-[2px] rounded-xl">
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/80 rounded-xl">
           <Lock className="h-8 w-8 text-primary mb-3" />
           <h4 className="font-bold text-lg mb-1">Unlock Your Full Weekly Plan</h4>
           <p className="text-sm text-muted-foreground mb-4 text-center max-w-sm">
@@ -357,9 +357,11 @@ function TonightPageInner() {
         try { sessionStorage.setItem('tonight-seen-ids', JSON.stringify(seenIdsRef.current)) } catch {}
       } else if (res.status === 401) {
         setAuthRequired(true)
+      } else {
+        setLoading(false)
       }
     } catch {
-      // Silently fail — loading will complete and show empty state
+      setLoading(false)
     }
   }, [mode, getBoosts])
 
@@ -407,9 +409,9 @@ function TonightPageInner() {
     : Math.max(status.freeTonightSwipeLimit - swipesUsed, 0)
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/90 backdrop-blur-sm">
+      <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/95">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
           <Link href="/" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="h-4 w-4" /> Back

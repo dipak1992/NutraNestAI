@@ -152,7 +152,7 @@ export function SmartInput({ mode, placeholder, onSubmit, allowPhoto = true, onP
             />
             {analyzing && (
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-2xl">
-                <div className="flex items-center gap-2 bg-black/60 text-white px-4 py-2 rounded-full text-sm backdrop-blur-sm">
+                <div className="flex items-center gap-2 bg-black/70 text-white px-4 py-2 rounded-full text-sm">
                   <Loader2 className="h-4 w-4 animate-spin" />
                   Detecting food…
                 </div>

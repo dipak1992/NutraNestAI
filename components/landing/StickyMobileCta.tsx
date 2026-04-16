@@ -20,7 +20,7 @@ export function StickyMobileCta() {
 
   if (!visible) return null
   return (
-    <div className="fixed bottom-0 inset-x-0 z-40 md:hidden p-4 bg-background/95 backdrop-blur-sm border-t border-border/60">
+    <div className="fixed bottom-0 inset-x-0 z-40 md:hidden p-4 bg-background/95 border-t border-border/60">
       <Button asChild className="w-full" size="lg">
         <Link href="/signup">Try MealEase free →</Link>
       </Button>

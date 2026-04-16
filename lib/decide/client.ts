@@ -79,11 +79,18 @@ export function householdFromMembers(members: MemberLike[]): DecideRequest['hous
 export function fallbackHousehold(
   householdType: 'solo' | 'couple' | 'family' | null,
   hasKids: boolean | null,
+  kidsAgeGroup?: string | null,
 ): DecideRequest['household'] {
   const base =
     householdType === 'solo'   ? { adultsCount: 1, kidsCount: 0, toddlersCount: 0, babiesCount: 0 } :
     householdType === 'couple' ? { adultsCount: 2, kidsCount: 0, toddlersCount: 0, babiesCount: 0 } :
-    householdType === 'family' ? { adultsCount: 2, kidsCount: hasKids ? 1 : 0, toddlersCount: 0, babiesCount: 0 } :
+    householdType === 'family' ? { adultsCount: 2, kidsCount: 0, toddlersCount: 0, babiesCount: 0 } :
                                  { adultsCount: 1, kidsCount: 0, toddlersCount: 0, babiesCount: 0 }
-  return base
+
+  if (!hasKids || householdType !== 'family') return base
+
+  if (kidsAgeGroup === 'baby')    return { ...base, babiesCount: 1 }
+  if (kidsAgeGroup === 'toddler') return { ...base, toddlersCount: 1 }
+  if (kidsAgeGroup === 'mixed')   return { ...base, kidsCount: 1, toddlersCount: 1 }
+  return { ...base, kidsCount: 1 } // 'school_age' or unknown default
 }

@@ -122,8 +122,8 @@ export function HomeHub({ userName }: Props) {
   const getHousehold = useCallback(() =>
     members?.length
       ? householdFromMembers(members)
-      : fallbackHousehold(light.householdType, light.hasKids),
-    [members, light.householdType, light.hasKids])
+      : fallbackHousehold(light.householdType, light.hasKids, light.kidsAgeGroup),
+    [members, light.householdType, light.hasKids, light.kidsAgeGroup])
 
   // ── Fetch logic ───────────────────────────────────────────
 

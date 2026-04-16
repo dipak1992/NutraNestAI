@@ -448,8 +448,25 @@ function buildVariations(meal: MealCandidate, request: SmartMealRequest): SmartV
   const stages = getRequiredStages(request.household)
 
   return stages.map(stage => {
-    const data = meal.variations[stage]
+    const data = meal.variations?.[stage]
     const meta = STAGE_META[stage]
+
+    if (!data) {
+      // Meal doesn't have a variation for this stage — fall back to adult variation or bare defaults
+      const fallback = meal.variations?.['adult']
+      return {
+        stage,
+        label: meta.label,
+        emoji: meta.emoji,
+        title: fallback?.title ?? meal.title,
+        description: fallback?.description ?? meal.description,
+        modifications: [],
+        safetyNotes: [],
+        textureNotes: null,
+        servingTip: '',
+        allergyWarnings: [],
+      }
+    }
 
     const modifications = [...data.modifications]
     const safetyNotes = [...data.safetyNotes]

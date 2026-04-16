@@ -542,7 +542,7 @@ export default function OnboardingPage() {
       )}
 
       {/* ── Step content ─────────────────────────────────────────────────────── */}
-      <div className="flex-1 flex items-center justify-center px-6 py-4 overflow-x-hidden">
+      <div className="flex-1 flex items-center justify-center px-6 py-4 overflow-x-clip">
         <div className="w-full max-w-md">
           <AnimatePresence mode="wait" custom={direction}>
             <motion.div

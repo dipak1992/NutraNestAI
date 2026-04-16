@@ -62,7 +62,7 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
     : 'ME'
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/90 backdrop-blur-sm">
+    <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
         <Link href="/dashboard" className="flex items-center">

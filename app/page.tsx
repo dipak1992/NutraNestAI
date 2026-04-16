@@ -452,8 +452,7 @@ function FinalCta() {
   return (
     <section className="relative overflow-hidden py-24 sm:py-32">
       {/* Full-bleed food photo + dark overlay */}
-      <div aria-hidden className="absolute inset-0">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
+      <div aria-hidden className="pointer-events-none absolute inset-0">
         <img src={CTA_IMG} alt="" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-br from-slate-900/90 via-primary/75 to-slate-900/85" />
       </div>

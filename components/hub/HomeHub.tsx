@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { ArrowLeft, Sparkles, FlameKindling, ChevronRight, BookMarked } from 'lucide-react'
 import { MealCard } from '@/components/hub/MealCard'
 import { PantryMatchList } from '@/components/hub/PantryMatchList'
+import { PantryCapture } from '@/components/hub/PantryCapture'
 import { AdjustChipRail } from '@/components/hub/AdjustChipRail'
 import { MilestoneBanner } from '@/components/dashboard/MilestoneBanner'
 import { StreakBadge } from '@/components/habit/StreakBadge'
@@ -84,6 +85,7 @@ export function HomeHub({ userName }: Props) {
   const [loading, setLoading] = useState(false)
   const [swapping, setSwapping] = useState(false)
   const [activeChip, setActiveChip] = useState<SmartChipId | null>(null)
+  const [pantryPhase, setPantryPhase] = useState<'capture' | 'results' | null>(null)
   const shownIdsRef = useRef<string[]>([])
 
   // ── Stores ───────────────────────────────────────────────
@@ -168,14 +170,21 @@ export function HomeHub({ userName }: Props) {
     }
   }, [getHousehold, light.cuisines, getBoosts])
 
-  const fetchPantry = useCallback(async () => {
+  const fetchPantry = useCallback(async (pantryItems: string[]) => {
     setLoading(true)
     try {
+      // Save items to server
+      await fetch('/api/pantry/scan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: pantryItems.map(name => ({ name })) }),
+      })
+
       const res = await fetch('/api/pantry/match', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          pantryItems: [],
+          pantryItems,
           household: getHousehold(),
           learnedBoosts: getBoosts() ?? undefined,
           limit: 3,
@@ -206,15 +215,21 @@ export function HomeHub({ userName }: Props) {
 
     if (id === 'quick')    void fetchQuick()
     if (id === 'surprise') void fetchSurprise()
-    if (id === 'pantry')   void fetchPantry()
+    if (id === 'pantry')   setPantryPhase('capture')
   }, [fetchQuick, fetchSurprise, fetchPantry])
 
   const handleBack = useCallback(() => {
+    if (activeTile === 'pantry' && pantryPhase === 'results') {
+      setPantryPhase('capture')
+      setPantryMatches([])
+      return
+    }
     setActiveTile(null)
     setMeal(null)
     setPantryMatches([])
     setActiveChip(null)
-  }, [])
+    setPantryPhase(null)
+  }, [activeTile, pantryPhase])
 
   // ── Meal actions ──────────────────────────────────────────
 
@@ -233,7 +248,7 @@ export function HomeHub({ userName }: Props) {
     try {
       if (activeTile === 'quick') await fetchQuick(chipOverrides)
       else if (activeTile === 'surprise') await fetchSurprise(chipOverrides)
-      else if (activeTile === 'pantry') await fetchPantry()
+      else if (activeTile === 'pantry') await fetchPantry([])
     } finally {
       setSwapping(false)
     }
@@ -480,7 +495,21 @@ export function HomeHub({ userName }: Props) {
           {/* ═══════════════════════════════════════════════════════
               RESULT SCREEN — shows after tapping a tile
              ═══════════════════════════════════════════════════════ */}
-          {activeTile && activeTile !== 'plan' && (
+          {/* ── PANTRY CAPTURE PHASE ── */}
+          {activeTile === 'pantry' && pantryPhase === 'capture' && (
+            <PantryCapture
+              onConfirm={(items) => {
+                setPantryPhase('results')
+                void fetchPantry(items)
+              }}
+              onCancel={() => {
+                setActiveTile(null)
+                setPantryPhase(null)
+              }}
+            />
+          )}
+
+          {activeTile && activeTile !== 'plan' && !(activeTile === 'pantry' && pantryPhase === 'capture') && (
             <motion.div
               key={`result-${activeTile}`}
               initial={{ opacity: 0, y: 16 }}

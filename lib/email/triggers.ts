@@ -1,6 +1,7 @@
 import { createElement } from 'react'
 import { sendEmail } from './send'
-import { EMAIL_ADMIN } from './client'
+import { EMAIL_ADMIN, SITE_URL } from './client'
+import { generateUnsubscribeToken } from './unsubscribe'
 
 // User templates
 import { WelcomeEmail } from './templates/welcome'
@@ -86,13 +87,20 @@ export async function sendPaymentReceiptEmail(params: {
 export async function sendWeeklyReminderEmail(params: {
   to: string
   firstName?: string
+  userId?: string
 }) {
   const week = getWeekKey()
+  const unsubscribeUrl = params.userId
+    ? `${SITE_URL}/api/unsubscribe?token=${generateUnsubscribeToken(params.userId)}`
+    : undefined
   return sendEmail({
     to: params.to,
     subject: 'Plan your week in 30 seconds',
-    react: createElement(WeeklyReminderEmail, { firstName: params.firstName }),
+    react: createElement(WeeklyReminderEmail, { firstName: params.firstName, unsubscribeUrl }),
     idempotencyKey: `weekly:${params.to}:${week}`,
+    headers: unsubscribeUrl
+      ? { 'List-Unsubscribe': `<${unsubscribeUrl}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' }
+      : undefined,
   })
 }
 
@@ -101,8 +109,12 @@ export async function sendDinnerReminderEmail(params: {
   firstName?: string
   mealTitle?: string
   mealDescription?: string
+  userId?: string
 }) {
   const today = getTodayKey()
+  const unsubscribeUrl = params.userId
+    ? `${SITE_URL}/api/unsubscribe?token=${generateUnsubscribeToken(params.userId)}`
+    : undefined
   return sendEmail({
     to: params.to,
     subject: params.mealTitle
@@ -112,8 +124,12 @@ export async function sendDinnerReminderEmail(params: {
       firstName: params.firstName,
       mealTitle: params.mealTitle,
       mealDescription: params.mealDescription,
+      unsubscribeUrl,
     }),
     idempotencyKey: `dinner:${params.to}:${today}`,
+    headers: unsubscribeUrl
+      ? { 'List-Unsubscribe': `<${unsubscribeUrl}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' }
+      : undefined,
   })
 }
 

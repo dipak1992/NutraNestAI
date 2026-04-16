@@ -19,6 +19,10 @@ interface DecideBody extends SmartMealRequest {
 const BUSY_WEEKDAY_MAX_MIN = 25
 const WEEKEND_MAX_MIN = 60
 
+// ── In-memory cache for server-side excludes (5-min TTL) ────
+const excludeCache = new Map<string, { ids: string[]; ts: number }>()
+const CACHE_TTL_MS = 5 * 60 * 1000
+
 export async function POST(req: NextRequest) {
   const rl = await rateLimit({ key: rateLimitKeyFromRequest(req), limit: 30, windowMs: 60_000 })
   if (!rl.success) return apiRateLimited(rl.reset)
@@ -51,16 +55,24 @@ export async function POST(req: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
 
     if (user) {
-      const cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
-      const { data: recent } = await supabase
-        .from('meal_signals')
-        .select('meal_id, signal, created_at')
-        .eq('user_id', user.id)
-        .in('signal', ['rejected', 'skipped', 'swapped'])
-        .gte('created_at', cutoff)
-        .order('created_at', { ascending: false })
-        .limit(40)
-      if (recent) serverExcludes = recent.map(r => r.meal_id)
+      const cached = excludeCache.get(user.id)
+      if (cached && Date.now() - cached.ts < CACHE_TTL_MS) {
+        serverExcludes = cached.ids
+      } else {
+        const cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+        const { data: recent } = await supabase
+          .from('meal_signals')
+          .select('meal_id, signal, created_at')
+          .eq('user_id', user.id)
+          .in('signal', ['rejected', 'skipped', 'swapped'])
+          .gte('created_at', cutoff)
+          .order('created_at', { ascending: false })
+          .limit(40)
+        if (recent) {
+          serverExcludes = recent.map(r => r.meal_id)
+          excludeCache.set(user.id, { ids: serverExcludes, ts: Date.now() })
+        }
+      }
     }
   } catch {
     // Supabase unavailable — continue without server-side excludes

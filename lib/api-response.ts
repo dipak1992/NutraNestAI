@@ -29,13 +29,19 @@ type RouteHandler = (req: Request, ctx?: unknown) => Promise<Response>
  */
 export function withErrorHandler(name: string, handler: RouteHandler): RouteHandler {
   return async (req, ctx) => {
+    const requestId = req.headers.get('x-request-id') ?? crypto.randomUUID()
     try {
-      return await handler(req, ctx)
+      const res = await handler(req, ctx)
+      res.headers.set('x-request-id', requestId)
+      return res
     } catch (err) {
       logger.error(`[${name}] Unhandled error`, {
+        requestId,
         error: err instanceof Error ? err.message : String(err),
       })
-      return apiError('An unexpected error occurred. Please try again.', 500)
+      const res = apiError('An unexpected error occurred. Please try again.', 500)
+      res.headers.set('x-request-id', requestId)
+      return res
     }
   }
 }

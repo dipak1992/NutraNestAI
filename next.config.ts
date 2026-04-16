@@ -13,18 +13,7 @@ const securityHeaders = [
     key: 'Strict-Transport-Security',
     value: 'max-age=63072000; includeSubDomains; preload',
   },
-  {
-    key: 'Content-Security-Policy',
-    value: [
-      "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.posthog.com https://*.sentry.io",
-      "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https:",
-      "font-src 'self' data:",
-      "connect-src 'self' https://*.supabase.co https://*.posthog.com https://*.sentry.io https://api.resend.com https://api.openai.com https://api.anthropic.com",
-      "frame-ancestors 'none'",
-    ].join('; '),
-  },
+  // CSP is now handled dynamically by middleware.ts with per-request nonce
 ]
 
 const nextConfig: NextConfig = {

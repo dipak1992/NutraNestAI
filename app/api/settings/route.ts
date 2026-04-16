@@ -51,17 +51,8 @@ export async function DELETE() {
 
   const admin = createSupabaseServiceClient()
 
-  // Remove all user-owned data rows first
-  await Promise.all([
-    admin.from('pantry_items').delete().eq('user_id', user.id),
-    admin.from('saved_meals').delete().eq('user_id', user.id),
-    admin.from('onboarding_preferences').delete().eq('user_id', user.id),
-  ])
-
-  // Remove profile row (FK reference)
-  await admin.from('profiles').delete().eq('id', user.id)
-
-  // Delete the auth user last
+  // All user data tables have ON DELETE CASCADE on user_id FK,
+  // so deleting the auth user removes everything automatically.
   const { error } = await admin.auth.admin.deleteUser(user.id)
   if (error) return NextResponse.json({ error: 'Failed to delete account' }, { status: 500 })
 

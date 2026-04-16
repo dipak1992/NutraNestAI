@@ -10,6 +10,8 @@ export interface SendEmailOptions {
   skipLog?: boolean
   /** Idempotency key — prevents duplicate sends */
   idempotencyKey?: string
+  /** Extra headers (e.g. List-Unsubscribe) */
+  headers?: Record<string, string>
 }
 
 interface SendResult {
@@ -29,7 +31,7 @@ async function sleep(ms: number) {
  * Core send utility with retry logic and DB logging.
  */
 export async function sendEmail(options: SendEmailOptions, attempt = 0): Promise<SendResult> {
-  const { to, subject, react, replyTo, skipLog, idempotencyKey } = options
+  const { to, subject, react, replyTo, skipLog, idempotencyKey, headers } = options
 
   // Idempotency guard — check for a recent matching log
   if (idempotencyKey && !skipLog) {
@@ -58,6 +60,7 @@ export async function sendEmail(options: SendEmailOptions, attempt = 0): Promise
       subject,
       react,
       replyTo: replyTo ?? EMAIL_REPLY_TO,
+      ...(headers ? { headers } : {}),
     })
 
     if (error) throw new Error(error.message)

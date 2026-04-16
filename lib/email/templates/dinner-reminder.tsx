@@ -9,9 +9,10 @@ interface Props {
   firstName?: string
   mealTitle?: string
   mealDescription?: string
+  unsubscribeUrl?: string
 }
 
-export function DinnerReminderEmail({ firstName, mealTitle, mealDescription }: Props) {
+export function DinnerReminderEmail({ firstName, mealTitle, mealDescription, unsubscribeUrl }: Props) {
   const name = firstName ?? 'there'
   return (
     <Html>
@@ -69,6 +70,11 @@ export function DinnerReminderEmail({ firstName, mealTitle, mealDescription }: P
 
           <Section style={styles.footer}>
             <Text style={styles.footerText}>MealEase · Daily dinner reminder</Text>
+            {unsubscribeUrl && (
+              <Text style={styles.footerText}>
+                <Link href={unsubscribeUrl} style={{ color: colors.sage, fontSize: '12px' }}>Unsubscribe</Link>
+              </Text>
+            )}
           </Section>
 
         </Container>

@@ -7,9 +7,10 @@ import { SITE_URL as SITE } from '../client'
 
 interface Props {
   firstName?: string
+  unsubscribeUrl?: string
 }
 
-export function WeeklyReminderEmail({ firstName }: Props) {
+export function WeeklyReminderEmail({ firstName, unsubscribeUrl }: Props) {
   const name = firstName ?? 'there'
   return (
     <Html>
@@ -48,6 +49,11 @@ export function WeeklyReminderEmail({ firstName }: Props) {
 
           <Section style={styles.footer}>
             <Text style={styles.footerText}>MealEase · Weekly planning reminder</Text>
+            {unsubscribeUrl && (
+              <Text style={styles.footerText}>
+                <Link href={unsubscribeUrl} style={{ color: colors.sage, fontSize: '12px' }}>Unsubscribe</Link>
+              </Text>
+            )}
           </Section>
 
         </Container>

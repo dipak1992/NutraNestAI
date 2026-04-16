@@ -251,7 +251,7 @@ export function MealResultCard({ meal, mode, isSaved, onSave, onSwap, onClose }:
               className="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-2xl bg-gray-50 border border-gray-100 text-gray-600 hover:bg-gray-100 transition-colors"
             >
               <RefreshCw className="h-5 w-5" />
-              <span className="text-[11px] font-medium">Swap</span>
+              <span className="text-[11px] font-medium">Try another</span>
             </motion.button>
 
             {/* Save */}
@@ -265,7 +265,7 @@ export function MealResultCard({ meal, mode, isSaved, onSave, onSwap, onClose }:
               }`}
             >
               <Heart className={`h-5 w-5 ${isSaved ? 'fill-rose-500 text-rose-500' : ''}`} />
-              <span className="text-[11px] font-medium">{isSaved ? 'Saved' : 'Save'}</span>
+              <span className="text-[11px] font-medium">{isSaved ? 'Loved' : 'Save'}</span>
             </motion.button>
 
             {/* Quick version */}
@@ -274,7 +274,7 @@ export function MealResultCard({ meal, mode, isSaved, onSave, onSwap, onClose }:
               className="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-2xl bg-gray-50 border border-gray-100 text-gray-600 hover:bg-gray-100 transition-colors"
             >
               <Zap className="h-5 w-5" />
-              <span className="text-[11px] font-medium">Quick</span>
+              <span className="text-[11px] font-medium">15 min</span>
             </motion.button>
 
             {/* Grocery */}
@@ -358,7 +358,7 @@ export function MealResultCard({ meal, mode, isSaved, onSave, onSwap, onClose }:
               onClick={() => setStepsOpen(o => !o)}
               className="flex items-center justify-between w-full text-sm font-semibold text-gray-900 py-3 border-t border-gray-100"
             >
-              <span>{stepsOpen ? 'Hide steps' : 'Show steps'}</span>
+              <span>{stepsOpen ? 'Hide steps' : 'See how to cook it'}</span>
               {stepsOpen ? (
                 <ChevronUp className="h-4 w-4 text-gray-400" />
               ) : (
@@ -394,7 +394,7 @@ export function MealResultCard({ meal, mode, isSaved, onSave, onSwap, onClose }:
           <div className="px-5 pb-6">
             <h2 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-violet-500" />
-              For your family
+              How we adapted it
             </h2>
             <div className="space-y-3">
               {meal.variations.map((v, i) => {

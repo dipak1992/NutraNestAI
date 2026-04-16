@@ -4,9 +4,9 @@ import { useRouter } from 'next/navigation'
 import { Check, ChevronRight, ShieldCheck, Utensils } from 'lucide-react'
 
 const TRUST_BULLETS = [
-  'Picky-eater friendly — mild, familiar flavours',
-  'One base recipe adapted for the whole family',
-  'Age-appropriate textures & safety checks built in',
+  'Automatically adjusts spice, texture & portion per person',
+  'One recipe — the whole table is covered',
+  'Safety checks run in the background, always',
 ]
 
 export function FamilyIntelligence() {
@@ -38,14 +38,14 @@ export function FamilyIntelligence() {
           {/* ─── Left: copy + selector + CTA ─── */}
           <div>
             <span className="inline-block text-xs font-semibold tracking-widest uppercase text-primary/80 mb-3">
-              Family Intelligence
+              One meal, everyone covered
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight leading-[1.1] mb-4">
-              Meals your kids will{' '}
-              <span className="text-gradient-sage">actually eat.</span>
+              Handles picky eaters.{' '}
+              <span className="text-gradient-sage">Without extra effort.</span>
             </h2>
             <p className="text-muted-foreground leading-relaxed mb-8 max-w-md">
-              Tell us their age — our AI adapts every meal to match textures, spice&nbsp;levels, and portion sizes your child needs. No separate app. No extra steps.
+              Tell us who’s eating — ages, allergies, preferences. MealEase adapts every meal automatically. One recipe, every version handled. No side dishes. No separate cooking.
             </p>
 
             {/* CTA */}
@@ -53,7 +53,7 @@ export function FamilyIntelligence() {
               onClick={handleCta}
               className="inline-flex items-center gap-2 rounded-xl bg-primary px-7 py-3.5 text-sm font-semibold text-white shadow-md hover:bg-primary/90 transition-colors"
             >
-              Start planning for my family
+              See how it adapts your meals
               <ChevronRight className="h-4 w-4" />
             </button>
 
@@ -79,7 +79,7 @@ export function FamilyIntelligence() {
                 <div className="flex items-center gap-2 mb-5">
                   <Utensils className="h-4 w-4 text-primary" />
                   <span className="text-xs font-semibold text-muted-foreground tracking-wide uppercase">
-                    Same recipe, adapted automatically
+                    One dinner, adapted for everyone
                   </span>
                 </div>
 

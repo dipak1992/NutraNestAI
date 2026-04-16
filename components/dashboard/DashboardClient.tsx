@@ -45,7 +45,7 @@ const SITUATIONS: {
     id: 'smart',
     emoji: '✨',
     label: 'Surprise me',
-    hint: 'Something you\u2019ll love, picked just for you',
+    hint: 'Picked for your family, not just anyone',
   },
   {
     id: 'planner',
@@ -191,7 +191,7 @@ export function DashboardClient({ userName }: Props) {
                   What sounds good tonight?
                 </h1>
                 <p className="text-sm text-muted-foreground mt-1.5">
-                  Too tired to decide? We&apos;ll handle it.
+                  Getting smarter about what your family loves.
                 </p>
 
                 {/* Family profile chip */}
@@ -208,11 +208,11 @@ export function DashboardClient({ userName }: Props) {
                     ))}
                   </div>
                   <span className="text-xs text-muted-foreground font-medium">
-                    Family profile active
+                    Learning your family
                   </span>
                   <span className="ml-auto flex items-center gap-1 text-[11px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-0.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    Personalized
+                    Adapting for you
                   </span>
                 </div>
               </div>
@@ -245,7 +245,7 @@ export function DashboardClient({ userName }: Props) {
                 <span className="text-3xl flex-shrink-0">🎲</span>
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-sm text-violet-900">Surprise me</p>
-                  <p className="text-xs text-violet-600/80 mt-0.5">Something you&apos;ll love, picked just for you</p>
+                  <p className="text-xs text-violet-600/80 mt-0.5">Picked based on what your family tends to enjoy</p>
                 </div>
                 <Sparkles className="h-5 w-5 text-violet-400 flex-shrink-0" />
               </motion.button>
@@ -302,9 +302,9 @@ export function DashboardClient({ userName }: Props) {
                   <span className="text-lg">✅</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-emerald-900">Your family is covered</p>
+                  <p className="text-sm font-semibold text-emerald-900">Gets better with every meal</p>
                   <p className="text-xs text-emerald-700/80 mt-0.5">
-                    Every meal adapts to your household — ages, allergies, and all.
+                    The more you use MealEase, the more it knows what works for your family.
                   </p>
                 </div>
               </div>
@@ -334,7 +334,7 @@ export function DashboardClient({ userName }: Props) {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-bold text-foreground">
-                        You&apos;ve explored {totalInteractions} meal{totalInteractions !== 1 ? 's' : ''} with MealEase
+                        MealEase has learned from {totalInteractions} meal{totalInteractions !== 1 ? 's' : ''} with your family
                       </p>
                       <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
                         {savedCount > 0

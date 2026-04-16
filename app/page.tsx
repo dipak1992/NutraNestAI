@@ -63,14 +63,14 @@ function Hero() {
           <div className="text-center lg:text-left">
             <Badge className="mb-6 bg-primary/10 text-primary border-primary/20 hover:bg-primary/10">
               <Sparkles className="mr-1.5 h-3.5 w-3.5" />
-              Smart meal planning for real families
+              Learns your family. Gets smarter every week.
             </Badge>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.05] mb-4">
-              Make family meals{' '}
-              <span className="text-gradient-sage">easy.</span>
+              Dinner that knows{' '}
+              <span className="text-gradient-sage">your family.</span>
             </h1>
             <p className="text-lg sm:text-xl text-muted-foreground max-w-xl mb-3 leading-relaxed">
-              Too tired to decide? We&apos;ll handle dinner — in seconds.
+              One suggestion. Adjusted for every person at your table.
             </p>
             <p className="text-sm text-muted-foreground mb-8">No credit card required. No decisions needed.</p>
 
@@ -81,7 +81,7 @@ function Hero() {
                 <span className="text-4xl flex-shrink-0">😴</span>
                 <div className="flex-1 min-w-0">
                   <p className="text-base font-bold group-hover:text-primary transition-colors">I don&apos;t want to think</p>
-                  <p className="text-sm text-muted-foreground mt-0.5">Just pick something simple for tonight →</p>
+                  <p className="text-sm text-muted-foreground mt-0.5">We&apos;ll pick based on what your family loves →</p>
                 </div>
               </Link>
             </div>
@@ -123,7 +123,7 @@ function Hero() {
                       <div className="h-6 w-6 rounded bg-primary text-white flex items-center justify-center text-xs font-bold">M</div>
                       <span className="text-xs font-bold text-gradient-sage">MealEase</span>
                     </div>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-medium">😴 No-think dinner</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-medium">🧠 Gets smarter daily</span>
                   </div>
                   <h3 className="text-sm font-bold text-foreground">One-Pan Lemon Herb Chicken</h3>
                   <div className="flex gap-3 mt-1.5 text-[11px] text-muted-foreground">
@@ -144,8 +144,8 @@ function Hero() {
 /* ──────────────────────── SOCIAL PROOF BAR ──────────────────────── */
 function SocialProof() {
   const stats = [
-    { value: '12,000+', label: 'Families using MealEase' },
-    { value: '340K+',   label: 'Meals planned' },
+    { value: '12,000+', label: 'Families trust MealEase' },
+    { value: '340K+',   label: 'Meals personalised' },
     { value: '4.9★',    label: 'Average app rating' },
     { value: '< 2 min', label: 'Average setup time' },
   ]
@@ -172,7 +172,7 @@ function SocialProof() {
             ))}
           </div>
           <p className="text-sm font-medium text-amber-900">
-            Joined by <span className="font-bold">12,000+ families</span> — rated 4.9 ★
+            Trusted by <span className="font-bold">12,000+ families</span> to handle dinner every night
           </p>
         </div>
         {/* Stats */}
@@ -207,13 +207,13 @@ function ProblemSolution() {
                 The Problem
               </Badge>
               <h2 className="text-2xl sm:text-3xl font-bold mb-6 leading-tight text-rose-950">
-                Family meal planning is exhausting and risky
+                Every night the same question. No good answer.
               </h2>
               <ul className="space-y-4">
                 {[
-                  "Your toddler can't eat what the baby eats. Your partner is low-sodium. Your kid has a nut allergy.",
-                  "You spend hours adapting one recipe into 4 different meals every night.",
-                  "You're terrified of accidentally giving your baby something unsafe.",
+                  "You open three recipe apps, close them all, and order takeout — again.",
+                  "Everyone at the table has different needs. You can't cook four separate meals.",
+                  "You second-guess every ingredient for the baby, the allergy, the picky one.",
                 ].map((p, i) => (
                   <li key={i} className="flex gap-3 text-rose-800">
                     <span className="mt-0.5 flex-shrink-0 h-5 w-5 rounded-full bg-rose-200 text-rose-700 flex items-center justify-center text-xs font-bold">✕</span>
@@ -240,7 +240,7 @@ function ProblemSolution() {
                 The MealEase Solution
               </Badge>
               <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-emerald-950">
-                One idea → A full plan your whole family will eat
+                One meal. Automatically right for everyone at your table.
               </h2>
               <p className="text-sm text-emerald-800 mb-5 leading-relaxed">
                 Tell us about your family once. MealEase builds complete meal plans with safe variations for every member — automatically.
@@ -273,12 +273,12 @@ function ProblemSolution() {
 /* ─────────────────────── FEATURES (dark) ─────────────────────── */
 function Features() {
   const features = [
-    { icon: Sparkles,      title: 'Smart Meal Generation',  description: 'Complete weekly meal plans in seconds — full ingredient lists and per-member instructions.', accent: 'text-violet-400', ring: 'ring-violet-500/30', bg: 'bg-violet-500/10' },
-    { icon: ShieldCheck,   title: 'Safety First',           description: 'Automatic safety checks for every household member — no honey for babies, egg-free for allergies.', accent: 'text-amber-400', ring: 'ring-amber-500/30', bg: 'bg-amber-500/10' },
-    { icon: Users,         title: 'Per-Member Variations',  description: 'Each family member gets their own tailored variation of every meal, from one base recipe.', accent: 'text-blue-400', ring: 'ring-blue-500/30', bg: 'bg-blue-500/10' },
-    { icon: Calendar,      title: 'Weekly Planner',         description: 'Visual 7-day planner with meal regeneration and nutrition overview at a glance.', accent: 'text-pink-400', ring: 'ring-pink-500/30', bg: 'bg-pink-500/10' },
-    { icon: ShoppingCart,  title: 'Smart Grocery Lists',    description: 'Auto-consolidated grocery lists with quantity estimates, pantry deduction, and per-aisle organisation.', accent: 'text-emerald-400', ring: 'ring-emerald-500/30', bg: 'bg-emerald-500/10' },
-    { icon: UtensilsCrossed, title: 'Pantry Tracking',      description: 'Track what you have on hand. MealEase prioritises existing pantry items before suggesting new purchases.', accent: 'text-orange-400', ring: 'ring-orange-500/30', bg: 'bg-orange-500/10' },
+    { icon: Sparkles,      title: 'Learns your taste',       description: 'Every swap and save teaches MealEase what your family loves. Suggestions get better every single week.', accent: 'text-violet-400', ring: 'ring-violet-500/30', bg: 'bg-violet-500/10' },
+    { icon: ShieldCheck,   title: 'Safe for every age',       description: 'Built-in rules screen every ingredient against ages, allergies, and conditions — before anything reaches your screen.', accent: 'text-amber-400', ring: 'ring-amber-500/30', bg: 'bg-amber-500/10' },
+    { icon: Users,         title: 'One meal, every version',  description: 'Cook once. Each family member gets their own perfectly adapted plate — from the same base recipe.', accent: 'text-blue-400', ring: 'ring-blue-500/30', bg: 'bg-blue-500/10' },
+    { icon: Calendar,      title: 'Full week, zero repeats',  description: 'A 7-day dinner plan that actually works for your household — regenerate any night with a tap.', accent: 'text-pink-400', ring: 'ring-pink-500/30', bg: 'bg-pink-500/10' },
+    { icon: ShoppingCart,  title: 'Grocery list, done',       description: 'One combined list for the whole week. Pantry items are deducted automatically so you only buy what you need.', accent: 'text-emerald-400', ring: 'ring-emerald-500/30', bg: 'bg-emerald-500/10' },
+    { icon: UtensilsCrossed, title: 'Use what you already have', description: 'Snap your fridge or enter what\u2019s in your pantry — MealEase builds meals around ingredients you own.', accent: 'text-orange-400', ring: 'ring-orange-500/30', bg: 'bg-orange-500/10' },
   ]
 
   return (
@@ -286,8 +286,8 @@ function Features() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="text-center mb-14">
           <Badge className="mb-4 bg-white/10 text-white/80 border-white/20 hover:bg-white/10">Features</Badge>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white">Everything your family needs</h2>
-          <p className="mt-3 text-white/50 max-w-xl mx-auto">One app. Every person at your table. Every night of the week.</p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-white">Gets smarter the more you use it.</h2>
+          <p className="mt-3 text-white/50 max-w-xl mx-auto">Every meal suggestion is shaped by what your family eats, loves, and needs.</p>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {features.map((f) => {
@@ -327,9 +327,9 @@ function Testimonials() {
         <div className="text-center mb-14">
           <Badge variant="outline" className="mb-4 border-orange-200 text-orange-700 bg-white/80">Real families, real results</Badge>
           <blockquote className="text-2xl sm:text-3xl font-bold text-foreground leading-snug max-w-2xl mx-auto mb-4">
-            &ldquo;I don&apos;t second-guess dinner anymore.&rdquo;
+            &ldquo;Feels like it reads our minds.&rdquo;
           </blockquote>
-          <p className="text-muted-foreground">— Loved by 12,000+ families navigating allergies, conditions, babies and picky eaters</p>
+          <p className="text-muted-foreground">— Even works for picky eaters. Loved by 12,000+ families.</p>
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -522,11 +522,11 @@ function FinalCta() {
           Join 12,000+ families
         </Badge>
         <h2 className="text-3xl sm:text-5xl font-bold text-white mb-5 leading-tight">
-          Your next dinner is<br />already decided.
+          Dinner that gets<br />your family.
         </h2>
         <p className="text-white/80 mb-8 text-lg leading-relaxed">
-          Stop opening three recipe tabs and closing them again.<br className="hidden sm:block" />
-          MealEase handles dinner so you can focus on the people eating it.
+          Stop guessing what everyone will eat.<br className="hidden sm:block" />
+          MealEase learns your family and handles dinner — so you just show up and eat.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-5">
           <Button asChild size="lg" variant="secondary" className="w-full sm:w-auto px-8 text-base shadow-xl font-semibold">
@@ -536,7 +536,7 @@ function FinalCta() {
             <Link href="/tonight?mode=tired">See tonight&apos;s meal →</Link>
           </Button>
         </div>
-        <p className="text-white/50 text-xs">No credit card required &middot; No decisions needed &middot; Built for real families</p>
+        <p className="text-white/50 text-xs">Learns your family &middot; Gets smarter every meal &middot; Built for real life</p>
       </div>
     </section>
   )

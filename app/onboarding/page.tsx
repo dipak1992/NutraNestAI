@@ -80,9 +80,9 @@ function StepHousehold({
   onSelect: (type: HouseholdType) => void
 }) {
   const options: { value: HouseholdType; emoji: string; label: string; sub: string }[] = [
-    { value: 'solo',   emoji: '🧑',          label: 'Just me',  sub: 'Solo meals, personal portions' },
-    { value: 'couple', emoji: '👫',           label: 'Couple',   sub: 'Two adults sharing meals' },
-    { value: 'family', emoji: '👨‍👩‍👧‍👦', label: 'Family',   sub: 'Adults and kids at the table' },
+    { value: 'solo',   emoji: '🧑',          label: 'Just me',  sub: 'Built around your taste, not anyone else\'s' },
+    { value: 'couple', emoji: '👫',           label: 'Couple',   sub: 'Two tastes, one meal that works for both' },
+    { value: 'family', emoji: '👨‍👩‍👧‍👦', label: 'Family',   sub: 'Kids and adults — all handled automatically' },
   ]
 
   return (
@@ -90,7 +90,7 @@ function StepHousehold({
       <div>
         <p className="text-sm font-medium text-primary mb-2">Step 1 of 5</p>
         <h1 className="text-2xl font-bold tracking-tight">Who are you cooking for?</h1>
-        <p className="text-muted-foreground mt-2 text-sm">We'll shape every meal around your household.</p>
+        <p className="text-muted-foreground mt-2 text-sm">We’ll build a flavour profile your whole household loves.</p>
       </div>
       <div className="grid gap-3">
         {options.map((opt) => (
@@ -141,8 +141,8 @@ function StepFamily({
     <div className="space-y-8">
       <div>
         <p className="text-sm font-medium text-primary mb-2">Step 2 of 5</p>
-        <h1 className="text-2xl font-bold tracking-tight">About your household</h1>
-        <p className="text-muted-foreground mt-2 text-sm">Helps us keep meals safe and age-appropriate.</p>
+        <h1 className="text-2xl font-bold tracking-tight">Tell us about the little ones</h1>
+        <p className="text-muted-foreground mt-2 text-sm">We’ll keep every meal safe and age-right — automatically.</p>
       </div>
       <div className="space-y-5">
         <div>
@@ -173,7 +173,7 @@ function StepFamily({
         <div className="flex items-center justify-between p-5 rounded-xl border border-border/60 bg-muted/20">
           <div>
             <p className="text-sm font-medium">Any picky eaters?</p>
-            <p className="text-xs text-muted-foreground mt-1">We'll keep things crowd-pleasing</p>
+            <p className="text-xs text-muted-foreground mt-1">Mild, familiar, guaranteed crowd-pleasing</p>
           </div>
           <Toggle checked={pickyEater} onChange={() => setPickyEater(!pickyEater)} />
         </div>
@@ -216,7 +216,7 @@ function StepCuisine({
       <div>
         <p className="text-sm font-medium text-primary mb-2">Step 3 of 5</p>
         <h1 className="text-2xl font-bold tracking-tight">What cuisines do you love?</h1>
-        <p className="text-muted-foreground mt-2 text-sm">Pick any you enjoy — or skip ahead.</p>
+        <p className="text-muted-foreground mt-2 text-sm">We’ll lean toward these when picking your meals.</p>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -292,8 +292,8 @@ function StepLifestyle({
     <div className="space-y-8">
       <div>
         <p className="text-sm font-medium text-primary mb-2">Step 4 of 5</p>
-        <h1 className="text-2xl font-bold tracking-tight">How do you like to cook?</h1>
-        <p className="text-muted-foreground mt-2 text-sm">This shapes how we time every recipe.</p>
+        <h1 className="text-2xl font-bold tracking-tight">How much time do you usually have?</h1>
+        <p className="text-muted-foreground mt-2 text-sm">We’ll match every suggestion to your real schedule.</p>
       </div>
       <div className="space-y-6">
         <div>
@@ -323,7 +323,7 @@ function StepLifestyle({
             <span className="text-xl mt-0.5">⚡</span>
             <div>
               <p className="text-sm font-medium">Low energy mode</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Prioritize quick, minimal-effort meals on tough days</p>
+              <p className="text-xs text-muted-foreground mt-0.5">On hard days, we’ll suggest meals under 20 minutes.</p>
             </div>
           </div>
           <Toggle checked={lowEnergy} onChange={() => setLowEnergy(!lowEnergy)} />
@@ -351,7 +351,7 @@ function StepLocation({
       <div>
         <p className="text-sm font-medium text-primary mb-2">Step 5 of 5</p>
         <h1 className="text-2xl font-bold tracking-tight">Where are you based?</h1>
-        <p className="text-muted-foreground mt-2 text-sm">Helps us suggest locally available ingredients.</p>
+        <p className="text-muted-foreground mt-2 text-sm">We’ll suggest ingredients you can actually find nearby.</p>
       </div>
       <div className="space-y-4">
         <div>
@@ -422,9 +422,9 @@ function StepDone({
     <div className="text-center space-y-8 py-4">
       <div>
         <div className="text-5xl mb-5">🎉</div>
-        <h1 className="text-2xl font-bold tracking-tight">You're all set!</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Your family profile is ready.</h1>
         <p className="text-muted-foreground mt-2.5 text-sm leading-relaxed max-w-xs mx-auto">
-          MealEase will personalize every meal recommendation for your household. You can update these any time.
+          MealEase now knows your household. Every suggestion from here is shaped around your family — and it gets more precise the more you use it.
         </p>
       </div>
 
@@ -447,14 +447,14 @@ function StepDone({
           className="w-full gap-2 gradient-sage text-white border-0 shadow-md shadow-primary/20"
         >
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <span>✨</span>}
-          Improve my meal plan
+          See what we picked for you
         </Button>
         <button
           type="button"
           onClick={onSkip}
           className="block w-full text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
         >
-          Maybe later — take me to my dashboard
+          Skip for now — I’ll explore first
         </button>
       </div>
     </div>

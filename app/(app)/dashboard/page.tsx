@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { DashboardClient } from '@/components/dashboard/DashboardClient'
+import { HomeHub } from '@/components/hub/HomeHub'
 
 export const metadata = { title: 'Dashboard – MealEase' }
 
@@ -9,6 +9,6 @@ export default async function DashboardPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  return <DashboardClient userName={user.email ?? 'there'} />
+  return <HomeHub userName={user.email ?? 'there'} />
 }
 

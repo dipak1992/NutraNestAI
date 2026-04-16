@@ -59,6 +59,7 @@ export async function POST(req: Request) {
     body.set('customer_email', user.email ?? '')
     body.set('client_reference_id', user.id)
     body.set('allow_promotion_codes', 'true')
+    body.set('automatic_tax[enabled]', 'true')
     body.set('subscription_data[metadata][user_id]', user.id)
     body.set('subscription_data[metadata][plan]', plan)
     // 7-day free trial baked in

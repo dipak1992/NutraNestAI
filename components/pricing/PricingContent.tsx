@@ -21,8 +21,9 @@ import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 
 const MONTHLY_PRICE = 9.99
 const ANNUAL_PRICE = 79.99
-const ANNUAL_MONTHLY = Math.round((ANNUAL_PRICE / 12) * 100) / 100 // $12.42
-const ANNUAL_SAVINGS = Math.round((1 - ANNUAL_PRICE / (MONTHLY_PRICE * 12)) * 100) // 35%
+const FULL_ANNUAL_PRICE = (MONTHLY_PRICE * 12).toFixed(2) // $119.88
+const ANNUAL_MONTHLY = Math.round((ANNUAL_PRICE / 12) * 100) / 100 // $6.67
+const ANNUAL_SAVINGS = Math.round((1 - ANNUAL_PRICE / (MONTHLY_PRICE * 12)) * 100) // 33%
 
 const TESTIMONIALS = [
   {
@@ -87,8 +88,6 @@ export function PricingContent() {
   const { status, loading: paywallLoading } = usePaywallStatus()
   const router = useRouter()
 
-  const currentPrice = isAnnual ? ANNUAL_MONTHLY : MONTHLY_PRICE
-  const billingLabel = isAnnual ? '/mo billed annually' : '/month'
   const plan = isAnnual ? 'yearly' : 'monthly'
 
   const handleStartTrial = useCallback(async () => {
@@ -255,15 +254,26 @@ export function PricingContent() {
             </div>
           </div>
           <div className="mb-1">
-            <p className="text-4xl font-bold">
-              ${currentPrice.toFixed(2)}
-              <span className="ml-1 text-base font-normal text-muted-foreground">
-                {billingLabel}
-              </span>
-            </p>
-            {isAnnual && (
-              <p className="text-sm text-emerald-700 font-medium mt-1">
-                ${ANNUAL_PRICE}/year — save ${(MONTHLY_PRICE * 12 - ANNUAL_PRICE)} vs monthly
+            {isAnnual ? (
+              <>
+                <div className="flex items-baseline gap-2">
+                  <p className="text-4xl font-bold">
+                    ${ANNUAL_PRICE}
+                    <span className="ml-1 text-base font-normal text-muted-foreground">/year</span>
+                  </p>
+                  <span className="text-sm text-muted-foreground line-through">${FULL_ANNUAL_PRICE}</span>
+                </div>
+                <div className="flex items-center gap-2 mt-1">
+                  <Badge className="bg-emerald-100 text-emerald-800 border-0 text-xs">{ANNUAL_SAVINGS}% off</Badge>
+                  <p className="text-sm text-emerald-700 font-medium">
+                    Just ${ANNUAL_MONTHLY.toFixed(2)}/month
+                  </p>
+                </div>
+              </>
+            ) : (
+              <p className="text-4xl font-bold">
+                ${MONTHLY_PRICE}
+                <span className="ml-1 text-base font-normal text-muted-foreground">/month</span>
               </p>
             )}
           </div>

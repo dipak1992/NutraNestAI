@@ -10,6 +10,7 @@ import {
 import { PublicSiteHeader } from '@/components/layout/PublicSiteHeader'
 import { PublicSiteFooter } from '@/components/layout/PublicSiteFooter'
 import { FamilyIntelligence } from '@/components/landing/FamilyIntelligence'
+import { PricingPreview } from '@/components/landing/PricingPreview'
 
 // All Unsplash IDs curl-verified 200 before use
 const U = (id: string) =>
@@ -406,62 +407,6 @@ function TrustBadges() {
               </div>
             )
           })}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-/* ─────────────────────── PRICING ─────────────────────── */
-function PricingPreview() {
-  const tiers = [
-    {
-      name: 'Free', price: '$0', description: 'Preview the value with no friction.',
-      features: ['Instant tonight meal preview', '2 extra swipes per day', '3 baby & kids recipes per day', '3-day weekly plan preview', 'No card required'],
-      cta: 'Get started free', href: '/signup', highlighted: false,
-    },
-    {
-      name: 'Pro', price: '$9.99', period: '/month', description: 'Unlock the full planning workflow.',
-      features: ['Full 7-day planner', 'Smart grocery list', 'Pantry tracking', 'Insights dashboard', 'Unlimited swipes', 'Unlimited kids recipes', 'Weekly kids meal plan', 'Photo-to-recipe', 'Advanced planning tools'],
-      cta: 'Upgrade to Pro', href: '/signup?plan=pro', highlighted: true,
-    },
-  ]
-
-  return (
-    <section className="py-20 sm:py-24 bg-muted/25">
-      <div className="mx-auto max-w-5xl px-4 sm:px-6">
-        <div className="text-center mb-14">
-          <Badge variant="outline" className="mb-4">Pricing</Badge>
-          <h2 className="text-3xl sm:text-4xl font-bold">Simple, family-friendly pricing</h2>
-          <p className="mt-3 text-muted-foreground">All plans include a 14-day free trial.</p>
-        </div>
-        <div className="grid sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
-          {tiers.map((tier) => (
-            <div key={tier.name} className={`rounded-2xl border p-6 flex flex-col ${tier.highlighted ? 'border-primary bg-primary/5 shadow-xl ring-1 ring-primary/20' : 'border-border/60 bg-card'}`}>
-              {tier.highlighted && <Badge className="w-fit mb-3 bg-primary text-white">Most popular</Badge>}
-              <h3 className="font-bold text-xl">{tier.name}</h3>
-              <div className="mt-1 flex items-baseline gap-1 mb-1">
-                <span className="text-3xl font-bold">{tier.price}</span>
-                {tier.period && <span className="text-muted-foreground text-sm">{tier.period}</span>}
-              </div>
-              <p className="text-sm text-muted-foreground mb-4">{tier.description}</p>
-              <ul className="space-y-2 mb-6 flex-1">
-                {tier.features.map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-sm">
-                    <Check className="h-4 w-4 text-primary flex-shrink-0" />{f}
-                  </li>
-                ))}
-              </ul>
-              <Button asChild variant={tier.highlighted ? 'default' : 'outline'} className="w-full">
-                <Link href={tier.href}>{tier.cta}</Link>
-              </Button>
-              {tier.highlighted && (
-                <p className="text-center text-xs text-muted-foreground mt-3">
-                  Used by 3,200+ families in early access
-                </p>
-              )}
-            </div>
-          ))}
         </div>
       </div>
     </section>

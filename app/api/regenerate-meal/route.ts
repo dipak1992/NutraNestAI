@@ -15,13 +15,13 @@ export async function POST(req: NextRequest) {
   if (!user) return apiError('Unauthenticated', 401)
 
   try {
-    const body = await req.json() as { request: AIGenerationRequest; modifier: string }
+    const body = await req.json() as { request: AIGenerationRequest; modifier: string; currentMealContext?: Record<string, unknown> }
 
     if (!body.request || !body.modifier) {
       return NextResponse.json({ error: 'Missing required fields: request, modifier' }, { status: 400 })
     }
 
-    const plan = await regenerateMeals(body.request, body.modifier)
+    const plan = await regenerateMeals(body.request, body.modifier, body.currentMealContext)
     return NextResponse.json(plan)
   } catch (err) {
     logger.error('[regenerate-meal] Error', { error: err instanceof Error ? err.message : String(err) })

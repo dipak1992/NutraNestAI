@@ -92,6 +92,8 @@ export interface EngineMeta {
   pickyEaterAdjusted: boolean
   localityApplied: boolean
   selectionReason: string
+  /** True when < 2 viable candidates remained after allergen/dietary filtering */
+  poolExhausted?: boolean
 }
 
 export interface SmartMealResult {

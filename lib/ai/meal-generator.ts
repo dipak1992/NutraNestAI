@@ -9,6 +9,7 @@ import type {
 } from '@/types';
 import { DEMO_WEEKLY_PLAN } from '@/lib/demo-data';
 import { format, addDays } from 'date-fns';
+import logger from '@/lib/logger';
 
 // ── Prompt Builder ──────────────────────────────────────────
 
@@ -94,7 +95,11 @@ function buildUserPrompt(request: AIGenerationRequest): string {
     ? `\nUse these pantry items first: ${request.pantry_items.join(', ')}`
     : '';
   const regenerateNote = request.regenerate_params
-    ? `\nREGENERATE with modifier: "${request.regenerate_params.modifier}". Keep the overall structure but apply this modifier to the affected meals.`
+    ? `\nREGENERATE with modifier: "${request.regenerate_params.modifier}". Keep the overall structure but apply this modifier to the affected meals.${
+        request.regenerate_params.current_meal_context
+          ? `\n\nCURRENT MEAL CONTEXT (JSON):\n${JSON.stringify(request.regenerate_params.current_meal_context, null, 2)}`
+          : ''
+      }`
     : '';
 
   return `Generate a complete 7-day family meal plan for the week starting ${weekStart}.
@@ -162,6 +167,16 @@ async function generateWithClaude(
     throw new Error('Unexpected AI response type');
   }
 
+  // Log token usage
+  if (message.usage) {
+    logger.info('[meal-generator] Token usage', {
+      feature: 'generate-plan',
+      provider: 'anthropic',
+      prompt_tokens: message.usage.input_tokens,
+      completion_tokens: message.usage.output_tokens,
+    });
+  }
+
   try {
     // Claude sometimes wraps JSON in markdown — strip it
     let jsonText = content.text.trim();
@@ -197,10 +212,11 @@ function generateMockPlan(request: AIGenerationRequest): AIGeneratedPlan {
 
 export async function regenerateMeals(
   request: AIGenerationRequest,
-  modifier: string
+  modifier: string,
+  currentMealContext?: Record<string, unknown>,
 ): Promise<AIGeneratedPlan> {
   return generateMealPlan({
     ...request,
-    regenerate_params: { modifier },
+    regenerate_params: { modifier, current_meal_context: currentMealContext },
   });
 }

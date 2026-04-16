@@ -311,6 +311,7 @@ export function generateSmartMeal(
 
   // Filter out eliminated meals (allergens/dietary)
   const viable = scored.filter(s => s.score > -1000)
+  const poolExhausted = viable.length < 2
   const pool2 = viable.length > 0 ? viable : scored
 
   // Weighted random: pick from top candidates proportionally
@@ -335,7 +336,7 @@ export function generateSmartMeal(
     if (rand <= 0) { best = w; break }
   }
 
-  return assembleMeal(best.meal, request, pantry, locality, best.score, best.reasons)
+  return assembleMeal(best.meal, request, pantry, locality, best.score, best.reasons, poolExhausted)
 }
 
 // ════════════════════════════════════════════════════════════
@@ -349,6 +350,7 @@ function assembleMeal(
   locality: string,
   score: number,
   reasons: string[],
+  poolExhausted = false,
 ): SmartMealResult {
   const localitySwaps = LOCALITY_SWAPS[locality] ?? {}
   const localityApplied = locality !== 'global' && locality !== 'us' && Object.keys(localitySwaps).length > 0
@@ -416,6 +418,7 @@ function assembleMeal(
     pickyEaterAdjusted: !!(request.pickyEater?.active),
     localityApplied,
     selectionReason: reasons.join('. '),
+    ...(poolExhausted ? { poolExhausted: true } : {}),
   }
 
   return {

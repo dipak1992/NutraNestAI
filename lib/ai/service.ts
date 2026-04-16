@@ -16,9 +16,15 @@ export interface AITextOptions {
   maxTokens?: number
 }
 
+export interface AITokenUsage {
+  prompt_tokens: number
+  completion_tokens: number
+}
+
 export interface AITextResult {
   text: string
   provider: 'openai' | 'anthropic'
+  usage?: AITokenUsage
 }
 
 // ── OpenAI ────────────────────────────────────────────────────────────────────
@@ -47,7 +53,13 @@ async function callOpenAI(opts: AITextOptions): Promise<AITextResult> {
     )
 
     const text = response.choices[0]?.message?.content ?? ''
-    return { text, provider: 'openai' }
+    return {
+      text,
+      provider: 'openai',
+      usage: response.usage
+        ? { prompt_tokens: response.usage.prompt_tokens ?? 0, completion_tokens: response.usage.completion_tokens ?? 0 }
+        : undefined,
+    }
   } finally {
     clearTimeout(timer)
   }
@@ -78,7 +90,13 @@ async function callAnthropic(opts: AITextOptions): Promise<AITextResult> {
 
     const content = message.content[0]
     if (content.type !== 'text') throw new Error('Unexpected Anthropic response type')
-    return { text: content.text, provider: 'anthropic' }
+    return {
+      text: content.text,
+      provider: 'anthropic',
+      usage: message.usage
+        ? { prompt_tokens: message.usage.input_tokens, completion_tokens: message.usage.output_tokens }
+        : undefined,
+    }
   } finally {
     clearTimeout(timer)
   }
@@ -95,7 +113,10 @@ export async function generateText(opts: AITextOptions): Promise<AITextResult> {
   if (process.env.OPENAI_API_KEY) {
     try {
       const result = await callOpenAI(opts)
-      logger.info('[ai/service] Generated via OpenAI')
+      logger.info('[ai/service] Generated via OpenAI', {
+        provider: 'openai',
+        ...(result.usage ? { prompt_tokens: result.usage.prompt_tokens, completion_tokens: result.usage.completion_tokens } : {}),
+      })
       return result
     } catch (err) {
       logger.warn('[ai/service] OpenAI failed, falling back to Anthropic', {
@@ -106,7 +127,10 @@ export async function generateText(opts: AITextOptions): Promise<AITextResult> {
 
   // Fall back to Anthropic
   const result = await callAnthropic(opts)
-  logger.info('[ai/service] Generated via Anthropic')
+  logger.info('[ai/service] Generated via Anthropic', {
+    provider: 'anthropic',
+    ...(result.usage ? { prompt_tokens: result.usage.prompt_tokens, completion_tokens: result.usage.completion_tokens } : {}),
+  })
   return result
 }
 

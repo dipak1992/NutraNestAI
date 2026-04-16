@@ -387,6 +387,8 @@ export interface AIGenerationRequest {
     modifier: string;
     meal_ids?: string[];
     day_ids?: string[];
+    /** Full current meal context for targeted regeneration */
+    current_meal_context?: Record<string, unknown>;
   };
   pantry_items?: string[];
   feedback_history?: MealFeedback[];

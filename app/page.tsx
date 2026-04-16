@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
   Sparkles, ShieldCheck, Users, Calendar, ShoppingCart,
-  ChevronRight, Check, Star, BookOpen, Soup, Lock,
+  ChevronRight, Check, BookOpen, Soup, Lock,
   BadgeCheck, Heart, UserCheck, UtensilsCrossed, Clock,
   ArrowRight,
 } from 'lucide-react'
@@ -11,6 +11,7 @@ import { PublicSiteHeader } from '@/components/layout/PublicSiteHeader'
 import { PublicSiteFooter } from '@/components/layout/PublicSiteFooter'
 import { FamilyIntelligence } from '@/components/landing/FamilyIntelligence'
 import { PricingPreview } from '@/components/landing/PricingPreview'
+import { StickyMobileCta } from '@/components/landing/StickyMobileCta'
 
 // All Unsplash IDs curl-verified 200 before use
 const U = (id: string) =>
@@ -45,17 +46,7 @@ function Hero() {
         <div className="absolute inset-0 bg-gradient-to-bl from-emerald-50/30 via-transparent to-transparent" />
       </div>
 
-      {/* Decorative emoji layer */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden select-none">
-        {['🍋','🫑','🧄','🍅','🥦','🧅','🫒','🥕'].map((emoji, i) => (
-          <span key={i} className="absolute opacity-[0.12]" style={{
-            top:  `${[12,70,30,85,15,60,42,78][i]}%`,
-            left: `${[5,90,82,8,55,3,72,48][i]}%`,
-            transform: `rotate(${[-15,20,-8,25,12,-20,5,-12][i]}deg)`,
-            fontSize: `${[3,2.5,3.5,2,3,2.5,3.5,2][i]}rem`,
-          }}>{emoji}</span>
-        ))}
-      </div>
+
 
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -100,6 +91,19 @@ function Hero() {
               ))}
             </div>
 
+            {/* Mobile app preview card */}
+            <div className="block lg:hidden mt-6 rounded-2xl overflow-hidden shadow-lg border border-border/40">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={HERO_IMG} alt="Family dinner" className="w-full aspect-[16/9] object-cover" loading="lazy" />
+              <div className="p-4 bg-white border-t border-border/40">
+                <h3 className="text-sm font-bold">One-Pan Lemon Herb Chicken</h3>
+                <div className="flex gap-3 mt-1 text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1"><Clock className="h-3 w-3 text-primary" /> 30 min</span>
+                  <span className="flex items-center gap-1"><Users className="h-3 w-3 text-primary" /> Serves 4</span>
+                </div>
+              </div>
+            </div>
+
             <div className="flex flex-col sm:flex-row gap-2 justify-center lg:justify-start items-center text-sm text-muted-foreground">
               <span>Already have an account?</span>
               <div className="flex gap-3">
@@ -138,6 +142,7 @@ function Hero() {
           </div>
         </div>
       </div>
+      <div id="hero-sentinel" />
     </section>
   )
 }
@@ -173,7 +178,7 @@ function SocialProof() {
             ))}
           </div>
           <p className="text-sm font-medium text-amber-900">
-            Joined by <span className="font-bold">3,200+ families</span> in early access
+            Trusted by <span className="font-bold">thousands</span> of families
           </p>
         </div>
         {/* Stats */}
@@ -222,11 +227,7 @@ function ProblemSolution() {
                   </li>
                 ))}
               </ul>
-              {/* Photo inset */}
-              <div className="mt-8 rounded-2xl overflow-hidden shadow-md border border-rose-100">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={PROBLEM_IMG} alt="Overwhelmed parent at dinner time" className="w-full aspect-[16/7] object-cover" loading="lazy" />
-              </div>
+
             </div>
           </div>
 
@@ -336,11 +337,6 @@ function Testimonials() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {items.map((t) => (
             <div key={t.author} className="bg-white rounded-2xl border border-orange-100 shadow-sm p-6 flex flex-col gap-4">
-              <div className="flex gap-0.5">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
-                ))}
-              </div>
               <p className="text-sm text-muted-foreground leading-relaxed flex-1">&ldquo;{t.quote}&rdquo;</p>
               <div>
                 <div className="flex items-center gap-3 mb-2">
@@ -464,7 +460,7 @@ function FinalCta() {
 
       <div className="relative mx-auto max-w-2xl px-4 text-center">
         <Badge className="mb-6 bg-white/15 text-white border-white/25 hover:bg-white/15">
-          Join 3,200+ families in early access
+          Join thousands of families
         </Badge>
         <h2 className="text-3xl sm:text-5xl font-bold text-white mb-5 leading-tight">
           Dinner that gets<br />your family.
@@ -523,8 +519,8 @@ export default function LandingPage() {
         <PricingPreview />
         <GrowthContent />
         <FinalCta />
-        <FriendlyDisclaimer />
       </main>
+      <StickyMobileCta />
       <PublicSiteFooter />
     </>
   )

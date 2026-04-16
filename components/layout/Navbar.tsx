@@ -40,8 +40,6 @@ const navLinks = [
   { href: '/grocery-list', label: 'Grocery List', icon: ShoppingCart },
   { href: '/pantry', label: 'Pantry', icon: Package },
   { href: '/saved', label: 'Saved', icon: Bookmark },
-  { href: '/insights', label: 'Insights', icon: BarChart3 },
-  { href: '/referral', label: 'Refer Friends', icon: Gift },
 ]
 
 export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: string; subscriptionTier?: 'free' | 'plus' | 'pro' }) {
@@ -132,6 +130,12 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
                 <Link href="/settings" className="flex items-center gap-2">
                   <User className="h-4 w-4" />
                   Profile &amp; Settings
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/insights" className="flex items-center gap-2">
+                  <BarChart3 className="h-4 w-4" />
+                  Insights
                 </Link>
               </DropdownMenuItem>
               {!isPro && (

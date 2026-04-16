@@ -72,6 +72,7 @@ export default function SettingsPage() {
           <TabsTrigger value="preferences" className="gap-2"><Leaf className="h-4 w-4" />Preferences</TabsTrigger>
           <TabsTrigger value="account" className="gap-2"><User className="h-4 w-4" />Account</TabsTrigger>
           <TabsTrigger value="notifications" className="gap-2"><Bell className="h-4 w-4" />Notifications</TabsTrigger>
+          <TabsTrigger value="billing" className="gap-2"><Crown className="h-4 w-4" />Billing</TabsTrigger>
         </TabsList>
 
         <TabsContent value="household" className="space-y-6">
@@ -219,6 +220,37 @@ export default function SettingsPage() {
 
         <TabsContent value="notifications">
           <NotificationSettings />
+        </TabsContent>
+
+        <TabsContent value="billing" className="space-y-6">
+          <div className="glass-card rounded-xl border border-border/60 p-5 space-y-4">
+            <h2 className="font-semibold flex items-center gap-2">
+              <Crown className="h-4 w-4 text-primary" />
+              Billing &amp; Plan
+            </h2>
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">
+                Current plan: <span className="font-medium text-foreground capitalize">{status.tier}</span>
+              </p>
+              <Badge className={status.isPro ? 'bg-amber-100 text-amber-800 border-0' : 'bg-primary/10 text-primary border-0'}>
+                {status.isPro ? 'Pro' : 'Free'}
+              </Badge>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {status.isPro
+                ? 'Your Pro subscription is active. All features are unlocked.'
+                : 'Upgrade to Pro to unlock the full weekly planner, grocery list, pantry, and more.'}
+            </p>
+            {status.isPro ? (
+              <Button asChild variant="outline" size="sm">
+                <Link href="/pricing">View Plan Details &rarr;</Link>
+              </Button>
+            ) : (
+              <Button asChild size="sm">
+                <Link href="/pricing?intent=pro">Upgrade to Pro</Link>
+              </Button>
+            )}
+          </div>
         </TabsContent>
       </Tabs>
     </div>

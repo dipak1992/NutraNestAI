@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { Navbar } from '@/components/layout/Navbar'
+import { MobileTabBar } from '@/components/layout/MobileTabBar'
 import type { SubscriptionTier } from '@/types'
 
 export default async function AppLayout({
@@ -17,7 +18,8 @@ export default async function AppLayout({
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar userEmail={user?.email} subscriptionTier={subscriptionTier} />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 pb-16 md:pb-0">{children}</main>
+      <MobileTabBar />
     </div>
   )
 }

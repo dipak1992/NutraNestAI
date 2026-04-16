@@ -44,30 +44,32 @@ export function PricingPreview() {
         </div>
 
         {/* Billing toggle */}
-        <div className="flex items-center justify-center gap-3 mb-10">
-          <button
-            onClick={() => setIsAnnual(false)}
-            className={`text-sm font-medium px-4 py-2 rounded-full transition-colors ${
-              !isAnnual
-                ? 'bg-primary text-primary-foreground'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            Monthly
-          </button>
-          <button
-            onClick={() => setIsAnnual(true)}
-            className={`text-sm font-medium px-4 py-2 rounded-full transition-colors ${
-              isAnnual
-                ? 'bg-primary text-primary-foreground'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            Annual
-            <Badge className="ml-2 border-0 bg-emerald-100 text-emerald-800 text-[10px]">
-              Save {ANNUAL_SAVINGS}%
-            </Badge>
-          </button>
+        <div className="flex items-center justify-center mb-10">
+          <div className="inline-flex rounded-full bg-muted p-1">
+            <button
+              onClick={() => setIsAnnual(false)}
+              className={`text-sm font-medium px-4 py-1.5 rounded-full transition-colors ${
+                !isAnnual
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Monthly
+            </button>
+            <button
+              onClick={() => setIsAnnual(true)}
+              className={`text-sm font-medium px-4 py-1.5 rounded-full transition-colors ${
+                isAnnual
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Annual
+              <Badge className="ml-2 border-0 bg-emerald-100 text-emerald-800 text-[10px]">
+                Save {ANNUAL_SAVINGS}%
+              </Badge>
+            </button>
+          </div>
         </div>
 
         <div className="grid sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
@@ -152,7 +154,7 @@ export function PricingPreview() {
               <Link href="/signup?plan=pro&trial=1">Start 7-day free trial</Link>
             </Button>
             <p className="text-center text-xs text-muted-foreground mt-3">
-              No credit card required
+              Cancel anytime &middot; No surprise charges
             </p>
           </div>
         </div>

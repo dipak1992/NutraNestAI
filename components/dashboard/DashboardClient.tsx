@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
-import { ArrowLeft, Zap, Sparkles, CalendarDays, FlameKindling, ChevronRight, BookMarked } from 'lucide-react'
+import { ArrowLeft, Zap, Sparkles, CalendarDays, ChevronRight, BookMarked } from 'lucide-react'
 import { MealSwipeStack } from '@/components/dashboard/MealSwipeStack'
 import { SmartInput } from '@/components/dashboard/SmartInput'
 import { QuickSuggestion } from '@/components/dashboard/QuickSuggestion'
@@ -62,6 +62,13 @@ function getGreeting(): string {
   if (h < 12) return 'Good morning'
   if (h < 17) return 'Good afternoon'
   return 'Good evening'
+}
+
+function getH1(): string {
+  const h = new Date().getHours()
+  if (h >= 5 && h < 11) return 'What are we cooking today?'
+  if (h >= 11 && h < 17) return "What's for dinner tonight?"
+  return 'What sounds good tonight?'
 }
 
 function stageToEmoji(stage: LifeStage): string {
@@ -188,7 +195,7 @@ export function DashboardClient({ userName }: Props) {
                   <StreakBadge />
                 </div>
                 <h1 className="text-2xl font-bold text-foreground leading-tight tracking-tight">
-                  What sounds good tonight?
+                  {getH1()}
                 </h1>
                 <p className="text-sm text-muted-foreground mt-1.5">
                   Getting smarter about what your family loves.
@@ -217,19 +224,19 @@ export function DashboardClient({ userName }: Props) {
                 </div>
               </div>
 
-              {/* ── HERO CTA — routes to /tonight (one-shot decide) ── */}
-              <motion.div whileTap={{ scale: 0.97 }} whileHover={{ scale: 1.01, transition: { duration: 0.15 } }}>
-                <Link
-                  href="/decide"
-                  className="glass-card flex items-center gap-4 w-full px-6 py-5 rounded-2xl border-2 border-primary/40 bg-primary/5 hover:bg-primary/10 hover:border-primary/60 hover:shadow-lg transition-all group text-left mb-4"
-                >
-                  <span className="text-4xl flex-shrink-0">😴</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-base font-bold group-hover:text-primary transition-colors">I don&apos;t want to think</p>
-                    <p className="text-sm text-muted-foreground mt-0.5">Just pick something simple for tonight →</p>
-                  </div>
-                </Link>
-              </motion.div>
+              {/* ── HERO CTA — inline decide (stays on dashboard) ── */}
+              <motion.button
+                whileTap={{ scale: 0.97 }}
+                whileHover={{ scale: 1.01, transition: { duration: 0.15 } }}
+                onClick={() => selectMode('tired')}
+                className="glass-card flex items-center gap-4 w-full px-6 py-5 rounded-2xl border-2 border-primary/40 bg-primary/5 hover:bg-primary/10 hover:border-primary/60 hover:shadow-lg transition-all group text-left mb-4"
+              >
+                <span className="text-4xl flex-shrink-0">😴</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-base font-bold group-hover:text-primary transition-colors">I don&apos;t want to think</p>
+                  <p className="text-sm text-muted-foreground mt-0.5">Just pick something simple for tonight →</p>
+                </div>
+              </motion.button>
 
               {/* ── Surprise me — accent card with gradient ── */}
               <motion.button
@@ -263,15 +270,16 @@ export function DashboardClient({ userName }: Props) {
                   <span className="text-[11px] text-muted-foreground">Snap your fridge</span>
                 </motion.button>
 
-                <motion.button
-                  whileTap={{ scale: 0.96 }}
-                  onClick={() => selectMode('smart')}
-                  className="glass-card rounded-xl p-4 border border-border/60 hover:border-primary/40 hover:shadow-md transition-all group text-center"
-                >
-                  <span className="text-2xl block mb-1.5">✨</span>
-                  <span className="text-xs font-semibold group-hover:text-primary transition-colors block">Get inspired</span>
-                  <span className="text-[11px] text-muted-foreground">AI picks for you</span>
-                </motion.button>
+                <motion.div whileTap={{ scale: 0.96 }}>
+                  <Link
+                    href="/grocery-list"
+                    className="glass-card rounded-xl p-4 border border-border/60 hover:border-primary/40 hover:shadow-md transition-all group text-center block"
+                  >
+                    <span className="text-2xl block mb-1.5">🛒</span>
+                    <span className="text-xs font-semibold group-hover:text-primary transition-colors block">Grocery list</span>
+                    <span className="text-[11px] text-muted-foreground">Auto-built for you</span>
+                  </Link>
+                </motion.div>
 
                 <motion.div whileTap={{ scale: 0.96 }}>
                   <Link
@@ -296,7 +304,12 @@ export function DashboardClient({ userName }: Props) {
                 </motion.div>
               </div>
 
-              {/* "Your family is covered" strip */}
+              {/* Today's meal suggestion — moved up so it's above the fold */}
+              <div className="mt-5">
+                <TodayCard />
+              </div>
+
+              {/* "Your family is covered" strip */}}
               <div className="mt-6 flex items-center gap-3 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100 px-4 py-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 flex-shrink-0">
                   <span className="text-lg">✅</span>
@@ -320,8 +333,8 @@ export function DashboardClient({ userName }: Props) {
                   <span className="text-[10px] text-muted-foreground font-medium leading-tight">meals<br/>saved</span>
                 </div>
                 <div className="flex flex-col items-center gap-0.5 rounded-xl bg-white border border-border/60 py-2.5 px-2 text-center">
-                  <FlameKindling className="h-5 w-5 text-orange-500" />
-                  <span className="text-[10px] text-muted-foreground font-medium leading-tight">streak<br/>active</span>
+                  <span className="text-lg font-bold text-foreground">{totalInteractions}</span>
+                  <span className="text-[10px] text-muted-foreground font-medium leading-tight">meals<br/>explored</span>
                 </div>
               </div>
 
@@ -345,10 +358,10 @@ export function DashboardClient({ userName }: Props) {
                     </div>
                   </div>
                   <Link
-                    href="/pricing"
+                    href="/pricing?intent=pro"
                     className="mt-3 flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition-colors"
                   >
-                    See your Pro preview
+                    Upgrade to Pro
                     <ChevronRight className="h-4 w-4" />
                   </Link>
                 </div>
@@ -359,13 +372,13 @@ export function DashboardClient({ userName }: Props) {
                 <MilestoneBanner isPro={paywallStatus.isPro} />
               </div>
 
-              {/* TodayCard + InsightCards */}
-              <div className="mt-8">
-                <TodayCard />
+              {/* InsightCards */}
+              <div className="mt-4">
                 <InsightCards />
               </div>
 
-              {/* Bottom CTA */}
+              {/* Bottom CTA — only shown when no meals are planned yet */}
+              {mealsPlannedCount === 0 && (
               <div className="mt-8 rounded-2xl overflow-hidden border border-border/60">
                 <div
                   className="relative px-5 py-5"
@@ -393,6 +406,7 @@ export function DashboardClient({ userName }: Props) {
                   </Link>
                 </div>
               </div>
+              )}
             </motion.div>
           )}
 

@@ -35,9 +35,6 @@ export default function SettingsPage() {
   const [deleteConfirm, setDeleteConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [managingBilling, setManagingBilling] = useState(false)
-  const [deleteConfirm, setDeleteConfirm] = useState(false)
-  const [deleting, setDeleting] = useState(false)
-  const [managingBilling, setManagingBilling] = useState(false)
 
   async function handleSignOut() {
     setSigningOut(true)
@@ -68,31 +65,7 @@ export default function SettingsPage() {
     updateState({ cuisinePreferences: next })
     fetch('/api/settings', {
       method: 'PATCH',
-   
-
-  async function handleDeleteAccount() {
-    setDeleting(true)
-    const res = await fetch('/api/settings', { method: 'DELETE' })
-    if (!res.ok) {
-      toast.error('Failed to delete account. Please try again.')
-      setDeleting(false)
-      return
-    }
-    await supabase.auth.signOut()
-    router.push('/')
-  }
-
-  async function handleManageSubscription() {
-    setManagingBilling(true)
-    const res = await fetch('/api/stripe/portal', { method: 'POST' })
-    if (!res.ok) {
-      toast.error('Could not open billing portal. Please try again.')
-      setManagingBilling(false)
-      return
-    }
-    const { url } = await res.json()
-    window.location.href = url
-  }   headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ cuisines: next }),
     }).catch(() => null)
   }
@@ -235,6 +208,33 @@ export default function SettingsPage() {
                 <button
                   key={opt.value}
                   onClick={() => {
+                    setCookingTimeMinutes(opt.value)
+                    fetch('/api/settings', {
+                      method: 'PATCH',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ cookingTimeMinutes: opt.value }),
+                    }).catch(() => null)
+                  }}
+                  className={`px-4 py-2 rounded-full text-sm transition-colors ${cookingTimeMinutes === opt.value ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80 text-foreground'}`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="account" className="space-y-6">
+          <div className="glass-card rounded-xl border border-border/60 p-5 space-y-4">
+            <h2 className="font-semibold">Session</h2>
+            <p className="text-sm text-muted-foreground">Sign out of your MealEase account on this device.</p>
+            <Button variant="outline" onClick={handleSignOut} disabled={signingOut} className="gap-2 text-destructive hover:text-destructive hover:bg-destructive/5">
+              <LogOut className="h-4 w-4" />{signingOut ? 'Signing out…' : 'Sign Out'}
+            </Button>
+          </div>
+          <div className="glass-card rounded-xl border border-red-200/60 p-5 space-y-4">
+            <h2 className="font-semibold text-destructive flex items-center gap-2"><Trash2 className="h-4 w-4" />Danger Zone</h2>
+            <p className="text-sm text-muted-foreground">Permanently delete your account and all household data. This cannot be undone.</p>
             {!deleteConfirm ? (
               <Button
                 variant="outline"
@@ -258,45 +258,18 @@ export default function SettingsPage() {
                   </Button>
                 </div>
               </div>
-            )}    }).catch(() => null)
-                  }}
-                  className={`px-4 py-2 rounded-full text-sm transition-colors ${cookingTimeMinutes === opt.value ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80 text-foreground'}`}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
+            )}
           </div>
         </TabsContent>
 
-        <TabsContent value="account" className="space-y-6">
+        <TabsContent value="notifications">
+          <NotificationSettings />
+        </TabsContent>
+
+        <TabsContent value="billing" className="space-y-6">
           <div className="glass-card rounded-xl border border-border/60 p-5 space-y-4">
-            <h2 className="font-semibold">Session</h2>
-            <p className="text-sm text-muted-foreground">Sign out of your MealEase account on this device.</p>
-            <Button variant="outline" onClick={handleSignOut} disabled={signingOut} className="gap-2 text-destructive hover:text-destructive hover:bg-destructive/5">
-              <LogOut className="h-4 w-4" />{signingOut ? 'Signing out…' : 'Sign Out'}
-            </Button>
-          </div>
-          <div className="glass-card rounded-xl border border-red-200/60 p-5 space-y-4">
-            <h2 className="font-semibold text-destructive flex items-center gap-2"><Trash2 className="h-4 w-4" />Danger Zone</h2>
-            <p className="text-sm text-muted-foreground">Permanently delete your account and all household data. This cannot be undone.</p>
-            {!deleteConfirm ? (
-              <ButtonTempPro
-                ? `You're on a free trial${status.tempProUntil ? ` — ends ${new Date(status.tempProUntil).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}` : ''}.`
-                : status.isPro
-                  ? 'Your Pro subscription is active. All features are unlocked.'
-                  : 'Upgrade to Pro to unlock the full weekly planner, grocery list, pantry, and more.'}
-            </p>
-            {status.isPro && !status.isTempPro ? (
-              <Button size="sm" variant="outline" onClick={handleManageSubscription} disabled={managingBilling} className="gap-2">
-                <Crown className="h-4 w-4 text-amber-500" />
-                {managingBilling ? 'Opening portal…' : 'Manage Subscription →'}
-              </Button>
-            ) : (
-              <Button asChild size="sm">
-                <Link href="/pricing?intent=pro">
-                  {status.isTempPro ? 'Upgrade to Pro →' : 'Upgrade to Pro'}
-                ive">
+            <h2 className="font-semibold flex items-center gap-2">
+              <Cive">
                   Are you sure? This will permanently delete your household, meal plans, pantry, and all saved data. This cannot be undone.
                 </p>
                 <div className="flex gap-2 flex-wrap">

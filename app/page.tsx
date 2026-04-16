@@ -37,13 +37,13 @@ function Hero() {
       {/* Real food photo backdrop */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={HERO_IMG} alt="" className="w-full h-full object-cover opacity-30" />
+        <img src={HERO_IMG} alt="" className="pointer-events-none w-full h-full object-cover opacity-30" />
         {/* Directional veil — heavier on left (text readable), opens up right so food shows */}
-        <div className="absolute inset-0 bg-gradient-to-r from-background/85 via-background/55 to-background/25" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background/85 via-background/55 to-background/25" />
         {/* Warm amber glow from bottom-left — makes it feel like a candlelit table */}
-        <div className="absolute inset-0 bg-gradient-to-tr from-amber-100/40 via-transparent to-transparent" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-amber-100/40 via-transparent to-transparent" />
         {/* Sage accent from top-right for brand color echo */}
-        <div className="absolute inset-0 bg-gradient-to-bl from-emerald-50/30 via-transparent to-transparent" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-bl from-emerald-50/30 via-transparent to-transparent" />
       </div>
 
 
@@ -453,8 +453,8 @@ function FinalCta() {
     <section className="relative overflow-hidden py-24 sm:py-32">
       {/* Full-bleed food photo + dark overlay */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
-        <img src={CTA_IMG} alt="" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/90 via-primary/75 to-slate-900/85" />
+        <img src={CTA_IMG} alt="" className="pointer-events-none w-full h-full object-cover" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-slate-900/90 via-primary/75 to-slate-900/85" />
       </div>
 
       <div className="relative mx-auto max-w-2xl px-4 text-center">

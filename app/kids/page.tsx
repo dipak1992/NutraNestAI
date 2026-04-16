@@ -157,7 +157,7 @@ function LoadingPhase({ onComplete }: { onComplete: () => void }) {
 
 function BlurredRecipeGate() {
   return (
-    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/60 backdrop-blur-[2px] rounded-xl">
+    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/60 rounded-xl">
       <Lock className="h-8 w-8 text-primary mb-3" />
       <h4 className="font-bold text-lg mb-1">Sign in to see the full recipe</h4>
       <p className="text-sm text-muted-foreground mb-4 text-center max-w-sm px-4">
@@ -213,7 +213,7 @@ function WeeklyPlanPreview({ isPro }: { isPro: boolean }) {
         </div>
 
         {!isPro && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/60 backdrop-blur-[2px] rounded-xl">
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/60 rounded-xl">
             <div className="flex items-center gap-2 mb-3">
               <Lock className="h-6 w-6 text-primary" />
               <Badge className="bg-primary text-white">Pro</Badge>
@@ -407,7 +407,7 @@ function KidsPageInner() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/90 backdrop-blur-sm">
+      <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
           <Link href="/" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="h-4 w-4" /> Back

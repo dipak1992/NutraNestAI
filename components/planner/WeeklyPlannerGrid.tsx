@@ -284,8 +284,8 @@ function LockedDayCard({
         </div>
 
         {/* Lock overlay */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-background/30 via-background/50 to-background/85 backdrop-blur-[1px]">
-          <div className="mx-4 max-w-sm rounded-2xl bg-background/95 border border-amber-300/60 shadow-lg p-5 text-center backdrop-blur-sm">
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-background/30 via-background/50 to-background/85">
+          <div className="mx-4 max-w-sm rounded-2xl bg-background/95 border border-amber-300/60 shadow-lg p-5 text-center">
             <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500 text-white">
               <Lock className="h-4 w-4" />
             </div>

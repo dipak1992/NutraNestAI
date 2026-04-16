@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createSupabaseServiceClient } from '@/lib/supabase/service'
 
 export async function PATCH(req: NextRequest) {
   try {
@@ -41,4 +42,28 @@ export async function PATCH(req: NextRequest) {
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
+}
+
+export async function DELETE() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const admin = createSupabaseServiceClient()
+
+  // Remove all user-owned data rows first
+  await Promise.all([
+    admin.from('pantry_items').delete().eq('user_id', user.id),
+    admin.from('saved_meals').delete().eq('user_id', user.id),
+    admin.from('onboarding_preferences').delete().eq('user_id', user.id),
+  ])
+
+  // Remove profile row (FK reference)
+  await admin.from('profiles').delete().eq('id', user.id)
+
+  // Delete the auth user last
+  const { error } = await admin.auth.admin.deleteUser(user.id)
+  if (error) return NextResponse.json({ error: 'Failed to delete account' }, { status: 500 })
+
+  return NextResponse.json({ ok: true })
 }

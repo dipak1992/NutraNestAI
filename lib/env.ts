@@ -24,6 +24,7 @@ export const serverEnv = {
   sentryDsn: process.env.SENTRY_DSN ?? '',
   stripeSecretKey: process.env.STRIPE_SECRET_KEY ?? '',
   stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET ?? '',
+  adminEmail: process.env.ADMIN_EMAIL ?? '',
 } as const
 
 // ─── Runtime validation (call once at startup for critical keys) ──────────────

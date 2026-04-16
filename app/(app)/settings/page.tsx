@@ -32,6 +32,12 @@ export default function SettingsPage() {
   const { cookingTimeMinutes, setCookingTimeMinutes, hasKids, kidsAgeGroup, setKidsAgeGroup } = useLightOnboardingStore()
   const [signingOut, setSigningOut] = useState(false)
   const [nameInput, setNameInput] = useState(householdName)
+  const [deleteConfirm, setDeleteConfirm] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [managingBilling, setManagingBilling] = useState(false)
+  const [deleteConfirm, setDeleteConfirm] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [managingBilling, setManagingBilling] = useState(false)
 
   async function handleSignOut() {
     setSigningOut(true)
@@ -62,9 +68,57 @@ export default function SettingsPage() {
     updateState({ cuisinePreferences: next })
     fetch('/api/settings', {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+   
+
+  async function handleDeleteAccount() {
+    setDeleting(true)
+    const res = await fetch('/api/settings', { method: 'DELETE' })
+    if (!res.ok) {
+      toast.error('Failed to delete account. Please try again.')
+      setDeleting(false)
+      return
+    }
+    await supabase.auth.signOut()
+    router.push('/')
+  }
+
+  async function handleManageSubscription() {
+    setManagingBilling(true)
+    const res = await fetch('/api/stripe/portal', { method: 'POST' })
+    if (!res.ok) {
+      toast.error('Could not open billing portal. Please try again.')
+      setManagingBilling(false)
+      return
+    }
+    const { url } = await res.json()
+    window.location.href = url
+  }   headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ cuisines: next }),
     }).catch(() => null)
+  }
+
+  async function handleDeleteAccount() {
+    setDeleting(true)
+    const res = await fetch('/api/settings', { method: 'DELETE' })
+    if (!res.ok) {
+      toast.error('Failed to delete account. Please try again.')
+      setDeleting(false)
+      return
+    }
+    await supabase.auth.signOut()
+    router.push('/')
+  }
+
+  async function handleManageSubscription() {
+    setManagingBilling(true)
+    const res = await fetch('/api/stripe/portal', { method: 'POST' })
+    if (!res.ok) {
+      toast.error('Could not open billing portal. Please try again.')
+      setManagingBilling(false)
+      return
+    }
+    const { url } = await res.json()
+    window.location.href = url
   }
 
   return (
@@ -181,12 +235,30 @@ export default function SettingsPage() {
                 <button
                   key={opt.value}
                   onClick={() => {
-                    setCookingTimeMinutes(opt.value)
-                    fetch('/api/settings', {
-                      method: 'PATCH',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ cookingTimeMinutes: opt.value }),
-                    }).catch(() => null)
+            {!deleteConfirm ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setDeleteConfirm(true)}
+                className="gap-2 text-destructive border-destructive/30 hover:bg-destructive/5"
+              >
+                <Trash2 className="h-4 w-4" />Delete My Account
+              </Button>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-sm font-medium text-destructive">
+                  Are you sure? This will permanently delete your household, meal plans, pantry, and all saved data. This cannot be undone.
+                </p>
+                <div className="flex gap-2 flex-wrap">
+                  <Button size="sm" variant="destructive" onClick={handleDeleteAccount} disabled={deleting}>
+                    {deleting ? 'Deleting…' : 'Yes, permanently delete'}
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => setDeleteConfirm(false)} disabled={deleting}>
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}    }).catch(() => null)
                   }}
                   className={`px-4 py-2 rounded-full text-sm transition-colors ${cookingTimeMinutes === opt.value ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80 text-foreground'}`}
                 >
@@ -208,12 +280,35 @@ export default function SettingsPage() {
           <div className="glass-card rounded-xl border border-red-200/60 p-5 space-y-4">
             <h2 className="font-semibold text-destructive flex items-center gap-2"><Trash2 className="h-4 w-4" />Danger Zone</h2>
             <p className="text-sm text-muted-foreground">Permanently delete your account and all household data. This cannot be undone.</p>
-            <a
-              href="mailto:hello@mealeaseai.com?subject=Account%20Deletion%20Request"
-              className="inline-flex items-center gap-2 text-sm text-destructive border border-destructive/30 rounded-md px-4 py-2 hover:bg-destructive/5 transition-colors"
-            >
-              <Trash2 className="h-4 w-4" />Contact Support to Delete Account
-            </a>
+            {!deleteConfirm ? (
+              <ButtonTempPro
+                ? `You're on a free trial${status.tempProUntil ? ` — ends ${new Date(status.tempProUntil).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}` : ''}.`
+                : status.isPro
+                  ? 'Your Pro subscription is active. All features are unlocked.'
+                  : 'Upgrade to Pro to unlock the full weekly planner, grocery list, pantry, and more.'}
+            </p>
+            {status.isPro && !status.isTempPro ? (
+              <Button size="sm" variant="outline" onClick={handleManageSubscription} disabled={managingBilling} className="gap-2">
+                <Crown className="h-4 w-4 text-amber-500" />
+                {managingBilling ? 'Opening portal…' : 'Manage Subscription →'}
+              </Button>
+            ) : (
+              <Button asChild size="sm">
+                <Link href="/pricing?intent=pro">
+                  {status.isTempPro ? 'Upgrade to Pro →' : 'Upgrade to Pro'}
+                ive">
+                  Are you sure? This will permanently delete your household, meal plans, pantry, and all saved data. This cannot be undone.
+                </p>
+                <div className="flex gap-2 flex-wrap">
+                  <Button size="sm" variant="destructive" onClick={handleDeleteAccount} disabled={deleting}>
+                    {deleting ? 'Deleting…' : 'Yes, permanently delete'}
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => setDeleteConfirm(false)} disabled={deleting}>
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         </TabsContent>
 
@@ -236,17 +331,22 @@ export default function SettingsPage() {
               </Badge>
             </div>
             <p className="text-sm text-muted-foreground">
-              {status.isPro
-                ? 'Your Pro subscription is active. All features are unlocked.'
-                : 'Upgrade to Pro to unlock the full weekly planner, grocery list, pantry, and more.'}
+              {status.isTempPro
+                ? `You're on a free trial${status.tempProUntil ? ` — ends ${new Date(status.tempProUntil).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}` : ''}.`
+                : status.isPro
+                  ? 'Your Pro subscription is active. All features are unlocked.'
+                  : 'Upgrade to Pro to unlock the full weekly planner, grocery list, pantry, and more.'}
             </p>
-            {status.isPro ? (
-              <Button asChild variant="outline" size="sm">
-                <Link href="/pricing">View Plan Details &rarr;</Link>
+            {status.isPro && !status.isTempPro ? (
+              <Button size="sm" variant="outline" onClick={handleManageSubscription} disabled={managingBilling} className="gap-2">
+                <Crown className="h-4 w-4 text-amber-500" />
+                {managingBilling ? 'Opening portal…' : 'Manage Subscription →'}
               </Button>
             ) : (
               <Button asChild size="sm">
-                <Link href="/pricing?intent=pro">Upgrade to Pro</Link>
+                <Link href="/pricing?intent=pro">
+                  {status.isTempPro ? 'Upgrade to Pro →' : 'Upgrade to Pro'}
+                </Link>
               </Button>
             )}
           </div>

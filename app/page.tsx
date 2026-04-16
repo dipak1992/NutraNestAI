@@ -144,9 +144,9 @@ function Hero() {
 /* ──────────────────────── SOCIAL PROOF BAR ──────────────────────── */
 function SocialProof() {
   const stats = [
-    { value: '12,000+', label: 'Families trust MealEase' },
-    { value: '340K+',   label: 'Meals personalised' },
-    { value: '4.9★',    label: 'Average app rating' },
+    { value: '3,200+',  label: 'Families using MealEase' },
+    { value: '58,000+', label: 'Meals generated' },
+    { value: '4.8 / 5', label: 'From beta user feedback' },
     { value: '< 2 min', label: 'Average setup time' },
   ]
 
@@ -172,7 +172,7 @@ function SocialProof() {
             ))}
           </div>
           <p className="text-sm font-medium text-amber-900">
-            Trusted by <span className="font-bold">12,000+ families</span> to handle dinner every night
+            Joined by <span className="font-bold">3,200+ families</span> in early access
           </p>
         </div>
         {/* Stats */}
@@ -329,7 +329,7 @@ function Testimonials() {
           <blockquote className="text-2xl sm:text-3xl font-bold text-foreground leading-snug max-w-2xl mx-auto mb-4">
             &ldquo;Feels like it reads our minds.&rdquo;
           </blockquote>
-          <p className="text-muted-foreground">— Even works for picky eaters. Loved by 12,000+ families.</p>
+          <p className="text-muted-foreground">— Even works for picky eaters. Loved by 3,200+ early users.</p>
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -457,7 +457,7 @@ function PricingPreview() {
               </Button>
               {tier.highlighted && (
                 <p className="text-center text-xs text-muted-foreground mt-3">
-                  Trusted by 12,000+ families · Cancel anytime
+                  Used by 3,200+ families in early access
                 </p>
               )}
             </div>
@@ -519,7 +519,7 @@ function FinalCta() {
 
       <div className="relative mx-auto max-w-2xl px-4 text-center">
         <Badge className="mb-6 bg-white/15 text-white border-white/25 hover:bg-white/15">
-          Join 12,000+ families
+          Join 3,200+ families in early access
         </Badge>
         <h2 className="text-3xl sm:text-5xl font-bold text-white mb-5 leading-tight">
           Dinner that gets<br />your family.

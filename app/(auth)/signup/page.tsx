@@ -11,7 +11,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
-import { Loader2, Check, Gift } from 'lucide-react'
+import { Loader2, Check, Gift, Eye, EyeOff } from 'lucide-react'
+import { Checkbox } from '@/components/ui/checkbox'
 
 // Inline Google "G" icon — no external dependency needed
 function GoogleIcon() {
@@ -29,17 +30,41 @@ const schema = z.object({
   email: z.string().email('Please enter a valid email'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   confirmPassword: z.string(),
+  agreedToTos: z.literal<boolean>(true, { errorMap: () => ({ message: 'You must agree to the Terms of Service' }) }),
 }).refine((d) => d.password === d.confirmPassword, {
   message: 'Passwords do not match',
   path: ['confirmPassword'],
 })
 type FormValues = z.infer<typeof schema>
 
+function getPasswordStrength(pw: string): { score: number; label: string; color: string } {
+  let score = 0
+  if (pw.length >= 8) score++
+  if (/[A-Z]/.test(pw)) score++
+  if (/[0-9]/.test(pw)) score++
+  if (/[^A-Za-z0-9]/.test(pw)) score++
+  const levels = [
+    { label: '', color: '' },
+    { label: 'Weak', color: 'bg-destructive' },
+    { label: 'Fair', color: 'bg-amber-500' },
+    { label: 'Good', color: 'bg-yellow-400' },
+    { label: 'Strong', color: 'bg-green-500' },
+  ]
+  return { score, ...levels[score] }
+}
+
 export default function SignupPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
-  const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({ resolver: zodResolver(schema) })
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: { agreedToTos: false as unknown as true },
+  })
+  const watchedPassword = watch('password', '')
+  const pwStrength = getPasswordStrength(watchedPassword ?? '')
 
   // Read referral code from URL at submit time to avoid useSearchParams Suspense
   function getRefCode(): string | null {
@@ -113,7 +138,7 @@ export default function SignupPage() {
         {['Instant meal previews and Tonight swipes', '3-day weekly planner preview', 'Upgrade to Pro for the full plan and grocery list'].map((f) => (
           <div key={f} className="flex items-center gap-2 text-sm text-muted-foreground">
             <Check className="h-4 w-4 text-primary flex-shrink-0" />
-            <span dangerouslySetInnerHTML={{ __html: f }} />
+            <span>{f}</span>
           </div>
         ))}
       </div>
@@ -145,13 +170,66 @@ export default function SignupPage() {
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="password">Password</Label>
-          <Input id="password" type="password" placeholder="Min. 8 characters" autoComplete="new-password" {...register('password')} />
+          <div className="relative">
+            <Input id="password" type={showPassword ? 'text' : 'password'} placeholder="Min. 8 characters" autoComplete="new-password" {...register('password')} />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
+          {watchedPassword && (
+            <div className="space-y-1">
+              <div className="flex gap-1">
+                {[1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className={`h-1 flex-1 rounded-full transition-colors ${
+                      i <= pwStrength.score ? pwStrength.color : 'bg-muted'
+                    }`}
+                  />
+                ))}
+              </div>
+              {pwStrength.label && (
+                <p className="text-xs text-muted-foreground">{pwStrength.label}</p>
+              )}
+            </div>
+          )}
           {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="confirmPassword">Confirm password</Label>
-          <Input id="confirmPassword" type="password" placeholder="••••••••" autoComplete="new-password" {...register('confirmPassword')} />
+          <div className="relative">
+            <Input id="confirmPassword" type={showConfirmPassword ? 'text' : 'password'} placeholder="••••••••" autoComplete="new-password" {...register('confirmPassword')} />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword((v) => !v)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+            >
+              {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
           {errors.confirmPassword && <p className="text-xs text-destructive">{errors.confirmPassword.message}</p>}
+        </div>
+        <div className="flex items-start gap-2">
+          <Checkbox
+            id="agreedToTos"
+            onCheckedChange={(checked) => setValue('agreedToTos', checked === true as unknown as true, { shouldValidate: true })}
+            className="mt-0.5"
+          />
+          <div>
+            <label htmlFor="agreedToTos" className="text-sm text-muted-foreground cursor-pointer">
+              I agree to the{' '}
+              <Link href="/terms" className="text-primary hover:underline">Terms of Service</Link>
+              {' '}and{' '}
+              <Link href="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
+            </label>
+            {errors.agreedToTos && <p className="text-xs text-destructive mt-0.5">{errors.agreedToTos.message}</p>}
+          </div>
         </div>
         <Button type="submit" className="w-full" disabled={loading || googleLoading}>
           {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Creating account…</> : 'Create free account'}

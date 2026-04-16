@@ -3,9 +3,11 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { toast } from 'sonner'
-import { Bookmark, Pencil, Trash2, Globe, Lock, Calendar } from 'lucide-react'
+import { Bookmark, Pencil, Trash2, Globe, Lock, Calendar, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
 import { ShareButton } from '@/components/content/ShareButton'
 import { EditMealModal } from '@/components/content/EditMealModal'
 import type { SavedMealSummary } from '@/lib/content/types'
@@ -30,6 +32,8 @@ export default function SavedMealsPage() {
   const [meals, setMeals] = useState<SavedMealSummary[]>([])
   const [loading, setLoading] = useState(true)
   const [editTarget, setEditTarget] = useState<SavedMealSummary | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<SavedMealSummary | null>(null)
+  const [search, setSearch] = useState('')
 
   useEffect(() => {
     fetch('/api/content/meals')
@@ -39,14 +43,30 @@ export default function SavedMealsPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  async function handleDelete(meal: SavedMealSummary) {
-    if (!confirm(`Delete "${meal.title}"? This cannot be undone.`)) return
+  async function confirmDelete() {
+    if (!deleteTarget) return
+    const meal = deleteTarget
+    setDeleteTarget(null)
     const res = await fetch(`/api/content/meals/${meal.id}`, { method: 'DELETE' })
     if (res.ok) {
       setMeals((prev) => prev.filter((m) => m.id !== meal.id))
       toast.success('Meal deleted.')
     } else {
       toast.error('Could not delete meal.')
+    }
+  }
+
+  async function togglePrivacy(meal: SavedMealSummary) {
+    const newPublic = !meal.is_public
+    setMeals((prev) => prev.map((m) => m.id === meal.id ? { ...m, is_public: newPublic } : m))
+    const res = await fetch(`/api/content/meals/${meal.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ is_public: newPublic }),
+    })
+    if (!res.ok) {
+      setMeals((prev) => prev.map((m) => m.id === meal.id ? { ...m, is_public: meal.is_public } : m))
+      toast.error('Could not update privacy.')
     }
   }
 
@@ -74,6 +94,19 @@ export default function SavedMealsPage() {
         </Button>
       </div>
 
+      {/* Search */}
+      {!loading && meals.length > 0 && (
+        <div className="relative mb-6">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search saved meals…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+      )}
+
       {/* Loading skeleton */}
       {loading && (
         <div className="grid gap-4 sm:grid-cols-2">
@@ -86,7 +119,7 @@ export default function SavedMealsPage() {
       {/* Meals grid */}
       {!loading && meals.length > 0 && (
         <div className="grid gap-4 sm:grid-cols-2">
-          {meals.map((meal) => (
+          {meals.filter((m) => m.title.toLowerCase().includes(search.toLowerCase())).map((meal) => (
             <div
               key={meal.id}
               className="rounded-xl border border-border/60 bg-card overflow-hidden hover:border-primary/30 transition-colors"
@@ -103,15 +136,21 @@ export default function SavedMealsPage() {
                         {meal.cuisine_type}
                       </Badge>
                     )}
-                    {meal.is_public ? (
-                      <Badge variant="outline" className="text-xs text-emerald-700 border-emerald-300 bg-emerald-50 gap-1">
-                        <Globe className="h-3 w-3" /> Public
-                      </Badge>
-                    ) : (
-                      <Badge variant="outline" className="text-xs text-muted-foreground gap-1">
-                        <Lock className="h-3 w-3" /> Private
-                      </Badge>
-                    )}
+                    <button
+                      onClick={() => togglePrivacy(meal)}
+                      className="focus:outline-none"
+                      title={meal.is_public ? 'Click to make private' : 'Click to make public'}
+                    >
+                      {meal.is_public ? (
+                        <Badge variant="outline" className="text-xs text-emerald-700 border-emerald-300 bg-emerald-50 gap-1 cursor-pointer hover:bg-emerald-100 transition-colors">
+                          <Globe className="h-3 w-3" /> Public
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-xs text-muted-foreground gap-1 cursor-pointer hover:bg-muted transition-colors">
+                          <Lock className="h-3 w-3" /> Private
+                        </Badge>
+                      )}
+                    </button>
                   </div>
                   <p className="font-semibold text-sm leading-snug line-clamp-2">{meal.title}</p>
                   {meal.description && (
@@ -148,7 +187,7 @@ export default function SavedMealsPage() {
                   variant="ghost"
                   size="sm"
                   className="h-8 text-xs gap-1.5 text-destructive hover:text-destructive ml-auto"
-                  onClick={() => handleDelete(meal)}
+                  onClick={() => setDeleteTarget(meal)}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                   Delete
@@ -182,6 +221,27 @@ export default function SavedMealsPage() {
           onSaved={(updates) => handleEditSaved(editTarget.id, updates)}
         />
       )}
+
+      {/* Delete confirmation */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null) }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this meal?</AlertDialogTitle>
+            <AlertDialogDescription>
+              &ldquo;{deleteTarget?.title}&rdquo; will be permanently deleted. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={confirmDelete}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

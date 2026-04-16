@@ -15,6 +15,8 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ProPaywallCard } from '@/components/paywall/ProPaywallCard'
 import { PaywallDialog } from '@/components/paywall/PaywallDialog'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import {
   Sparkles,
   ShoppingCart,
@@ -348,26 +350,42 @@ export function WeeklyPlannerV2() {
           )}
         </div>
 
+        <TooltipProvider>
         <div className="flex flex-wrap gap-2">
           {mealsPlanned > 0 && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                clearPlan()
-                toast('Plan cleared.')
-              }}
-              className="text-muted-foreground"
-            >
-              <RefreshCcw className="h-4 w-4 mr-1.5" />
-              Clear
-            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" size="sm" className="text-muted-foreground">
+                  <RefreshCcw className="h-4 w-4 mr-1.5" />
+                  Clear
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Clear this week's plan?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will remove all {mealsPlanned} planned meal{mealsPlanned !== 1 ? 's' : ''}. You can generate a new plan anytime.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => { clearPlan(); toast('Plan cleared.') }}>
+                    Clear plan
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           )}
           {mealsPlanned > 0 && (
-            <Button variant="outline" size="sm" onClick={handlePublishPlan}>
-              <Globe className="h-4 w-4 mr-1.5" />
-              Publish plan
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="outline" size="sm" onClick={handlePublishPlan}>
+                  <Globe className="h-4 w-4 mr-1.5" />
+                  Publish plan
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Share a public link to your weekly plan</TooltipContent>
+            </Tooltip>
           )}
           <Button
             variant="default"
@@ -400,6 +418,7 @@ export function WeeklyPlannerV2() {
             )}
           </Button>
         </div>
+        </TooltipProvider>
       </div>
 
       {/* ── Planner grid ── */}

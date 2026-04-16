@@ -7,6 +7,8 @@ import { useLightOnboardingStore, type HouseholdType } from '@/lib/store'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ChevronRight, ChevronLeft, Check, X, Loader2 } from 'lucide-react'
+import { Progress } from '@/components/ui/progress'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { MealEaseLogo } from '@/components/ui/MealEaseLogo'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
@@ -356,17 +358,16 @@ function StepLocation({
       <div className="space-y-4">
         <div>
           <label htmlFor="country" className="text-sm font-medium mb-2 block">Country</label>
-          <select
-            id="country"
-            value={country}
-            onChange={(e) => setCountry(e.target.value)}
-            className="w-full px-3 py-2.5 text-sm border border-border/60 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/40 transition-shadow"
-          >
-            <option value="">Select your country</option>
-            {COUNTRIES.map((c) => (
-              <option key={c} value={c}>{c}</option>
-            ))}
-          </select>
+          <Select value={country || undefined} onValueChange={setCountry}>
+            <SelectTrigger id="country" className="w-full">
+              <SelectValue placeholder="Select your country" />
+            </SelectTrigger>
+            <SelectContent>
+              {COUNTRIES.map((c) => (
+                <SelectItem key={c} value={c}>{c}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div>
           <label htmlFor="store" className="text-sm font-medium mb-2 block">
@@ -513,8 +514,8 @@ export default function OnboardingPage() {
     router.push('/dashboard')
   }
 
-  // Steps 1–4 show the footer nav; step 0 auto-advances, step 5 has its own CTA
-  const showBottomNav = step >= 1 && step <= 4
+  // Steps 1–5 show the footer nav; step 0 auto-advances on selection
+  const showBottomNav = step >= 1 && step <= 5
 
   return (
     <div className="min-h-screen gradient-hero flex flex-col">
@@ -533,22 +534,10 @@ export default function OnboardingPage() {
         </button>
       </header>
 
-      {/* ── Progress dots ────────────────────────────────────────────────────── */}
+      {/* ── Progress bar ─────────────────────────────────────────────────────── */}
       {step < 5 && (
-        <div className="flex items-center justify-center gap-1.5 py-4 flex-shrink-0">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div
-              key={i}
-              className={cn(
-                'h-1.5 rounded-full transition-all duration-300',
-                i < step
-                  ? 'w-6 bg-primary'
-                  : i === step
-                  ? 'w-6 bg-primary/60'
-                  : 'w-3 bg-border'
-              )}
-            />
-          ))}
+        <div className="px-6 py-4 flex-shrink-0">
+          <Progress value={(step / 5) * 100} className="h-2" />
         </div>
       )}
 
@@ -624,7 +613,7 @@ export default function OnboardingPage() {
         </div>
       </div>
 
-      {/* ── Bottom nav (steps 1–4 only) ──────────────────────────────────────── */}
+      {/* ── Bottom nav (steps 1–5) ───────────────────────────────────────────── */}
       {showBottomNav && (
         <footer className="flex items-center justify-between px-6 py-5 border-t border-border/40 flex-shrink-0">
           <Button
@@ -636,10 +625,12 @@ export default function OnboardingPage() {
             <ChevronLeft className="h-4 w-4" />
             Back
           </Button>
-          <Button size="sm" onClick={handleAdvance} className="gap-1.5 px-5">
-            Continue
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+          {step < 5 && (
+            <Button size="sm" onClick={handleAdvance} className="gap-1.5 px-5">
+              Continue
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          )}
         </footer>
       )}
     </div>

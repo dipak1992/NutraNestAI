@@ -45,17 +45,17 @@ function CopyButton({ text }: { text: string }) {
 export default function ReferralPage() {
   const [stats, setStats] = useState<ReferralStats | null>(null)
   const [loading, setLoading] = useState(true)
+  const [origin, setOrigin] = useState('')
 
   useEffect(() => {
+    setOrigin(window.location.origin)
     fetch('/api/referral/me')
       .then((r) => r.json())
       .then((data) => { setStats(data); setLoading(false) })
       .catch(() => setLoading(false))
   }, [])
 
-  const referralLink = stats?.code
-    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/r/${stats.code}`
-    : ''
+  const referralLink = stats?.code ? `${origin}/r/${stats.code}` : ''
 
   const cycleProgress = stats
     ? stats.totalReferrals % REFERRAL_TEMP_PRO_THRESHOLD
@@ -101,7 +101,7 @@ export default function ReferralPage() {
       </div>
 
       {/* Stats row */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {[
           {
             icon: Users,
@@ -209,23 +209,41 @@ export default function ReferralPage() {
 
       {/* Share CTA */}
       {referralLink && (
-        <Button
-          className="w-full"
-          onClick={() => {
-            if (navigator.share) {
-              navigator.share({
-                title: 'MealEase — free meal planning for families',
-                text: 'Join me on MealEase for smart family meal planning.',
-                url: referralLink,
-              }).catch(() => {})
-            } else {
-              navigator.clipboard.writeText(referralLink)
-            }
-          }}
-        >
-          <Gift className="mr-2 h-4 w-4" />
-          Share your referral link
-        </Button>
+        <div className="space-y-2">
+          <Button
+            className="w-full"
+            onClick={() => {
+              if (navigator.share) {
+                navigator.share({
+                  title: 'MealEase — free meal planning for families',
+                  text: 'Join me on MealEase for smart family meal planning.',
+                  url: referralLink,
+                }).catch(() => {})
+              } else {
+                navigator.clipboard.writeText(referralLink)
+              }
+            }}
+          >
+            <Gift className="mr-2 h-4 w-4" />
+            Share your referral link
+          </Button>
+          <div className="grid grid-cols-2 gap-2">
+            <a
+              href={`https://wa.me/?text=${encodeURIComponent(`Join me on MealEase for smart family meal planning: ${referralLink}`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 rounded-md border border-border bg-[#25D366] px-4 py-2 text-sm font-medium text-white hover:bg-[#1ebe5d] transition-colors"
+            >
+              WhatsApp
+            </a>
+            <a
+              href={`mailto:?subject=${encodeURIComponent('Try MealEase — free family meal planning')}&body=${encodeURIComponent(`Hey! I\'ve been using MealEase to plan family meals and it\'s great. Sign up free with my link: ${referralLink}`)}`}
+              className="flex items-center justify-center gap-2 rounded-md border border-border bg-muted px-4 py-2 text-sm font-medium text-foreground hover:bg-muted/80 transition-colors"
+            >
+              Email
+            </a>
+          </div>
+        </div>
       )}
     </div>
   )

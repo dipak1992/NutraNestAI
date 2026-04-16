@@ -1,4 +1,6 @@
 import Image from 'next/image'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { PublicSiteFooter } from '@/components/layout/PublicSiteFooter'
 import { PublicSiteHeader } from '@/components/layout/PublicSiteHeader'
@@ -39,6 +41,8 @@ export default function AboutPage() {
                 width={2712}
                 height={2536}
                 className="h-auto w-full object-cover"
+                placeholder="blur"
+                blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAIAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAABgUE/8QAIRAAAQQCAgMAAAAAAAAAAAAAAQIDBBEABSExUWH/xAAUAQEAAAAAAAAAAAAAAAAAAAAA/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8Ai8e4Tl2btsSnfkWxHFqr1XMRBbBJIAHXYABJ0AOtgmqGMWqxRr9rp4WGKSWSQKN+5JJJJJJJJJJJJJJJJJJJJL/2Q=="
                 priority
               />
             </div>
@@ -103,6 +107,23 @@ export default function AboutPage() {
               </p>
             </div>
           </div>
+        </div>
+
+        {/* ── Signup CTA ── */}
+        <div className="mx-auto max-w-2xl mt-16 rounded-3xl glass-card border border-border/60 px-6 py-10 text-center">
+          <h2 className="text-2xl font-bold mb-3">Ready to end the dinner debate?</h2>
+          <p className="text-muted-foreground mb-6">
+            Join thousands of families who already know what&apos;s for dinner tonight.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Button asChild size="lg" className="gradient-sage border-0 text-white hover:opacity-90">
+              <Link href="/signup">Get started free</Link>
+            </Button>
+            <Button asChild variant="outline" size="lg">
+              <Link href="/pricing">See pricing</Link>
+            </Button>
+          </div>
+          <p className="mt-4 text-xs text-muted-foreground">No credit card required &middot; Free plan available</p>
         </div>
       </main>
       <PublicSiteFooter />

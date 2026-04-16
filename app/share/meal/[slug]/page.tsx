@@ -44,6 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: 'article',
       siteName: 'MealEase',
       url: absoluteUrl(`/meals/${slug}`),
+      images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: m.title }],
     },
   }
 }
@@ -67,6 +68,18 @@ export default async function ShareMealPage({ params }: Props) {
       <div className="space-y-8">
         {/* Badges + title */}
         <div>
+          {/* Illustration header */}
+          <div className="relative rounded-2xl overflow-hidden mb-4 h-36 gradient-sage flex items-center justify-center">
+            <span className="text-6xl select-none" aria-hidden="true">
+              {m.cuisineType === 'italian' ? '🍝'
+                : m.cuisineType === 'mexican' ? '🌮'
+                : m.cuisineType === 'asian' ? '🍜'
+                : m.cuisineType === 'american' ? '🍔'
+                : m.cuisineType === 'mediterranean' ? '🥗'
+                : m.cuisineType === 'indian' ? '🍛'
+                : '🍽️'}
+            </span>
+          </div>
           <div className="flex gap-2 flex-wrap mb-3">
             {m.cuisineType && (
               <Badge variant="secondary" className="capitalize">

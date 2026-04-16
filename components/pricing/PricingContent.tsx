@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 
 // ── Pricing data ──────────────────────────────────────────────
@@ -160,7 +161,7 @@ export function PricingContent() {
       <div className="text-center mb-14">
         <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
           <Users className="h-4 w-4" />
-          Join 2,400+ families eating better this week
+          Join thousands of families eating better each week
         </div>
 
         <h1 className="text-4xl font-bold tracking-tight sm:text-5xl mb-4">
@@ -355,6 +356,9 @@ export function PricingContent() {
             </div>
           ))}
         </div>
+        <p className="text-center text-xs text-muted-foreground/60 mt-4">
+          * MealEase is currently in beta. Features and pricing may change.
+        </p>
       </div>
 
       {/* ── Comparison table ── */}
@@ -421,19 +425,22 @@ export function PricingContent() {
         <h2 className="mb-8 text-center text-2xl font-bold">
           Frequently Asked Questions
         </h2>
-        <div className="space-y-4">
-          {FAQ.map(({ q, a }) => (
-            <div
+        <Accordion type="single" collapsible className="space-y-2">
+          {FAQ.map(({ q, a }, i) => (
+            <AccordionItem
               key={q}
-              className="glass-card rounded-2xl border border-border/60 p-5"
+              value={`faq-${i}`}
+              className="glass-card rounded-2xl border border-border/60 px-5"
             >
-              <p className="mb-2 font-semibold">{q}</p>
-              <p className="text-sm leading-relaxed text-muted-foreground">
+              <AccordionTrigger className="font-semibold text-sm text-left py-4 hover:no-underline">
+                {q}
+              </AccordionTrigger>
+              <AccordionContent className="text-sm leading-relaxed text-muted-foreground pb-4">
                 {a}
-              </p>
-            </div>
+              </AccordionContent>
+            </AccordionItem>
           ))}
-        </div>
+        </Accordion>
       </div>
 
       {/* ── Bottom CTA ── */}

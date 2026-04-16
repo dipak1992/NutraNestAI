@@ -47,13 +47,24 @@ export default function SettingsPage() {
   function saveName() {
     if (nameInput.trim()) {
       updateState({ householdName: nameInput.trim() })
+      fetch('/api/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ householdName: nameInput.trim() }),
+      }).catch(() => null)
       toast.success('Household name updated')
     }
   }
 
   function toggleCuisine(c: string) {
     const current = cuisinePreferences ?? []
-    updateState({ cuisinePreferences: current.includes(c) ? current.filter((x) => x !== c) : [...current, c] })
+    const next = current.includes(c) ? current.filter((x) => x !== c) : [...current, c]
+    updateState({ cuisinePreferences: next })
+    fetch('/api/settings', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cuisines: next }),
+    }).catch(() => null)
   }
 
   return (
@@ -67,13 +78,15 @@ export default function SettingsPage() {
       </div>
 
       <Tabs defaultValue="household">
-        <TabsList className="mb-6 w-full justify-start">
-          <TabsTrigger value="household" className="gap-2"><Home className="h-4 w-4" />Household</TabsTrigger>
-          <TabsTrigger value="preferences" className="gap-2"><Leaf className="h-4 w-4" />Preferences</TabsTrigger>
-          <TabsTrigger value="account" className="gap-2"><User className="h-4 w-4" />Account</TabsTrigger>
-          <TabsTrigger value="notifications" className="gap-2"><Bell className="h-4 w-4" />Notifications</TabsTrigger>
-          <TabsTrigger value="billing" className="gap-2"><Crown className="h-4 w-4" />Billing</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto">
+          <TabsList className="mb-6 w-full justify-start">
+            <TabsTrigger value="household" className="gap-2"><Home className="h-4 w-4" />Household</TabsTrigger>
+            <TabsTrigger value="preferences" className="gap-2"><Leaf className="h-4 w-4" />Preferences</TabsTrigger>
+            <TabsTrigger value="account" className="gap-2"><User className="h-4 w-4" />Account</TabsTrigger>
+            <TabsTrigger value="notifications" className="gap-2"><Bell className="h-4 w-4" />Notifications</TabsTrigger>
+            <TabsTrigger value="billing" className="gap-2"><Crown className="h-4 w-4" />Billing</TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="household" className="space-y-6">
           <div className="glass-card rounded-xl border border-border/60 p-5 space-y-4">
@@ -110,7 +123,7 @@ export default function SettingsPage() {
               <p className="text-sm text-muted-foreground">No members yet. Complete onboarding to add family members.</p>
             )}
             <Button variant="outline" size="sm" className="mt-4" onClick={() => router.push('/onboarding')}>
-              Edit Members in Onboarding
+              Edit Members
             </Button>
           </div>
 
@@ -167,7 +180,14 @@ export default function SettingsPage() {
               {COOKING_TIME_OPTIONS.map((opt) => (
                 <button
                   key={opt.value}
-                  onClick={() => setCookingTimeMinutes(opt.value)}
+                  onClick={() => {
+                    setCookingTimeMinutes(opt.value)
+                    fetch('/api/settings', {
+                      method: 'PATCH',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ cookingTimeMinutes: opt.value }),
+                    }).catch(() => null)
+                  }}
                   className={`px-4 py-2 rounded-full text-sm transition-colors ${cookingTimeMinutes === opt.value ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80 text-foreground'}`}
                 >
                   {opt.label}
@@ -179,30 +199,6 @@ export default function SettingsPage() {
 
         <TabsContent value="account" className="space-y-6">
           <div className="glass-card rounded-xl border border-border/60 p-5 space-y-4">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h2 className="font-semibold flex items-center gap-2">
-                  <Crown className="h-4 w-4 text-primary" />
-                  Current Plan
-                </h2>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {status.isPro
-                    ? 'Pro is active. Full planner, grocery list, pantry, and insights are unlocked.'
-                    : 'You are on Free. Upgrade to Pro to unlock the full weekly planner and advanced tools.'}
-                </p>
-              </div>
-              <Badge className={status.isPro ? 'bg-amber-100 text-amber-800 border-0' : 'bg-primary/10 text-primary border-0'}>
-                {status.tier}
-              </Badge>
-            </div>
-            {!status.isPro && (
-              <Button asChild>
-                <Link href="/pricing?intent=pro">Upgrade to Pro</Link>
-              </Button>
-            )}
-          </div>
-
-          <div className="glass-card rounded-xl border border-border/60 p-5 space-y-4">
             <h2 className="font-semibold">Session</h2>
             <p className="text-sm text-muted-foreground">Sign out of your MealEase account on this device.</p>
             <Button variant="outline" onClick={handleSignOut} disabled={signingOut} className="gap-2 text-destructive hover:text-destructive hover:bg-destructive/5">
@@ -212,9 +208,12 @@ export default function SettingsPage() {
           <div className="glass-card rounded-xl border border-red-200/60 p-5 space-y-4">
             <h2 className="font-semibold text-destructive flex items-center gap-2"><Trash2 className="h-4 w-4" />Danger Zone</h2>
             <p className="text-sm text-muted-foreground">Permanently delete your account and all household data. This cannot be undone.</p>
-            <Button variant="outline" disabled className="gap-2 text-destructive border-destructive/30">
-              <Trash2 className="h-4 w-4" />Delete Account (coming soon)
-            </Button>
+            <a
+              href="mailto:hello@mealeaseai.com?subject=Account%20Deletion%20Request"
+              className="inline-flex items-center gap-2 text-sm text-destructive border border-destructive/30 rounded-md px-4 py-2 hover:bg-destructive/5 transition-colors"
+            >
+              <Trash2 className="h-4 w-4" />Contact Support to Delete Account
+            </a>
           </div>
         </TabsContent>
 

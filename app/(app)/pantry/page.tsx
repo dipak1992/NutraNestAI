@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ProPaywallCard } from '@/components/paywall/ProPaywallCard'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 import { Package, Plus, Trash2, Search } from 'lucide-react'
@@ -18,29 +19,48 @@ interface PantryItem {
   expires?: string
 }
 
-const INITIAL_PANTRY: PantryItem[] = [
-  { id: '1', name: 'Olive Oil', amount: '500', unit: 'ml', category: 'Oils & Condiments' },
-  { id: '2', name: 'Kosher Salt', amount: '1', unit: 'box', category: 'Spices & Seasonings' },
-  { id: '3', name: 'Black Pepper', amount: '1', unit: 'jar', category: 'Spices & Seasonings' },
-  { id: '4', name: 'All-Purpose Flour', amount: '2', unit: 'kg', category: 'Grains & Pasta', expires: '2025-12-01' },
-  { id: '5', name: 'Brown Rice', amount: '1', unit: 'kg', category: 'Grains & Pasta' },
-  { id: '6', name: 'Canned Tomatoes', amount: '4', unit: 'cans', category: 'Canned Goods' },
-  { id: '7', name: 'Chicken Broth', amount: '2', unit: 'cartons', category: 'Canned Goods', expires: '2025-08-15' },
-  { id: '8', name: 'Garlic Powder', amount: '1', unit: 'jar', category: 'Spices & Seasonings' },
-  { id: '9', name: 'Honey', amount: '1', unit: 'jar', category: 'Oils & Condiments' },
-  { id: '10', name: 'Soy Sauce (low-sodium)', amount: '1', unit: 'bottle', category: 'Oils & Condiments' },
-]
-
 const CATEGORIES = ['Grains & Pasta', 'Canned Goods', 'Spices & Seasonings', 'Oils & Condiments', 'Snacks', 'Other']
 
 export default function PantryPage() {
   const { status, loading } = usePaywallStatus()
-  const [items, setItems] = useState<PantryItem[]>(INITIAL_PANTRY)
+  const [items, setItems] = useState<PantryItem[]>([])
+  const [fetchLoading, setFetchLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [showAdd, setShowAdd] = useState(false)
   const [form, setForm] = useState({ name: '', amount: '', unit: '', category: 'Other', expires: '' })
 
-  if (!loading && !status.isPro) {
+  useEffect(() => {
+    if (loading || !status.isPro) return
+    fetch('/api/pantry')
+      .then((r) => r.json())
+      .then((json) => {
+        if (json.data) {
+          setItems(
+            (json.data as { id: string; name: string; quantity: number; unit: string; category: string; expires_at: string | null }[]).map((row) => ({
+              id: row.id,
+              name: row.name,
+              amount: String(row.quantity),
+              unit: row.unit,
+              category: row.category,
+              expires: row.expires_at ?? undefined,
+            }))
+          )
+        }
+      })
+      .finally(() => setFetchLoading(false))
+  }, [loading, status.isPro])
+
+  if (loading || (status.isPro && fetchLoading)) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex items-center justify-center py-20 text-muted-foreground">
+          <span className="animate-pulse">Loading pantry…</span>
+        </div>
+      </div>
+    )
+  }
+
+  if (!status.isPro) {
     return (
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <ProPaywallCard
@@ -62,15 +82,31 @@ export default function PantryPage() {
     return acc
   }, {})
 
-  function addItem() {
+  async function addItem() {
     if (!form.name.trim()) return
-    setItems((prev) => [...prev, { ...form, id: Date.now().toString() }])
+    const res = await fetch('/api/pantry', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: form.name.trim(),
+        category: form.category,
+        quantity: form.amount ? parseFloat(form.amount) : 1,
+        unit: form.unit || 'unit',
+        expires_at: form.expires || undefined,
+      }),
+    })
+    const json = await res.json()
+    if (json.data) {
+      const row = json.data as { id: string; name: string; quantity: number; unit: string; category: string; expires_at: string | null }
+      setItems((prev) => [...prev, { id: row.id, name: row.name, amount: String(row.quantity), unit: row.unit, category: row.category, expires: row.expires_at ?? undefined }])
+    }
     setForm({ name: '', amount: '', unit: '', category: 'Other', expires: '' })
     setShowAdd(false)
   }
 
-  function removeItem(id: string) {
+  async function removeItem(id: string) {
     setItems((prev) => prev.filter((i) => i.id !== id))
+    await fetch(`/api/pantry?id=${encodeURIComponent(id)}`, { method: 'DELETE' })
   }
 
   function isExpiringSoon(expires?: string) {
@@ -103,13 +139,14 @@ export default function PantryPage() {
               <Input placeholder="Amount" value={form.amount} onChange={(e) => setForm((f) => ({ ...f, amount: e.target.value }))} className="w-24" />
               <Input placeholder="Unit" value={form.unit} onChange={(e) => setForm((f) => ({ ...f, unit: e.target.value }))} className="w-24" />
             </div>
-            <select
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm"
-              value={form.category}
-              onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
-            >
-              {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-            </select>
+            <Select value={form.category} onValueChange={(v) => setForm((f) => ({ ...f, category: v }))}>
+              <SelectTrigger>
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                {CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+              </SelectContent>
+            </Select>
             <Input type="date" placeholder="Expiry (optional)" value={form.expires} onChange={(e) => setForm((f) => ({ ...f, expires: e.target.value }))} />
           </div>
           <Button onClick={addItem} disabled={!form.name.trim()}>Add to Pantry</Button>

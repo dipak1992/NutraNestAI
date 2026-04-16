@@ -421,7 +421,7 @@ function PricingPreview() {
       cta: 'Get started free', href: '/signup', highlighted: false,
     },
     {
-      name: 'Pro', price: '$19', period: '/month', description: 'Unlock the full planning workflow.',
+      name: 'Pro', price: '$9.99', period: '/month', description: 'Unlock the full planning workflow.',
       features: ['Full 7-day planner', 'Smart grocery list', 'Pantry tracking', 'Insights dashboard', 'Unlimited swipes', 'Unlimited kids recipes', 'Weekly kids meal plan', 'Photo-to-recipe', 'Advanced planning tools'],
       cta: 'Upgrade to Pro', href: '/signup?plan=pro', highlighted: true,
     },

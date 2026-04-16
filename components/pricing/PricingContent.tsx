@@ -19,8 +19,8 @@ import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 
 // ── Pricing data ──────────────────────────────────────────────
 
-const MONTHLY_PRICE = 19
-const ANNUAL_PRICE = 149
+const MONTHLY_PRICE = 9.99
+const ANNUAL_PRICE = 79.99
 const ANNUAL_MONTHLY = Math.round((ANNUAL_PRICE / 12) * 100) / 100 // $12.42
 const ANNUAL_SAVINGS = Math.round((1 - ANNUAL_PRICE / (MONTHLY_PRICE * 12)) * 100) // 35%
 

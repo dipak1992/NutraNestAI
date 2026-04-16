@@ -27,7 +27,6 @@ function Hero() {
   const secondaryModes = [
     { label: 'Get inspired',   emoji: '✨', href: '/tonight?mode=inspiration', description: 'AI picks for you' },
     { label: 'Use what I have',emoji: '🥫', href: '/tonight?mode=pantry',      description: 'Snap your fridge' },
-    { label: 'Baby & Kids',    emoji: '👶', href: '#family',                     description: 'Age-safe meals' },
     { label: 'Plan my week',   emoji: '📅', href: '/onboarding',               description: 'Full meal planning' },
   ]
 
@@ -89,7 +88,7 @@ function Hero() {
 
             {/* Secondary modes */}
             <p className="text-xs text-muted-foreground mb-3 text-center lg:text-left">Or choose a different approach:</p>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 max-w-md mx-auto lg:mx-0 mb-6">
+            <div className="grid grid-cols-3 gap-2 max-w-md mx-auto lg:mx-0 mb-6">
               {secondaryModes.map((m) => (
                 <Link key={m.label} href={m.href}
                   className="glass-card rounded-xl p-3 border border-border/60 hover:border-primary/40 hover:shadow-md transition-all group text-center">
@@ -530,10 +529,10 @@ function FinalCta() {
           MealEase handles dinner so you can focus on the people eating it.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-5">
-          <Button asChild size="lg" variant="secondary" className="px-8 text-base shadow-xl font-semibold">
+          <Button asChild size="lg" variant="secondary" className="w-full sm:w-auto px-8 text-base shadow-xl font-semibold">
             <Link href="/signup">Try MealEase free <ChevronRight className="ml-2 h-4 w-4" /></Link>
           </Button>
-          <Button asChild size="lg" className="px-8 text-base bg-white/10 border border-white/30 text-white hover:bg-white/20 hover:text-white shadow-lg">
+          <Button asChild size="lg" className="w-full sm:w-auto px-8 text-base bg-white/10 border border-white/30 text-white hover:bg-white/20 hover:text-white shadow-lg">
             <Link href="/tonight?mode=tired">See tonight&apos;s meal →</Link>
           </Button>
         </div>
@@ -550,9 +549,9 @@ function FriendlyDisclaimer() {
       <div className="mx-auto max-w-3xl px-4 sm:px-6 text-center">
         <div className="inline-flex items-center gap-2 text-muted-foreground mb-3">
           <Heart className="h-4 w-4 text-rose-400" aria-hidden="true" />
-          <span className="text-sm font-medium">A note from our team</span>
+          <span className="text-base font-semibold">A note from our team</span>
         </div>
-        <p className="text-xs text-muted-foreground leading-relaxed">
+        <p className="text-sm text-muted-foreground leading-relaxed">
           MealEase is a meal planning assistant — not a substitute for a medical professional or registered dietitian.
           Our built-in safety rules are designed to help reduce risk, but they are not a guarantee.
           Always consult your pediatrician or healthcare provider for specific dietary guidance, especially for infants,

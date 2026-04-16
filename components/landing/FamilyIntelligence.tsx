@@ -1,16 +1,7 @@
 'use client'
 
-import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useLightOnboardingStore } from '@/lib/store'
-import type { KidsAgeGroup } from '@/types'
 import { Check, ChevronRight, ShieldCheck, Utensils } from 'lucide-react'
-
-const AGE_OPTIONS: { id: KidsAgeGroup; emoji: string; label: string; range: string }[] = [
-  { id: 'baby',       emoji: '👶', label: 'Baby',    range: '0–2 yrs' },
-  { id: 'toddler',    emoji: '🧒', label: 'Toddler', range: '3–6 yrs' },
-  { id: 'school_age', emoji: '🧑', label: 'Kids',    range: '7–12 yrs' },
-]
 
 const TRUST_BULLETS = [
   'Picky-eater friendly — mild, familiar flavours',
@@ -19,14 +10,10 @@ const TRUST_BULLETS = [
 ]
 
 export function FamilyIntelligence() {
-  const [selected, setSelected] = useState<KidsAgeGroup | null>(null)
   const router = useRouter()
-  const { setHasKids, setKidsAgeGroup } = useLightOnboardingStore()
 
   function handleCta() {
-    setHasKids(true)
-    if (selected) setKidsAgeGroup(selected)
-    router.push('/onboarding')
+    router.push('/tonight?mode=surprise')
   }
 
   return (
@@ -46,34 +33,6 @@ export function FamilyIntelligence() {
             <p className="text-muted-foreground leading-relaxed mb-8 max-w-md">
               Tell us their age — our AI adapts every meal to match textures, spice&nbsp;levels, and portion sizes your child needs. No separate app. No extra steps.
             </p>
-
-            {/* Age selector pills */}
-            <p className="text-sm font-medium mb-3">Select your child&apos;s age group</p>
-            <div className="flex flex-wrap gap-3 mb-8">
-              {AGE_OPTIONS.map((opt) => {
-                const active = selected === opt.id
-                return (
-                  <button
-                    key={opt.id}
-                    onClick={() => setSelected(active ? null : opt.id)}
-                    className={`
-                      flex items-center gap-2.5 rounded-2xl border px-5 py-3.5
-                      transition-all text-left
-                      ${active
-                        ? 'border-primary bg-primary/10 shadow-sm ring-1 ring-primary/30'
-                        : 'border-border/60 bg-white hover:border-primary/30 hover:shadow-sm'
-                      }
-                    `}
-                  >
-                    <span className="text-2xl">{opt.emoji}</span>
-                    <div>
-                      <span className="block text-sm font-semibold leading-tight">{opt.label}</span>
-                      <span className="block text-xs text-muted-foreground">{opt.range}</span>
-                    </div>
-                  </button>
-                )
-              })}
-            </div>
 
             {/* CTA */}
             <button
@@ -96,7 +55,7 @@ export function FamilyIntelligence() {
           </div>
 
           {/* ─── Right: visual meal comparison card ─── */}
-          <div className="hidden lg:block" aria-hidden>
+          <div className="mt-8 lg:mt-0" aria-hidden>
             <div className="relative">
               {/* Soft glow */}
               <div className="absolute -inset-4 bg-primary/8 rounded-3xl blur-2xl" />

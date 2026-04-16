@@ -17,8 +17,22 @@ export function FamilyIntelligence() {
   }
 
   return (
-    <section id="family" className="py-20 sm:py-24 bg-gradient-to-b from-orange-50/50 to-background">
-      <div className="mx-auto max-w-5xl px-4 sm:px-6">
+    <section id="family" className="relative py-20 sm:py-24 overflow-hidden">
+      {/* Background photo */}
+      <div aria-hidden className="pointer-events-none absolute inset-0">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="https://images.unsplash.com/photo-1528736235302-52922df5c122?w=1600&q=80&auto=format&fit=crop"
+          alt=""
+          className="w-full h-full object-cover opacity-20"
+        />
+        {/* Warm white veil so left-column text stays crisp */}
+        <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/70 to-background/40" />
+        {/* Subtle sage tint from top */}
+        <div className="absolute inset-0 bg-gradient-to-b from-orange-50/60 via-transparent to-background/80" />
+      </div>
+
+      <div className="relative mx-auto max-w-5xl px-4 sm:px-6">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
           {/* ─── Left: copy + selector + CTA ─── */}

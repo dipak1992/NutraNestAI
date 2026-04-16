@@ -217,19 +217,19 @@ export function DashboardClient({ userName }: Props) {
                 </div>
               </div>
 
-              {/* ── HERO CTA — glass card style matching landing page ── */}
-              <motion.button
-                whileTap={{ scale: 0.97 }}
-                whileHover={{ scale: 1.01, transition: { duration: 0.15 } }}
-                onClick={() => selectMode('tired')}
-                className="glass-card flex items-center gap-4 w-full px-6 py-5 rounded-2xl border-2 border-primary/40 bg-primary/5 hover:bg-primary/10 hover:border-primary/60 hover:shadow-lg transition-all group text-left mb-4"
-              >
-                <span className="text-4xl flex-shrink-0">😴</span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-base font-bold group-hover:text-primary transition-colors">I don&apos;t want to think</p>
-                  <p className="text-sm text-muted-foreground mt-0.5">Just pick something simple for tonight →</p>
-                </div>
-              </motion.button>
+              {/* ── HERO CTA — routes to /tonight (one-shot decide) ── */}
+              <motion.div whileTap={{ scale: 0.97 }} whileHover={{ scale: 1.01, transition: { duration: 0.15 } }}>
+                <Link
+                  href="/decide"
+                  className="glass-card flex items-center gap-4 w-full px-6 py-5 rounded-2xl border-2 border-primary/40 bg-primary/5 hover:bg-primary/10 hover:border-primary/60 hover:shadow-lg transition-all group text-left mb-4"
+                >
+                  <span className="text-4xl flex-shrink-0">😴</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-base font-bold group-hover:text-primary transition-colors">I don&apos;t want to think</p>
+                    <p className="text-sm text-muted-foreground mt-0.5">Just pick something simple for tonight →</p>
+                  </div>
+                </Link>
+              </motion.div>
 
               {/* ── Surprise me — accent card with gradient ── */}
               <motion.button

@@ -269,29 +269,6 @@ export default function SettingsPage() {
         <TabsContent value="billing" className="space-y-6">
           <div className="glass-card rounded-xl border border-border/60 p-5 space-y-4">
             <h2 className="font-semibold flex items-center gap-2">
-              <Cive">
-                  Are you sure? This will permanently delete your household, meal plans, pantry, and all saved data. This cannot be undone.
-                </p>
-                <div className="flex gap-2 flex-wrap">
-                  <Button size="sm" variant="destructive" onClick={handleDeleteAccount} disabled={deleting}>
-                    {deleting ? 'Deleting…' : 'Yes, permanently delete'}
-                  </Button>
-                  <Button size="sm" variant="outline" onClick={() => setDeleteConfirm(false)} disabled={deleting}>
-                    Cancel
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="notifications">
-          <NotificationSettings />
-        </TabsContent>
-
-        <TabsContent value="billing" className="space-y-6">
-          <div className="glass-card rounded-xl border border-border/60 p-5 space-y-4">
-            <h2 className="font-semibold flex items-center gap-2">
               <Crown className="h-4 w-4 text-primary" />
               Billing &amp; Plan
             </h2>

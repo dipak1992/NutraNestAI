@@ -36,11 +36,11 @@ function chipToOverrides(chipId: SmartChipId): Partial<SmartMealRequest> {
     case 'too_expensive':    return { budget: 'low' }
     case 'too_much_cooking': return { lowEnergy: true, maxCookTime: 20 }
     case 'more_protein':     return { preferredProteins: ['chicken', 'beef', 'fish', 'eggs'] }
-    case 'kid_friendly':     return { pickyEater: true }
+    case 'kid_friendly':     return { pickyEater: { active: true } }
     case 'faster':           return { maxCookTime: 20 }
-    case 'less_spicy':       return { pickyEater: true, tags: ['mild'] }
-    case 'easier_texture':   return { pickyEater: true, maxCookTime: 30 }
-    case 'picky_safe':       return { pickyEater: true, tags: ['mild', 'kid-friendly'] }
+    case 'less_spicy':       return { pickyEater: { active: true } }
+    case 'easier_texture':   return { pickyEater: { active: true }, maxCookTime: 30 }
+    case 'picky_safe':       return { pickyEater: { active: true } }
   }
 }
 
@@ -88,7 +88,7 @@ export function QuickSuggestion() {
     const req: SmartMealRequest & { learnedBoosts?: unknown } = {
       household,
       lowEnergy: true,
-      pickyEater: pickyEater || undefined,
+      pickyEater: pickyEater ? { active: true } : undefined,
       excludeIds: seenIds.current,
       ...overrides,
       ...(boosts ? { learnedBoosts: boosts } : {}),

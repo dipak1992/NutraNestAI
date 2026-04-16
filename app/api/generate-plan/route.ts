@@ -6,7 +6,7 @@ import logger from '@/lib/logger'
 import type { AIGenerationRequest } from '@/types'
 
 export async function POST(req: NextRequest) {
-  const rl = rateLimit({ key: rateLimitKeyFromRequest(req), limit: 10, windowMs: 60_000 })
+  const rl = await rateLimit({ key: rateLimitKeyFromRequest(req), limit: 10, windowMs: 60_000 })
   if (!rl.success) return apiRateLimited(rl.reset)
 
   try {

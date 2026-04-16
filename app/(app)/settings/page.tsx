@@ -103,16 +103,16 @@ export default function SettingsPage() {
               <ul className="space-y-3">
                 {members.map((member) => (
                   <li key={member.id} className="flex items-start gap-3 rounded-lg border border-border/40 bg-muted/20 p-3">
-                    <span className="text-xl mt-0.5">{getStageEmoji(member.life_stage)}</span>
+                    <span className="text-xl mt-0.5">{getStageEmoji(member.stage ?? 'adult')}</span>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm">{member.name}</p>
-                      <p className="text-xs text-muted-foreground capitalize">{stageLabelDisplay(member.life_stage)}</p>
+                      <p className="text-xs text-muted-foreground capitalize">{stageLabelDisplay(member.stage ?? 'adult')}</p>
                       <div className="flex flex-wrap gap-1 mt-1.5">
                         {member.allergies?.map((a) => (
-                          <Badge key={a} className="bg-amber-100 text-amber-700 border-0 text-xs">{ALLERGY_LABELS[a] ?? a}</Badge>
+                          <Badge key={a.allergy} className="bg-amber-100 text-amber-700 border-0 text-xs">{ALLERGY_LABELS[a.allergy] ?? a.allergy}</Badge>
                         ))}
-                        {member.medical_conditions?.map((c) => (
-                          <Badge key={c} className="bg-blue-100 text-blue-700 border-0 text-xs">{CONDITION_LABELS[c] ?? c}</Badge>
+                        {member.conditions?.map((c) => (
+                          <Badge key={c.condition} className="bg-blue-100 text-blue-700 border-0 text-xs">{CONDITION_LABELS[c.condition] ?? c.condition}</Badge>
                         ))}
                       </div>
                     </div>

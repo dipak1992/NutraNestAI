@@ -23,11 +23,11 @@ export function MealCard({ meal, onRegenerate, isRegenerating, compact }: MealCa
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap mb-1">
             <Badge variant="secondary" className="text-xs capitalize">{meal.meal_type}</Badge>
-            {meal.prep_time_minutes && (
-              <span className="flex items-center gap-1 text-xs text-muted-foreground"><Clock className="h-3 w-3" />{meal.prep_time_minutes} min</span>
+            {meal.prep_time && (
+              <span className="flex items-center gap-1 text-xs text-muted-foreground"><Clock className="h-3 w-3" />{meal.prep_time} min</span>
             )}
           </div>
-          <h3 className={cn('font-semibold leading-snug', compact ? 'text-sm' : 'text-base')}>{meal.name}</h3>
+          <h3 className={cn('font-semibold leading-snug', compact ? 'text-sm' : 'text-base')}>{meal.title}</h3>
           {!compact && meal.description && <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{meal.description}</p>}
         </div>
         {onRegenerate && (

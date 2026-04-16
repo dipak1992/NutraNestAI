@@ -30,7 +30,7 @@ const schema = z.object({
   email: z.string().email('Please enter a valid email'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   confirmPassword: z.string(),
-  agreedToTos: z.literal<boolean>(true, { errorMap: () => ({ message: 'You must agree to the Terms of Service' }) }),
+  agreedToTos: z.literal<boolean>(true, { error: 'You must agree to the Terms of Service' }),
 }).refine((d) => d.password === d.confirmPassword, {
   message: 'Passwords do not match',
   path: ['confirmPassword'],

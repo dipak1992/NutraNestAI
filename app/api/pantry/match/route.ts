@@ -19,7 +19,7 @@ interface PantryMatchBody {
 
 export const POST = withErrorHandler('pantry/match', async (req: Request) => {
   const nextReq = req as unknown as NextRequest
-  const rl = rateLimit({ key: rateLimitKeyFromRequest(nextReq), limit: 20, windowMs: 60_000 })
+  const rl = await rateLimit({ key: rateLimitKeyFromRequest(nextReq), limit: 20, windowMs: 60_000 })
   if (!rl.success) return apiRateLimited(rl.reset)
 
   const body = (await req.json()) as PantryMatchBody

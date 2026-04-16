@@ -109,7 +109,7 @@ export const useLearningStore = create<LearningStore>()(
       partialize: (state) => ({
         feedbackHistory: state.feedbackHistory,
       }),
-      onRehydrate: () => (state) => {
+      onRehydrateStorage: () => (state) => {
         if (state?.feedbackHistory?.length) {
           const { _cachedSignal, _cachedBoosts } = recompute(state.feedbackHistory)
           state._cachedSignal = _cachedSignal

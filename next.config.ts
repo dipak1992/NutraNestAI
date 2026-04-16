@@ -28,9 +28,6 @@ const securityHeaders = [
 ]
 
 const nextConfig: NextConfig = {
-  typescript: {
-    ignoreBuildErrors: true,
-  },
   turbopack: {
     root: process.cwd(),
   },
@@ -51,7 +48,5 @@ export default process.env.SENTRY_AUTH_TOKEN && process.env.SENTRY_ORG && proces
       project: process.env.SENTRY_PROJECT,
       silent: !process.env.CI,
       authToken: process.env.SENTRY_AUTH_TOKEN,
-      disableClientWebpackPlugin: !process.env.SENTRY_DSN,
-      disableServerWebpackPlugin: !process.env.SENTRY_DSN,
     })
   : nextConfig

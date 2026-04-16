@@ -139,7 +139,7 @@ function DraggableCard({
       await animate(y, dir * 700, { duration: 0.25, ease: 'easeIn' })
       onDismiss()
     } else {
-      animate(y, 0, { type: 'spring', stiffness: 350, damping: 28 } as Parameters<typeof animate>[2])
+      void animate(y, 0, { type: 'spring', stiffness: 350, damping: 28 })
     }
   }
 

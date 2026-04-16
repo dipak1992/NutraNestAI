@@ -9,7 +9,7 @@ interface ScanBody {
 
 export const POST = withErrorHandler('pantry/scan', async (req: Request) => {
   const nextReq = req as unknown as NextRequest
-  const rl = rateLimit({ key: rateLimitKeyFromRequest(nextReq), limit: 10, windowMs: 60_000 })
+  const rl = await rateLimit({ key: rateLimitKeyFromRequest(nextReq), limit: 10, windowMs: 60_000 })
   if (!rl.success) return apiRateLimited(rl.reset)
 
   const supabase = await createClient()

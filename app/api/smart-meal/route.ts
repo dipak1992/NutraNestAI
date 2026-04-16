@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateSmartMeal } from '@/lib/engine/engine'
+import { createClient } from '@/lib/supabase/server'
 import { rateLimit, rateLimitKeyFromRequest } from '@/lib/rate-limit'
 import { apiError, apiRateLimited } from '@/lib/api-response'
 import logger from '@/lib/logger'
@@ -7,8 +8,12 @@ import type { SmartMealRequest } from '@/lib/engine/types'
 import type { LearnedBoosts } from '@/lib/learning/types'
 
 export async function POST(req: NextRequest) {
-  const rl = rateLimit({ key: rateLimitKeyFromRequest(req), limit: 30, windowMs: 60_000 })
+  const rl = await rateLimit({ key: rateLimitKeyFromRequest(req), limit: 30, windowMs: 60_000 })
   if (!rl.success) return apiRateLimited(rl.reset)
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return apiError('Unauthenticated', 401)
 
   try {
     const body = (await req.json()) as SmartMealRequest & { learnedBoosts?: LearnedBoosts }

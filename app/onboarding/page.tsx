@@ -358,7 +358,7 @@ function StepLocation({
       <div className="space-y-4">
         <div>
           <label htmlFor="country" className="text-sm font-medium mb-2 block">Country</label>
-          <Select value={country || undefined} onValueChange={setCountry}>
+          <Select value={country || undefined} onValueChange={(v) => v && setCountry(v)}>
             <SelectTrigger id="country" className="w-full">
               <SelectValue placeholder="Select your country" />
             </SelectTrigger>

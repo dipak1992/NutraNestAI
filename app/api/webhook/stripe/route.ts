@@ -106,12 +106,13 @@ async function handleSubscriptionUpserted(sub: Record<string, unknown>) {
   const customerId = sub['customer'] as string | null
   const subscriptionId = sub['id'] as string | null
   const status = sub['status'] as string
-  const priceId =
+  const priceId = (
     (
       (sub['items'] as Record<string, unknown>)?.['data'] as Array<
         Record<string, unknown>
       >
-    )?.[0]?.['price']?.['id'] as string | undefined
+    )?.[0]?.['price'] as Record<string, unknown> | undefined
+  )?.['id'] as string | undefined
 
   if (!customerId) {
     console.error('[stripe-webhook] subscription event missing customer')

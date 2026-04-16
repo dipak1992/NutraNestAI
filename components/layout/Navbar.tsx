@@ -108,14 +108,12 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
             </Button>
           )}
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="rounded-full">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
-                    {initials}
-                  </AvatarFallback>
-                </Avatar>
-              </Button>
+            <DropdownMenuTrigger render={<Button variant="ghost" size="icon" className="rounded-full" />}>
+              <Avatar className="h-8 w-8">
+                <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
               {userEmail && (
@@ -126,31 +124,23 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
                   <DropdownMenuSeparator />
                 </>
               )}
-              <DropdownMenuItem asChild>
-                <Link href="/settings" className="flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  Profile &amp; Settings
-                </Link>
+              <DropdownMenuItem render={<Link href="/settings" />}>
+                <User className="h-4 w-4" />
+                Profile &amp; Settings
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/insights" className="flex items-center gap-2">
-                  <BarChart3 className="h-4 w-4" />
-                  Insights
-                </Link>
+              <DropdownMenuItem render={<Link href="/insights" />}>
+                <BarChart3 className="h-4 w-4" />
+                Insights
               </DropdownMenuItem>
               {!isPro && (
-                <DropdownMenuItem asChild>
-                  <Link href="/pricing?intent=pro" className="flex items-center gap-2">
-                    <Crown className="h-4 w-4" />
-                    Upgrade to Pro
-                  </Link>
+                <DropdownMenuItem render={<Link href="/pricing?intent=pro" />}>
+                  <Crown className="h-4 w-4" />
+                  Upgrade to Pro
                 </DropdownMenuItem>
               )}
-              <DropdownMenuItem asChild>
-                <Link href="/referral" className="flex items-center gap-2">
-                  <Gift className="h-4 w-4" />
-                  Refer Friends
-                </Link>
+              <DropdownMenuItem render={<Link href="/referral" />}>
+                <Gift className="h-4 w-4" />
+                Refer Friends
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem

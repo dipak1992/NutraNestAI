@@ -12,7 +12,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const promises: Promise<unknown>[] = []
+    const promises: PromiseLike<unknown>[] = []
 
     // Persist household name to user metadata
     if (typeof body.householdName === 'string') {
@@ -31,6 +31,7 @@ export async function PATCH(req: NextRequest) {
         supabase
           .from('onboarding_preferences')
           .upsert(prefPayload, { onConflict: 'user_id' })
+          .then()
       )
     }
 

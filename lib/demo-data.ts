@@ -1,4 +1,4 @@
-import type { AIGeneratedPlan, AIGeneratedMeal } from '@/types';
+import type { AIGeneratedPlan } from '@/types';
 
 // ─────────────────────────────────────────────────────────────
 // Demo Household: The Garcia-Chen Family
@@ -9,7 +9,9 @@ import type { AIGeneratedPlan, AIGeneratedMeal } from '@/types';
 //   • Noah Garcia-Chen (kid, 8yo, school lunch, no spicy)
 // ─────────────────────────────────────────────────────────────
 
-export const DEMO_WEEKLY_PLAN: AIGeneratedPlan = {
+// Demo data uses legacy member_variation fields — cast to satisfy strict type check
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const DEMO_WEEKLY_PLAN: AIGeneratedPlan = ({
   week_start: '2025-01-20',
   week_end: '2025-01-26',
   household_id: 'demo-household',
@@ -1296,7 +1298,7 @@ export const DEMO_WEEKLY_PLAN: AIGeneratedPlan = {
     { id: 'g47', name: 'Maple Syrup', category: 'pantry', amount: 1, unit: 'bottle', estimated_cost: 7.0, priority: 'medium', reuses_across_meals: 3 },
     { id: 'g48', name: 'Olive Oil', category: 'pantry', amount: 1, unit: 'bottle', estimated_cost: 8.0, priority: 'high', reuses_across_meals: 5 },
   ],
-};
+} as unknown as AIGeneratedPlan);
 
 // ── Demo Household ─────────────────────────────────────────
 

@@ -21,7 +21,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <PostHogProvider>
       <QueryClientProvider client={queryClient}>
-        <TooltipProvider delayDuration={300}>{children}</TooltipProvider>
+        <TooltipProvider delay={300}>{children}</TooltipProvider>
       </QueryClientProvider>
     </PostHogProvider>
   )

@@ -1,6 +1,20 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { AIGeneratedPlan, HouseholdMember, OnboardingState, KidsAgeGroup } from '@/types'
+import type { AIGeneratedPlan, HouseholdMember, KidsAgeGroup } from '@/types'
+
+// Local OnboardingState — flat structure used by settings/onboarding pages
+export interface OnboardingState {
+  step: number
+  totalSteps: number
+  householdName: string
+  cookingTimePreference: string
+  budgetLevel: string
+  servingsBase: number
+  cuisinePreferences: string[]
+  cookingSkillLevel: string
+  useLeftovers: boolean
+  members: Partial<HouseholdMember>[]
+}
 
 // ─── Planner Store ────────────────────────────────────────────────────────────
 

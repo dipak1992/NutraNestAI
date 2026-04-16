@@ -20,7 +20,7 @@ const BUSY_WEEKDAY_MAX_MIN = 25
 const WEEKEND_MAX_MIN = 60
 
 export async function POST(req: NextRequest) {
-  const rl = rateLimit({ key: rateLimitKeyFromRequest(req), limit: 30, windowMs: 60_000 })
+  const rl = await rateLimit({ key: rateLimitKeyFromRequest(req), limit: 30, windowMs: 60_000 })
   if (!rl.success) return apiRateLimited(rl.reset)
 
   let body: DecideBody

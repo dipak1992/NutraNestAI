@@ -19,7 +19,7 @@ Respond ONLY with valid JSON in this exact format:
 {"type": "ingredients" | "inspiration" | "unknown", "result": "your comma-separated ingredients OR meal description OR empty string"}`
 
 export async function POST(req: NextRequest) {
-  const rl = rateLimit({ key: rateLimitKeyFromRequest(req), limit: 20, windowMs: 60_000 })
+  const rl = await rateLimit({ key: rateLimitKeyFromRequest(req), limit: 20, windowMs: 60_000 })
   if (!rl.success) return apiRateLimited(rl.reset)
 
   try {
@@ -29,6 +29,22 @@ export async function POST(req: NextRequest) {
     if (!image || !mimeType) {
       return NextResponse.json(
         { error: 'Missing image or mimeType' },
+        { status: 400 },
+      )
+    }
+
+    const MAX_BASE64_SIZE = 7_000_000 // ~5MB decoded
+    if (image.length > MAX_BASE64_SIZE) {
+      return NextResponse.json(
+        { error: 'Image too large. Maximum size is 5MB.' },
+        { status: 413 },
+      )
+    }
+
+    const ALLOWED_MIME = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+    if (!ALLOWED_MIME.includes(mimeType)) {
+      return NextResponse.json(
+        { error: 'Unsupported image type. Use JPEG, PNG, GIF, or WebP.' },
         { status: 400 },
       )
     }

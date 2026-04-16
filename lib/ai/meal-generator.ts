@@ -1,3 +1,4 @@
+import { aiGeneratedPlanSchema } from './schemas'
 import type {
   AIGenerationRequest,
   AIGeneratedPlan,
@@ -167,7 +168,8 @@ async function generateWithClaude(
     if (jsonText.startsWith('```')) {
       jsonText = jsonText.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
     }
-    return JSON.parse(jsonText) as AIGeneratedPlan;
+    const parsed = JSON.parse(jsonText);
+    return aiGeneratedPlanSchema.parse(parsed) as AIGeneratedPlan;
   } catch (err) {
     console.error('[MealEase] Failed to parse AI response:', err);
     throw new Error('Failed to parse meal plan response from AI');

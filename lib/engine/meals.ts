@@ -6,7 +6,7 @@ import type { MealCandidate, MealIngredient, MealVariationData, IngredientCatego
 
 // ── Helpers ──────────────────────────────────────────────────
 
-function ing(
+export function ing(
   name: string,
   qty: string,
   unit: string,
@@ -17,7 +17,7 @@ function ing(
   return { name, quantity: qty, unit, category: cat, pantryStaple: staple, ...(note ? { note } : {}) }
 }
 
-function v(
+export function v(
   title: string,
   desc: string,
   mods: string[],

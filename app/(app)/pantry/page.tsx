@@ -139,7 +139,7 @@ export default function PantryPage() {
               <Input placeholder="Amount" value={form.amount} onChange={(e) => setForm((f) => ({ ...f, amount: e.target.value }))} className="w-24" />
               <Input placeholder="Unit" value={form.unit} onChange={(e) => setForm((f) => ({ ...f, unit: e.target.value }))} className="w-24" />
             </div>
-            <Select value={form.category} onValueChange={(v) => setForm((f) => ({ ...f, category: v }))}>
+            <Select value={form.category} onValueChange={(v) => setForm((f) => ({ ...f, category: v ?? "" }))}>
               <SelectTrigger>
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
@@ -162,7 +162,7 @@ export default function PantryPage() {
         {Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b)).map(([category, catItems]) => (
           <div key={category} className="glass-card rounded-xl border border-border/60 overflow-hidden">
             <div className="flex items-center gap-2 px-5 py-3 bg-muted/30 border-b border-border/40">
-              <span className="text-lg">{GROCERY_CATEGORY_ICONS[category] ?? '📦'}</span>
+              <span className="text-lg">{GROCERY_CATEGORY_ICONS[category as keyof typeof GROCERY_CATEGORY_ICONS] ?? '📦'}</span>
               <h2 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">{category}</h2>
               <span className="ml-auto text-xs text-muted-foreground">{catItems.length} items</span>
             </div>

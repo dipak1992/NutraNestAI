@@ -119,7 +119,7 @@ export function DashboardClient({ userName }: Props) {
   // ── Family emojis ─────────────────────────────────────────────────────────
   const familyEmojis = useMemo(() => {
     if (members && members.length > 0) {
-      return members.slice(0, 5).map(m => stageToEmoji(m.stage))
+      return members.slice(0, 5).map(m => stageToEmoji(m.stage ?? 'adult'))
     }
     const base: string[] = householdType === 'solo' ? ['🧑'] : ['🧑', '🧑']
     if (hasKids) base.push('🧒')
@@ -143,7 +143,8 @@ export function DashboardClient({ userName }: Props) {
   function handleSmartSubmit(value: string, detectedMode?: 'ingredients' | 'inspiration') {
     // If image analysis detected a different mode, switch to it
     if (detectedMode && detectedMode !== mode) {
-      setMode(detectedMode)
+      const mapped: SituationMode = detectedMode === 'ingredients' ? 'ingredients' : 'smart'
+      setMode(mapped)
     }
     setInput(value)
     setSubmitted(true)
@@ -309,7 +310,7 @@ export function DashboardClient({ userName }: Props) {
                 <TodayCard />
               </div>
 
-              {/* "Your family is covered" strip */}}
+              {/* "Your family is covered" strip */}
               <div className="mt-6 flex items-center gap-3 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100 px-4 py-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 flex-shrink-0">
                   <span className="text-lg">✅</span>

@@ -191,7 +191,7 @@ export function buildGroceryList(
 /** Re-apply store format to an existing list (without re-fetching meals) */
 export function reformatGroceryList(list: GroceryList, newFormat: StoreFormat): GroceryList {
   const items = list.items.map((item) => {
-    const cleaned = { ...item, walmartAisle: undefined, costcoBulkNote: undefined }
+    const cleaned = { ...item, walmartAisle: undefined as string | undefined, costcoBulkNote: undefined as string | undefined }
     if (newFormat === 'walmart') {
       cleaned.walmartAisle = WALMART_AISLES[item.category] ?? WALMART_AISLES['other']
     } else if (newFormat === 'costco') {

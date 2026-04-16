@@ -28,7 +28,7 @@ interface AdjustBody {
 
 export const POST = withErrorHandler('plan/adjust', async (req: Request) => {
   const nextReq = req as unknown as NextRequest
-  const rl = rateLimit({ key: rateLimitKeyFromRequest(nextReq), limit: 30, windowMs: 60_000 })
+  const rl = await rateLimit({ key: rateLimitKeyFromRequest(nextReq), limit: 30, windowMs: 60_000 })
   if (!rl.success) return apiRateLimited(rl.reset)
 
   const supabase = await createClient()

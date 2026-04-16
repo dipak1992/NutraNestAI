@@ -122,11 +122,10 @@ export function WeeklyPlannerV2() {
       return {
         household: { adultsCount, kidsCount, toddlersCount: 0, babiesCount: 0 },
         cuisinePreferences: cuisines.length > 0 ? cuisines : undefined,
-        dislikedFoods: dislikedFoods.length > 0 ? dislikedFoods : undefined,
         lowEnergy,
         locality: country || undefined,
         maxCookTime: cookingTimeMinutes > 0 ? cookingTimeMinutes : 45,
-        pickyEater: pickyEater ? { active: true } : undefined,
+        pickyEater: pickyEater ? { active: true, dislikedFoods: dislikedFoods.length > 0 ? dislikedFoods : undefined } : undefined,
         excludeIds,
       }
     },
@@ -354,11 +353,9 @@ export function WeeklyPlannerV2() {
         <div className="flex flex-wrap gap-2">
           {mealsPlanned > 0 && (
             <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="outline" size="sm" className="text-muted-foreground">
-                  <RefreshCcw className="h-4 w-4 mr-1.5" />
-                  Clear
-                </Button>
+              <AlertDialogTrigger render={<Button variant="outline" size="sm" className="text-muted-foreground" />}>
+                <RefreshCcw className="h-4 w-4 mr-1.5" />
+                Clear
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
@@ -378,11 +375,9 @@ export function WeeklyPlannerV2() {
           )}
           {mealsPlanned > 0 && (
             <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="outline" size="sm" onClick={handlePublishPlan}>
-                  <Globe className="h-4 w-4 mr-1.5" />
-                  Publish plan
-                </Button>
+              <TooltipTrigger render={<Button variant="outline" size="sm" onClick={handlePublishPlan} />}>
+                <Globe className="h-4 w-4 mr-1.5" />
+                Publish plan
               </TooltipTrigger>
               <TooltipContent>Share a public link to your weekly plan</TooltipContent>
             </Tooltip>

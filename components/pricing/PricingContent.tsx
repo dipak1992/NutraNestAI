@@ -425,7 +425,7 @@ export function PricingContent() {
         <h2 className="mb-8 text-center text-2xl font-bold">
           Frequently Asked Questions
         </h2>
-        <Accordion type="single" collapsible className="space-y-2">
+        <Accordion className="space-y-2">
           {FAQ.map(({ q, a }, i) => (
             <AccordionItem
               key={q}

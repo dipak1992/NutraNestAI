@@ -496,8 +496,8 @@ function buildVariations(meal: MealCandidate, request: SmartMealRequest): SmartV
 
     // Populate allergen warnings from request allergens
     const allergyWarnings: string[] = []
-    if (request.allergens?.length) {
-      for (const allergen of request.allergens) {
+    if (request.allergies?.length) {
+      for (const allergen of request.allergies) {
         const terms = ALLERGEN_MAP[allergen] ?? [allergen]
         const found = meal.ingredients.some(i =>
           terms.some(t => i.name.toLowerCase().includes(t))

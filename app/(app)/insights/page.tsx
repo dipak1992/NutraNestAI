@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { ProPaywallCard } from '@/components/paywall/ProPaywallCard'
 import { getPaywallStatus } from '@/lib/paywall/server'
 import { TrendingUp, Utensils, Users, Clock, Leaf, ShieldCheck, CalendarDays } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import type { PlanDay } from '@/lib/planner/adapt'
 import type { SmartMealResult } from '@/lib/engine/types'
 
@@ -83,9 +83,9 @@ export default async function InsightsPage() {
           <p className="text-muted-foreground text-sm max-w-sm">
             Generate a weekly meal plan to start seeing cuisine trends, cook-time stats, and personalization insights here.
           </p>
-          <Button asChild size="lg" className="mt-2">
-            <Link href="/planner">Build this week&apos;s plan</Link>
-          </Button>
+          <Link href="/planner" className={buttonVariants({ size: "lg", className: "mt-2" })}>
+            Build this week&apos;s plan
+          </Link>
         </div>
       </div>
     )

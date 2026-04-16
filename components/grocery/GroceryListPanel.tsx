@@ -112,8 +112,7 @@ function GroceryItemRow({
       {/* Pantry toggle */}
       <TooltipProvider>
         <Tooltip>
-          <TooltipTrigger asChild>
-            <button
+          <TooltipTrigger
               type="button"
               onClick={() => onTogglePantry(item.id)}
               className={cn(
@@ -124,7 +123,6 @@ function GroceryItemRow({
               )}
             >
               <Leaf className="h-3.5 w-3.5" />
-            </button>
           </TooltipTrigger>
           <TooltipContent side="left" className="text-xs">
             {item.isInPantry ? 'Remove from pantry' : 'Mark as in pantry'}

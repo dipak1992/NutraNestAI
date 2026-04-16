@@ -307,6 +307,7 @@ function TonightPageInner() {
   const mode = (searchParams.get('mode') as 'quick' | 'tired' | 'pantry' | 'inspiration') || 'quick'
   const needsInput = mode === 'pantry' || mode === 'inspiration'
   const [loading, setLoading] = useState(!needsInput)
+  const [authRequired, setAuthRequired] = useState(false)
   const [userInput, setUserInput] = useState('')
   const [inputSubmitted, setInputSubmitted] = useState(false)
   const { status } = usePaywallStatus()
@@ -328,6 +329,7 @@ function TonightPageInner() {
 
   const fetchMeal = useCallback(async (ingredientText?: string) => {
     setLoading(true)
+    setAuthRequired(false)
     try {
       const boosts = getBoosts()
       const body: Record<string, unknown> = {
@@ -353,6 +355,8 @@ function TonightPageInner() {
         setMeal(data)
         seenIdsRef.current = [...seenIdsRef.current, data.id]
         try { sessionStorage.setItem('tonight-seen-ids', JSON.stringify(seenIdsRef.current)) } catch {}
+      } else if (res.status === 401) {
+        setAuthRequired(true)
       }
     } catch {
       // Silently fail — loading will complete and show empty state
@@ -652,6 +656,26 @@ function TonightPageInner() {
                 </Button>
                 <p className="mt-2 text-xs text-muted-foreground">Free plan · No credit card required</p>
               </motion.div>
+            </motion.div>
+          ) : authRequired ? (
+            <motion.div
+              key="auth"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="min-h-[50vh] flex flex-col items-center justify-center text-center px-4"
+            >
+              <p className="text-xl font-bold mb-2">Sign in to get your dinner idea</p>
+              <p className="text-muted-foreground mb-6 max-w-xs">
+                MealEase needs an account to personalise meal suggestions for your family.
+              </p>
+              <div className="flex flex-col gap-3 w-full max-w-xs">
+                <Button asChild size="lg">
+                  <Link href={`/login?redirect=/tonight%3Fmode%3D${mode}`}>Sign in free →</Link>
+                </Button>
+                <Button asChild variant="outline" size="lg">
+                  <Link href="/signup">Create account</Link>
+                </Button>
+              </div>
             </motion.div>
           ) : (
             <motion.div

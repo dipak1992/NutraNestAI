@@ -518,7 +518,7 @@ export default function OnboardingPage() {
   const showBottomNav = step >= 1 && step <= 5
 
   return (
-    <div className="min-h-screen gradient-hero flex flex-col">
+    <div className="min-h-[100dvh] gradient-hero flex flex-col">
 
       {/* ── Header ──────────────────────────────────────────────────────────── */}
       <header className="flex items-center justify-between px-6 pt-6 pb-2 flex-shrink-0">
@@ -542,7 +542,7 @@ export default function OnboardingPage() {
       )}
 
       {/* ── Step content ─────────────────────────────────────────────────────── */}
-      <div className="flex-1 flex items-center justify-center px-6 py-4 overflow-hidden">
+      <div className="flex-1 flex items-center justify-center px-6 py-4 overflow-x-hidden">
         <div className="w-full max-w-md">
           <AnimatePresence mode="wait" custom={direction}>
             <motion.div

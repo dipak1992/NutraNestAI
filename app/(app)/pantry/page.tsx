@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ProPaywallCard } from '@/components/paywall/ProPaywallCard'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
-import { Package, Plus, Trash2, Search } from 'lucide-react'
+import { Package, Plus, Trash2, Search, Camera, Clock, ChefHat } from 'lucide-react'
 import { GROCERY_CATEGORY_ICONS } from '@/lib/utils'
 
 interface PantryItem {
@@ -21,6 +21,14 @@ interface PantryItem {
 
 const CATEGORIES = ['Grains & Pasta', 'Canned Goods', 'Spices & Seasonings', 'Oils & Condiments', 'Snacks', 'Other']
 
+interface UseSoonMeal {
+  id: string
+  title: string
+  totalTime: number
+  difficulty: string
+  cuisineType: string
+}
+
 export default function PantryPage() {
   const { status, loading } = usePaywallStatus()
   const [items, setItems] = useState<PantryItem[]>([])
@@ -28,6 +36,10 @@ export default function PantryPage() {
   const [search, setSearch] = useState('')
   const [showAdd, setShowAdd] = useState(false)
   const [form, setForm] = useState({ name: '', amount: '', unit: '', category: 'Other', expires: '' })
+  const [useSoonMeals, setUseSoonMeals] = useState<UseSoonMeal[]>([])
+  const [photoLoading, setPhotoLoading] = useState(false)
+  const [photoMessage, setPhotoMessage] = useState<string | null>(null)
+  const photoInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (loading || !status.isPro) return
@@ -49,6 +61,25 @@ export default function PantryPage() {
       })
       .finally(() => setFetchLoading(false))
   }, [loading, status.isPro])
+
+  useEffect(() => {
+    const expiring = items.filter((i) => isExpiryCritical(i.expires) || isExpiryWarning(i.expires))
+    if (expiring.length === 0) { setUseSoonMeals([]); return }
+    const names = expiring.map((i) => i.name)
+    fetch('/api/pantry/match', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pantryItems: names, household: { adultsCount: 2, kidsCount: 0, toddlersCount: 0, babiesCount: 0 }, limit: 3 }),
+    })
+      .then((r) => r.json())
+      .then((json) => {
+        const meals: UseSoonMeal[] = (json.data?.meals ?? []).map((m: UseSoonMeal) => ({
+          id: m.id, title: m.title, totalTime: m.totalTime, difficulty: m.difficulty, cuisineType: m.cuisineType,
+        }))
+        setUseSoonMeals(meals)
+      })
+      .catch(() => {})
+  }, [items])
 
   if (loading || (status.isPro && fetchLoading)) {
     return (
@@ -109,10 +140,60 @@ export default function PantryPage() {
     await fetch(`/api/pantry?id=${encodeURIComponent(id)}`, { method: 'DELETE' })
   }
 
-  function isExpiringSoon(expires?: string) {
+  function isExpiryCritical(expires?: string) {
     if (!expires) return false
     const days = (new Date(expires).getTime() - Date.now()) / 86400000
-    return days <= 7
+    return days >= 0 && days <= 3
+  }
+
+  function isExpiryWarning(expires?: string) {
+    if (!expires) return false
+    const days = (new Date(expires).getTime() - Date.now()) / 86400000
+    return days > 3 && days <= 7
+  }
+
+  async function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setPhotoLoading(true)
+    setPhotoMessage(null)
+    const reader = new FileReader()
+    reader.onload = async () => {
+      try {
+        const dataUrl = reader.result as string
+        const res = await fetch('/api/pantry/vision', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: dataUrl }),
+        })
+        const json = await res.json()
+        const detected: string[] = json.data?.items ?? []
+        if (detected.length === 0) {
+          setPhotoMessage('No ingredients detected. Try a clearer photo.')
+        } else {
+          for (const name of detected) {
+            const addRes = await fetch('/api/pantry', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ name, category: 'Other', quantity: 1, unit: 'unit' }),
+            })
+            const addJson = await addRes.json()
+            if (addJson.data) {
+              const row = addJson.data as { id: string; name: string; quantity: number; unit: string; category: string; expires_at: string | null }
+              setItems((prev) => [...prev, { id: row.id, name: row.name, amount: String(row.quantity), unit: row.unit, category: row.category, expires: row.expires_at ?? undefined }])
+            }
+          }
+          setPhotoMessage(`Added ${detected.length} item${detected.length !== 1 ? 's' : ''} from photo!`)
+        }
+      } catch {
+        setPhotoMessage('Failed to scan photo. Please try again.')
+      } finally {
+        setPhotoLoading(false)
+        if (photoInputRef.current) photoInputRef.current.value = ''
+        setTimeout(() => setPhotoMessage(null), 4000)
+      }
+    }
+    reader.readAsDataURL(file)
   }
 
   return (
@@ -125,10 +206,31 @@ export default function PantryPage() {
           </h1>
           <p className="text-muted-foreground mt-1">{items.length} items stocked</p>
         </div>
-        <Button onClick={() => setShowAdd((v) => !v)} className="gap-2 flex-shrink-0">
-          <Plus className="h-4 w-4" />{showAdd ? 'Cancel' : 'Add Item'}
-        </Button>
+        <div className="flex gap-2 flex-shrink-0">
+          <input
+            type="file"
+            accept="image/*"
+            capture="environment"
+            ref={photoInputRef}
+            onChange={handlePhotoUpload}
+            className="hidden"
+          />
+          <Button variant="outline" onClick={() => photoInputRef.current?.click()} disabled={photoLoading} className="gap-2">
+            <Camera className="h-4 w-4" />{photoLoading ? 'Scanning…' : 'Add via Photo'}
+          </Button>
+          <Button onClick={() => setShowAdd((v) => !v)} className="gap-2">
+            <Plus className="h-4 w-4" />{showAdd ? 'Cancel' : 'Add Item'}
+          </Button>
+        </div>
       </div>
+
+      {photoMessage && (
+        <div className={`rounded-lg px-4 py-3 text-sm font-medium mb-4 ${
+          photoMessage.startsWith('Added') ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-amber-50 text-amber-700 border border-amber-200'
+        }`}>
+          {photoMessage}
+        </div>
+      )}
 
       {showAdd && (
         <div className="glass-card rounded-xl border border-border/60 p-5 mb-6 space-y-4">
@@ -158,6 +260,26 @@ export default function PantryPage() {
         <Input placeholder="Search pantry..." className="pl-9" value={search} onChange={(e) => setSearch(e.target.value)} />
       </div>
 
+      {useSoonMeals.length > 0 && (
+        <div className="mb-6">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3 flex items-center gap-2">
+            <ChefHat className="h-4 w-4 text-amber-500" />
+            Use These Up
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {useSoonMeals.map((meal) => (
+              <div key={meal.id} className="glass-card rounded-xl border border-amber-200/60 bg-amber-50/40 p-4 space-y-1">
+                <p className="font-semibold text-sm leading-snug">{meal.title}</p>
+                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{meal.totalTime} min</span>
+                  <span className="capitalize">{meal.difficulty}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="space-y-6">
         {Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b)).map(([category, catItems]) => (
           <div key={category} className="glass-card rounded-xl border border-border/60 overflow-hidden">
@@ -176,8 +298,14 @@ export default function PantryPage() {
                     )}
                   </div>
                   {item.expires && (
-                    <Badge className={`text-xs border-0 ${isExpiringSoon(item.expires) ? 'bg-red-100 text-red-700' : 'bg-muted text-muted-foreground'}`}>
-                      {isExpiringSoon(item.expires) ? '⚠️ ' : ''}Exp {new Date(item.expires).toLocaleDateString()}
+                    <Badge className={`text-xs border-0 ${
+                      isExpiryCritical(item.expires)
+                        ? 'bg-red-100 text-red-700'
+                        : isExpiryWarning(item.expires)
+                          ? 'bg-amber-100 text-amber-700'
+                          : 'bg-muted text-muted-foreground'
+                    }`}>
+                      {isExpiryCritical(item.expires) ? '🔴 ' : isExpiryWarning(item.expires) ? '⚠️ ' : ''}Exp {new Date(item.expires).toLocaleDateString()}
                     </Badge>
                   )}
                   <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => removeItem(item.id)}>

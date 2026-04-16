@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
-import { ArrowLeft, Zap, Sparkles, CalendarDays, ChevronRight, BookMarked } from 'lucide-react'
+import { ArrowLeft, Zap, Sparkles, CalendarDays, ChevronRight, BookMarked, Flame } from 'lucide-react'
 import { MealSwipeStack } from '@/components/dashboard/MealSwipeStack'
 import { SmartInput } from '@/components/dashboard/SmartInput'
 import { QuickSuggestion } from '@/components/dashboard/QuickSuggestion'
@@ -88,9 +88,19 @@ export function DashboardClient({ userName }: Props) {
   const [mode, setMode] = useState<SituationMode>(null)
   const [input, setInput] = useState('')
   const [submitted, setSubmitted] = useState(false)
+  const [streak, setStreak] = useState<{ current_streak: number; longest_streak: number } | null>(null)
 
   const firstName = userName.includes('@') ? userName.split('@')[0] : userName
   const activeMode = SITUATIONS.find(s => s.id === mode)
+
+  useEffect(() => {
+    fetch('/api/habit/streak')
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        if (data?.current_streak >= 1) setStreak(data)
+      })
+      .catch(() => null)
+  }, [])
 
   // ── Stores ──────────────────────────────────────────────────────────────────
   const { state: { members } } = useOnboardingStore()
@@ -338,6 +348,25 @@ export function DashboardClient({ userName }: Props) {
                   <span className="text-[10px] text-muted-foreground font-medium leading-tight">meals<br/>explored</span>
                 </div>
               </div>
+
+              {/* Streak card */}
+              {streak && streak.current_streak >= 1 && (
+                <div className="mt-4 flex items-center gap-3 rounded-2xl border border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50 px-4 py-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-100 flex-shrink-0">
+                    <Flame className="h-5 w-5 text-orange-500" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold text-orange-900">
+                      🔥 {streak.current_streak}-day cooking streak!
+                    </p>
+                    <p className="text-xs text-orange-700/80 mt-0.5">
+                      {streak.current_streak >= streak.longest_streak
+                        ? 'Personal best — keep it going!'
+                        : `Best: ${streak.longest_streak} days · Cook tonight to keep it going`}
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {/* Value Accumulator — free users only */}
               {!paywallStatus.isPro && totalInteractions > 0 && (

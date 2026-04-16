@@ -6,6 +6,14 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, ChefHat, RefreshCw, ShoppingCart, Clock, Flame } from 'lucide-react'
 import { useOnboardingStore, useLightOnboardingStore } from '@/lib/store'
 import { useLearningStore } from '@/lib/learning/store'
+import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog'
 import {
   decideMeal,
   sendSignal,
@@ -48,12 +56,19 @@ export function OneShotSuggestion({ mode = 'tonight', title }: Props) {
   const light = useLightOnboardingStore()
   const { getBoosts, recordLike, recordReject } = useLearningStore()
 
+  const { status: paywallStatus } = usePaywallStatus()
+
   const [meal, setMeal] = useState<SmartMealResult | null>(null)
   const [ctx, setCtx] = useState<DecideResponse['context'] | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [swapping, setSwapping] = useState(false)
+  const [cookedFeedback, setCookedFeedback] = useState(false)
+  const [feedbackGiven, setFeedbackGiven] = useState(false)
+  const [trialNudgeOpen, setTrialNudgeOpen] = useState(false)
+  const [startingTrial, setStartingTrial] = useState(false)
   const shownIdsRef = useRef<string[]>([])
+  const swapCountRef = useRef(0)
 
   const fetchMeal = useCallback(async (opts: { swap?: boolean } = {}) => {
     setError(null)
@@ -100,6 +115,15 @@ export function OneShotSuggestion({ mode = 'tonight', title }: Props) {
     if (!meal) return
     recordLike(meal)
     sendSignal(meal.id, 'cooked', { mode })
+    setCookedFeedback(true)
+    setFeedbackGiven(false)
+  }
+
+  const handleFeedback = (rating: 'loved' | 'okay' | 'disliked') => {
+    if (!meal) return
+    sendSignal(meal.id, 'cooked', { mode, rating })
+    setFeedbackGiven(true)
+    setTimeout(() => setCookedFeedback(false), 1200)
   }
 
   const handleSwap = () => {
@@ -107,6 +131,24 @@ export function OneShotSuggestion({ mode = 'tonight', title }: Props) {
     recordReject(meal)
     sendSignal(meal.id, 'swapped', { mode })
     void fetchMeal({ swap: true })
+    swapCountRef.current += 1
+    if (swapCountRef.current === 3 && !paywallStatus.isPro) {
+      setTrialNudgeOpen(true)
+      swapCountRef.current = 0
+    }
+  }
+
+  const handleStartTrial = async () => {
+    setStartingTrial(true)
+    try {
+      const res = await fetch('/api/paywall/start-trial', { method: 'POST' })
+      if (res.ok) {
+        setTrialNudgeOpen(false)
+        window.location.reload()
+      }
+    } finally {
+      setStartingTrial(false)
+    }
   }
 
   const handleOrder = () => {
@@ -224,16 +266,79 @@ export function OneShotSuggestion({ mode = 'tonight', title }: Props) {
                   <span className="text-xs font-semibold text-blue-700 group-hover:text-blue-800">Order</span>
                 </button>
               </div>
+
+              {/* Post-cook feedback row */}
+              <AnimatePresence>
+                {cookedFeedback && !feedbackGiven && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    className="border-t border-border/60 px-4 py-3"
+                  >
+                    <p className="text-xs text-center text-muted-foreground mb-2">How&apos;d it go?</p>
+                    <div className="flex items-center justify-center gap-3">
+                      {([['loved', '😍', 'Loved it'], ['okay', '👍', 'Pretty good'], ['disliked', '😬', 'Didn\'t work']] as const).map(([rating, emoji, label]) => (
+                        <button
+                          key={rating}
+                          onClick={() => handleFeedback(rating)}
+                          className="flex flex-col items-center gap-0.5 rounded-xl px-3 py-2 text-center hover:bg-muted transition-colors"
+                        >
+                          <span className="text-xl">{emoji}</span>
+                          <span className="text-[10px] text-muted-foreground font-medium">{label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+                {cookedFeedback && feedbackGiven && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="border-t border-border/60 px-4 py-3 text-center"
+                  >
+                    <p className="text-xs text-emerald-700 font-semibold">Thanks! We&apos;ll keep learning 🙌</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
           ) : null}
         </AnimatePresence>
 
-        {meal && !loading && (
+        {meal && !loading && !cookedFeedback && (
           <p className="text-[11px] text-muted-foreground text-center mt-4">
             Not feeling it? Tap <span className="font-semibold">Swap</span> — we&apos;ll learn.
           </p>
         )}
       </div>
+
+      {/* Trial nudge after 3 swipes */}
+      <Dialog open={trialNudgeOpen} onOpenChange={setTrialNudgeOpen}>
+        <DialogContent className="max-w-sm mx-auto">
+          <DialogHeader>
+            <DialogTitle className="text-lg">Still searching? 🍽️</DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground mt-1">
+              Unlock unlimited swipes, the full 7-day planner, and your grocery list — free for 7 days, cancel anytime.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4 flex flex-col gap-3">
+            <button
+              onClick={() => void handleStartTrial()}
+              disabled={startingTrial}
+              className="w-full rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold py-3 text-sm hover:from-amber-600 hover:to-orange-600 transition-all disabled:opacity-60"
+            >
+              {startingTrial ? 'Starting…' : 'Start 7-day free trial'}
+            </button>
+            <button
+              onClick={() => setTrialNudgeOpen(false)}
+              className="w-full text-sm text-muted-foreground py-2"
+            >
+              Keep exploring for free
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

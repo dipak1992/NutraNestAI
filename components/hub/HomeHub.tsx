@@ -18,6 +18,8 @@ import { OnboardingPromptPopup } from '@/components/onboarding/OnboardingPromptP
 import { useLearningStore } from '@/lib/learning/store'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 import { DEMO_WEEKLY_PLAN } from '@/lib/demo-data'
+import { ZeroCookSheet } from '@/components/zero-cook/ZeroCookSheet'
+import { ZeroCookTeaser } from '@/components/zero-cook/ZeroCookTeaser'
 import {
   decideMeal,
   sendSignal,
@@ -29,13 +31,14 @@ import type { SmartChipId, LifeStage } from '@/types'
 
 // ── Intent tiles ────────────────────────────────────────────
 
-type HubTile = 'quick' | 'pantry' | 'surprise' | 'plan'
+type HubTile = 'quick' | 'pantry' | 'surprise' | 'plan' | 'zero-cook'
 
 const TILES: { id: HubTile; emoji: string; label: string; hint: string }[] = [
   { id: 'quick',    emoji: '⚡', label: "Don't want to think", hint: 'One tap — dinner decided' },
   { id: 'pantry',   emoji: '🥫', label: 'Use what I have',     hint: 'Meals from your pantry' },
   { id: 'surprise', emoji: '✨', label: 'Surprise me',         hint: "Something new you'll love" },
   { id: 'plan',     emoji: '📅', label: 'Plan my week',        hint: '7 dinners, zero repeats' },
+  { id: 'zero-cook', emoji: '🛵', label: "Don't cook tonight",  hint: 'Get it delivered — we pick for you' },
 ]
 
 // ── Chip → request modifier ─────────────────────────────────
@@ -88,6 +91,8 @@ export function HomeHub({ userName }: Props) {
   const [swapping, setSwapping] = useState(false)
   const [activeChip, setActiveChip] = useState<SmartChipId | null>(null)
   const [pantryPhase, setPantryPhase] = useState<'capture' | 'results' | null>(null)
+  const [zeroCookOpen, setZeroCookOpen] = useState(false)
+  const [zeroCookTeaserOpen, setZeroCookTeaserOpen] = useState(false)
   const shownIdsRef = useRef<string[]>([])
 
   // ── Stores ───────────────────────────────────────────────
@@ -211,6 +216,16 @@ export function HomeHub({ userName }: Props) {
   const handleTileTap = useCallback((id: HubTile) => {
     if (id === 'plan') return // navigates via Link
     posthog.capture('hub_tile_tapped', { tile: id })
+
+    if (id === 'zero-cook') {
+      if (paywallStatus.isPro) {
+        setZeroCookOpen(true)
+      } else {
+        setZeroCookTeaserOpen(true)
+      }
+      return
+    }
+
     setActiveTile(id)
     setActiveChip(null)
     setMeal(null)
@@ -219,7 +234,7 @@ export function HomeHub({ userName }: Props) {
     if (id === 'quick')    void fetchQuick()
     if (id === 'surprise') void fetchSurprise()
     if (id === 'pantry')   setPantryPhase('capture')
-  }, [fetchQuick, fetchSurprise, fetchPantry])
+  }, [fetchQuick, fetchSurprise, fetchPantry, paywallStatus.isPro])
 
   const handleBack = useCallback(() => {
     if (activeTile === 'pantry' && pantryPhase === 'results') {
@@ -594,6 +609,19 @@ export function HomeHub({ userName }: Props) {
         </AnimatePresence>
       </div>
     </div>
+
+    {/* Zero-Cook sheets (rendered outside main layout) */}
+    <ZeroCookSheet
+      open={zeroCookOpen}
+      onOpenChange={setZeroCookOpen}
+      household={getHousehold()}
+      cuisinePreferences={light.cuisines}
+      budget={light.cookingTimeMinutes && light.cookingTimeMinutes <= 15 ? 'low' : undefined}
+    />
+    <ZeroCookTeaser
+      open={zeroCookTeaserOpen}
+      onOpenChange={setZeroCookTeaserOpen}
+    />
     </>
   )
 }

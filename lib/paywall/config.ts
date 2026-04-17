@@ -11,6 +11,7 @@ export const PRO_UNLOCKS = [
   'Weekend Mode — dinner + movie night 🎬',
   'Unlimited Tonight swipes',
   'Family-adapted meals for every age',
+  'Zero-Cook Mode — delivery picks 🛵',
 ] as const
 
 export function normalizeTier(tier: string | null | undefined): SubscriptionTier {

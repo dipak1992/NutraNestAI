@@ -13,7 +13,7 @@ function buildCsp(nonce: string) {
   ].join('; ')
 }
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const nonce = Buffer.from(crypto.randomUUID()).toString('base64')
   request.headers.set('x-nonce', nonce)
 

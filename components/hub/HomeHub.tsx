@@ -4,6 +4,7 @@ import { useCallback, useRef, useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { ArrowLeft, Sparkles, FlameKindling, ChevronRight, BookMarked } from 'lucide-react'
+import posthog from 'posthog-js'
 import { MealCard } from '@/components/hub/MealCard'
 import { PantryMatchList } from '@/components/hub/PantryMatchList'
 import { PantryCapture } from '@/components/hub/PantryCapture'
@@ -209,6 +210,7 @@ export function HomeHub({ userName }: Props) {
 
   const handleTileTap = useCallback((id: HubTile) => {
     if (id === 'plan') return // navigates via Link
+    posthog.capture('hub_tile_tapped', { tile: id })
     setActiveTile(id)
     setActiveChip(null)
     setMeal(null)
@@ -237,11 +239,13 @@ export function HomeHub({ userName }: Props) {
   const handleCook = useCallback((m: SmartMealResult) => {
     recordLike(m)
     sendSignal(m.id, 'cooked', { mode: activeTile ?? 'tonight' })
+    posthog.capture('meal_cooked', { meal_id: m.id, meal_name: m.name, mode: activeTile ?? 'tonight' })
   }, [recordLike, activeTile])
 
   const handleSwap = useCallback(async (m: SmartMealResult) => {
     recordReject(m)
     sendSignal(m.id, 'swapped', { mode: activeTile ?? 'tonight' })
+    posthog.capture('meal_swapped', { meal_id: m.id, meal_name: m.name, mode: activeTile ?? 'tonight', active_chip: activeChip })
     setSwapping(true)
 
     const chipOverrides = activeChip ? chipToOverrides(activeChip) : {}

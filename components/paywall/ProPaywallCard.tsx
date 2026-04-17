@@ -8,6 +8,7 @@ import { Crown, Lock, CheckCircle2, Sparkles, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { PRO_UNLOCKS } from '@/lib/paywall/config'
+import posthog from 'posthog-js'
 
 interface ProPaywallCardProps {
   title: string
@@ -31,6 +32,7 @@ export function ProPaywallCard({
 
   const handleStartTrial = useCallback(async () => {
     setIsStartingTrial(true)
+    posthog.capture('paywall_trial_started', { redirect_path: redirectPath })
     try {
       const res = await fetch('/api/paywall/start-trial', { method: 'POST' })
       const data = await res.json()
@@ -47,7 +49,7 @@ export function ProPaywallCard({
     } finally {
       setIsStartingTrial(false)
     }
-  }, [router])
+  }, [router, redirectPath])
 
   return (
     <div className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-white via-sage-muted/30 to-amber-50/40 p-6 sm:p-8 shadow-lg shadow-primary/5">

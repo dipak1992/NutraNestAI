@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { MealEaseLogo } from '@/components/ui/MealEaseLogo'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+import posthog from 'posthog-js'
 
 // ─── Static data ──────────────────────────────────────────────────────────────
 
@@ -480,6 +481,7 @@ export default function OnboardingPage() {
   const handleAdvance = () => {
     // Step 1 (family details) is skipped for solo households
     const next = step === 0 && store.householdType === 'solo' ? 2 : step + 1
+    posthog.capture('onboarding_step_completed', { step, total_steps: 5 })
     goTo(Math.min(next, 5), 1)
   }
 
@@ -493,6 +495,14 @@ export default function OnboardingPage() {
 
   const handleFinish = async () => {
     store.markCompleted()
+    posthog.capture('onboarding_completed', {
+      household_type: store.householdType,
+      cuisines_count: store.cuisines.length,
+      has_kids: store.hasKids,
+      picky_eater: store.pickyEater,
+      low_energy: store.lowEnergy,
+      country: store.country,
+    })
     setSaving(true)
     // Fire-and-forget — never blocks navigation
     fetch('/api/onboarding', {

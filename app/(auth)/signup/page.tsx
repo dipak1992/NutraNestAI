@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
 import { Loader2, Check, Gift, Eye, EyeOff } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
+import posthog from 'posthog-js'
 
 // Inline Google "G" icon — no external dependency needed
 function GoogleIcon() {
@@ -79,7 +80,7 @@ export default function SignupPage() {
     setLoading(true)
     const refCode = getRefCode()
     const supabase = createClient()
-    const { error } = await supabase.auth.signUp({
+    const { data: signUpData, error } = await supabase.auth.signUp({
       email: values.email,
       password: values.password,
       // Fixed: must route through /auth/callback for PKCE email confirmation to work
@@ -90,6 +91,10 @@ export default function SignupPage() {
       setLoading(false)
       return
     }
+    if (signUpData.user) {
+      posthog.identify(signUpData.user.id, { email: signUpData.user.email })
+    }
+    posthog.capture('user_signed_up', { method: 'email', has_referral: !!refCode })
 
     // Apply referral code if present — fire-and-forget (non-blocking)
     if (refCode) {
@@ -107,6 +112,7 @@ export default function SignupPage() {
 
   async function handleGoogleSignIn() {
     setGoogleLoading(true)
+    posthog.capture('user_signed_up', { method: 'google' })
     try {
       const supabase = createClient()
       // Note: Google provider must be enabled in Supabase dashboard → Authentication → Providers → Google

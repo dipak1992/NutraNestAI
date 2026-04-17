@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getStripe } from '@/lib/stripe'
 import { publicEnv } from '@/lib/env'
 import { apiError, apiSuccess, withErrorHandler } from '@/lib/api-response'
+import { getPostHogClient } from '@/lib/posthog-server'
 
 export const POST = withErrorHandler('stripe-checkout', async (req: Request) => {
   const supabase = await createClient()
@@ -52,6 +53,13 @@ export const POST = withErrorHandler('stripe-checkout', async (req: Request) => 
     subscription_data: {
       metadata: { supabase_user_id: user.id },
     },
+  })
+
+  const posthog = getPostHogClient()
+  posthog.capture({
+    distinctId: user.id,
+    event: 'checkout_session_created',
+    properties: { price_id: priceId, stripe_customer_id: customerId },
   })
 
   return apiSuccess({ url: session.url })

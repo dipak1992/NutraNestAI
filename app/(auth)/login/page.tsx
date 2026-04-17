@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
 import { Loader2, Eye, EyeOff } from 'lucide-react'
+import posthog from 'posthog-js'
 
 const schema = z.object({
   email: z.string().email('Please enter a valid email'),
@@ -61,12 +62,14 @@ export default function LoginPage() {
   async function onSubmit(values: FormValues) {
     setLoading(true)
     const supabase = createClient()
-    const { error } = await supabase.auth.signInWithPassword({ email: values.email, password: values.password })
+    const { data, error } = await supabase.auth.signInWithPassword({ email: values.email, password: values.password })
     if (error) {
       toast.error(error.message)
       setLoading(false)
       return
     }
+    posthog.identify(data.user.id, { email: data.user.email })
+    posthog.capture('user_logged_in', { method: 'email' })
     const redirectTarget = new URLSearchParams(window.location.search).get('redirect') || '/dashboard'
     router.push(redirectTarget)
     router.refresh()
@@ -74,6 +77,7 @@ export default function LoginPage() {
 
   async function handleGoogleSignIn() {
     setGoogleLoading(true)
+    posthog.capture('user_logged_in', { method: 'google' })
     const supabase = createClient()
     const redirectTarget = new URLSearchParams(window.location.search).get('redirect') || '/dashboard'
     // Note: Google provider must be enabled in Supabase dashboard → Authentication → Providers → Google

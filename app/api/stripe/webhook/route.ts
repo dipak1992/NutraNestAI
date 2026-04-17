@@ -4,6 +4,7 @@ import { getStripe } from '@/lib/stripe'
 import { serverEnv } from '@/lib/env'
 import { createSupabaseServiceClient } from '@/lib/supabase/service'
 import logger from '@/lib/logger'
+import { getPostHogClient } from '@/lib/posthog-server'
 
 export async function POST(req: NextRequest) {
   const body = await req.text()
@@ -51,6 +52,12 @@ export async function POST(req: NextRequest) {
             .eq('id', userId)
 
           logger.info('[stripe-webhook] Checkout completed', { userId })
+          const posthog = getPostHogClient()
+          posthog.capture({
+            distinctId: userId,
+            event: 'subscription_activated',
+            properties: { price_id: priceId, stripe_subscription_id: session.subscription as string },
+          })
         }
         break
       }
@@ -133,6 +140,12 @@ export async function POST(req: NextRequest) {
             .eq('id', userId)
 
           logger.info('[stripe-webhook] Subscription cancelled', { userId })
+          const posthog = getPostHogClient()
+          posthog.capture({
+            distinctId: userId,
+            event: 'subscription_cancelled',
+            properties: { stripe_subscription_id: sub.id },
+          })
         }
         break
       }

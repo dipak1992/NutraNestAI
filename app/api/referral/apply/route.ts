@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { applyReferralCode } from '@/lib/referral/server'
+import { getPostHogClient } from '@/lib/posthog-server'
 
 export async function POST(req: Request) {
   const supabase = await createClient()
@@ -27,6 +28,17 @@ export async function POST(req: Request) {
   if (!result.ok) {
     return NextResponse.json({ error: result.error }, { status: 422 })
   }
+
+  const posthog = getPostHogClient()
+  posthog.capture({
+    distinctId: user.id,
+    event: 'referral_applied',
+    properties: {
+      referral_code: code,
+      bonus_days_granted: result.bonusDaysGranted,
+      temp_pro_granted: result.tempProGranted,
+    },
+  })
 
   return NextResponse.json({
     bonusDaysGranted: result.bonusDaysGranted,

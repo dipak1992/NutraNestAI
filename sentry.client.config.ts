@@ -16,7 +16,4 @@ Sentry.init({
       blockAllMedia: true,
     }),
   ],
-
-  // Don't send errors in development
-  enabled: process.env.NODE_ENV === 'production',
 })

@@ -36,11 +36,11 @@ export function LandingHero() {
           backgroundImage: `url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1920&q=80')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center top',
-          opacity: 0.25,
+          opacity: 0.45,
           filter: 'blur(1px)',
         }}
       />
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1] bg-[#FAFBFA]/55" />
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1] bg-[#FAFBFA]/40" />
       {/* Subtle gradient orbs */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-[2]">
         <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-primary/[0.07] blur-3xl" />

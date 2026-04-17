@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { Crown, Lock, CheckCircle2 } from 'lucide-react'
+import { Crown, Lock, CheckCircle2, Sparkles, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { PRO_UNLOCKS } from '@/lib/paywall/config'
@@ -50,57 +50,88 @@ export function ProPaywallCard({
   }, [router])
 
   return (
-    <div className="rounded-2xl border border-amber-300/70 bg-gradient-to-br from-amber-50 via-background to-rose-50 p-5 sm:p-6 shadow-sm">
-      <div className="flex items-start gap-3">
-        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-amber-500 text-white shadow-sm">
+    <div className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-white via-sage-muted/30 to-amber-50/40 p-6 sm:p-8 shadow-lg shadow-primary/5">
+      {/* Decorative glow */}
+      <div className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-primary/8 blur-3xl" />
+      <div className="pointer-events-none absolute -left-8 -bottom-8 h-32 w-32 rounded-full bg-amber-300/10 blur-3xl" />
+
+      {/* Header */}
+      <div className="relative flex items-start gap-4">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-emerald-600 text-white shadow-md shadow-primary/20">
           <Crown className="h-5 w-5" />
         </div>
         <div className="flex-1">
-          <Badge variant="outline" className="mb-2 border-amber-300 bg-white/70 text-amber-800">
-            <Lock className="mr-1.5 h-3 w-3" /> {isAuthenticated ? 'Pro required' : 'Free account required'}
+          <Badge className="mb-2.5 border-primary/20 bg-primary/8 text-primary text-[11px] font-semibold tracking-wide uppercase">
+            <Lock className="mr-1.5 h-3 w-3" />
+            {isAuthenticated ? 'Pro Feature' : 'Account Required'}
           </Badge>
-          <h3 className="text-lg font-bold tracking-tight">{title}</h3>
-          <p className="mt-1 text-sm text-muted-foreground leading-relaxed">{description}</p>
+          <h3 className="text-xl font-bold tracking-tight leading-snug">{title}</h3>
+          <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed max-w-md">{description}</p>
         </div>
       </div>
 
       {!compact && (
-        <div className="mt-4 grid gap-2 sm:grid-cols-2">
-          {PRO_UNLOCKS.map((item) => (
-            <div key={item} className="flex items-center gap-2 rounded-xl border border-white/70 bg-white/70 px-3 py-2 text-sm">
-              <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-              <span>{item}</span>
+        <>
+          {/* Benefits grid */}
+          <div className="relative mt-6 grid gap-2 sm:grid-cols-2">
+            {PRO_UNLOCKS.map((item) => (
+              <div
+                key={item}
+                className="flex items-center gap-2.5 rounded-xl border border-primary/8 bg-white/80 px-3.5 py-2.5 text-[13px] font-medium"
+              >
+                <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-primary" />
+                <span>{item}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Weekend Mode highlight */}
+          <div className="relative mt-4 flex items-center gap-3 rounded-2xl border border-amber-200/70 bg-gradient-to-r from-amber-50/80 to-yellow-50/60 px-4 py-3">
+            <span className="text-xl">🎬</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-bold text-amber-900">
+                Weeknights planned. Weekends curated.
+              </p>
+              <p className="text-[11px] text-amber-700/70 mt-0.5">
+                Pro unlocks Weekend Mode — dinner + movie night, every Fri & Sat.
+              </p>
             </div>
-          ))}
-        </div>
+            <Sparkles className="h-4 w-4 text-amber-500 flex-shrink-0" />
+          </div>
+        </>
       )}
 
-      <div className="mt-5 flex flex-col gap-2 sm:flex-row">
+      {/* CTAs */}
+      <div className="relative mt-6 flex flex-col gap-2.5 sm:flex-row sm:items-center">
         {isAuthenticated ? (
           <>
             <Button
               onClick={handleStartTrial}
               disabled={isStartingTrial}
-              className="gradient-sage border-0 text-white hover:opacity-90"
+              size="lg"
+              className="gradient-sage border-0 text-white hover:opacity-90 shadow-md shadow-primary/15 gap-2"
             >
-              {isStartingTrial ? 'Starting trial…' : 'Start 7-day free trial'}
+              {isStartingTrial ? 'Starting trial…' : 'Try Pro free for 7 days'}
+              {!isStartingTrial && <ArrowRight className="h-4 w-4" />}
             </Button>
-            <Button asChild variant="outline">
-              <Link href="/pricing">See plans & pricing</Link>
+            <Button asChild variant="ghost" size="lg" className="text-muted-foreground">
+              <Link href="/pricing">Compare plans</Link>
             </Button>
-            <p className="text-center text-[11px] text-muted-foreground sm:text-left">
-              No credit card required
+            <p className="text-center text-[11px] text-muted-foreground/70 sm:text-left sm:ml-1">
+              No credit card · Cancel anytime
             </p>
           </>
         ) : (
           <>
-            <Button asChild>
-              <Link href={signupHref}>Create free account</Link>
+            <Button asChild size="lg" className="gradient-sage border-0 text-white hover:opacity-90 shadow-md shadow-primary/15 gap-2">
+              <Link href={signupHref}>
+                Get started free <ArrowRight className="h-4 w-4" />
+              </Link>
             </Button>
-            <Button asChild variant="outline">
+            <Button asChild variant="ghost" size="lg" className="text-muted-foreground">
               <Link href="/pricing">See what Pro includes</Link>
             </Button>
-            <p className="text-center text-xs text-muted-foreground sm:text-left">
+            <p className="text-center text-xs text-muted-foreground/70 sm:text-left">
               Already have an account?{' '}
               <Link href={loginHref} className="font-medium text-primary hover:underline">Sign in</Link>
             </p>

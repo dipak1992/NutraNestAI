@@ -5,10 +5,12 @@ export const FREE_PLAN_PREVIEW_DAYS = 3
 export const FREE_KIDS_RECIPE_LIMIT = 3
 
 export const PRO_UNLOCKS = [
-  'Full 7-day weekly planner',
-  'Auto-built grocery list',
-  'Pantry and insights tools',
-  'Plan publishing and advanced utilities',
+  'Full 7-day meal planner',
+  'Smart grocery list — auto-built',
+  'Pantry Magic & food insights',
+  'Weekend Mode — dinner + movie night 🎬',
+  'Unlimited Tonight swipes',
+  'Family-adapted meals for every age',
 ] as const
 
 export function normalizeTier(tier: string | null | undefined): SubscriptionTier {

@@ -12,6 +12,9 @@ import {
   Shield,
   Users,
   Quote,
+  ArrowRight,
+  Zap,
+  X,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -28,19 +31,19 @@ const ANNUAL_SAVINGS = Math.round((1 - ANNUAL_PRICE / (MONTHLY_PRICE * 12)) * 10
 
 const TESTIMONIALS = [
   {
-    quote: 'Saved 4 hours every week on meal planning. I actually look forward to cooking now.',
+    quote: "Monday through Friday, meals are just handled. Then Friday night rolls around and Weekend Mode picks a movie and dinner for us. My kids think I'm magic.",
     name: 'Sarah M.',
     role: 'Mom of 2',
     emoji: '👩‍👧‍👦',
   },
   {
-    quote: 'Stopped eating out on Tuesdays and Thursdays. We save over $200/month.',
+    quote: 'We used to blow $60 on Friday takeout. Now MealEase plans a fun dinner and a movie — the whole family is happier and our wallet is, too.',
     name: 'James K.',
     role: 'Dad of 3',
     emoji: '👨‍👧‍👦',
   },
   {
-    quote: 'My picky eater actually tries the meals MealEase suggests. Game changer.',
+    quote: 'The weekday planner alone is worth it, but Weekend Mode made Pro a no-brainer. My picky eater actually gets excited for Friday night.',
     name: 'Priya R.',
     role: 'Mom of 1',
     emoji: '👩‍👦',
@@ -56,20 +59,25 @@ const COMPARISON_FEATURES = [
   { feature: 'Family meal variations', free: '3 max', pro: 'Unlimited' },
   { feature: 'Adaptive learning', free: false, pro: true },
   { feature: 'Plan publishing & sharing', free: false, pro: true },
+  { feature: 'Weekend Mode 🎬', free: false, pro: true },
 ]
 
 const FAQ = [
   {
     q: 'What happens during my 7-day free trial?',
-    a: 'You get full Pro access — the complete weekly planner, grocery list, Pantry Magic, and unlimited swipes. No credit card needed. After 7 days, you simply choose to subscribe or stay on Free.',
+    a: 'You get full Pro access — the complete weekly planner, grocery list, Pantry Magic, Weekend Mode, and unlimited swipes. No credit card needed. After 7 days, you simply choose to subscribe or stay on Free.',
   },
   {
     q: 'What can I do on the free plan?',
     a: 'Preview meal ideas instantly, try 2 Tonight swipes per day, and see 3 days of your weekly plan. It\'s enough to feel whether MealEase fits your family.',
   },
   {
+    q: 'What is Weekend Mode?',
+    a: 'Every Friday and Saturday evening, Pro users get a curated dinner + movie pairing — a complete night-in experience picked just for your family. Think of it as a personal concierge for your weekend.',
+  },
+  {
     q: 'Is annual billing worth it?',
-    a: `Annual saves you ${ANNUAL_SAVINGS}% compared to monthly — that's $${(MONTHLY_PRICE * 12 - ANNUAL_PRICE)} back in your pocket every year. Most families choose annual after their first month.`,
+    a: `Annual saves you ${ANNUAL_SAVINGS}% compared to monthly — that's $${(MONTHLY_PRICE * 12 - ANNUAL_PRICE).toFixed(2)} back in your pocket every year. Most families choose annual after their first month.`,
   },
   {
     q: 'Can I cancel anytime?',
@@ -137,7 +145,6 @@ export function PricingContent() {
       const data = await res.json()
 
       if (data.error === 'billing_not_configured') {
-        // Stripe not live yet — start trial instead
         handleStartTrial()
         return
       }
@@ -158,139 +165,169 @@ export function PricingContent() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
       {/* ── Hero ── */}
-      <div className="text-center mb-14">
-        <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
-          <Users className="h-4 w-4" />
-          Join thousands of families eating better each week
+      <div className="text-center mb-16">
+        <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary/8 px-4 py-2 text-sm font-medium text-primary">
+          <Sparkles className="h-4 w-4" />
+          Weeknights planned. Weekends curated.
         </div>
 
-        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl mb-4">
-          Your whole week of dinners,
-          <span className="block text-gradient-sage">decided before Monday morning</span>
+        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-[3.5rem] leading-[1.1] mb-5">
+          Stop deciding what&rsquo;s for dinner.
+          <span className="block text-gradient-sage mt-1">Start enjoying it.</span>
         </h1>
-        <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-          One plan covers every mouth in your house. Skip the nightly &ldquo;what&rsquo;s for dinner?&rdquo; panic for less than the price of takeout.
+        <p className="mx-auto max-w-2xl text-lg text-muted-foreground leading-relaxed">
+          MealEase plans your weeknight meals in seconds — then surprises your family with
+          a <strong className="text-foreground">dinner + movie night</strong> every weekend. One subscription, every mouth at the table.
         </p>
+
+        <div className="mt-8 flex items-center justify-center gap-3 text-sm text-muted-foreground">
+          <span className="flex items-center gap-1.5"><Check className="h-4 w-4 text-primary" /> 7-day free trial</span>
+          <span className="text-border">|</span>
+          <span className="flex items-center gap-1.5"><Check className="h-4 w-4 text-primary" /> No credit card</span>
+          <span className="text-border">|</span>
+          <span className="flex items-center gap-1.5"><Check className="h-4 w-4 text-primary" /> Cancel anytime</span>
+        </div>
       </div>
 
       {/* ── Billing toggle ── */}
-      <div className="flex items-center justify-center gap-3 mb-10">
-        <button
-          onClick={() => setIsAnnual(false)}
-          className={`text-sm font-medium px-4 py-2 rounded-full transition-colors ${
-            !isAnnual
-              ? 'bg-primary text-primary-foreground'
-              : 'text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          Monthly
-        </button>
-        <button
-          onClick={() => setIsAnnual(true)}
-          className={`text-sm font-medium px-4 py-2 rounded-full transition-colors ${
-            isAnnual
-              ? 'bg-primary text-primary-foreground'
-              : 'text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          Annual
-          <Badge className="ml-2 border-0 bg-emerald-100 text-emerald-800 text-[10px]">
-            Save {ANNUAL_SAVINGS}%
-          </Badge>
-        </button>
+      <div className="flex items-center justify-center gap-1 mb-12">
+        <div className="inline-flex rounded-full border border-border/60 bg-muted/40 p-1">
+          <button
+            onClick={() => setIsAnnual(false)}
+            className={`text-sm font-medium px-5 py-2 rounded-full transition-all ${
+              !isAnnual
+                ? 'bg-white text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Monthly
+          </button>
+          <button
+            onClick={() => setIsAnnual(true)}
+            className={`text-sm font-medium px-5 py-2 rounded-full transition-all flex items-center gap-2 ${
+              isAnnual
+                ? 'bg-white text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Annual
+            <Badge className="border-0 bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+              -{ANNUAL_SAVINGS}%
+            </Badge>
+          </button>
+        </div>
       </div>
 
       {/* ── Pricing cards ── */}
-      <div className="mx-auto mb-16 grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-2">
+      <div className="mx-auto mb-20 grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-2 items-start">
         {/* Free tier */}
-        <div className="relative flex flex-col rounded-3xl border border-border/70 bg-background/85 p-7">
-          <div className="mb-5 flex items-center gap-3">
-            <div className="rounded-2xl bg-primary/10 p-3 text-primary">
-              <Sparkles className="h-5 w-5" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold">Free</h2>
-              <p className="text-sm text-muted-foreground">
-                See if MealEase fits your family
-              </p>
-            </div>
-          </div>
+        <div className="relative flex flex-col rounded-3xl border border-border/60 bg-white/80 p-8">
           <div className="mb-6">
-            <p className="text-4xl font-bold">$0</p>
-            <p className="text-sm text-muted-foreground">forever</p>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="rounded-2xl bg-muted p-3">
+                <Sparkles className="h-5 w-5 text-muted-foreground" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold">Free</h2>
+                <p className="text-sm text-muted-foreground">
+                  Taste what MealEase can do
+                </p>
+              </div>
+            </div>
+            <div className="mt-4">
+              <p className="text-4xl font-bold tracking-tight">$0</p>
+              <p className="text-sm text-muted-foreground mt-1">No commitment</p>
+            </div>
           </div>
-          <ul className="mb-7 flex-1 space-y-3">
+
+          <ul className="mb-8 flex-1 space-y-3.5">
             {[
               'Instant meal previews',
               '2 Tonight swipes per day',
               '3-day weekly plan preview',
-              'Limited kid recipe variations',
-              'No credit card required',
+              '3 kid recipe variations',
             ].map((f) => (
               <li key={f} className="flex items-start gap-3 text-sm">
                 <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
                 <span>{f}</span>
               </li>
             ))}
+            {[
+              'Full 7-day planner',
+              'Grocery list',
+              'Weekend Mode',
+            ].map((f) => (
+              <li key={f} className="flex items-start gap-3 text-sm text-muted-foreground/60">
+                <X className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                <span>{f}</span>
+              </li>
+            ))}
           </ul>
-          <Button asChild variant="outline" className="w-full">
-            <Link href="/signup">Get Started Free</Link>
+
+          <Button asChild variant="outline" size="lg" className="w-full">
+            <Link href="/signup">Get started free</Link>
           </Button>
         </div>
 
         {/* Pro tier */}
-        <div className="relative flex flex-col rounded-3xl border glass-card border-primary bg-background shadow-xl shadow-primary/10 ring-1 ring-primary/15 md:-translate-y-2 p-7">
-          <span className="absolute -top-3 left-6 rounded-full bg-primary px-4 py-1 text-xs font-semibold text-primary-foreground">
-            Most Popular
+        <div className="relative flex flex-col rounded-3xl border-2 border-primary/30 bg-white p-8 shadow-xl shadow-primary/8 md:-translate-y-3">
+          <span className="absolute -top-3.5 left-7 rounded-full gradient-sage px-4 py-1.5 text-xs font-bold text-white tracking-wide shadow-md shadow-primary/20">
+            MOST POPULAR
           </span>
-          <div className="mb-5 flex items-center gap-3">
-            <div className="rounded-2xl bg-primary p-3 text-primary-foreground">
-              <Crown className="h-5 w-5" />
+
+          <div className="mb-6">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="rounded-2xl bg-gradient-to-br from-primary to-emerald-600 p-3 text-white shadow-md shadow-primary/20">
+                <Crown className="h-5 w-5" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold">Pro</h2>
+                <p className="text-sm text-muted-foreground">
+                  Weeknights handled. Weekends elevated.
+                </p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-2xl font-bold">Pro</h2>
-              <p className="text-sm text-muted-foreground">
-                Every meal, every family member, every week
-              </p>
+
+            <div className="mt-4">
+              {isAnnual ? (
+                <>
+                  <div className="flex items-baseline gap-2">
+                    <p className="text-4xl font-bold tracking-tight">
+                      ${ANNUAL_MONTHLY.toFixed(2)}
+                      <span className="ml-1 text-base font-normal text-muted-foreground">/mo</span>
+                    </p>
+                    <span className="text-sm text-muted-foreground line-through">${MONTHLY_PRICE}</span>
+                  </div>
+                  <div className="flex items-center gap-2 mt-1.5">
+                    <Badge className="bg-emerald-100 text-emerald-800 border-0 text-[11px] font-bold">Save {ANNUAL_SAVINGS}%</Badge>
+                    <p className="text-sm text-muted-foreground">
+                      ${ANNUAL_PRICE}/year · billed annually
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="text-4xl font-bold tracking-tight">
+                    ${MONTHLY_PRICE}
+                    <span className="ml-1 text-base font-normal text-muted-foreground">/month</span>
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Less than one takeout dinner
+                  </p>
+                </>
+              )}
             </div>
           </div>
-          <div className="mb-1">
-            {isAnnual ? (
-              <>
-                <div className="flex items-baseline gap-2">
-                  <p className="text-4xl font-bold">
-                    ${ANNUAL_PRICE}
-                    <span className="ml-1 text-base font-normal text-muted-foreground">/year</span>
-                  </p>
-                  <span className="text-sm text-muted-foreground line-through">${FULL_ANNUAL_PRICE}</span>
-                </div>
-                <div className="flex items-center gap-2 mt-1">
-                  <Badge className="bg-emerald-100 text-emerald-800 border-0 text-xs">{ANNUAL_SAVINGS}% off</Badge>
-                  <p className="text-sm text-emerald-700 font-medium">
-                    Just ${ANNUAL_MONTHLY.toFixed(2)}/month
-                  </p>
-                </div>
-              </>
-            ) : (
-              <p className="text-4xl font-bold">
-                ${MONTHLY_PRICE}
-                <span className="ml-1 text-base font-normal text-muted-foreground">/month</span>
-              </p>
-            )}
-          </div>
-          <p className="text-xs text-muted-foreground mb-5">
-            That&rsquo;s less than one takeout dinner
-          </p>
-          <ul className="mb-7 flex-1 space-y-3">
+
+          <ul className="mb-6 flex-1 space-y-3.5">
             {[
-              'Full 7-day weekly plan',
+              'Full 7-day meal planner',
               'Smart auto-built grocery list',
               'Pantry Magic tools',
-              'Image-to-meal feature',
-              'Adaptive learning for your family',
               'Unlimited Tonight swipes',
-              'Plan publishing & sharing',
-              'Cancel anytime',
+              'Adaptive learning for your family',
+              'Unlimited kid recipe variations',
+              'Image-to-meal & plan sharing',
             ].map((f) => (
               <li key={f} className="flex items-start gap-3 text-sm">
                 <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
@@ -298,9 +335,22 @@ export function PricingContent() {
               </li>
             ))}
           </ul>
-          <div className="space-y-2">
+
+          {/* Weekend Mode spotlight */}
+          <div className="mb-6 flex items-center gap-3 rounded-2xl border border-amber-200/70 bg-gradient-to-r from-amber-50/80 to-yellow-50/60 px-4 py-3.5">
+            <span className="text-2xl">🎬</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-amber-900">Weekend Mode included</p>
+              <p className="text-[12px] text-amber-700/70 mt-0.5 leading-snug">
+                Curated dinner + movie night every Fri & Sat — the perk families love most.
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-2.5">
             <Button
-              className="w-full gradient-sage border-0 text-white hover:opacity-90"
+              size="lg"
+              className="w-full gradient-sage border-0 text-white hover:opacity-90 shadow-md shadow-primary/15 gap-2 text-[15px]"
               onClick={handleStartTrial}
               disabled={isStartingTrial || (status.isPro && !paywallLoading)}
             >
@@ -308,14 +358,16 @@ export function PricingContent() {
                 ? 'Starting trial…'
                 : status.isPro
                 ? 'You have Pro'
-                : 'Start 7-day free trial'}
+                : 'Try Pro free for 7 days'}
+              {!isStartingTrial && !status.isPro && <ArrowRight className="h-4 w-4" />}
             </Button>
             <p className="text-center text-xs text-muted-foreground">
-              No credit card required
+              No credit card required · Cancel anytime
             </p>
             {!status.isPro && (
               <Button
                 variant="outline"
+                size="lg"
                 className="w-full"
                 onClick={handleCheckout}
               >
@@ -326,24 +378,69 @@ export function PricingContent() {
         </div>
       </div>
 
-      {/* ── Testimonials ── */}
-      <div className="mx-auto max-w-5xl mb-16">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-1 mb-2">
+      {/* ── Weekend Mode spotlight ── */}
+      <div className="mx-auto max-w-4xl mb-20">
+        <div className="relative overflow-hidden rounded-3xl border border-amber-200/60 bg-gradient-to-br from-amber-50/80 via-white to-yellow-50/40 px-8 py-10 sm:px-12 sm:py-12 text-center">
+          <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-amber-200/20 blur-3xl" />
+          <div className="pointer-events-none absolute -left-12 -bottom-12 h-40 w-40 rounded-full bg-yellow-200/15 blur-3xl" />
+
+          <div className="relative">
+            <span className="text-5xl mb-4 block">🎬🍽️</span>
+            <Badge className="mb-4 border-amber-300 bg-amber-100 text-amber-900 text-xs font-bold">
+              PRO EXCLUSIVE
+            </Badge>
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-3">
+              Weekend Mode
+            </h2>
+            <p className="mx-auto max-w-lg text-muted-foreground leading-relaxed">
+              Every Friday and Saturday, Pro members get a curated dinner + movie pairing —
+              a complete night-in experience picked just for your family. No planning, no scrolling, just enjoy.
+            </p>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-sm font-medium text-amber-900">
+              <span className="flex items-center gap-1.5 rounded-full bg-amber-100/80 px-3 py-1.5">
+                <Zap className="h-3.5 w-3.5" /> Auto-paired dinners
+              </span>
+              <span className="flex items-center gap-1.5 rounded-full bg-amber-100/80 px-3 py-1.5">
+                🎬 Curated movie picks
+              </span>
+              <span className="flex items-center gap-1.5 rounded-full bg-amber-100/80 px-3 py-1.5">
+                🔄 Swap until it&rsquo;s perfect
+              </span>
+            </div>
+            {!status.isPro && (
+              <Button
+                size="lg"
+                className="mt-8 gradient-sage border-0 text-white hover:opacity-90 shadow-md shadow-primary/15 gap-2"
+                onClick={handleStartTrial}
+                disabled={isStartingTrial}
+              >
+                {isStartingTrial ? 'Starting trial…' : 'Unlock Weekend Mode — free for 7 days'}
+                {!isStartingTrial && <ArrowRight className="h-4 w-4" />}
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Social proof ── */}
+      <div className="mx-auto max-w-5xl mb-20">
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center gap-1 mb-3">
             {[1, 2, 3, 4, 5].map((i) => (
               <Star key={i} className="h-5 w-5 fill-amber-400 text-amber-400" />
             ))}
           </div>
-          <h2 className="text-2xl font-bold">Loved by families like yours</h2>
+          <h2 className="text-2xl font-bold tracking-tight">Families are loving this</h2>
+          <p className="mt-2 text-sm text-muted-foreground">Real feedback from real households</p>
         </div>
         <div className="grid gap-6 sm:grid-cols-3">
           {TESTIMONIALS.map(({ quote, name, role, emoji }) => (
             <div
               key={name}
-              className="glass-card rounded-2xl border border-border/60 p-6 relative"
+              className="glass-card rounded-2xl border border-border/50 p-6 relative"
             >
-              <Quote className="absolute top-4 right-4 h-8 w-8 text-primary/10" />
-              <p className="text-sm leading-relaxed text-foreground mb-4">
+              <Quote className="absolute top-4 right-4 h-8 w-8 text-primary/8" />
+              <p className="text-sm leading-relaxed text-foreground mb-5">
                 &ldquo;{quote}&rdquo;
               </p>
               <div className="flex items-center gap-3">
@@ -356,47 +453,49 @@ export function PricingContent() {
             </div>
           ))}
         </div>
-        <p className="text-center text-xs text-muted-foreground/60 mt-4">
-          * MealEase is currently in beta. Features and pricing may change.
-        </p>
       </div>
 
       {/* ── Comparison table ── */}
-      <div className="mx-auto max-w-3xl mb-16">
-        <h2 className="text-2xl font-bold text-center mb-8">
+      <div className="mx-auto max-w-3xl mb-20">
+        <h2 className="text-2xl font-bold text-center mb-3 tracking-tight">
           Free vs Pro — side by side
         </h2>
+        <p className="text-center text-sm text-muted-foreground mb-8">
+          See exactly what you get at every level
+        </p>
         <div className="rounded-2xl border border-border/60 overflow-hidden">
           <div className="grid grid-cols-3 bg-muted/50 text-sm font-semibold">
-            <div className="px-4 py-3">Feature</div>
-            <div className="px-4 py-3 text-center">Free</div>
-            <div className="px-4 py-3 text-center text-primary">Pro</div>
+            <div className="px-5 py-3.5">Feature</div>
+            <div className="px-5 py-3.5 text-center">Free</div>
+            <div className="px-5 py-3.5 text-center text-primary">Pro</div>
           </div>
           {COMPARISON_FEATURES.map(({ feature, free, pro }, i) => (
             <div
               key={feature}
               className={`grid grid-cols-3 text-sm ${
                 i % 2 === 0 ? 'bg-background' : 'bg-muted/20'
-              }`}
+              } ${feature.includes('Weekend') ? 'bg-amber-50/50' : ''}`}
             >
-              <div className="px-4 py-3 font-medium">{feature}</div>
-              <div className="px-4 py-3 text-center text-muted-foreground">
+              <div className={`px-5 py-3.5 font-medium ${feature.includes('Weekend') ? 'text-amber-900' : ''}`}>
+                {feature}
+              </div>
+              <div className="px-5 py-3.5 text-center text-muted-foreground">
                 {typeof free === 'boolean' ? (
                   free ? (
                     <Check className="mx-auto h-4 w-4 text-emerald-600" />
                   ) : (
-                    <span className="text-muted-foreground/50">—</span>
+                    <span className="text-muted-foreground/40">—</span>
                   )
                 ) : (
                   free
                 )}
               </div>
-              <div className="px-4 py-3 text-center font-medium">
+              <div className="px-5 py-3.5 text-center font-medium">
                 {typeof pro === 'boolean' ? (
                   pro ? (
                     <Check className="mx-auto h-4 w-4 text-emerald-600" />
                   ) : (
-                    <span className="text-muted-foreground/50">—</span>
+                    <span className="text-muted-foreground/40">—</span>
                   )
                 ) : (
                   pro
@@ -408,12 +507,12 @@ export function PricingContent() {
       </div>
 
       {/* ── Guarantee ── */}
-      <div className="mx-auto max-w-3xl mb-14">
+      <div className="mx-auto max-w-3xl mb-16">
         <div className="rounded-2xl border border-emerald-200 bg-emerald-50/50 px-6 py-5 flex items-center gap-4">
           <Shield className="h-8 w-8 text-emerald-600 flex-shrink-0" />
           <div>
-            <p className="font-semibold text-sm">Risk-free guarantee</p>
-            <p className="text-sm text-muted-foreground">
+            <p className="font-bold text-sm">Risk-free guarantee</p>
+            <p className="text-sm text-muted-foreground leading-relaxed">
               Cancel anytime with one click. Full refund within 14 days if Pro isn&rsquo;t right for your family. No questions asked.
             </p>
           </div>
@@ -421,16 +520,16 @@ export function PricingContent() {
       </div>
 
       {/* ── FAQ ── */}
-      <div className="mx-auto max-w-3xl mb-14">
-        <h2 className="mb-8 text-center text-2xl font-bold">
-          Frequently Asked Questions
+      <div className="mx-auto max-w-3xl mb-16">
+        <h2 className="mb-8 text-center text-2xl font-bold tracking-tight">
+          Common Questions
         </h2>
         <Accordion className="space-y-2">
           {FAQ.map(({ q, a }, i) => (
             <AccordionItem
               key={q}
               value={`faq-${i}`}
-              className="glass-card rounded-2xl border border-border/60 px-5"
+              className="glass-card rounded-2xl border border-border/50 px-5"
             >
               <AccordionTrigger className="font-semibold text-sm text-left py-4 hover:no-underline">
                 {q}
@@ -445,8 +544,29 @@ export function PricingContent() {
 
       {/* ── Bottom CTA ── */}
       <div className="text-center">
-        <p className="text-muted-foreground mb-4">
-          Questions? Contact us at{' '}
+        <h3 className="text-xl font-bold tracking-tight mb-2">
+          Ready for stress-free dinners?
+        </h3>
+        <p className="text-muted-foreground mb-6 text-sm">
+          Join families who never ask &ldquo;what&rsquo;s for dinner?&rdquo; again.
+        </p>
+        {!status.isPro ? (
+          <Button
+            size="lg"
+            className="gradient-sage border-0 text-white hover:opacity-90 shadow-md shadow-primary/15 gap-2"
+            onClick={handleStartTrial}
+            disabled={isStartingTrial}
+          >
+            {isStartingTrial ? 'Starting trial…' : 'Start your free trial'}
+            {!isStartingTrial && <ArrowRight className="h-4 w-4" />}
+          </Button>
+        ) : (
+          <Button asChild size="lg" variant="outline">
+            <Link href="/dashboard">Go to dashboard</Link>
+          </Button>
+        )}
+        <p className="text-muted-foreground text-xs mt-8">
+          Questions?{' '}
           <a
             href="mailto:hello@mealeaseai.com"
             className="text-primary hover:underline"

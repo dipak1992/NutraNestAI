@@ -59,7 +59,7 @@ export function LandingPricing() {
 
             {/* Price */}
             <div className="flex items-baseline gap-2 mb-2">
-              <span className="text-5xl sm:text-6xl font-extrabold tracking-tight text-foreground">$9</span>
+              <span className="text-5xl sm:text-6xl font-extrabold tracking-tight text-foreground">$9.99</span>
               <span className="text-lg text-muted-foreground">/month</span>
             </div>
             <p className="text-sm text-muted-foreground mb-8">

@@ -405,10 +405,117 @@ export function GroceryListPanel() {
 
   if (!groceryList) {
     return (
-      <div className="text-center py-16 text-muted-foreground">
-        <ShoppingCart className="h-12 w-12 mx-auto mb-3 opacity-30" />
-        <p className="font-medium">No grocery list yet</p>
-        <p className="text-sm mt-1">Go to the planner and tap "Get everything for this week"</p>
+      <div className="space-y-4">
+        {/* Empty state — non-blocking */}
+        <div className="rounded-xl border border-dashed border-border/60 p-6 text-center text-muted-foreground">
+          <ShoppingCart className="h-10 w-10 mx-auto mb-3 opacity-30" />
+          <p className="font-semibold mb-1">No grocery list yet</p>
+          <p className="text-sm">
+            Generate a weekly meal plan to auto-fill your list, or add items manually below.
+          </p>
+        </div>
+
+        {/* Add custom item — accessible without a meal plan */}
+        <div className="space-y-2">
+          {!showAddForm ? (
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full border-dashed"
+              onClick={() => setShowAddForm(true)}
+            >
+              <Plus className="h-4 w-4 mr-1.5" />
+              Add custom item
+            </Button>
+          ) : (
+            <div className="rounded-xl border border-border bg-muted/30 p-3 space-y-3">
+              <div className="flex items-center gap-2">
+                <Plus className="h-4 w-4 text-primary flex-shrink-0" />
+                <span className="text-sm font-semibold">Add Custom Item</span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <input
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  placeholder="Item name *"
+                  className="col-span-2 text-sm bg-background border border-border rounded-lg px-3 py-1.5 outline-none focus:ring-1 focus:ring-primary/30"
+                  autoFocus
+                />
+                <input
+                  value={newQty}
+                  onChange={(e) => setNewQty(e.target.value)}
+                  placeholder="Qty"
+                  type="number"
+                  min="0"
+                  step="any"
+                  className="text-sm bg-background border border-border rounded-lg px-3 py-1.5 outline-none focus:ring-1 focus:ring-primary/30"
+                />
+                <input
+                  value={newUnit}
+                  onChange={(e) => setNewUnit(e.target.value)}
+                  placeholder="Unit (e.g. lbs)"
+                  className="text-sm bg-background border border-border rounded-lg px-3 py-1.5 outline-none focus:ring-1 focus:ring-primary/30"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <select
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                  className="text-sm bg-background border border-border rounded-lg px-3 py-1.5 outline-none focus:ring-1 focus:ring-primary/30"
+                >
+                  {CATEGORY_ORDER.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {GROCERY_ICONS[cat] ?? '🛒'} {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  value={newNote}
+                  onChange={(e) => setNewNote(e.target.value)}
+                  placeholder="Note (optional)"
+                  className="text-sm bg-background border border-border rounded-lg px-3 py-1.5 outline-none focus:ring-1 focus:ring-primary/30"
+                />
+              </div>
+              <div className="flex gap-2 justify-end">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setShowAddForm(false)
+                    setNewName('')
+                    setNewQty('1')
+                    setNewUnit('')
+                    setNewCategory('other')
+                    setNewNote('')
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  size="sm"
+                  disabled={!newName.trim()}
+                  onClick={() => {
+                    addCustomItem({
+                      name: newName.trim(),
+                      quantity: parseFloat(newQty) || 1,
+                      unit: newUnit.trim() || 'unit',
+                      category: newCategory,
+                      note: newNote.trim() || undefined,
+                    })
+                    setNewName('')
+                    setNewQty('1')
+                    setNewUnit('')
+                    setNewCategory('other')
+                    setNewNote('')
+                  }}
+                >
+                  <Plus className="h-3.5 w-3.5 mr-1" />
+                  Add Item
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     )
   }

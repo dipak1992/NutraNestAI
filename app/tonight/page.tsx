@@ -19,6 +19,29 @@ import { SmartInput } from '@/components/dashboard/SmartInput'
 import type { SmartMealResult } from '@/lib/engine/types'
 
 const TONIGHT_SWIPE_STORAGE_KEY = 'nutrinest-tonight-swipes'
+const GUEST_SWIPE_STORAGE_KEY = 'nutrinest-guest-tonight'
+const GUEST_SWIPE_LIMIT = 3
+
+function readGuestSwipeCount(): number {
+  if (typeof window === 'undefined') return 0
+  try {
+    const raw = window.localStorage.getItem(GUEST_SWIPE_STORAGE_KEY)
+    if (!raw) return 0
+    const parsed = JSON.parse(raw) as { date?: string; count?: number }
+    if (parsed.date !== getTodayKey()) return 0
+    return parsed.count ?? 0
+  } catch {
+    return 0
+  }
+}
+
+function writeGuestSwipeCount(count: number): void {
+  if (typeof window === 'undefined') return
+  window.localStorage.setItem(
+    GUEST_SWIPE_STORAGE_KEY,
+    JSON.stringify({ date: getTodayKey(), count }),
+  )
+}
 
 function getTodayKey() {
   return new Date().toISOString().slice(0, 10)
@@ -312,6 +335,7 @@ function TonightPageInner() {
   const [inputSubmitted, setInputSubmitted] = useState(false)
   const { status, loading: paywallLoading } = usePaywallStatus()
   const [swipesUsed, setSwipesUsed] = useState(0)
+  const [guestSwipesUsed, setGuestSwipesUsed] = useState(0)
   const [paywallOpen, setPaywallOpen] = useState(false)
   const [meal, setMeal] = useState<SmartMealResult | null>(null)
   const seenIdsRef = useRef<string[]>([])
@@ -327,6 +351,7 @@ function TonightPageInner() {
       if (stored) seenIdsRef.current = JSON.parse(stored)
     } catch {}
     setSwipesUsed(readSwipeCount())
+    setGuestSwipesUsed(readGuestSwipeCount())
   }, [])
 
   const fetchMeal = useCallback(async (ingredientText?: string) => {
@@ -335,34 +360,42 @@ function TonightPageInner() {
     animationDoneRef.current = false
     fetchPendingRef.current = true
     try {
-      const boosts = getBoosts()
-      const body: Record<string, unknown> = {
-        household: { adultsCount: 2, kidsCount: 1, toddlersCount: 0, babiesCount: 0 },
-        lowEnergy: mode === 'tired',
-        maxCookTime: mode === 'quick' ? 30 : mode === 'tired' ? 20 : undefined,
-        excludeIds: seenIdsRef.current,
-        ...(boosts ? { learnedBoosts: boosts } : {}),
+      const isGuest = !status.isAuthenticated
+
+      let res: Response
+      if (isGuest) {
+        res = await fetch('/api/guest-meal', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ excludeIds: seenIdsRef.current }),
+        })
+      } else {
+        const boosts = getBoosts()
+        const body: Record<string, unknown> = {
+          household: { adultsCount: 2, kidsCount: 1, toddlersCount: 0, babiesCount: 0 },
+          lowEnergy: mode === 'tired',
+          maxCookTime: mode === 'quick' ? 30 : mode === 'tired' ? 20 : undefined,
+          excludeIds: seenIdsRef.current,
+          ...(boosts ? { learnedBoosts: boosts } : {}),
+        }
+        if (mode === 'pantry' && ingredientText) {
+          body.pantryItems = ingredientText.split(',').map((s: string) => s.trim()).filter(Boolean)
+        }
+        if (mode === 'inspiration' && ingredientText) {
+          body.inspirationMeal = ingredientText
+        }
+        res = await fetch('/api/smart-meal', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        })
       }
-      if (mode === 'pantry' && ingredientText) {
-        body.pantryItems = ingredientText.split(',').map((s: string) => s.trim()).filter(Boolean)
-      }
-      if (mode === 'inspiration' && ingredientText) {
-        body.inspirationMeal = ingredientText
-      }
-      const res = await fetch('/api/smart-meal', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      })
+
       if (res.ok) {
         const data = await res.json() as SmartMealResult
         setMeal(data)
         seenIdsRef.current = [...seenIdsRef.current, data.id]
         try { sessionStorage.setItem('tonight-seen-ids', JSON.stringify(seenIdsRef.current)) } catch {}
-        fetchPendingRef.current = false
-        if (animationDoneRef.current) setLoading(false)
-      } else if (res.status === 401) {
-        setAuthRequired(true)
         fetchPendingRef.current = false
         if (animationDoneRef.current) setLoading(false)
       } else {
@@ -373,22 +406,14 @@ function TonightPageInner() {
       fetchPendingRef.current = false
       setLoading(false)
     }
-  }, [mode, getBoosts])
+  }, [mode, getBoosts, status.isAuthenticated])
 
-  // Fetch once auth is confirmed and mode doesn't need input
+  // Fetch once auth state is known and mode doesn't need text input
   useEffect(() => {
-    if (!needsInput && !paywallLoading && status.isAuthenticated) {
+    if (!needsInput && !paywallLoading) {
       fetchMeal()
     }
   }, [mode, needsInput, paywallLoading, status.isAuthenticated]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // For unauthenticated users: skip loading animation and show auth prompt immediately
-  useEffect(() => {
-    if (!paywallLoading && !status.isAuthenticated && loading) {
-      setLoading(false)
-      setAuthRequired(true)
-    }
-  }, [paywallLoading, status.isAuthenticated, loading]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleInputSubmit = useCallback((value: string) => {
     setUserInput(value)
@@ -406,6 +431,19 @@ function TonightPageInner() {
   const currentMode = modeLabels[mode] || modeLabels.quick
 
   const handleAnotherMeal = useCallback(() => {
+    // Guest (not signed in) — soft gate after free limit
+    if (!status.isAuthenticated) {
+      const nextGuestCount = guestSwipesUsed + 1
+      if (nextGuestCount > GUEST_SWIPE_LIMIT) {
+        setAuthRequired(true)
+        return
+      }
+      writeGuestSwipeCount(nextGuestCount)
+      setGuestSwipesUsed(nextGuestCount)
+      fetchMeal(userInput || undefined)
+      return
+    }
+
     if (status.isPro) {
       fetchMeal(userInput || undefined)
       return
@@ -420,7 +458,7 @@ function TonightPageInner() {
     writeSwipeCount(nextSwipeCount)
     setSwipesUsed(nextSwipeCount)
     fetchMeal(userInput || undefined)
-  }, [status.freeTonightSwipeLimit, status.isPro, swipesUsed, fetchMeal, userInput])
+  }, [status.isAuthenticated, status.freeTonightSwipeLimit, status.isPro, swipesUsed, guestSwipesUsed, fetchMeal, userInput])
 
   const swipesRemaining = status.isPro
     ? null
@@ -534,6 +572,22 @@ function TonightPageInner() {
                 </div>
               </motion.div>
 
+              {/* Guest personalisation nudge */}
+              {!status.isAuthenticated && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.25 }}
+                  className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-center text-sm text-amber-800 mb-8"
+                >
+                  ✨ Results are generic.{' '}
+                  <Link href={`/login?redirect=/tonight%3Fmode%3D${mode}`} className="underline font-medium">
+                    Sign in free
+                  </Link>{' '}
+                  for personalized meals matched to your family.
+                </motion.div>
+              )}
+
               {/* Tags */}
               <motion.div
                 initial={{ opacity: 0 }}
@@ -646,7 +700,14 @@ function TonightPageInner() {
                 >
                   <RefreshCw className="h-3.5 w-3.5" /> Try a different meal
                 </Button>
-                {swipesRemaining !== null && (
+                {!status.isAuthenticated && (
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {GUEST_SWIPE_LIMIT - guestSwipesUsed > 0
+                      ? `${GUEST_SWIPE_LIMIT - guestSwipesUsed} free try${GUEST_SWIPE_LIMIT - guestSwipesUsed === 1 ? '' : 's'} left today.`
+                      : 'Free tries used up for today.'}
+                  </p>
+                )}
+              {status.isAuthenticated && swipesRemaining !== null && (
                   <p className="mt-2 text-xs text-muted-foreground">
                     {swipesRemaining > 0
                       ? `${swipesRemaining} free swipe${swipesRemaining === 1 ? '' : 's'} left today after this preview.`
@@ -684,9 +745,9 @@ function TonightPageInner() {
               animate={{ opacity: 1 }}
               className="min-h-[50vh] flex flex-col items-center justify-center text-center px-4"
             >
-              <p className="text-xl font-bold mb-2">Sign in to get your dinner idea</p>
+              <p className="text-xl font-bold mb-2">You&apos;ve had {GUEST_SWIPE_LIMIT} free tries today!</p>
               <p className="text-muted-foreground mb-6 max-w-xs">
-                MealEase needs an account to personalise meal suggestions for your family.
+                Sign in free to unlock unlimited personalized meal suggestions tailored for your family.
               </p>
               <div className="flex flex-col gap-3 w-full max-w-xs">
                 <Button asChild size="lg">

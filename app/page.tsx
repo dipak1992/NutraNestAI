@@ -27,7 +27,7 @@ const SAUSAGE_IMG = U('1555939594-58d7cb561ad1')  // roasted sheet-pan
 /* ─────────────────────────────── HERO ─────────────────────────────── */
 function Hero() {
   const secondaryModes = [
-    { label: 'Get inspired',   emoji: '✨', href: '/tonight?mode=inspiration', description: 'AI picks for you' },
+    { label: 'Surprise me',    emoji: '✨', href: '/tonight?mode=quick',       description: 'AI picks for you' },
     { label: 'Use what I have',emoji: '🥫', href: '/tonight?mode=pantry',      description: 'Snap your fridge' },
     { label: 'Plan my week',   emoji: '📅', href: '/onboarding',               description: 'Full meal planning' },
   ]

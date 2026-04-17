@@ -368,6 +368,29 @@ export function DashboardClient({ userName }: Props) {
                 </div>
               )}
 
+              {/* Weekend Mode banner — PRO only, Fri 5pm+ / Sat / Sun */}
+              {(() => {
+                const d = new Date()
+                const day = d.getDay()
+                const hour = d.getHours()
+                const isWeekend =
+                  day === 0 || day === 6 || (day === 5 && hour >= 17)
+                return isWeekend && paywallStatus.isPro ? (
+                  <Link
+                    href="/weekend"
+                    className="mt-4 flex items-center gap-3 rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50 px-4 py-3 hover:shadow-md transition-all"
+                  >
+                    <span className="text-2xl flex-shrink-0">🎬</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-amber-900">Weekend Mode</p>
+                      <p className="text-xs text-amber-700/80 mt-0.5">
+                        Dinner + movie picked for tonight →
+                      </p>
+                    </div>
+                  </Link>
+                ) : null
+              })()}
+
               {/* Value Accumulator — free users only */}
               {!paywallStatus.isPro && totalInteractions > 0 && (
                 <div className="mt-4 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-amber-50 p-4">

@@ -9,6 +9,7 @@ import { MagicLinkEmail } from './templates/magic-link'
 import { ProConfirmationEmail } from './templates/pro-confirmation'
 import { PaymentReceiptEmail } from './templates/payment-receipt'
 import { WeeklyReminderEmail } from './templates/weekly-reminder'
+import { WeekendReminderEmail } from './templates/weekend-reminder'
 import { DinnerReminderEmail } from './templates/dinner-reminder'
 import { ReferralRewardEmail } from './templates/referral-reward'
 import { SupportConfirmationEmail } from './templates/support-confirmation'
@@ -98,6 +99,33 @@ export async function sendWeeklyReminderEmail(params: {
     subject: 'Plan your week in 30 seconds',
     react: createElement(WeeklyReminderEmail, { firstName: params.firstName, unsubscribeUrl }),
     idempotencyKey: `weekly:${params.to}:${week}`,
+    headers: unsubscribeUrl
+      ? { 'List-Unsubscribe': `<${unsubscribeUrl}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' }
+      : undefined,
+  })
+}
+
+export async function sendWeekendReminderEmail(params: {
+  to: string
+  firstName?: string
+  mealTitle?: string
+  entertainmentTitle?: string
+  userId?: string
+}) {
+  const week = getWeekKey()
+  const unsubscribeUrl = params.userId
+    ? `${SITE_URL}/api/unsubscribe?token=${generateUnsubscribeToken(params.userId)}`
+    : undefined
+  return sendEmail({
+    to: params.to,
+    subject: '🎬 Your weekend plan is ready — dinner + a movie',
+    react: createElement(WeekendReminderEmail, {
+      firstName: params.firstName,
+      mealTitle: params.mealTitle,
+      entertainmentTitle: params.entertainmentTitle,
+      unsubscribeUrl,
+    }),
+    idempotencyKey: `weekend:${params.to}:${week}`,
     headers: unsubscribeUrl
       ? { 'List-Unsubscribe': `<${unsubscribeUrl}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' }
       : undefined,

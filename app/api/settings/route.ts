@@ -26,6 +26,9 @@ export async function PATCH(req: NextRequest) {
     const prefPayload: Record<string, unknown> = { user_id: user.id, updated_at: new Date().toISOString() }
     if (Array.isArray(body.cuisines)) prefPayload.cuisines = body.cuisines
     if (typeof body.cookingTimeMinutes === 'number') prefPayload.cooking_time_minutes = body.cookingTimeMinutes
+    if (body.entertainmentPrefs !== undefined && typeof body.entertainmentPrefs === 'object' && body.entertainmentPrefs !== null) {
+      prefPayload.entertainment_prefs = body.entertainmentPrefs
+    }
 
     if (Object.keys(prefPayload).length > 2) {
       promises.push(

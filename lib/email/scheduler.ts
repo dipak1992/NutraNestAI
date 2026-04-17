@@ -13,6 +13,7 @@ export interface ReminderScheduleRow {
   timezone: string          // IANA, e.g. "America/New_York"
   last_dinner_sent_at: string | null
   last_weekly_sent_at: string | null
+  last_weekend_sent_at: string | null
 }
 
 /** Returns true if dinner reminder should fire right now for this user. */
@@ -39,6 +40,24 @@ export function isWeeklyReminderDue(schedule: ReminderScheduleRow): boolean {
   if (schedule.last_weekly_sent_at?.slice(0, 10) === thisWeek) return false
 
   return now.getDay() === schedule.weekly_day
+}
+
+/**
+ * Returns true if a weekend reminder should fire for this user.
+ * Fires once per weekend period (Fri 5 PM → Mon 5 AM).
+ */
+export function isWeekendReminderDue(schedule: ReminderScheduleRow): boolean {
+  const now = nowInTz(schedule.timezone)
+  const day = now.getDay()   // 0=Sun … 6=Sat
+  const hour = now.getHours()
+  const isWeekendWindow = day === 0 || day === 6 || (day === 5 && hour >= 17)
+  if (!isWeekendWindow) return false
+
+  // Use Mon of this week as the weekend period key
+  const periodKey = weekStartKey(now)
+  if (schedule.last_weekend_sent_at?.slice(0, 10) === periodKey) return false
+
+  return true
 }
 
 // ─── Internal helpers ────────────────────────────────────────────────────────

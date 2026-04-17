@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServiceClient } from '@/lib/supabase/service'
-import { sendDinnerReminderEmail, sendWeeklyReminderEmail, sendAdminWeeklySummary } from '@/lib/email/triggers'
+import { sendDinnerReminderEmail, sendWeeklyReminderEmail, sendWeekendReminderEmail, sendAdminWeeklySummary } from '@/lib/email/triggers'
 
 /**
  * Cron endpoint — called by Vercel Cron or any scheduler.
@@ -28,6 +28,8 @@ export async function GET(request: NextRequest) {
     return handleDinnerReminders(supabase)
   } else if (type === 'weekly') {
     return handleWeeklyReminders(supabase)
+  } else if (type === 'weekend') {
+    return handleWeekendReminders(supabase)
   } else if (type === 'admin-summary') {
     return handleAdminSummary(supabase)
   }
@@ -145,6 +147,70 @@ async function handleWeeklyReminders(supabase: ReturnType<typeof createSupabaseS
       await supabase
         .from('reminder_schedules')
         .update({ last_weekly_sent_at: new Date().toISOString() })
+        .eq('user_id', row.user_id)
+      sent++
+    }
+  }
+
+  return NextResponse.json({ ok: true, sent, skipped })
+}
+
+// ─── Weekend reminders ───────────────────────────────────────────────────────
+
+async function handleWeekendReminders(supabase: ReturnType<typeof createSupabaseServiceClient>) {
+  const now = new Date()
+  const day = now.getDay()
+  const hour = now.getUTCHours()
+  const isWeekendWindow = day === 0 || day === 6 || (day === 5 && hour >= 17)
+  if (!isWeekendWindow) {
+    return NextResponse.json({ ok: true, skipped: 'not weekend window', sent: 0 })
+  }
+
+  // Use Monday of this week as the dedup key
+  const d = new Date()
+  const diff = d.getDate() - (d.getDay() === 0 ? 6 : d.getDay() - 1)
+  const weekKey = new Date(d.setDate(diff)).toISOString().slice(0, 10)
+
+  const { data: users, error } = await supabase
+    .from('reminder_schedules')
+    .select('user_id, last_weekend_sent_at')
+    .eq('weekly_enabled', true)
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  let sent = 0
+  let skipped = 0
+
+  for (const row of (users ?? [])) {
+    const lastSent = row.last_weekend_sent_at?.slice(0, 10)
+    if (lastSent === weekKey) {
+      skipped++
+      continue
+    }
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('email, first_name, is_pro')
+      .eq('user_id', row.user_id)
+      .maybeSingle()
+
+    if (!profile?.email || !profile.is_pro) {
+      skipped++
+      continue
+    }
+
+    const result = await sendWeekendReminderEmail({
+      to: profile.email,
+      firstName: profile.first_name ?? undefined,
+      userId: row.user_id,
+    })
+
+    if (result.success) {
+      await supabase
+        .from('reminder_schedules')
+        .update({ last_weekend_sent_at: new Date().toISOString() })
         .eq('user_id', row.user_id)
       sent++
     }

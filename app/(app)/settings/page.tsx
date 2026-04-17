@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Settings, User, Home, Leaf, LogOut, Trash2, Crown, Bell } from 'lucide-react'
+import { Settings, User, Home, Leaf, LogOut, Trash2, Crown, Bell, Film } from 'lucide-react'
 import { getStageEmoji, stageLabelDisplay, ALLERGY_LABELS, CONDITION_LABELS } from '@/lib/utils'
 import { toast } from 'sonner'
 import { NotificationSettings } from '@/components/habit/NotificationSettings'
@@ -35,6 +35,12 @@ export default function SettingsPage() {
   const [deleteConfirm, setDeleteConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [managingBilling, setManagingBilling] = useState(false)
+
+  // Entertainment prefs state
+  const [entLanguage, setEntLanguage] = useState('English')
+  const [entGenres, setEntGenres] = useState<string[]>(['Comedy', 'Drama'])
+  const [entWatchStyle, setEntWatchStyle] = useState<'solo' | 'couple' | 'family'>('couple')
+  const [savingEnt, setSavingEnt] = useState(false)
 
   async function handleSignOut() {
     setSigningOut(true)
@@ -112,6 +118,9 @@ export default function SettingsPage() {
             <TabsTrigger value="account" className="gap-2"><User className="h-4 w-4" />Account</TabsTrigger>
             <TabsTrigger value="notifications" className="gap-2"><Bell className="h-4 w-4" />Notifications</TabsTrigger>
             <TabsTrigger value="billing" className="gap-2"><Crown className="h-4 w-4" />Billing</TabsTrigger>
+            {status.isPro && (
+              <TabsTrigger value="entertainment" className="gap-2"><Film className="h-4 w-4" />Entertainment</TabsTrigger>
+            )}
           </TabsList>
         </div>
 
@@ -301,6 +310,108 @@ export default function SettingsPage() {
             )}
           </div>
         </TabsContent>
+
+        {status.isPro && (
+          <TabsContent value="entertainment" className="space-y-6">
+            <div className="glass-card rounded-xl border border-border/60 p-5 space-y-5">
+              <h2 className="font-semibold flex items-center gap-2">
+                <Film className="h-4 w-4 text-amber-500" />
+                Weekend Entertainment Preferences
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Used by Weekend Mode to suggest movies &amp; shows tailored to your taste.
+              </p>
+
+              {/* Language */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">Preferred Language</label>
+                <input
+                  type="text"
+                  value={entLanguage}
+                  onChange={e => setEntLanguage(e.target.value)}
+                  placeholder="e.g. English"
+                  className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                />
+              </div>
+
+              {/* Genre */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Favourite Genres</label>
+                <div className="flex flex-wrap gap-2">
+                  {['Comedy', 'Drama', 'Action', 'Thriller', 'Sci-Fi', 'Horror', 'Animation', 'Documentary'].map(g => (
+                    <button
+                      key={g}
+                      type="button"
+                      onClick={() =>
+                        setEntGenres(prev =>
+                          prev.includes(g) ? prev.filter(x => x !== g) : [...prev, g]
+                        )
+                      }
+                      className={`rounded-full px-3 py-1 text-sm font-medium border transition-colors ${
+                        entGenres.includes(g)
+                          ? 'bg-amber-500 text-white border-amber-500'
+                          : 'bg-background border-border text-muted-foreground hover:border-amber-300'
+                      }`}
+                    >
+                      {g}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Watch style */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Watch Style</label>
+                <div className="flex gap-3">
+                  {(['solo', 'couple', 'family'] as const).map(style => (
+                    <button
+                      key={style}
+                      type="button"
+                      onClick={() => setEntWatchStyle(style)}
+                      className={`flex-1 rounded-xl border px-3 py-2.5 text-sm font-medium capitalize transition-colors ${
+                        entWatchStyle === style
+                          ? 'bg-amber-500 text-white border-amber-500'
+                          : 'border-border text-muted-foreground hover:border-amber-300'
+                      }`}
+                    >
+                      {style === 'solo' ? '🧘 Solo' : style === 'couple' ? '👫 Couple' : '👨‍👩‍👧 Family'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <Button
+                size="sm"
+                disabled={savingEnt}
+                onClick={async () => {
+                  setSavingEnt(true)
+                  try {
+                    const res = await fetch('/api/settings', {
+                      method: 'PATCH',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        entertainmentPrefs: {
+                          language: entLanguage.trim() || 'English',
+                          genre: entGenres,
+                          watchStyle: entWatchStyle,
+                        },
+                      }),
+                    })
+                    if (res.ok) toast.success('Entertainment preferences saved')
+                    else toast.error('Failed to save preferences')
+                  } catch {
+                    toast.error('Failed to save preferences')
+                  } finally {
+                    setSavingEnt(false)
+                  }
+                }}
+                className="bg-amber-500 hover:bg-amber-600 text-white"
+              >
+                {savingEnt ? 'Saving…' : 'Save Entertainment Preferences'}
+              </Button>
+            </div>
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   )

@@ -531,3 +531,36 @@ export interface ShareableCard {
   servings: number;
   gradient: string;
 }
+
+// ============================================================
+// Weekend Mode (PRO)
+// ============================================================
+
+export interface EntertainmentPrefs {
+  language: string;
+  genre: string[];
+  watchStyle: 'solo' | 'couple' | 'family';
+}
+
+export interface EntertainmentResult {
+  title: string;
+  type: 'movie' | 'series';
+  year: number;
+  rating: string;
+  whereToWatch: string[];
+  reason: string;
+  posterEmoji: string;
+}
+
+export interface WeekendModeResult {
+  meal: {
+    title: string;
+    description: string;
+    prepTime: number;
+    cookTime: number;
+    tags: string[];
+    ingredients: string[];
+    instructions: string[];
+  };
+  entertainment: EntertainmentResult;
+}

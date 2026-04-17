@@ -55,18 +55,26 @@ async function batchFetchProfiles(
 // ─── Dinner reminders ────────────────────────────────────────────────────────
 
 async function handleDinnerReminders(supabase: SupabaseClient) {
+  // Step 1: get users who have dinner_reminders enabled in notification_preferences
+  const { data: prefs, error: prefsError } = await supabase
+    .from('notification_preferences')
+    .select('user_id')
+    .eq('dinner_reminders', true)
+
+  if (prefsError) {
+    console.error('[cron] dinner reminder fetch error:', prefsError)
+    return NextResponse.json({ error: prefsError.message }, { status: 500 })
+  }
+
+  const prefUserIds = (prefs ?? []).map((p: { user_id: string }) => p.user_id)
+  if (!prefUserIds.length) return NextResponse.json({ ok: true, sent: 0, skipped: 0 })
+
+  // Step 2: get reminder schedules for those users
   const { data: users, error } = await supabase
     .from('reminder_schedules')
-    .select(`
-      user_id,
-      dinner_enabled,
-      dinner_hour,
-      timezone,
-      last_dinner_sent_at,
-      notification_preferences!inner(dinner_reminders)
-    `)
+    .select('user_id, dinner_enabled, dinner_hour, timezone, last_dinner_sent_at')
     .eq('dinner_enabled', true)
-    .eq('notification_preferences.dinner_reminders', true)
+    .in('user_id', prefUserIds)
 
   if (error) {
     console.error('[cron] dinner reminder fetch error:', error)
@@ -104,18 +112,25 @@ async function handleDinnerReminders(supabase: SupabaseClient) {
 // ─── Weekly reminders ────────────────────────────────────────────────────────
 
 async function handleWeeklyReminders(supabase: SupabaseClient) {
+  // Step 1: get users who have weekly_reminders enabled in notification_preferences
+  const { data: prefs, error: prefsError } = await supabase
+    .from('notification_preferences')
+    .select('user_id')
+    .eq('weekly_reminders', true)
+
+  if (prefsError) {
+    return NextResponse.json({ error: prefsError.message }, { status: 500 })
+  }
+
+  const prefUserIds = (prefs ?? []).map((p: { user_id: string }) => p.user_id)
+  if (!prefUserIds.length) return NextResponse.json({ ok: true, sent: 0, skipped: 0 })
+
+  // Step 2: get reminder schedules for those users
   const { data: users, error } = await supabase
     .from('reminder_schedules')
-    .select(`
-      user_id,
-      weekly_enabled,
-      weekly_day,
-      timezone,
-      last_weekly_sent_at,
-      notification_preferences!inner(weekly_reminders)
-    `)
+    .select('user_id, weekly_enabled, weekly_day, timezone, last_weekly_sent_at')
     .eq('weekly_enabled', true)
-    .eq('notification_preferences.weekly_reminders', true)
+    .in('user_id', prefUserIds)
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })

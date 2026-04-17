@@ -19,7 +19,7 @@ export function LandingFinalCTA() {
           opacity: 0.50,
         }}
       />
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1] bg-slate-950/50" />
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1] bg-slate-950/72" />
       {/* Background orbs */}
       <div className="absolute z-[2] top-1/4 left-1/4 h-80 w-80 rounded-full bg-primary/10 blur-[120px]" />
       <div className="absolute z-[2] bottom-1/4 right-1/4 h-64 w-64 rounded-full bg-violet-500/10 blur-[100px]" />

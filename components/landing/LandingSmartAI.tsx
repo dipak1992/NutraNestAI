@@ -60,7 +60,7 @@ export function LandingSmartAI() {
           opacity: 0.45,
         }}
       />
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1] bg-slate-950/55" />
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1] bg-slate-950/72" />
       <div className="relative z-[2] mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         {/* Section header */}
         <motion.div

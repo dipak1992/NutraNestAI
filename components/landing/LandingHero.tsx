@@ -40,7 +40,7 @@ export function LandingHero() {
           filter: 'blur(1px)',
         }}
       />
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1] bg-[#FAFBFA]/40" />
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1] bg-[#FAFBFA]/65" />
       {/* Subtle gradient orbs */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-[2]">
         <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-primary/[0.07] blur-3xl" />

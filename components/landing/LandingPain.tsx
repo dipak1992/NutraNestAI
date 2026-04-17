@@ -81,7 +81,7 @@ export function LandingPain() {
           filter: 'grayscale(100%)',
         }}
       />
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1] bg-white/45" />
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1] bg-white/65" />
       <div className="relative z-[2] mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Section header */}
         <motion.div

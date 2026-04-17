@@ -95,7 +95,7 @@ export function LandingFeatures() {
           opacity: 0.45,
         }}
       />
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1] bg-white/40" />
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1] bg-white/65" />
       <div className="relative z-[2] mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section header */}
         <motion.div

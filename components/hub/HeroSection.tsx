@@ -1,0 +1,97 @@
+'use client'
+
+import { useMemo } from 'react'
+import Link from 'next/link'
+import { motion } from 'framer-motion'
+import { ChevronRight } from 'lucide-react'
+
+function getGreeting(): { greeting: string; subtext: string } {
+  const h = new Date().getHours()
+  if (h < 12) return { greeting: 'Good morning', subtext: "What's for lunch today?" }
+  if (h < 17) return { greeting: 'Good afternoon', subtext: "Let's sort dinner." }
+  return { greeting: 'Good evening', subtext: 'What do you need right now?' }
+}
+
+interface Props {
+  firstName: string
+  onQuickDecide: () => void
+  onZeroCook: () => void
+}
+
+export function HeroSection({ firstName, onQuickDecide, onZeroCook }: Props) {
+  const { greeting, subtext } = useMemo(() => getGreeting(), [])
+
+  return (
+    <section className="mb-8">
+      {/* Greeting */}
+      <div className="mb-6">
+        <h1 className="text-[26px] font-bold text-foreground tracking-tight leading-tight">
+          {greeting}, {firstName} 👋
+        </h1>
+        <p className="text-sm text-muted-foreground mt-1.5">{subtext}</p>
+      </div>
+
+      {/* 3 Primary Action Cards */}
+      <div className="flex flex-col gap-3">
+        {/* ⚡ I Don't Want to Think — Primary hero card */}
+        <motion.button
+          whileTap={{ scale: 0.98 }}
+          onClick={onQuickDecide}
+          className="w-full px-5 py-5 rounded-2xl text-left transition-all bg-gradient-to-r from-primary/[0.06] to-primary/[0.02] border-2 border-primary/20 hover:border-primary/40 hover:shadow-lg"
+        >
+          <div className="flex items-center gap-4">
+            <span className="text-3xl">⚡</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-[15px] font-bold text-foreground">
+                I Don&apos;t Want to Think
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                One tap — dinner decided
+              </p>
+            </div>
+            <ChevronRight className="h-4 w-4 text-primary/50 flex-shrink-0" />
+          </div>
+        </motion.button>
+
+        {/* 🚚 Zero-Cook Mode */}
+        <motion.button
+          whileTap={{ scale: 0.98 }}
+          onClick={onZeroCook}
+          className="w-full px-5 py-4 rounded-2xl text-left transition-all bg-white border border-border/60 hover:border-primary/30 hover:shadow-md"
+        >
+          <div className="flex items-center gap-4">
+            <span className="text-3xl">🚚</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-[15px] font-semibold text-foreground">
+                Zero-Cook Mode
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Get it delivered — we pick for you
+              </p>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground/40 flex-shrink-0" />
+          </div>
+        </motion.button>
+
+        {/* 📅 Plan My Week */}
+        <motion.div whileTap={{ scale: 0.98 }}>
+          <Link
+            href="/planner"
+            className="flex items-center gap-4 w-full px-5 py-4 rounded-2xl bg-white border border-border/60 hover:border-primary/30 hover:shadow-md transition-all"
+          >
+            <span className="text-3xl">📅</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-[15px] font-semibold text-foreground">
+                Plan My Week
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                7 dinners, zero repeats
+              </p>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground/40 flex-shrink-0" />
+          </Link>
+        </motion.div>
+      </div>
+    </section>
+  )
+}

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { RefreshCw, ChevronDown, ChevronUp, Clock, Users } from 'lucide-react'
+import { RefreshCw, ChevronDown, ChevronUp, Clock, Users, ChefHat, ListOrdered } from 'lucide-react'
 import type { Meal } from '@/types'
 import { cn } from '@/lib/utils'
 
@@ -16,6 +16,7 @@ interface MealCardProps {
 
 export function MealCard({ meal, onRegenerate, isRegenerating, compact }: MealCardProps) {
   const [expanded, setExpanded] = useState(false)
+  const [recipeExpanded, setRecipeExpanded] = useState(false)
 
   return (
     <div className={cn('glass-card rounded-xl border border-border/60 hover:border-primary/25 transition-colors', compact ? 'p-3' : 'p-5')}>
@@ -51,6 +52,45 @@ export function MealCard({ meal, onRegenerate, isRegenerating, compact }: MealCa
                   )}
                 </div>
               ))}
+            </div>
+          )}
+        </div>
+      )}
+      {!compact && (meal.base_ingredients?.length > 0 || meal.base_instructions?.length > 0) && (
+        <div className="mt-3 border-t border-border/40 pt-3">
+          <button type="button" onClick={() => setRecipeExpanded(!recipeExpanded)} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
+            <ChefHat className="h-3.5 w-3.5" />
+            Recipe details
+            {recipeExpanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+          </button>
+          {recipeExpanded && (
+            <div className="mt-3 space-y-4">
+              {meal.base_ingredients?.length > 0 && (
+                <div>
+                  <p className="text-xs font-semibold text-muted-foreground mb-1.5 flex items-center gap-1"><ListOrdered className="h-3 w-3" /> Ingredients</p>
+                  <ul className="space-y-1">
+                    {meal.base_ingredients.map((ing, i) => (
+                      <li key={i} className="text-xs rounded-md bg-muted/50 px-3 py-1.5">
+                        <span className="font-medium">{ing.quantity} {ing.unit}</span> {ing.name}
+                        {ing.notes && <span className="text-muted-foreground ml-1">({ing.notes})</span>}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {meal.base_instructions?.length > 0 && (
+                <div>
+                  <p className="text-xs font-semibold text-muted-foreground mb-1.5 flex items-center gap-1"><ChefHat className="h-3 w-3" /> Instructions</p>
+                  <ol className="space-y-1.5">
+                    {meal.base_instructions.map((step, i) => (
+                      <li key={i} className="flex gap-2 text-xs">
+                        <span className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-[10px] font-bold">{i + 1}</span>
+                        <span className="pt-0.5">{step}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              )}
             </div>
           )}
         </div>

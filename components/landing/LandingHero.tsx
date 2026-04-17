@@ -165,7 +165,7 @@ export function LandingHero() {
 
                   {/* Feature pills */}
                   <div className="grid grid-cols-2 gap-2">
-                    <div className="flex items-center gap-2 rounded-xl bg-violet-50 border border-violet-100 p-3">
+                    <Link href="/signup" className="flex items-center gap-2 rounded-xl bg-violet-50 border border-violet-100 p-3 hover:shadow-md hover:border-violet-200 transition-all">
                       <div className="h-8 w-8 rounded-lg bg-violet-100 flex items-center justify-center">
                         <Truck className="h-4 w-4 text-violet-600" />
                       </div>
@@ -173,8 +173,8 @@ export function LandingHero() {
                         <p className="text-xs font-semibold text-violet-900">Zero-Cook Mode</p>
                         <p className="text-[10px] text-violet-600">Delivery picks</p>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-2 rounded-xl bg-amber-50 border border-amber-100 p-3">
+                    </Link>
+                    <Link href="/signup" className="flex items-center gap-2 rounded-xl bg-amber-50 border border-amber-100 p-3 hover:shadow-md hover:border-amber-200 transition-all">
                       <div className="h-8 w-8 rounded-lg bg-amber-100 flex items-center justify-center">
                         <Camera className="h-4 w-4 text-amber-600" />
                       </div>
@@ -182,7 +182,7 @@ export function LandingHero() {
                         <p className="text-xs font-semibold text-amber-900">Snap & Cook</p>
                         <p className="text-[10px] text-amber-600">Photo → meals</p>
                       </div>
-                    </div>
+                    </Link>
                   </div>
                 </div>
               </div>

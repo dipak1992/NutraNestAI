@@ -36,8 +36,8 @@ const SITUATIONS: {
   },
   {
     id: 'ingredients',
-    emoji: '🥫',
-    label: 'Use what I have',
+    emoji: '📸',
+    label: 'Snap & Cook',
     hint: 'Snap your fridge or list ingredients',
     inputPlaceholder: 'e.g. chicken, broccoli, garlic, pasta…',
   },
@@ -276,8 +276,8 @@ export function DashboardClient({ userName }: Props) {
                   onClick={() => selectMode('ingredients')}
                   className="glass-card rounded-xl p-4 border border-border/60 hover:border-primary/40 hover:shadow-md transition-all group text-center"
                 >
-                  <span className="text-2xl block mb-1.5">🥫</span>
-                  <span className="text-xs font-semibold group-hover:text-primary transition-colors block">Use what I have</span>
+                  <span className="text-2xl block mb-1.5">📸</span>
+                  <span className="text-xs font-semibold group-hover:text-primary transition-colors block">Snap & Cook</span>
                   <span className="text-[11px] text-muted-foreground">Snap your fridge</span>
                 </motion.button>
 

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, ChefHat, RefreshCw, ShoppingCart, Clock, Flame } from 'lucide-react'
 import { useOnboardingStore, useLightOnboardingStore } from '@/lib/store'
@@ -23,6 +24,7 @@ import {
   type DecideResponse,
 } from '@/lib/decide/client'
 import type { SmartMealResult } from '@/lib/engine/types'
+import { useWeeklyPlanStore } from '@/lib/planner/store'
 
 interface Props {
   mode?: DecideMode
@@ -52,9 +54,11 @@ function DifficultyDots({ difficulty }: { difficulty: 'easy' | 'moderate' | 'har
 }
 
 export function OneShotSuggestion({ mode = 'tonight', title }: Props) {
+  const router = useRouter()
   const { state: { members } } = useOnboardingStore()
   const light = useLightOnboardingStore()
   const { getBoosts, recordLike, recordReject } = useLearningStore()
+  const { addCustomItem } = useWeeklyPlanStore()
 
   const { status: paywallStatus } = usePaywallStatus()
 
@@ -66,6 +70,7 @@ export function OneShotSuggestion({ mode = 'tonight', title }: Props) {
   const [cookedFeedback, setCookedFeedback] = useState(false)
   const [feedbackGiven, setFeedbackGiven] = useState(false)
   const [trialNudgeOpen, setTrialNudgeOpen] = useState(false)
+  const [groceryPromptOpen, setGroceryPromptOpen] = useState(false)
   const [startingTrial, setStartingTrial] = useState(false)
   const shownIdsRef = useRef<string[]>([])
   const swapCountRef = useRef(0)
@@ -123,7 +128,35 @@ export function OneShotSuggestion({ mode = 'tonight', title }: Props) {
     if (!meal) return
     sendSignal(meal.id, 'cooked', { mode, rating })
     setFeedbackGiven(true)
-    setTimeout(() => setCookedFeedback(false), 1200)
+    // Show grocery prompt after brief confirmation, then navigate to recipe
+    setTimeout(() => {
+      setCookedFeedback(false)
+      setGroceryPromptOpen(true)
+    }, 1200)
+  }
+
+  const handleAddToGrocery = () => {
+    if (!meal) return
+    for (const item of meal.shoppingList) {
+      addCustomItem({
+        name: item.name,
+        quantity: parseFloat(item.quantity) || 1,
+        unit: item.unit,
+        category: item.category,
+      })
+    }
+    setGroceryPromptOpen(false)
+    // Also store meal for recipe access later
+    sessionStorage.setItem('tonight-meal', JSON.stringify(meal))
+    router.push('/grocery-list')
+  }
+
+  const handleSkipGrocery = () => {
+    if (!meal) return
+    setGroceryPromptOpen(false)
+    // Store meal in sessionStorage for the recipe detail page
+    sessionStorage.setItem('tonight-meal', JSON.stringify(meal))
+    router.push('/tonight/recipe')
   }
 
   const handleSwap = () => {
@@ -154,6 +187,15 @@ export function OneShotSuggestion({ mode = 'tonight', title }: Props) {
   const handleOrder = () => {
     if (!meal) return
     sendSignal(meal.id, 'accepted', { mode, intent: 'order_ingredients' })
+    for (const item of meal.shoppingList) {
+      addCustomItem({
+        name: item.name,
+        quantity: parseFloat(item.quantity) || 1,
+        unit: item.unit,
+        category: item.category,
+      })
+    }
+    router.push('/grocery-list')
   }
 
   const headerTitle = title ?? (mode === 'surprise' ? 'Picked for you' : 'Tonight')
@@ -219,6 +261,16 @@ export function OneShotSuggestion({ mode = 'tonight', title }: Props) {
               transition={{ duration: 0.22 }}
               className="rounded-3xl border border-border/60 bg-white overflow-hidden shadow-sm"
             >
+              {/* Meal image */}
+              <div className="relative w-full h-48 bg-muted overflow-hidden">
+                <img
+                  src={`https://source.unsplash.com/800x400/?${encodeURIComponent(meal.title)},food`}
+                  alt={meal.title}
+                  className="w-full h-full object-cover"
+                  loading="eager"
+                />
+              </div>
+
               <div className="p-6">
                 <p className="text-[15px] text-foreground/80 leading-relaxed">{meal.description}</p>
 
@@ -335,6 +387,32 @@ export function OneShotSuggestion({ mode = 'tonight', title }: Props) {
               className="w-full text-sm text-muted-foreground py-2"
             >
               Keep exploring for free
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Grocery prompt after cook feedback */}
+      <Dialog open={groceryPromptOpen} onOpenChange={setGroceryPromptOpen}>
+        <DialogContent className="max-w-sm mx-auto">
+          <DialogHeader>
+            <DialogTitle className="text-lg">Add to grocery list? 🛒</DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground mt-1">
+              We can add the ingredients for <span className="font-semibold">{meal?.title}</span> to your grocery list.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4 flex flex-col gap-3">
+            <button
+              onClick={handleAddToGrocery}
+              className="w-full rounded-xl bg-gradient-to-r from-emerald-500 to-green-500 text-white font-semibold py-3 text-sm hover:from-emerald-600 hover:to-green-600 transition-all"
+            >
+              Yes, add ingredients
+            </button>
+            <button
+              onClick={handleSkipGrocery}
+              className="w-full text-sm text-muted-foreground py-2"
+            >
+              Skip, show me the recipe
             </button>
           </div>
         </DialogContent>

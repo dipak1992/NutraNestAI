@@ -142,11 +142,10 @@ export default function SignupPage() {
           </div>
         ))}
       </div>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <Button
+      <Button
           type="button"
           variant="outline"
-          className="w-full flex items-center gap-2"
+          className="w-full h-12 flex items-center justify-center gap-2"
           onClick={handleGoogleSignIn}
           disabled={googleLoading || loading}
         >
@@ -154,7 +153,7 @@ export default function SignupPage() {
           Continue with Google
         </Button>
 
-        <div className="relative">
+        <div className="relative my-4">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t border-border/50" />
           </div>
@@ -163,6 +162,7 @@ export default function SignupPage() {
           </div>
         </div>
 
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="space-y-1.5">
           <Label htmlFor="email">Email</Label>
           <Input id="email" type="email" placeholder="you@example.com" autoComplete="email" {...register('email')} />

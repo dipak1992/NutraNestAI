@@ -27,12 +27,12 @@ export function FamilyIntelligence() {
           className="w-full h-full object-cover opacity-20"
         />
         {/* Warm white veil so left-column text stays crisp */}
-        <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/70 to-background/40" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background/90 via-background/70 to-background/40" />
         {/* Subtle sage tint from top */}
-        <div className="absolute inset-0 bg-gradient-to-b from-orange-50/60 via-transparent to-background/80" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-orange-50/60 via-transparent to-background/80" />
       </div>
 
-      <div className="relative mx-auto max-w-5xl px-4 sm:px-6">
+      <div className="relative z-10 mx-auto max-w-5xl px-4 sm:px-6">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
           {/* ─── Left: copy + selector + CTA ─── */}

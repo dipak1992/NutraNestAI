@@ -18,7 +18,7 @@ const productLinks = [
 
 export function PublicSiteFooter() {
   return (
-    <footer className="border-t border-border/60 bg-muted/20 py-10">
+    <footer className="border-t border-border/60 bg-muted/20 py-10 pb-28 md:pb-10">
       <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
           <div className="max-w-sm">

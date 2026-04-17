@@ -48,7 +48,7 @@ function Hero() {
 
 
 
-      <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+      <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
           {/* Left: copy + CTAs */}

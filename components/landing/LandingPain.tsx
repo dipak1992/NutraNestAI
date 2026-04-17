@@ -77,11 +77,11 @@ export function LandingPain() {
           backgroundImage: `url('https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=1920&q=80')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          opacity: 0.06,
+          opacity: 0.20,
           filter: 'grayscale(100%)',
         }}
       />
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1] bg-white/88" />
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1] bg-white/60" />
       <div className="relative z-[2] mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Section header */}
         <motion.div

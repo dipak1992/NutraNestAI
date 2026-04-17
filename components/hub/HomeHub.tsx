@@ -239,13 +239,13 @@ export function HomeHub({ userName }: Props) {
   const handleCook = useCallback((m: SmartMealResult) => {
     recordLike(m)
     sendSignal(m.id, 'cooked', { mode: activeTile ?? 'tonight' })
-    posthog.capture('meal_cooked', { meal_id: m.id, meal_name: m.name, mode: activeTile ?? 'tonight' })
+    posthog.capture('meal_cooked', { meal_id: m.id, meal_name: m.title, mode: activeTile ?? 'tonight' })
   }, [recordLike, activeTile])
 
   const handleSwap = useCallback(async (m: SmartMealResult) => {
     recordReject(m)
     sendSignal(m.id, 'swapped', { mode: activeTile ?? 'tonight' })
-    posthog.capture('meal_swapped', { meal_id: m.id, meal_name: m.name, mode: activeTile ?? 'tonight', active_chip: activeChip })
+    posthog.capture('meal_swapped', { meal_id: m.id, meal_name: m.title, mode: activeTile ?? 'tonight', active_chip: activeChip })
     setSwapping(true)
 
     const chipOverrides = activeChip ? chipToOverrides(activeChip) : {}

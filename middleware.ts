@@ -1,11 +1,11 @@
 import { updateSession } from '@/lib/supabase/middleware'
 import { NextResponse, type NextRequest } from 'next/server'
 
-function buildCsp(nonce: string) {
+function buildCsp() {
   return [
     `default-src 'self'`,
-    `script-src 'self' 'nonce-${nonce}' https://*.posthog.com https://*.sentry.io`,
-    `style-src 'self' 'nonce-${nonce}'`,
+    `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.posthog.com https://*.sentry.io`,
+    `style-src 'self' 'unsafe-inline'`,
     `img-src 'self' data: blob: https:`,
     `font-src 'self' data:`,
     `connect-src 'self' https://*.supabase.co https://*.posthog.com https://*.sentry.io https://api.resend.com https://api.openai.com https://api.anthropic.com`,
@@ -14,17 +14,14 @@ function buildCsp(nonce: string) {
 }
 
 export async function middleware(request: NextRequest) {
-  const nonce = Buffer.from(crypto.randomUUID()).toString('base64')
-  request.headers.set('x-nonce', nonce)
-
   try {
     const response = await updateSession(request)
-    response.headers.set('Content-Security-Policy', buildCsp(nonce))
+    response.headers.set('Content-Security-Policy', buildCsp())
     return response
   } catch {
     // Supabase unavailable (e.g. missing env vars) — pass through
     const response = NextResponse.next()
-    response.headers.set('Content-Security-Policy', buildCsp(nonce))
+    response.headers.set('Content-Security-Policy', buildCsp())
     return response
   }
 }

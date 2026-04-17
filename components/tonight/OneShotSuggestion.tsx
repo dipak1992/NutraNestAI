@@ -262,13 +262,19 @@ export function OneShotSuggestion({ mode = 'tonight', title }: Props) {
               className="rounded-3xl border border-border/60 bg-white overflow-hidden shadow-sm"
             >
               {/* Meal image */}
-              <div className="relative w-full h-48 bg-muted overflow-hidden">
-                <img
-                  src={`https://source.unsplash.com/800x400/?${encodeURIComponent(meal.title)},food`}
-                  alt={meal.title}
-                  className="w-full h-full object-cover"
-                  loading="eager"
-                />
+              <div className="relative w-full h-48 overflow-hidden">
+                {meal.imageUrl ? (
+                  <img
+                    src={meal.imageUrl}
+                    alt={meal.title}
+                    className="w-full h-full object-cover"
+                    loading="eager"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-emerald-100 via-amber-50 to-orange-100 flex items-center justify-center">
+                    <span className="text-6xl">🍽️</span>
+                  </div>
+                )}
               </div>
 
               <div className="p-6">

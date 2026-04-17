@@ -111,12 +111,18 @@ export default function TonightRecipePage() {
         </div>
 
         {/* Meal image */}
-        <div className="relative w-full h-64 rounded-2xl overflow-hidden mb-8 bg-muted">
-          <img
-            src={`https://source.unsplash.com/800x400/?${encodeURIComponent(meal.title)},food`}
-            alt={meal.title}
-            className="w-full h-full object-cover"
-          />
+        <div className="relative w-full h-64 rounded-2xl overflow-hidden mb-8">
+          {meal.imageUrl ? (
+            <img
+              src={meal.imageUrl}
+              alt={meal.title}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-emerald-100 via-amber-50 to-orange-100 flex items-center justify-center">
+              <span className="text-7xl">🍽️</span>
+            </div>
+          )}
         </div>
 
         {meal.description && (

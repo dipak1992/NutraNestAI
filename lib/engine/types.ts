@@ -102,6 +102,7 @@ export interface SmartMealResult {
   tagline: string
   description: string
   cuisineType: string
+  imageUrl?: string
   prepTime: number
   cookTime: number
   totalTime: number

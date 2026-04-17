@@ -20,6 +20,7 @@ export default function WeekendModeClient({ initialData }: WeekendModeClientProp
   const [swappingEnt, setSwappingEnt] = useState(false)
   const [saved, setSaved] = useState(false)
   const [usedTonight, setUsedTonight] = useState(false)
+  const [recipeExpanded, setRecipeExpanded] = useState(false)
 
   const fetchNew = useCallback(
     async (opts: { swapMeal?: boolean; swapEntertainment?: boolean }) => {
@@ -116,6 +117,82 @@ export default function WeekendModeClient({ initialData }: WeekendModeClientProp
             {meal.ingredients.length > 5 ? ` +${meal.ingredients.length - 5} more` : ''}
           </p>
         </div>
+
+        {/* Expandable recipe details */}
+        <button
+          onClick={() => setRecipeExpanded(prev => !prev)}
+          className="mt-3 w-full text-left text-xs font-semibold text-amber-600 hover:text-amber-800 transition-colors"
+        >
+          {recipeExpanded ? '▾ Hide recipe details' : '▸ Show recipe details'}
+        </button>
+
+        {recipeExpanded && (
+          <div className="mt-3 space-y-4 border-t border-amber-200 pt-3">
+            {/* Full ingredients */}
+            <div>
+              <p className="text-xs font-bold text-amber-800 mb-1.5">🧾 All Ingredients</p>
+              <ul className="space-y-1">
+                {meal.ingredients.map((ing, i) => (
+                  <li key={i} className="text-xs text-amber-900/80 flex items-start gap-1.5">
+                    <span className="text-amber-500 mt-0.5">•</span>
+                    <span>
+                      <span className="font-medium">{ing.quantity} {ing.unit}</span> {ing.name}
+                      {ing.note && <span className="text-amber-600/70 ml-1">({ing.note})</span>}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Steps */}
+            {meal.steps && meal.steps.length > 0 && (
+              <div>
+                <p className="text-xs font-bold text-amber-800 mb-1.5">👩‍🍳 Steps</p>
+                <ol className="space-y-2">
+                  {meal.steps.map((step, i) => (
+                    <li key={i} className="text-xs text-amber-900/80 flex gap-2">
+                      <span className="flex-shrink-0 w-5 h-5 rounded-full bg-amber-200 text-amber-800 flex items-center justify-center text-[10px] font-bold">
+                        {i + 1}
+                      </span>
+                      <span className="pt-0.5">{step}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )}
+
+            {/* Variations */}
+            {meal.variations && meal.variations.length > 0 && (
+              <div>
+                <p className="text-xs font-bold text-amber-800 mb-1.5">👨‍👩‍👧‍👦 Family Variations</p>
+                <div className="space-y-2">
+                  {meal.variations.map((v, i) => (
+                    <div key={i} className="rounded-lg bg-amber-100/50 border border-amber-200/60 p-2.5">
+                      <p className="text-xs font-semibold text-amber-900">
+                        {v.emoji} {v.label} <span className="text-amber-600 font-normal capitalize">({v.stage})</span>
+                      </p>
+                      {v.description && <p className="text-xs text-amber-800/70 mt-0.5">{v.description}</p>}
+                      {v.modifications.length > 0 && (
+                        <ul className="mt-1 space-y-0.5">
+                          {v.modifications.map((mod, j) => (
+                            <li key={j} className="text-xs text-amber-800/60">• {mod}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Leftover tip */}
+            {meal.leftoverTip && (
+              <p className="text-xs text-amber-700 bg-amber-100/40 rounded-lg p-2">
+                🥡 <span className="font-semibold">Leftover tip:</span> {meal.leftoverTip}
+              </p>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Entertainment card */}

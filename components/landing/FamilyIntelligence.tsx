@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { Check, ChevronRight, ShieldCheck, Utensils } from 'lucide-react'
 
 const TRUST_BULLETS = [
@@ -10,12 +10,6 @@ const TRUST_BULLETS = [
 ]
 
 export function FamilyIntelligence() {
-  const router = useRouter()
-
-  function handleCta() {
-    router.push('/tonight?mode=surprise')
-  }
-
   return (
     <section id="family" className="relative py-20 sm:py-24 overflow-hidden">
       {/* Background photo */}
@@ -49,13 +43,13 @@ export function FamilyIntelligence() {
             </p>
 
             {/* CTA */}
-            <button
-              onClick={handleCta}
+            <Link
+              href="/tonight?mode=tired"
               className="inline-flex items-center gap-2 rounded-xl bg-primary px-7 py-3.5 text-sm font-semibold text-white shadow-md hover:bg-primary/90 transition-colors"
             >
               See how it adapts your meals
               <ChevronRight className="h-4 w-4" />
-            </button>
+            </Link>
 
             {/* Trust bullets */}
             <ul className="mt-8 space-y-2">

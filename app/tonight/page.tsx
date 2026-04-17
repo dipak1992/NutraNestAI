@@ -310,11 +310,13 @@ function TonightPageInner() {
   const [authRequired, setAuthRequired] = useState(false)
   const [userInput, setUserInput] = useState('')
   const [inputSubmitted, setInputSubmitted] = useState(false)
-  const { status } = usePaywallStatus()
+  const { status, loading: paywallLoading } = usePaywallStatus()
   const [swipesUsed, setSwipesUsed] = useState(0)
   const [paywallOpen, setPaywallOpen] = useState(false)
   const [meal, setMeal] = useState<SmartMealResult | null>(null)
   const seenIdsRef = useRef<string[]>([])
+  const animationDoneRef = useRef(false)
+  const fetchPendingRef = useRef(false)
   const { getBoosts } = useLearningStore()
   const hasLearning = !!getBoosts()?.cuisineBoost && Object.keys(getBoosts()?.cuisineBoost ?? {}).length > 0
 
@@ -330,6 +332,8 @@ function TonightPageInner() {
   const fetchMeal = useCallback(async (ingredientText?: string) => {
     setLoading(true)
     setAuthRequired(false)
+    animationDoneRef.current = false
+    fetchPendingRef.current = true
     try {
       const boosts = getBoosts()
       const body: Record<string, unknown> = {
@@ -355,22 +359,36 @@ function TonightPageInner() {
         setMeal(data)
         seenIdsRef.current = [...seenIdsRef.current, data.id]
         try { sessionStorage.setItem('tonight-seen-ids', JSON.stringify(seenIdsRef.current)) } catch {}
+        fetchPendingRef.current = false
+        if (animationDoneRef.current) setLoading(false)
       } else if (res.status === 401) {
         setAuthRequired(true)
+        fetchPendingRef.current = false
+        if (animationDoneRef.current) setLoading(false)
       } else {
+        fetchPendingRef.current = false
         setLoading(false)
       }
     } catch {
+      fetchPendingRef.current = false
       setLoading(false)
     }
   }, [mode, getBoosts])
 
-  // Fetch on mount and mode change (skip if mode needs user input first)
+  // Fetch once auth is confirmed and mode doesn't need input
   useEffect(() => {
-    if (!needsInput) {
+    if (!needsInput && !paywallLoading && status.isAuthenticated) {
       fetchMeal()
     }
-  }, [mode, needsInput]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [mode, needsInput, paywallLoading, status.isAuthenticated]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // For unauthenticated users: skip loading animation and show auth prompt immediately
+  useEffect(() => {
+    if (!paywallLoading && !status.isAuthenticated && loading) {
+      setLoading(false)
+      setAuthRequired(true)
+    }
+  }, [paywallLoading, status.isAuthenticated, loading]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleInputSubmit = useCallback((value: string) => {
     setUserInput(value)
@@ -462,7 +480,7 @@ function TonightPageInner() {
               </div>
             </motion.div>
           ) : loading ? (
-            <LoadingPhase key="loading" onComplete={() => setLoading(false)} mode={mode} hasLearning={hasLearning} />
+            <LoadingPhase key="loading" onComplete={() => { animationDoneRef.current = true; if (!fetchPendingRef.current) setLoading(false) }} mode={mode} hasLearning={hasLearning} />
           ) : meal ? (
             <motion.div
               key="result"
@@ -710,8 +728,9 @@ function TonightPageInner() {
 export default function TonightPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <Sparkles className="h-8 w-8 text-primary animate-spin" />
+      <div className="min-h-screen flex flex-col items-center justify-center gap-3">
+        <Sparkles className="h-10 w-10 text-primary animate-spin" />
+        <p className="text-sm text-muted-foreground">Finding your dinner idea…</p>
       </div>
     }>
       <TonightPageInner />

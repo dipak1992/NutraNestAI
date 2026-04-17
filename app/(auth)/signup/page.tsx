@@ -107,15 +107,24 @@ export default function SignupPage() {
 
   async function handleGoogleSignIn() {
     setGoogleLoading(true)
-    const supabase = createClient()
-    // Note: Google provider must be enabled in Supabase dashboard → Authentication → Providers → Google
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
-      },
-    })
-    setGoogleLoading(false)
+    try {
+      const supabase = createClient()
+      // Note: Google provider must be enabled in Supabase dashboard → Authentication → Providers → Google
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
+        },
+      })
+      if (error) {
+        toast.error('Could not sign in with Google. Please try again.')
+        setGoogleLoading(false)
+      }
+      // On success the browser redirects — setGoogleLoading is intentionally not called
+    } catch {
+      toast.error('Something went wrong. Please try again.')
+      setGoogleLoading(false)
+    }
   }
 
   const refCode = typeof window !== 'undefined'

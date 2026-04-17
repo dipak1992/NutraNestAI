@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState, useRef } from 'react'
 import { useWeeklyPlanStore } from '@/lib/planner/store'
 import { CATEGORY_ORDER, GROCERY_ICONS, WALMART_AISLES } from '@/lib/planner/types'
 import type { GroceryLine, StoreFormat } from '@/lib/planner/types'
@@ -16,6 +16,12 @@ import {
   Store,
   Package,
   Info,
+  Trash2,
+  X,
+  Plus,
+  Pencil,
+  Check,
+  StickyNote,
 } from 'lucide-react'
 import {
   Tooltip,
@@ -38,97 +44,253 @@ function GroceryItemRow({
   item,
   onToggleChecked,
   onTogglePantry,
+  onDelete,
+  onUpdate,
 }: {
   item: GroceryLine
   onToggleChecked: (id: string) => void
   onTogglePantry: (id: string) => void
+  onDelete: (id: string) => void
+  onUpdate: (id: string, updates: Partial<GroceryLine>) => void
 }) {
+  const [isEditing, setIsEditing] = useState(false)
+  const [editName, setEditName] = useState(item.name)
+  const [editQty, setEditQty] = useState(String(item.quantity))
+  const [editUnit, setEditUnit] = useState(item.unit)
+  const [showNote, setShowNote] = useState(false)
+  const [noteText, setNoteText] = useState(item.note ?? '')
+  const nameRef = useRef<HTMLInputElement>(null)
+
   const qty = item.quantity % 1 === 0 ? String(item.quantity) : item.quantity.toFixed(2)
 
+  function startEdit() {
+    setEditName(item.name)
+    setEditQty(String(item.quantity))
+    setEditUnit(item.unit)
+    setIsEditing(true)
+    setTimeout(() => nameRef.current?.focus(), 0)
+  }
+
+  function saveEdit() {
+    const parsedQty = parseFloat(editQty)
+    if (editName.trim() && parsedQty > 0) {
+      onUpdate(item.id, {
+        name: editName.trim(),
+        quantity: parsedQty,
+        unit: editUnit.trim(),
+      })
+    }
+    setIsEditing(false)
+  }
+
+  function saveNote() {
+    onUpdate(item.id, { note: noteText.trim() || undefined })
+    setShowNote(false)
+  }
+
+  if (isEditing) {
+    return (
+      <div className="flex items-center gap-2 py-2 px-1 rounded-lg bg-muted/50">
+        <input
+          ref={nameRef}
+          value={editName}
+          onChange={(e) => setEditName(e.target.value)}
+          className="flex-1 min-w-0 text-sm font-medium bg-transparent border-b border-primary/40 focus:border-primary outline-none px-1 py-0.5"
+          onKeyDown={(e) => e.key === 'Enter' && saveEdit()}
+          placeholder="Item name"
+        />
+        <input
+          value={editQty}
+          onChange={(e) => setEditQty(e.target.value)}
+          className="w-14 text-sm bg-transparent border-b border-primary/40 focus:border-primary outline-none text-center px-1 py-0.5"
+          onKeyDown={(e) => e.key === 'Enter' && saveEdit()}
+          placeholder="Qty"
+          type="number"
+          step="any"
+          min="0"
+        />
+        <input
+          value={editUnit}
+          onChange={(e) => setEditUnit(e.target.value)}
+          className="w-16 text-sm bg-transparent border-b border-primary/40 focus:border-primary outline-none px-1 py-0.5"
+          onKeyDown={(e) => e.key === 'Enter' && saveEdit()}
+          placeholder="Unit"
+        />
+        <button type="button" onClick={saveEdit} className="p-1 text-emerald-600 hover:text-emerald-700">
+          <Check className="h-4 w-4" />
+        </button>
+        <button type="button" onClick={() => setIsEditing(false)} className="p-1 text-muted-foreground hover:text-foreground">
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+    )
+  }
+
   return (
-    <div
-      className={cn(
-        'flex items-start gap-3 py-2 px-1 rounded-lg transition-colors group',
-        item.isChecked && 'opacity-50',
-        item.isInPantry && 'bg-emerald-50/50',
-      )}
-    >
-      {/* Checkbox */}
-      <Checkbox
-        id={item.id}
-        checked={item.isChecked}
-        onCheckedChange={() => onToggleChecked(item.id)}
-        className="mt-0.5 flex-shrink-0"
-      />
-
-      {/* Content */}
-      <div className="flex-1 min-w-0">
-        <label
-          htmlFor={item.id}
-          className={cn(
-            'text-sm font-medium cursor-pointer leading-snug flex items-center gap-1.5 flex-wrap',
-            item.isChecked && 'line-through text-muted-foreground',
-          )}
-        >
-          <span>{item.name}</span>
-
-          {/* Pantry badge */}
-          {item.isInPantry && (
-            <Badge variant="outline" className="text-[10px] py-0 px-1.5 text-emerald-700 border-emerald-300 bg-emerald-50">
-              <Leaf className="h-2.5 w-2.5 mr-0.5" />pantry
-            </Badge>
-          )}
-
-          {/* Cart integration placeholder (future) */}
-          {/* <Button variant="ghost" size="sm">Add to Cart</Button> */}
-        </label>
-
-        {/* Quantity + unit */}
-        <p className="text-xs text-muted-foreground mt-0.5">
-          {qty} {item.unit}
-          {item.walmartAisle && (
-            <span className="ml-2 text-blue-600">{item.walmartAisle}</span>
-          )}
-          {item.costcoBulkNote && (
-            <span className="ml-2 text-orange-600">{item.costcoBulkNote}</span>
-          )}
-        </p>
-
-        {/* From meals tooltip */}
-        {item.fromMeals.length > 0 && (
-          <p className="text-[11px] text-muted-foreground/70 mt-0.5">
-            For: {item.fromMeals.join(', ')}
-          </p>
+    <div className="space-y-0">
+      <div
+        className={cn(
+          'flex items-start gap-3 py-2 px-1 rounded-lg transition-colors group',
+          item.isChecked && 'opacity-50',
+          item.isInPantry && 'bg-emerald-50/50',
         )}
+      >
+        {/* Checkbox */}
+        <Checkbox
+          id={item.id}
+          checked={item.isChecked}
+          onCheckedChange={() => onToggleChecked(item.id)}
+          className="mt-0.5 flex-shrink-0"
+        />
+
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          <label
+            htmlFor={item.id}
+            className={cn(
+              'text-sm font-medium cursor-pointer leading-snug flex items-center gap-1.5 flex-wrap',
+              item.isChecked && 'line-through text-muted-foreground',
+            )}
+          >
+            <span>{item.name}</span>
+
+            {/* Custom badge */}
+            {item.isCustom && (
+              <Badge variant="outline" className="text-[10px] py-0 px-1.5 text-violet-700 border-violet-300 bg-violet-50">
+                custom
+              </Badge>
+            )}
+
+            {/* Pantry badge */}
+            {item.isInPantry && (
+              <Badge variant="outline" className="text-[10px] py-0 px-1.5 text-emerald-700 border-emerald-300 bg-emerald-50">
+                <Leaf className="h-2.5 w-2.5 mr-0.5" />pantry
+              </Badge>
+            )}
+          </label>
+
+          {/* Quantity + unit */}
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {qty} {item.unit}
+            {item.walmartAisle && (
+              <span className="ml-2 text-blue-600">{item.walmartAisle}</span>
+            )}
+            {item.costcoBulkNote && (
+              <span className="ml-2 text-orange-600">{item.costcoBulkNote}</span>
+            )}
+          </p>
+
+          {/* Note */}
+          {item.note && (
+            <p className="text-[11px] text-violet-600 mt-0.5 italic">📝 {item.note}</p>
+          )}
+
+          {/* From meals tooltip */}
+          {item.fromMeals.length > 0 && (
+            <p className="text-[11px] text-muted-foreground/70 mt-0.5">
+              For: {item.fromMeals.join(', ')}
+            </p>
+          )}
+        </div>
+
+        {/* Cost */}
+        {item.estimatedCost > 0 && (
+          <span className="text-xs text-muted-foreground flex-shrink-0 mt-0.5">
+            ~${item.estimatedCost.toFixed(2)}
+          </span>
+        )}
+
+        {/* Action buttons — visible on hover */}
+        <div className="flex items-center gap-0.5 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+          {/* Edit */}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger
+                type="button"
+                onClick={startEdit}
+                className="p-1 rounded-md text-muted-foreground hover:text-primary"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </TooltipTrigger>
+              <TooltipContent side="top" className="text-xs">Edit item</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          {/* Note */}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger
+                type="button"
+                onClick={() => setShowNote(!showNote)}
+                className={cn(
+                  'p-1 rounded-md',
+                  item.note ? 'text-violet-600' : 'text-muted-foreground hover:text-violet-600',
+                )}
+              >
+                <StickyNote className="h-3.5 w-3.5" />
+              </TooltipTrigger>
+              <TooltipContent side="top" className="text-xs">
+                {item.note ? 'Edit note' : 'Add note'}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          {/* Pantry toggle */}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger
+                type="button"
+                onClick={() => onTogglePantry(item.id)}
+                className={cn(
+                  'p-1 rounded-md',
+                  item.isInPantry
+                    ? 'text-emerald-600'
+                    : 'text-muted-foreground hover:text-emerald-600',
+                )}
+              >
+                <Leaf className="h-3.5 w-3.5" />
+              </TooltipTrigger>
+              <TooltipContent side="top" className="text-xs">
+                {item.isInPantry ? 'Remove from pantry' : 'Mark as in pantry'}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          {/* Delete */}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger
+                type="button"
+                onClick={() => onDelete(item.id)}
+                className="p-1 rounded-md text-muted-foreground hover:text-red-600"
+              >
+                <X className="h-3.5 w-3.5" />
+              </TooltipTrigger>
+              <TooltipContent side="top" className="text-xs">Remove item</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
       </div>
 
-      {/* Cost */}
-      {item.estimatedCost > 0 && (
-        <span className="text-xs text-muted-foreground flex-shrink-0 mt-0.5">
-          ~${item.estimatedCost.toFixed(2)}
-        </span>
+      {/* Note editor */}
+      {showNote && (
+        <div className="flex items-center gap-2 pl-9 pb-2">
+          <input
+            value={noteText}
+            onChange={(e) => setNoteText(e.target.value)}
+            className="flex-1 text-xs bg-muted/50 border border-border rounded-md px-2 py-1 outline-none focus:ring-1 focus:ring-primary/30"
+            placeholder="Add a note (e.g. buy organic)"
+            onKeyDown={(e) => e.key === 'Enter' && saveNote()}
+            autoFocus
+          />
+          <button type="button" onClick={saveNote} className="text-xs text-primary font-medium hover:underline">
+            Save
+          </button>
+          <button type="button" onClick={() => setShowNote(false)} className="text-xs text-muted-foreground hover:underline">
+            Cancel
+          </button>
+        </div>
       )}
-
-      {/* Pantry toggle */}
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger
-              type="button"
-              onClick={() => onTogglePantry(item.id)}
-              className={cn(
-                'flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-md',
-                item.isInPantry
-                  ? 'text-emerald-600 opacity-100'
-                  : 'text-muted-foreground hover:text-emerald-600',
-              )}
-            >
-              <Leaf className="h-3.5 w-3.5" />
-          </TooltipTrigger>
-          <TooltipContent side="left" className="text-xs">
-            {item.isInPantry ? 'Remove from pantry' : 'Mark as in pantry'}
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
     </div>
   )
 }
@@ -141,12 +303,16 @@ function CategorySection({
   onCheckAll,
   onToggleChecked,
   onTogglePantry,
+  onDelete,
+  onUpdate,
 }: {
   category: string
   items: GroceryLine[]
-  onCheckAll: (cat: string) => void
+  onCheckAll: (category: string) => void
   onToggleChecked: (id: string) => void
   onTogglePantry: (id: string) => void
+  onDelete: (id: string) => void
+  onUpdate: (id: string, updates: Partial<GroceryLine>) => void
 }) {
   const icon = GROCERY_ICONS[category] ?? '🛒'
   const allChecked = items.every((i) => i.isChecked)
@@ -186,6 +352,8 @@ function CategorySection({
           item={item}
           onToggleChecked={onToggleChecked}
           onTogglePantry={onTogglePantry}
+          onDelete={onDelete}
+          onUpdate={onUpdate}
         />
       ))}
     </div>
@@ -204,7 +372,18 @@ export function GroceryListPanel() {
     checkAllInCategory,
     uncheckAll,
     clearGrocery,
+    addCustomItem,
+    deleteItem,
+    updateItem,
+    clearCheckedItems,
   } = useWeeklyPlanStore()
+
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [newName, setNewName] = useState('')
+  const [newQty, setNewQty] = useState('1')
+  const [newUnit, setNewUnit] = useState('')
+  const [newCategory, setNewCategory] = useState('other')
+  const [newNote, setNewNote] = useState('')
 
   // Group items by category, sorted by CATEGORY_ORDER
   const grouped = useMemo(() => {
@@ -285,6 +464,17 @@ export function GroceryListPanel() {
             <CheckCheck className="h-3.5 w-3.5 mr-1.5" />
             Check all
           </Button>
+          {checkedCount > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={clearCheckedItems}
+              className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+            >
+              <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+              Clear checked ({checkedCount})
+            </Button>
+          )}
         </div>
       </div>
 
@@ -332,8 +522,113 @@ export function GroceryListPanel() {
             onCheckAll={checkAllInCategory}
             onToggleChecked={toggleChecked}
             onTogglePantry={togglePantryItem}
+            onDelete={deleteItem}
+            onUpdate={updateItem}
           />
         ))}
+      </div>
+
+      {/* ── Add custom item ── */}
+      <div className="space-y-2">
+        {!showAddForm ? (
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full border-dashed"
+            onClick={() => setShowAddForm(true)}
+          >
+            <Plus className="h-4 w-4 mr-1.5" />
+            Add custom item
+          </Button>
+        ) : (
+          <div className="rounded-xl border border-border bg-muted/30 p-3 space-y-3">
+            <div className="flex items-center gap-2">
+              <Plus className="h-4 w-4 text-primary flex-shrink-0" />
+              <span className="text-sm font-semibold">Add Custom Item</span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <input
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                placeholder="Item name *"
+                className="col-span-2 text-sm bg-background border border-border rounded-lg px-3 py-1.5 outline-none focus:ring-1 focus:ring-primary/30"
+                autoFocus
+              />
+              <input
+                value={newQty}
+                onChange={(e) => setNewQty(e.target.value)}
+                placeholder="Qty"
+                type="number"
+                min="0"
+                step="any"
+                className="text-sm bg-background border border-border rounded-lg px-3 py-1.5 outline-none focus:ring-1 focus:ring-primary/30"
+              />
+              <input
+                value={newUnit}
+                onChange={(e) => setNewUnit(e.target.value)}
+                placeholder="Unit (e.g. lbs)"
+                className="text-sm bg-background border border-border rounded-lg px-3 py-1.5 outline-none focus:ring-1 focus:ring-primary/30"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <select
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
+                className="text-sm bg-background border border-border rounded-lg px-3 py-1.5 outline-none focus:ring-1 focus:ring-primary/30"
+              >
+                {CATEGORY_ORDER.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {GROCERY_ICONS[cat] ?? '🛒'} {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                  </option>
+                ))}
+              </select>
+              <input
+                value={newNote}
+                onChange={(e) => setNewNote(e.target.value)}
+                placeholder="Note (optional)"
+                className="text-sm bg-background border border-border rounded-lg px-3 py-1.5 outline-none focus:ring-1 focus:ring-primary/30"
+              />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setShowAddForm(false)
+                  setNewName('')
+                  setNewQty('1')
+                  setNewUnit('')
+                  setNewCategory('other')
+                  setNewNote('')
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                disabled={!newName.trim()}
+                onClick={() => {
+                  addCustomItem({
+                    name: newName.trim(),
+                    quantity: parseFloat(newQty) || 1,
+                    unit: newUnit.trim() || 'unit',
+                    category: newCategory,
+                    note: newNote.trim() || undefined,
+                  })
+                  setNewName('')
+                  setNewQty('1')
+                  setNewUnit('')
+                  setNewCategory('other')
+                  setNewNote('')
+                  // Keep form open for adding multiple items
+                }}
+              >
+                <Plus className="h-3.5 w-3.5 mr-1" />
+                Add Item
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ── Footer cost summary ── */}

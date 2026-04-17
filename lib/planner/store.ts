@@ -5,7 +5,7 @@
 
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { WeekDay, WeeklyPlan, GroceryList, StoreFormat } from './types'
+import type { WeekDay, WeeklyPlan, GroceryList, GroceryLine, StoreFormat } from './types'
 import { reformatGroceryList } from './grocery'
 
 // ── Helpers ───────────────────────────────────────────────────
@@ -64,6 +64,10 @@ interface WeeklyPlanStore {
   checkAllInCategory: (category: string) => void
   uncheckAll: () => void
   clearGrocery: () => void
+  addCustomItem: (item: { name: string; quantity: number; unit: string; category: string; note?: string }) => void
+  deleteItem: (id: string) => void
+  updateItem: (id: string, updates: Partial<GroceryLine>) => void
+  clearCheckedItems: () => void
 
   // Loading flags
   setIsGeneratingWeek: (v: boolean) => void
@@ -142,6 +146,90 @@ export const useWeeklyPlanStore = create<WeeklyPlanStore>()(
           }
         }),
       clearGrocery: () => set({ groceryList: null }),
+      addCustomItem: (item) =>
+        set((s) => {
+          const list = s.groceryList
+          if (!list) {
+            // Create a new list if none exists
+            const newList: GroceryList = {
+              weekStart: s.plan.weekStart,
+              items: [{
+                id: `custom-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+                name: item.name,
+                quantity: item.quantity,
+                unit: item.unit,
+                category: item.category,
+                estimatedCost: 0,
+                fromMeals: [],
+                isInPantry: false,
+                isChecked: false,
+                isCustom: true,
+                note: item.note,
+              }],
+              totalEstimatedCost: 0,
+              generatedAt: new Date().toISOString(),
+              storeFormat: s.storeFormat,
+            }
+            return { groceryList: newList }
+          }
+          return {
+            groceryList: {
+              ...list,
+              items: [
+                ...list.items,
+                {
+                  id: `custom-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+                  name: item.name,
+                  quantity: item.quantity,
+                  unit: item.unit,
+                  category: item.category,
+                  estimatedCost: 0,
+                  fromMeals: [],
+                  isInPantry: false,
+                  isChecked: false,
+                  isCustom: true,
+                  note: item.note,
+                },
+              ],
+            },
+          }
+        }),
+      deleteItem: (id) =>
+        set((s) => {
+          if (!s.groceryList) return s
+          const items = s.groceryList.items.filter((item) => item.id !== id)
+          return {
+            groceryList: {
+              ...s.groceryList,
+              items,
+              totalEstimatedCost: items.reduce((sum, i) => sum + i.estimatedCost, 0),
+            },
+          }
+        }),
+      updateItem: (id, updates) =>
+        set((s) => {
+          if (!s.groceryList) return s
+          return {
+            groceryList: {
+              ...s.groceryList,
+              items: s.groceryList.items.map((item) =>
+                item.id === id ? { ...item, ...updates } : item
+              ),
+            },
+          }
+        }),
+      clearCheckedItems: () =>
+        set((s) => {
+          if (!s.groceryList) return s
+          const items = s.groceryList.items.filter((item) => !item.isChecked)
+          return {
+            groceryList: {
+              ...s.groceryList,
+              items,
+              totalEstimatedCost: items.reduce((sum, i) => sum + i.estimatedCost, 0),
+            },
+          }
+        }),
       setIsGeneratingWeek: (v) => set({ isGeneratingWeek: v }),
       setGeneratingDayIndex: (i) => set({ generatingDayIndex: i }),
     }),

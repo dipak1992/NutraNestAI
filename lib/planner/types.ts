@@ -38,6 +38,8 @@ export interface GroceryLine {
   fromMeals: string[]   // meal titles that need this ingredient
   isInPantry: boolean   // user owns this already
   isChecked: boolean    // has been picked up
+  isCustom?: boolean    // manually added by user
+  note?: string         // optional user note (e.g. "buy organic")
   // Store-specific metadata
   walmartAisle?: string
   costcoBulkNote?: string

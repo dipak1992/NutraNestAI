@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServiceClient } from '@/lib/supabase/service'
 import { sendDinnerReminderEmail, sendWeeklyReminderEmail, sendWeekendReminderEmail, sendAdminWeeklySummary } from '@/lib/email/triggers'
+import { isDinnerReminderDue, isWeeklyReminderDue, isWeekendReminderDue } from '@/lib/email/scheduler'
 
 /**
  * Cron endpoint — called by Vercel Cron or any scheduler.
  *
- * Schedule examples (vercel.json):
- *   Daily reminders:  "0 21 * * *"    (21 UTC = 4–6 PM across US timezones)
- *   Weekly summary:   "0 9 * * MON"   (Monday 9 AM UTC)
+ * Schedule (vercel.json):
+ *   Dinner:        "0 * * * *"    (hourly — timezone-aware per user via isDinnerReminderDue)
+ *   Weekly:        "0 0 * * *"    (daily midnight UTC — timezone-aware per user)
+ *   Weekend:       "0 17 * * 5"   (Friday 5 PM UTC)
+ *   Admin summary: "0 10 * * 1"   (Monday 10 AM UTC)
  *
  * Protected by CRON_SECRET env var.
  */
@@ -24,28 +27,41 @@ export async function GET(request: NextRequest) {
   const type = request.nextUrl.searchParams.get('type') ?? 'dinner'
   const supabase = createSupabaseServiceClient()
 
-  if (type === 'dinner') {
-    return handleDinnerReminders(supabase)
-  } else if (type === 'weekly') {
-    return handleWeeklyReminders(supabase)
-  } else if (type === 'weekend') {
-    return handleWeekendReminders(supabase)
-  } else if (type === 'admin-summary') {
-    return handleAdminSummary(supabase)
-  }
+  if (type === 'dinner') return handleDinnerReminders(supabase)
+  if (type === 'weekly') return handleWeeklyReminders(supabase)
+  if (type === 'weekend') return handleWeekendReminders(supabase)
+  if (type === 'admin-summary') return handleAdminSummary(supabase)
 
   return NextResponse.json({ error: 'Unknown type' }, { status: 400 })
 }
 
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+type SupabaseClient = ReturnType<typeof createSupabaseServiceClient>
+type ProfileRow = { user_id: string; email: string; first_name: string | null; is_pro?: boolean }
+
+/** Batch-fetch profiles for a list of user IDs. Returns a map keyed by user_id. */
+async function batchFetchProfiles(
+  supabase: SupabaseClient,
+  userIds: string[],
+  includePro = false,
+): Promise<Record<string, ProfileRow>> {
+  if (!userIds.length) return {}
+  const select = includePro ? 'user_id, email, first_name, is_pro' : 'user_id, email, first_name'
+  const { data } = await supabase.from('profiles').select(select).in('user_id', userIds)
+  return Object.fromEntries(((data as unknown as ProfileRow[]) ?? []).map((p: ProfileRow) => [p.user_id, p]))
+}
+
 // ─── Dinner reminders ────────────────────────────────────────────────────────
 
-async function handleDinnerReminders(supabase: ReturnType<typeof createSupabaseServiceClient>) {
-  // Get users with dinner reminders enabled
+async function handleDinnerReminders(supabase: SupabaseClient) {
   const { data: users, error } = await supabase
     .from('reminder_schedules')
     .select(`
       user_id,
+      dinner_enabled,
       dinner_hour,
+      timezone,
       last_dinner_sent_at,
       notification_preferences!inner(dinner_reminders)
     `)
@@ -57,29 +73,16 @@ async function handleDinnerReminders(supabase: ReturnType<typeof createSupabaseS
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  const today = new Date().toISOString().slice(0, 10)
+  const profileMap = await batchFetchProfiles(supabase, (users ?? []).map(u => u.user_id))
+
   let sent = 0
   let skipped = 0
 
   for (const row of (users ?? [])) {
-    // Skip if already sent today
-    const lastSent = row.last_dinner_sent_at?.slice(0, 10)
-    if (lastSent === today) {
-      skipped++
-      continue
-    }
+    if (!isDinnerReminderDue(row)) { skipped++; continue }
 
-    // Get user profile for name / email
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('email, first_name')
-      .eq('user_id', row.user_id)
-      .maybeSingle()
-
-    if (!profile?.email) {
-      skipped++
-      continue
-    }
+    const profile = profileMap[row.user_id]
+    if (!profile?.email) { skipped++; continue }
 
     const result = await sendDinnerReminderEmail({
       to: profile.email,
@@ -100,13 +103,14 @@ async function handleDinnerReminders(supabase: ReturnType<typeof createSupabaseS
 
 // ─── Weekly reminders ────────────────────────────────────────────────────────
 
-async function handleWeeklyReminders(supabase: ReturnType<typeof createSupabaseServiceClient>) {
-  const thisWeek = getWeekStart()
-
+async function handleWeeklyReminders(supabase: SupabaseClient) {
   const { data: users, error } = await supabase
     .from('reminder_schedules')
     .select(`
       user_id,
+      weekly_enabled,
+      weekly_day,
+      timezone,
       last_weekly_sent_at,
       notification_preferences!inner(weekly_reminders)
     `)
@@ -117,26 +121,16 @@ async function handleWeeklyReminders(supabase: ReturnType<typeof createSupabaseS
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
+  const profileMap = await batchFetchProfiles(supabase, (users ?? []).map(u => u.user_id))
+
   let sent = 0
   let skipped = 0
 
   for (const row of (users ?? [])) {
-    const lastSent = row.last_weekly_sent_at?.slice(0, 10)
-    if (lastSent === thisWeek) {
-      skipped++
-      continue
-    }
+    if (!isWeeklyReminderDue(row)) { skipped++; continue }
 
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('email, first_name')
-      .eq('user_id', row.user_id)
-      .maybeSingle()
-
-    if (!profile?.email) {
-      skipped++
-      continue
-    }
+    const profile = profileMap[row.user_id]
+    if (!profile?.email) { skipped++; continue }
 
     const result = await sendWeeklyReminderEmail({
       to: profile.email,
@@ -157,49 +151,26 @@ async function handleWeeklyReminders(supabase: ReturnType<typeof createSupabaseS
 
 // ─── Weekend reminders ───────────────────────────────────────────────────────
 
-async function handleWeekendReminders(supabase: ReturnType<typeof createSupabaseServiceClient>) {
-  const now = new Date()
-  const day = now.getDay()
-  const hour = now.getUTCHours()
-  const isWeekendWindow = day === 0 || day === 6 || (day === 5 && hour >= 17)
-  if (!isWeekendWindow) {
-    return NextResponse.json({ ok: true, skipped: 'not weekend window', sent: 0 })
-  }
-
-  // Use Monday of this week as the dedup key
-  const d = new Date()
-  const diff = d.getDate() - (d.getDay() === 0 ? 6 : d.getDay() - 1)
-  const weekKey = new Date(d.setDate(diff)).toISOString().slice(0, 10)
-
+async function handleWeekendReminders(supabase: SupabaseClient) {
   const { data: users, error } = await supabase
     .from('reminder_schedules')
-    .select('user_id, last_weekend_sent_at')
+    .select('user_id, weekly_enabled, timezone, last_weekend_sent_at')
     .eq('weekly_enabled', true)
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
+  const profileMap = await batchFetchProfiles(supabase, (users ?? []).map(u => u.user_id), true)
+
   let sent = 0
   let skipped = 0
 
   for (const row of (users ?? [])) {
-    const lastSent = row.last_weekend_sent_at?.slice(0, 10)
-    if (lastSent === weekKey) {
-      skipped++
-      continue
-    }
+    if (!isWeekendReminderDue(row)) { skipped++; continue }
 
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('email, first_name, is_pro')
-      .eq('user_id', row.user_id)
-      .maybeSingle()
-
-    if (!profile?.email || !profile.is_pro) {
-      skipped++
-      continue
-    }
+    const profile = profileMap[row.user_id]
+    if (!profile?.email || !profile.is_pro) { skipped++; continue }
 
     const result = await sendWeekendReminderEmail({
       to: profile.email,
@@ -221,39 +192,22 @@ async function handleWeekendReminders(supabase: ReturnType<typeof createSupabase
 
 // ─── Admin weekly summary ────────────────────────────────────────────────────
 
-async function handleAdminSummary(supabase: ReturnType<typeof createSupabaseServiceClient>) {
+async function handleAdminSummary(supabase: SupabaseClient) {
   const weekStart = getWeekStart()
 
-  // New signups this week
-  const { count: newUsers } = await supabase
-    .from('profiles')
-    .select('*', { count: 'exact', head: true })
-    .gte('created_at', weekStart)
-
-  // New Pro subs this week
-  const { count: newPro } = await supabase
-    .from('profiles')
-    .select('*', { count: 'exact', head: true })
-    .eq('is_pro', true)
-    .gte('pro_activated_at', weekStart)
-
-  // Total users
-  const { count: totalUsers } = await supabase
-    .from('profiles')
-    .select('*', { count: 'exact', head: true })
-
-  // Email stats this week
-  const { count: emailsSent } = await supabase
-    .from('email_logs')
-    .select('*', { count: 'exact', head: true })
-    .eq('status', 'sent')
-    .gte('created_at', weekStart)
-
-  const { count: failures } = await supabase
-    .from('email_logs')
-    .select('*', { count: 'exact', head: true })
-    .eq('status', 'failed')
-    .gte('created_at', weekStart)
+  const [
+    { count: newUsers },
+    { count: newPro },
+    { count: totalUsers },
+    { count: emailsSent },
+    { count: failures },
+  ] = await Promise.all([
+    supabase.from('profiles').select('*', { count: 'exact', head: true }).gte('created_at', weekStart),
+    supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('is_pro', true).gte('pro_activated_at', weekStart),
+    supabase.from('profiles').select('*', { count: 'exact', head: true }),
+    supabase.from('email_logs').select('*', { count: 'exact', head: true }).eq('status', 'sent').gte('created_at', weekStart),
+    supabase.from('email_logs').select('*', { count: 'exact', head: true }).eq('status', 'failed').gte('created_at', weekStart),
+  ])
 
   await sendAdminWeeklySummary({
     weekStart,
@@ -267,11 +221,13 @@ async function handleAdminSummary(supabase: ReturnType<typeof createSupabaseServ
   return NextResponse.json({ ok: true })
 }
 
-function getWeekStart() {
+/** Monday of the current week as YYYY-MM-DD (UTC). Consistent with weekStartKey() in lib/email/scheduler.ts. */
+function getWeekStart(): string {
   const d = new Date()
-  const day = d.getDay()
-  const diff = d.getDate() - day
+  const dow = d.getUTCDay()
+  const diff = dow === 0 ? -6 : 1 - dow   // Monday = 1
   const start = new Date(d)
-  start.setDate(diff)
+  start.setUTCDate(d.getUTCDate() + diff)
   return start.toISOString().slice(0, 10)
 }
+

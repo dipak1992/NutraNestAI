@@ -6,14 +6,14 @@
  */
 
 export interface ReminderScheduleRow {
-  dinner_enabled: boolean
-  dinner_hour: number       // 0–23 in user's local timezone
-  weekly_enabled: boolean
-  weekly_day: number        // 0=Sun … 6=Sat
-  timezone: string          // IANA, e.g. "America/New_York"
-  last_dinner_sent_at: string | null
-  last_weekly_sent_at: string | null
-  last_weekend_sent_at: string | null
+  dinner_enabled?: boolean
+  dinner_hour?: number       // 0–23 in user's local timezone
+  weekly_enabled?: boolean
+  weekly_day?: number        // 0=Sun … 6=Sat
+  timezone: string           // IANA, e.g. "America/New_York"
+  last_dinner_sent_at?: string | null
+  last_weekly_sent_at?: string | null
+  last_weekend_sent_at?: string | null
 }
 
 /** Returns true if dinner reminder should fire right now for this user. */
@@ -26,7 +26,7 @@ export function isDinnerReminderDue(schedule: ReminderScheduleRow): boolean {
   // Already sent today?
   if (schedule.last_dinner_sent_at?.slice(0, 10) === todayKey) return false
 
-  return now.getHours() === schedule.dinner_hour
+  return now.getHours() === (schedule.dinner_hour ?? -1)
 }
 
 /** Returns true if weekly reminder should fire right now for this user. */
@@ -39,7 +39,7 @@ export function isWeeklyReminderDue(schedule: ReminderScheduleRow): boolean {
   // Already sent this week?
   if (schedule.last_weekly_sent_at?.slice(0, 10) === thisWeek) return false
 
-  return now.getDay() === schedule.weekly_day
+  return now.getDay() === (schedule.weekly_day ?? -1)
 }
 
 /**

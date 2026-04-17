@@ -29,6 +29,7 @@ const CUISINE_EMOJI: Record<string, string> = {
   mediterranean: '🥗',
   comfort: '🫕',
   global: '🌏',
+  nepali: '🏔️',
 }
 
 const getPlan = cache(async (slug: string): Promise<PublishedPlan | null> => {

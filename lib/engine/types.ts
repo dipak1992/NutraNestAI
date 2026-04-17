@@ -126,6 +126,7 @@ export type CuisineTag =
   | 'mediterranean'
   | 'indian'
   | 'italian'
+  | 'nepali'
   | 'comfort'
   | 'global'
 

@@ -26,6 +26,7 @@ const CUISINES = [
   { label: 'Japanese', emoji: '🍱' },
   { label: 'Thai', emoji: '🍲' },
   { label: 'French', emoji: '🥐' },
+  { label: 'Nepali', emoji: '🏔️' },
 ]
 
 const COOKING_TIMES = [

@@ -4,6 +4,7 @@
 
 import type { MealCandidate, MealIngredient, MealVariationData, IngredientCategory } from './types'
 import { MEALS_EXTENDED } from './meals-extended'
+import { MEALS_NEPALI } from './meals-nepali'
 
 // ── Helpers ──────────────────────────────────────────────────
 
@@ -1007,5 +1008,6 @@ export const MEAL_DATABASE: MealCandidate[] = [
     keyIngredients: ['chicken', 'honey', 'soy sauce', 'garlic', 'rice', 'green beans'],
     relatedTerms: ['honey garlic chicken', 'honey chicken', 'garlic chicken', 'sticky chicken', 'chicken thighs', 'glazed chicken'],
   },
+  ...MEALS_NEPALI,
   ...MEALS_EXTENDED,
 ]

@@ -15,7 +15,7 @@ import { getStageEmoji, stageLabelDisplay, ALLERGY_LABELS, CONDITION_LABELS } fr
 import { toast } from 'sonner'
 import { NotificationSettings } from '@/components/habit/NotificationSettings'
 
-const CUISINE_OPTIONS = ['Italian', 'Mexican', 'Asian', 'Mediterranean', 'American', 'Indian', 'Middle Eastern', 'Japanese', 'Thai', 'French']
+const CUISINE_OPTIONS = ['Italian', 'Mexican', 'Asian', 'Mediterranean', 'American', 'Indian', 'Middle Eastern', 'Japanese', 'Thai', 'French', 'Nepali']
 const COOKING_TIME_OPTIONS = [
   { label: '< 20 min', value: 20 },
   { label: '30 min', value: 30 },

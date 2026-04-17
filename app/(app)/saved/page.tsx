@@ -21,6 +21,7 @@ const CUISINE_EMOJI: Record<string, string> = {
   mediterranean: '🥗',
   comfort: '🫕',
   global: '🌏',
+  nepali: '🏔️',
 }
 
 function cuisineEmoji(type?: string | null) {

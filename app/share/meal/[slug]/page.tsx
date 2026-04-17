@@ -77,6 +77,7 @@ export default async function ShareMealPage({ params }: Props) {
                 : m.cuisineType === 'american' ? '🍔'
                 : m.cuisineType === 'mediterranean' ? '🥗'
                 : m.cuisineType === 'indian' ? '🍛'
+                : m.cuisineType === 'nepali' ? '🏔️'
                 : '🍽️'}
             </span>
           </div>

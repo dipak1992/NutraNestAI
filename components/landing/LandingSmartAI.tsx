@@ -48,8 +48,20 @@ const TIMELINE = [
 
 export function LandingSmartAI() {
   return (
-    <section className="py-24 sm:py-32 bg-slate-950 text-white">
-      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+    <section className="relative overflow-hidden py-24 sm:py-32 bg-slate-950 text-white">
+      {/* Background image */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{
+          backgroundImage: `url('https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=1920&q=80')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: 0.10,
+        }}
+      />
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1] bg-slate-950/82" />
+      <div className="relative z-[2] mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         {/* Section header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

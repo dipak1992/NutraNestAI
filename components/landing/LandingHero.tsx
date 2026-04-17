@@ -28,14 +28,27 @@ export function LandingHero() {
 
   return (
     <section className="relative overflow-hidden bg-[#FAFBFA] min-h-[90vh] flex items-center">
+      {/* Background image */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{
+          backgroundImage: `url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1920&q=80')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center top',
+          opacity: 0.08,
+          filter: 'blur(1px)',
+        }}
+      />
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1] bg-[#FAFBFA]/80" />
       {/* Subtle gradient orbs */}
-      <div aria-hidden className="pointer-events-none absolute inset-0">
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-[2]">
         <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-primary/[0.07] blur-3xl" />
         <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full bg-amber-200/30 blur-3xl" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-emerald-50/60 blur-3xl" />
       </div>
 
-      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 sm:py-28 w-full">
+      <div className="relative z-[3] mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 sm:py-28 w-full">
         <div className="grid lg:grid-cols-2 gap-16 lg:gap-20 items-center">
           {/* Left: Copy */}
           <div className="text-center lg:text-left max-w-2xl mx-auto lg:mx-0">

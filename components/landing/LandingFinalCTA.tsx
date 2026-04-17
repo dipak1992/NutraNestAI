@@ -8,11 +8,23 @@ import { ArrowRight } from 'lucide-react'
 export function LandingFinalCTA() {
   return (
     <section className="relative py-24 sm:py-32 bg-slate-950 text-white overflow-hidden">
+      {/* Background image */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{
+          backgroundImage: `url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1920&q=80')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: 0.12,
+        }}
+      />
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1] bg-slate-950/80" />
       {/* Background orbs */}
-      <div className="absolute top-1/4 left-1/4 h-80 w-80 rounded-full bg-primary/10 blur-[120px]" />
-      <div className="absolute bottom-1/4 right-1/4 h-64 w-64 rounded-full bg-violet-500/10 blur-[100px]" />
+      <div className="absolute z-[2] top-1/4 left-1/4 h-80 w-80 rounded-full bg-primary/10 blur-[120px]" />
+      <div className="absolute z-[2] bottom-1/4 right-1/4 h-64 w-64 rounded-full bg-violet-500/10 blur-[100px]" />
 
-      <div className="relative mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
+      <div className="relative z-[3] mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

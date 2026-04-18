@@ -1,7 +1,9 @@
 'use client'
 
-import { motion } from 'framer-motion'
-import { Clock, ChefHat, RefreshCw, ShoppingCart, Flame } from 'lucide-react'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Clock, ChefHat, RefreshCw, ShoppingCart, Flame, ChevronDown, ChevronUp, Leaf, ExternalLink } from 'lucide-react'
 import type { SmartMealResult } from '@/lib/engine/types'
 
 // ── Helpers ─────────────────────────────────────────────────
@@ -44,6 +46,18 @@ interface Props {
 // ── Component ───────────────────────────────────────────────
 
 export function MealCard({ meal, pantryMatch, swapping, onCook, onSwap, onOrder }: Props) {
+  const [showIngredients, setShowIngredients] = useState(false)
+  const [showSteps, setShowSteps] = useState(false)
+  const router = useRouter()
+
+  const pantryItems = meal.ingredients?.filter((i) => i.fromPantry) ?? []
+  const toBuyItems = meal.ingredients?.filter((i) => !i.fromPantry) ?? []
+
+  function handleViewRecipe() {
+    try { sessionStorage.setItem('__meal', JSON.stringify(meal)) } catch {}
+    router.push('/tonight/recipe')
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -78,6 +92,110 @@ export function MealCard({ meal, pantryMatch, swapping, onCook, onSwap, onOrder 
             </span>
           )}
         </div>
+      </div>
+
+      {/* Pantry usage hint */}
+      {pantryItems.length > 0 && (
+        <div className="flex items-center gap-1.5 px-5 pb-2 text-xs text-emerald-700 font-medium">
+          <Leaf className="h-3 w-3" />
+          Uses {pantryItems.length} pantry item{pantryItems.length > 1 ? 's' : ''}:{' '}
+          {pantryItems.slice(0, 3).map((i) => i.name).join(', ')}
+          {pantryItems.length > 3 && ` +${pantryItems.length - 3} more`}
+        </div>
+      )}
+
+      {/* Expandable: Ingredients */}
+      {meal.ingredients && meal.ingredients.length > 0 && (
+        <div className="border-t border-border/40">
+          <button
+            onClick={() => setShowIngredients((v) => !v)}
+            className="w-full flex items-center justify-between px-5 py-2.5 text-sm font-medium hover:bg-muted/50 transition-colors"
+          >
+            <span>🛒 {toBuyItems.length} to buy · {pantryItems.length} from pantry</span>
+            {showIngredients ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </button>
+          <AnimatePresence>
+            {showIngredients && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden"
+              >
+                <div className="px-5 pb-3 space-y-2">
+                  {toBuyItems.length > 0 && (
+                    <div>
+                      <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-1">Need to buy</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {toBuyItems.map((i, idx) => (
+                          <span key={idx} className="text-xs bg-red-50 text-red-800 border border-red-200 rounded-full px-2 py-0.5">
+                            {i.quantity} {i.unit} {i.name}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {pantryItems.length > 0 && (
+                    <div>
+                      <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-1">From pantry</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {pantryItems.map((i, idx) => (
+                          <span key={idx} className="text-xs bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full px-2 py-0.5">
+                            {i.quantity} {i.unit} {i.name}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
+
+      {/* Expandable: Cooking steps */}
+      {meal.steps && meal.steps.length > 0 && (
+        <div className="border-t border-border/40">
+          <button
+            onClick={() => setShowSteps((v) => !v)}
+            className="w-full flex items-center justify-between px-5 py-2.5 text-sm font-medium hover:bg-muted/50 transition-colors"
+          >
+            <span>📋 {meal.steps.length} cooking step{meal.steps.length !== 1 ? 's' : ''}</span>
+            {showSteps ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </button>
+          <AnimatePresence>
+            {showSteps && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden"
+              >
+                <ol className="px-5 pb-3 space-y-1.5 list-decimal list-inside">
+                  {meal.steps.map((step, idx) => (
+                    <li key={idx} className="text-xs leading-relaxed text-muted-foreground">
+                      {step}
+                    </li>
+                  ))}
+                </ol>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
+
+      {/* View Full Recipe link */}
+      <div className="border-t border-border/40">
+        <button
+          onClick={handleViewRecipe}
+          className="w-full flex items-center justify-center gap-1.5 px-5 py-2.5 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors"
+        >
+          <ExternalLink className="h-3.5 w-3.5" />
+          View Full Recipe
+        </button>
       </div>
 
       {/* 3-button footer — Cook / Swap / Order */}

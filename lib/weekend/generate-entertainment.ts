@@ -25,6 +25,11 @@ export async function generateEntertainment(
 
   const user = `Recommend a single ${prefs.watchStyle === 'family' ? 'family-friendly' : ''} movie or series for tonight.
 
+IMPORTANT RULES:
+- Strongly prefer titles released from 2020 onwards. Older classics (pre-2020) are okay only if they are iconic and highly rated.
+- The title MUST have an IMDb score of 6.5 or higher. Never recommend anything below 6.5.
+- Vary your picks — avoid always suggesting the most obvious mainstream titles.
+
 Preferences:
 - Language: ${prefs.language}
 - Genres: ${prefs.genre.join(', ')}
@@ -38,6 +43,7 @@ Return ONLY this JSON object (no wrapper, no code fences):
   "type": "movie" | "series",
   "year": number,
   "rating": "string (e.g. PG, PG-13, R, TV-14)",
+  "imdbScore": number (e.g. 7.4 — must be 6.5 or higher),
   "whereToWatch": ["string", ...],
   "reason": "string (1–2 sentences why this fits tonight)",
   "posterEmoji": "string (single emoji representing the vibe)"

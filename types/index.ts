@@ -547,6 +547,7 @@ export interface EntertainmentResult {
   type: 'movie' | 'series';
   year: number;
   rating: string;
+  imdbScore: number;
   whereToWatch: string[];
   reason: string;
   posterEmoji: string;

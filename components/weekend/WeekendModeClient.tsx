@@ -21,10 +21,11 @@ export default function WeekendModeClient({ initialData }: WeekendModeClientProp
   const [saved, setSaved] = useState(false)
   const [usedTonight, setUsedTonight] = useState(false)
   const [recipeExpanded, setRecipeExpanded] = useState(false)
+  const [seenTitles, setSeenTitles] = useState<string[]>([initialData.entertainment.title])
 
   const fetchNew = useCallback(
     async (opts: { swapMeal?: boolean; swapEntertainment?: boolean }) => {
-      const excludeTitles = opts.swapEntertainment ? [data.entertainment.title] : []
+      const excludeTitles = opts.swapEntertainment ? seenTitles : []
       const res = await fetch('/api/weekend-mode', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -33,7 +34,7 @@ export default function WeekendModeClient({ initialData }: WeekendModeClientProp
       if (!res.ok) throw new Error('Failed')
       return res.json() as Promise<WeekendModeData>
     },
-    [data.entertainment.title],
+    [seenTitles],
   )
 
   async function handleSwapMeal() {
@@ -52,6 +53,7 @@ export default function WeekendModeClient({ initialData }: WeekendModeClientProp
     setSwappingEnt(true)
     try {
       const next = await fetchNew({ swapEntertainment: true })
+      setSeenTitles(prev => [...prev, next.entertainment.title])
       setData(prev => ({ ...prev, entertainment: next.entertainment }))
     } catch {
       // silent
@@ -216,6 +218,14 @@ export default function WeekendModeClient({ initialData }: WeekendModeClientProp
               </span>
               <span className="text-xs text-amber-700">·</span>
               <span className="text-xs text-amber-700">{entertainment.rating}</span>
+              {entertainment.imdbScore && (
+                <>
+                  <span className="text-xs text-amber-700">·</span>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-yellow-400/20 px-2 py-0.5 text-xs font-bold text-yellow-800">
+                    ⭐ {entertainment.imdbScore.toFixed(1)}
+                  </span>
+                </>
+              )}
             </div>
           </div>
         </div>

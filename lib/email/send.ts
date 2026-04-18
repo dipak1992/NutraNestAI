@@ -1,4 +1,4 @@
-import { resend, EMAIL_FROM, EMAIL_REPLY_TO, EMAIL_ADMIN } from './client'
+import { resend, EMAIL_FROM, EMAIL_REPLY_TO, EMAIL_ALERTS } from './client'
 import { createSupabaseServiceClient } from '@/lib/supabase/service'
 
 export interface SendEmailOptions {
@@ -140,7 +140,7 @@ async function alertAdminEmailFailure(to: string, subject: string, error: string
     const { createElement: h } = await import('react')
     await resend.emails.send({
       from: EMAIL_FROM,
-      to: [EMAIL_ADMIN],
+      to: [EMAIL_ALERTS],
       subject: `[MealEase] Email delivery failure`,
       html: `<p><strong>Failed to deliver email</strong></p>
              <p><strong>To:</strong> ${to}</p>

@@ -6,7 +6,7 @@ This is the shortest practical path to get MealEase live without missing any req
 
 Create these accounts in this order:
 
-1. Google Workspace
+1. Namecheap Private Email
 2. Supabase
 3. Google Cloud Console
 4. Resend
@@ -31,33 +31,28 @@ Domain: `mealeaseai.com`
 
 Email roles already expected by the codebase:
 
-- `hello@mealeaseai.com` = support inbox
-- `system@mealeaseai.com` = transactional sender
-- `alerts@mealeaseai.com` = internal alerts
+- `hello@mealeaseai.com` = support inbox + transactional sender + internal alerts
 
-### Google Workspace
+### Namecheap Private Email
 
 1. Buy or confirm control of `mealeaseai.com` at your registrar.
-2. Create Google Workspace on Business Starter.
+2. Activate Namecheap Private Email.
 3. Set up the first mailbox as `hello@mealeaseai.com`.
-4. Add `system@mealeaseai.com` as an alias on the hello account.
-5. Create a Google Group named `alerts@mealeaseai.com`.
-6. Add `hello@mealeaseai.com` and your founder email to that group.
+4. Use this mailbox for manual support and business replies.
 
 ### DNS records to add early
 
 Add these in the DNS provider for your domain:
 
-- Google verification TXT record
-- Google Workspace MX records
+- Namecheap Private Email MX records
 - One SPF TXT record at root
 - One DMARC TXT record at `_dmarc`
-- Google DKIM record
+- Namecheap and Resend DKIM records
 
 Recommended SPF pattern once Resend is added:
 
 ```txt
-v=spf1 include:_spf.google.com include:amazonses.com ~all
+v=spf1 include:spf.privateemail.com include:amazonses.com ~all
 ```
 
 Recommended DMARC starter record:
@@ -145,7 +140,7 @@ Supabase Storage is not currently used by the app. Open the Storage section once
 1. Create workspace `MealEase`.
 2. Add domain `mealeaseai.com`.
 3. Add the DNS verification records Resend shows.
-4. Merge SPF with your existing Google SPF into one record.
+4. Merge SPF with your existing Namecheap SPF into one record.
 5. Wait for verification to pass.
 6. Create API key named `mealease-production`.
 7. Save the key.
@@ -168,7 +163,7 @@ Go to Supabase -> Authentication -> SMTP Settings and set:
 - Username: `resend`
 - Password: your Resend API key
 - Sender name: `MealEase`
-- Sender email: `system@mealeaseai.com`
+- Sender email: `hello@mealeaseai.com`
 
 This is required so auth emails come from your domain.
 
@@ -268,7 +263,7 @@ Run this exact sequence on the live domain:
 1. Open `https://mealeaseai.com`
 2. Confirm page loads over HTTPS.
 3. Create an account with email/password.
-4. Confirm verification email arrives from `system@mealeaseai.com`.
+4. Confirm verification email arrives from `hello@mealeaseai.com`.
 5. Confirm reply goes to `hello@mealeaseai.com`.
 6. Test Google login.
 7. Complete onboarding.
@@ -278,7 +273,7 @@ Run this exact sequence on the live domain:
 11. Trigger one browser error and confirm it reaches Sentry.
 12. Trigger one server-side error in a preview environment and confirm it reaches Sentry.
 13. Manually call the reminders endpoint with the bearer secret.
-14. Confirm admin alerts go to `alerts@mealeaseai.com`.
+14. Confirm admin alerts go to `hello@mealeaseai.com`.
 
 ## 9. Launch Blockers to Watch
 

@@ -24,8 +24,10 @@ export const resend = {
   },
 } as unknown as Resend
 
-export const EMAIL_FROM = 'MealEase <system@mealeaseai.com>'
-export const EMAIL_REPLY_TO = 'hello@mealeaseai.com'
-export const EMAIL_SUPPORT = 'hello@mealeaseai.com'
-export const EMAIL_ADMIN = 'alerts@mealeaseai.com'
+export const EMAIL_PRIMARY = 'hello@mealeaseai.com'
+export const EMAIL_FROM = `MealEase <${EMAIL_PRIMARY}>`
+export const EMAIL_REPLY_TO = EMAIL_PRIMARY
+export const EMAIL_ALERTS = EMAIL_PRIMARY
+// Legacy alias kept to avoid breaking existing imports.
+export const EMAIL_ADMIN = EMAIL_ALERTS
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.mealeaseai.com'

@@ -13,12 +13,11 @@ Use this as the working checklist for launch. Complete one phase at a time. Afte
 - [ ] Create a password manager vault named `MealEase`
 - [ ] Create a secure note named `MealEase Production Keys`
 
-### Google Workspace
+### Namecheap Private Email
 
-- [ ] Create a Google Workspace account on Business Starter
-- [ ] Use `mealeaseai.com` as the domain during setup
+- [ ] Activate Namecheap Private Email for `mealeaseai.com`
 - [ ] Create the first mailbox as `hello@mealeaseai.com`
-- [ ] Save the Google Workspace admin login in your password manager
+- [ ] Save the Namecheap Private Email login in your password manager
 
 ### Supabase
 
@@ -75,33 +74,20 @@ Verification before moving on:
 
 ## Phase 2: Domain and DNS
 
-### Google Workspace domain verification
+### Namecheap mail setup
 
-- [ ] Open Google Workspace setup and copy the domain verification TXT record
-- [ ] Add the TXT record in your DNS provider
-- [ ] Wait for Google Workspace to verify the domain
-
-### Mailboxes and aliases
-
-- [ ] In Google Admin, add `system@mealeaseai.com` as an alias for `hello@mealeaseai.com`
-- [ ] In Google Admin, create a Google Group for `alerts@mealeaseai.com`
-- [ ] Add `hello@mealeaseai.com` and your founder email as members of `alerts@mealeaseai.com`
-
-### Google Workspace receiving mail
-
-- [ ] Add all Google Workspace MX records at the root domain
-- [ ] Remove any old MX records that conflict with Google Workspace
+- [ ] Add Namecheap Private Email MX records at the root domain
+- [ ] Remove any old MX records that conflict with Private Email
 - [ ] Wait for MX propagation
 - [ ] Send a test email to `hello@mealeaseai.com`
-- [ ] Confirm the test email arrives in Gmail
+- [ ] Confirm the test email arrives in Namecheap webmail
 
 ### Email authentication
 
 - [ ] Add a single SPF TXT record at the root domain
 - [ ] Add a DMARC TXT record at `_dmarc`
-- [ ] Turn on Google DKIM in Google Admin
-- [ ] Add the DKIM DNS record Google gives you
-- [ ] Confirm Google DKIM passes
+- [ ] Add Namecheap DKIM DNS record and confirm it passes
+- [ ] Add Resend DKIM DNS record and confirm it passes
 
 ### Pre-Vercel DNS awareness
 
@@ -114,8 +100,6 @@ Verification before moving on:
 Verification before moving on:
 
 - [ ] `hello@mealeaseai.com` receives email
-- [ ] `system@mealeaseai.com` alias exists
-- [ ] `alerts@mealeaseai.com` group exists
 - [ ] SPF, DKIM, and DMARC are configured
 
 ---
@@ -229,7 +213,7 @@ Verification before moving on:
 - [ ] Set username to `resend`
 - [ ] Set password to the Resend API key
 - [ ] Set sender name to `MealEase`
-- [ ] Set sender email to `system@mealeaseai.com`
+- [ ] Set sender email to `hello@mealeaseai.com`
 - [ ] Save SMTP settings
 
 ### Vercel project
@@ -349,9 +333,9 @@ Verification before moving on:
 ### Email and cron flows
 
 - [ ] Send a test support email to `hello@mealeaseai.com`
-- [ ] Confirm transactional emails come from `system@mealeaseai.com`
+- [ ] Confirm transactional emails come from `hello@mealeaseai.com`
 - [ ] Confirm replies go to `hello@mealeaseai.com`
-- [ ] Confirm admin alerts reach `alerts@mealeaseai.com`
+- [ ] Confirm admin alerts reach `hello@mealeaseai.com`
 - [ ] Manually call `/api/email/reminders?type=dinner` with the bearer secret
 - [ ] Manually call `/api/email/reminders?type=weekly` with the bearer secret
 

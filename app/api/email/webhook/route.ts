@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServiceClient } from '@/lib/supabase/service'
-import { resend, EMAIL_ADMIN, EMAIL_FROM } from '@/lib/email/client'
+import { resend, EMAIL_ALERTS, EMAIL_FROM } from '@/lib/email/client'
 
 // Resend sends a `svix-signature` header for verification
 // https://resend.com/docs/dashboard/webhooks/introduction
@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
     try {
       await resend.emails.send({
         from: EMAIL_FROM,
-        to: [EMAIL_ADMIN],
+        to: [EMAIL_ALERTS],
         subject: `[MealEase] ⚠️ ${label} — ${recipient}`,
         html: `
           <p><strong>${label}</strong></p>

@@ -1,6 +1,6 @@
 import { createElement } from 'react'
 import { sendEmail } from './send'
-import { EMAIL_ADMIN, SITE_URL } from './client'
+import { EMAIL_ALERTS, SITE_URL } from './client'
 import { generateUnsubscribeToken } from './unsubscribe'
 
 // User templates
@@ -202,7 +202,7 @@ export async function alertAdminNewUser(params: {
   referralCode?: string
 }) {
   return sendEmail({
-    to: EMAIL_ADMIN,
+    to: EMAIL_ALERTS,
     subject: `[MealEase] New signup — ${params.userEmail}`,
     react: createElement(AdminNewUserEmail, params),
     skipLog: true,
@@ -216,7 +216,7 @@ export async function alertAdminNewPro(params: {
   amount?: string
 }) {
   return sendEmail({
-    to: EMAIL_ADMIN,
+    to: EMAIL_ALERTS,
     subject: `[MealEase] New Pro — ${params.userEmail}`,
     react: createElement(AdminNewProEmail, params),
     skipLog: true,
@@ -230,7 +230,7 @@ export async function alertAdminFailedPayment(params: {
   amount?: string
 }) {
   return sendEmail({
-    to: EMAIL_ADMIN,
+    to: EMAIL_ALERTS,
     subject: `[MealEase] ⚠️ Failed payment — ${params.userEmail}`,
     react: createElement(AdminFailedPaymentEmail, params),
     skipLog: true,
@@ -243,7 +243,7 @@ export async function alertAdminReferral(params: {
   newUserEmail: string
 }) {
   return sendEmail({
-    to: EMAIL_ADMIN,
+    to: EMAIL_ALERTS,
     subject: `[MealEase] Referral conversion — ${params.referrerEmail}`,
     react: createElement(AdminReferralEmail, params),
     skipLog: true,
@@ -256,7 +256,7 @@ export async function alertAdminContactForm(params: {
   message: string
 }) {
   return sendEmail({
-    to: EMAIL_ADMIN,
+    to: EMAIL_ALERTS,
     subject: `[MealEase] Contact form — ${params.senderEmail}`,
     react: createElement(AdminContactFormEmail, params),
     skipLog: true,
@@ -272,7 +272,7 @@ export async function sendAdminWeeklySummary(params: {
   failures: number
 }) {
   return sendEmail({
-    to: EMAIL_ADMIN,
+    to: EMAIL_ALERTS,
     subject: `[MealEase] Weekly summary — ${params.weekStart}`,
     react: createElement(AdminWeeklySummaryEmail, params),
     skipLog: true,

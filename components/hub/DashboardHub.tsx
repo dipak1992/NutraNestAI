@@ -98,7 +98,10 @@ export function DashboardHub({ userName }: Props) {
             householdConfig={householdConfig}
           />
 
-          <WeekendModeCard weekendSubtitle={householdConfig.weekendSubtitle} />
+          <WeekendModeCard
+            weekendTitle={householdConfig.weekendTitle}
+            weekendSubtitle={householdConfig.weekendSubtitle}
+          />
 
           <div ref={tonightRef}>
             <TonightRecommendation refreshKey={refreshKey} />

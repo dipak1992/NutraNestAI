@@ -5,17 +5,17 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 
 function isWeekendWindow(): boolean {
-  const now = new Date()
-  const day = now.getDay()
-  const hour = now.getHours()
-  return day === 0 || day === 6 || (day === 5 && hour >= 17)
+  const day = new Date().getDay()
+  // Show Friday, Saturday, Sunday
+  return day === 5 || day === 6 || day === 0
 }
 
 interface Props {
+  weekendTitle?: string
   weekendSubtitle?: string
 }
 
-export function WeekendModeCard({ weekendSubtitle }: Props) {
+export function WeekendModeCard({ weekendTitle, weekendSubtitle }: Props) {
   const show = useMemo(() => isWeekendWindow(), [])
 
   if (!show) return null
@@ -34,7 +34,7 @@ export function WeekendModeCard({ weekendSubtitle }: Props) {
           <div className="flex items-center gap-4">
             <span className="text-4xl">🎬</span>
             <div className="flex-1 min-w-0">
-              <p className="text-[15px] font-bold text-amber-900">Weekend Mode</p>
+              <p className="text-[15px] font-bold text-amber-900">{weekendTitle ?? 'Weekend Mode'}</p>
               <p className="text-xs text-amber-700/80 mt-0.5">
                 {weekendSubtitle ?? 'Dinner + movie night — curated for you'}
               </p>

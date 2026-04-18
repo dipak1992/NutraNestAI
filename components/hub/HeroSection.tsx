@@ -36,7 +36,7 @@ export function HeroSection({ firstName, onQuickDecide, onZeroCook, householdCon
 
       {/* 3 Primary Action Cards */}
       <div className="flex flex-col gap-3">
-        {/* ⚡ I Don't Want to Think — Primary hero card */}
+        {/* ⚡ Quick Decide — label adapts to household type */}
         <motion.button
           whileTap={{ scale: 0.98 }}
           onClick={onQuickDecide}
@@ -46,17 +46,17 @@ export function HeroSection({ firstName, onQuickDecide, onZeroCook, householdCon
             <span className="text-3xl">⚡</span>
             <div className="flex-1 min-w-0">
               <p className="text-[15px] font-bold text-foreground">
-                I Don&apos;t Want to Think
+                {householdConfig.cardLabels.quickDecide.title}
               </p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                One tap — dinner decided
+                {householdConfig.cardLabels.quickDecide.sub}
               </p>
             </div>
             <ChevronRight className="h-4 w-4 text-primary/50 flex-shrink-0" />
           </div>
         </motion.button>
 
-        {/* 🚚 Zero-Cook Mode */}
+        {/* 🚚 Zero-Cook — label adapts to household type */}
         <motion.button
           whileTap={{ scale: 0.98 }}
           onClick={onZeroCook}
@@ -66,17 +66,17 @@ export function HeroSection({ firstName, onQuickDecide, onZeroCook, householdCon
             <span className="text-3xl">🚚</span>
             <div className="flex-1 min-w-0">
               <p className="text-[15px] font-semibold text-foreground">
-                Zero-Cook Mode
+                {householdConfig.cardLabels.zeroCook.title}
               </p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Get it delivered — we pick for you
+                {householdConfig.cardLabels.zeroCook.sub}
               </p>
             </div>
             <ChevronRight className="h-4 w-4 text-muted-foreground/40 flex-shrink-0" />
           </div>
         </motion.button>
 
-        {/* 📅 Plan My Week */}
+        {/* 📅 Plan Week — label adapts to household type */}
         <motion.div whileTap={{ scale: 0.98 }}>
           <Link
             href="/planner"
@@ -85,10 +85,10 @@ export function HeroSection({ firstName, onQuickDecide, onZeroCook, householdCon
             <span className="text-3xl">📅</span>
             <div className="flex-1 min-w-0">
               <p className="text-[15px] font-semibold text-foreground">
-                Plan My Week
+                {householdConfig.cardLabels.planWeek.title}
               </p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                7 dinners, zero repeats
+                {householdConfig.cardLabels.planWeek.sub}
               </p>
             </div>
             <ChevronRight className="h-4 w-4 text-muted-foreground/40 flex-shrink-0" />

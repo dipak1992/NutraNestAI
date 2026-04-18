@@ -82,11 +82,11 @@ function getKidsPriorityTools(): KidsTool[] {
 
   type Sortable = KidsTool & { _order: number }
   const tools: Sortable[] = [
-    { emoji: '🍱', label: 'Lunchbox Help',      href: '/tonight?mode=lunchbox', _order: isMorning ? 0 : 4 },
-    { emoji: '🍎', label: 'Snack for Kids',      href: '/tonight?mode=snack',    _order: isAfterSchool ? 0 : 3 },
-    { emoji: '🧁', label: 'Bake With Kids',      href: '/tonight?mode=bake',     _order: isWeekend ? 1 : 5 },
-    { emoji: '🍽', label: 'Picky Eater Help',    href: '/tonight?mode=picky',    _order: 2 },
-    { emoji: '⚡', label: 'Need Food in 5 Min',  href: '/tonight?mode=fast',     _order: isBusyEvening ? 0 : 6 },
+    { emoji: '🍱', label: 'Lunchbox Help',      href: '/kids-tool?mode=lunchbox', _order: isMorning ? 0 : 4 },
+    { emoji: '🍎', label: 'Snack for Kids',      href: '/kids-tool?mode=snack',    _order: isAfterSchool ? 0 : 3 },
+    { emoji: '🧁', label: 'Bake With Kids',      href: '/kids-tool?mode=bake',     _order: isWeekend ? 1 : 5 },
+    { emoji: '🍽', label: 'Picky Eater Help',    href: '/kids-tool?mode=picky',    _order: 2 },
+    { emoji: '⚡', label: 'Need Food in 5 Min',  href: '/kids-tool?mode=fast',     _order: isBusyEvening ? 0 : 6 },
   ]
 
   return tools

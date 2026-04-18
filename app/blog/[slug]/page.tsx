@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Badge } from '@/components/ui/badge'
@@ -80,11 +81,25 @@ export default async function BlogPostPage({ params }: Props) {
     keywords: post.tags.join(', '),
   }
 
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: absoluteUrl('/') },
+      { '@type': 'ListItem', position: 2, name: 'Blog', item: absoluteUrl('/blog') },
+      { '@type': 'ListItem', position: 3, name: post.title, item: absoluteUrl(`/blog/${post.slug}`) },
+    ],
+  }
+
   return (
     <main className="mx-auto max-w-3xl px-4 py-14 sm:px-6 lg:px-8">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
 
       <div className="mb-8">
@@ -117,12 +132,14 @@ export default async function BlogPostPage({ params }: Props) {
           </div>
           {post.heroImage && (
             <figure className="mt-8 overflow-hidden rounded-2xl border border-border/60 bg-muted">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={post.heroImage}
                 alt={post.heroImageAlt}
+                width={1600}
+                height={900}
                 className="w-full h-auto object-cover aspect-[16/9]"
-                loading="eager"
+                priority
+                sizes="(max-width: 768px) 100vw, 768px"
               />
             </figure>
           )}

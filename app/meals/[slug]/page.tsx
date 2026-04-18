@@ -91,11 +91,25 @@ export default async function PublicMealDetailPage({ params }: Props) {
     keywords: data.tags.join(', '),
   }
 
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: absoluteUrl('/') },
+      { '@type': 'ListItem', position: 2, name: 'Meals', item: absoluteUrl('/meals') },
+      { '@type': 'ListItem', position: 3, name: data.title, item: absoluteUrl(`/meals/${slug}`) },
+    ],
+  }
+
   return (
     <main className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(recipeJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
 
       <div className="mb-8">

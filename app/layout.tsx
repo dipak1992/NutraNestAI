@@ -58,6 +58,21 @@ export default function RootLayout({
       className={`${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Organization',
+              name: 'MealEase',
+              url: getSiteUrl(),
+              logo: `${getSiteUrl()}/icon`,
+              description:
+                'MealEase helps you decide what to cook with simple, smart meal plans for your whole family.',
+              sameAs: [],
+            }),
+          }}
+        />
         <Providers>
           {children}
           <Toaster richColors position="top-right" />

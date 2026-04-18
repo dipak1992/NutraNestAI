@@ -15,77 +15,90 @@ import {
   ArrowRight,
   Zap,
   X,
+  Gift,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
+import { PRICING_TIERS, PRO_ANNUAL_SAVINGS, FAMILY_ANNUAL_SAVINGS } from '@/lib/paywall/config'
 
 // ── Pricing data ──────────────────────────────────────────────
 
-const MONTHLY_PRICE = 9.99
-const ANNUAL_PRICE = 79.99
-const FULL_ANNUAL_PRICE = (MONTHLY_PRICE * 12).toFixed(2) // $119.88
-const ANNUAL_MONTHLY = Math.round((ANNUAL_PRICE / 12) * 100) / 100 // $6.67
-const ANNUAL_SAVINGS = Math.round((1 - ANNUAL_PRICE / (MONTHLY_PRICE * 12)) * 100) // 33%
-
 const TESTIMONIALS = [
   {
-    quote: "Monday through Friday, meals are just handled. Then Friday night rolls around and Weekend Mode picks a movie and dinner for us. My kids think I'm magic.",
+    quote: "I used to spend 30 minutes every evening deciding what to cook. Now I just open MealEaseAI and dinner is planned in seconds. My kids actually eat what I make.",
     name: 'Sarah M.',
-    role: 'Mom of 2',
-    emoji: '👩‍👧‍👦',
+    role: 'Mom of 3',
+    emoji: '👩‍👧‍👧',
   },
   {
-    quote: 'Living solo, I used to default to the same 3 takeout places. Now MealEase keeps things interesting — and Weekend Mode gives me a movie night I actually look forward to.',
+    quote: 'Living solo, I used to default to the same 5 takeout places. Now I actually cook and enjoy it. The budget modes helped me save money too.',
     name: 'James K.',
     role: 'Works from home',
     emoji: '👨‍💻',
   },
   {
-    quote: 'My partner and I could never agree on dinner. Now MealEase picks something we both love and Weekend Mode is our new Friday ritual.',
+    quote: 'Family Plus changed everything. My partner and I finally have a system, the kids get kid-friendly options, and our grocery budget actually makes sense now.',
     name: 'Priya R.',
-    role: 'Half of a busy couple',
-    emoji: '💑',
+    role: 'Parent of 2',
+    emoji: '👨‍👩‍👧‍👦',
   },
 ]
 
 const COMPARISON_FEATURES = [
-  { feature: 'Tonight meal previews', free: '2 per day', pro: 'Unlimited' },
-  { feature: 'Weekly meal plan', free: '3-day preview', pro: 'Full 7 days' },
-  { feature: 'Smart grocery list', free: false, pro: true },
-  { feature: 'Pantry Magic tools', free: false, pro: true },
-  { feature: 'Image-to-meal', free: false, pro: true },
-  { feature: 'Household meal variations', free: '3 max', pro: 'Unlimited' },
-  { feature: 'Adaptive learning', free: false, pro: true },
-  { feature: 'Plan publishing & sharing', free: false, pro: true },
-  { feature: 'Weekend Mode 🎬', free: false, pro: true },
+  { feature: 'Tonight Dinner', free: true, pro: true, family: true },
+  { feature: 'Daily meal generations', free: '3 per day', pro: 'Unlimited', family: 'Unlimited' },
+  { feature: 'Simple grocery list', free: true, pro: true, family: true },
+  { feature: 'Unlimited regenerations', free: false, pro: true, family: true },
+  { feature: 'Weekly Planner', free: '3-day preview', pro: 'Full 7 days', family: 'Full 7 days' },
+  { feature: 'Save preferences', free: false, pro: true, family: true },
+  { feature: 'Household memory', free: false, pro: '1 household', family: 'Up to 6 members' },
+  { feature: 'Budget meal mode', free: false, pro: true, family: true },
+  { feature: 'Healthy mode', free: false, pro: true, family: true },
+  { feature: 'Meal history', free: false, pro: true, family: true },
+  { feature: 'Faster AI responses', free: false, pro: true, family: true },
+  { feature: 'Pantry Mode', free: false, pro: false, family: true },
+  { feature: 'Kids Mode', free: false, pro: false, family: true },
+  { feature: 'Lunchbox Planner', free: false, pro: false, family: true },
+  { feature: 'Shared grocery lists', free: false, pro: false, family: true },
+  { feature: 'Family dashboard', free: false, pro: false, family: true },
+  { feature: 'Multi-profile balancing', free: false, pro: false, family: true },
+  { feature: 'Priority support', free: false, pro: false, family: true },
 ]
 
 const FAQ = [
   {
-    q: 'What happens during my 7-day free trial?',
-    a: 'You get full Pro access — the complete weekly planner, grocery list, Pantry Magic, Weekend Mode, and unlimited swipes. No credit card needed. After 7 days, you simply choose to subscribe or stay on Free.',
+    q: 'Is MealEaseAI free?',
+    a: 'Yes. Free users get Tonight Dinner, 3 meal ideas daily, and simple grocery lists. Perfect to try MealEaseAI risk-free.',
   },
   {
-    q: 'What can I do on the free plan?',
-    a: 'Preview meal ideas instantly, try 2 Tonight swipes per day, and see 3 days of your weekly plan. It\'s enough to feel whether MealEase fits your routine.',
+    q: 'What do I get with Pro?',
+    a: 'Unlimited meal ideas, full Weekly Planner, saved preferences, budget modes, and faster planning tools. Great for individuals and couples.',
   },
   {
-    q: 'What is Weekend Mode?',
-    a: 'Every Friday and Saturday evening, Pro users get a curated dinner + movie pairing — a complete night-in experience picked just for you. Think of it as a personal concierge for your weekend.',
-  },
-  {
-    q: 'Is annual billing worth it?',
-    a: `Annual saves you ${ANNUAL_SAVINGS}% compared to monthly — that's $${(MONTHLY_PRICE * 12 - ANNUAL_PRICE).toFixed(2)} back in your pocket every year. Most users choose annual after their first month.`,
+    q: 'What do I get with Family Plus?',
+    a: 'Everything in Pro plus Pantry Mode, Kids Mode, Lunchbox Planner, shared grocery lists, and family profiles. Best for households with multiple members.',
   },
   {
     q: 'Can I cancel anytime?',
-    a: 'Yes. Cancel with one click — your plan stays active until the end of the current billing period. No questions, no fees. Full refund within 14 days if Pro isn\'t right for you.',
+    a: 'Yes, cancel anytime from your account settings. Your plan stays active until the end of the current billing period. No questions asked.',
   },
   {
-    q: 'Does one plan cover my whole family?',
-    a: 'Yes. One Pro subscription covers your entire household — whether you\'re solo, a couple, or a full family. MealEase adapts each meal for everyone at the table.',
+    q: 'Do you offer yearly plans?',
+    a: `Yes. Yearly plans save you money — Pro saves ${PRO_ANNUAL_SAVINGS}% and Family Plus saves ${FAMILY_ANNUAL_SAVINGS}% compared to monthly billing.`,
+  },
+  {
+    q: 'Can I switch plans later?',
+    a: 'Yes, upgrade or downgrade anytime. Changes take effect at your next billing cycle.',
+  },
+  {
+    q: 'Do you support allergies and preferences?',
+    a: 'Yes. MealEaseAI supports dietary filters and personalized household preferences at every tier.',
+  },
+  {
+    q: 'Is there a free trial?',
+    a: 'Free users can try everything without signing up. Paid plans don\'t require a credit card to start — upgrade anytime.',
   },
 ]
 
@@ -97,7 +110,10 @@ export function PricingContent() {
   const { status, loading: paywallLoading } = usePaywallStatus()
   const router = useRouter()
 
-  const plan = isAnnual ? 'yearly' : 'monthly'
+  const proMonthly = PRICING_TIERS.pro.monthlyPrice
+  const proAnnual = PRICING_TIERS.pro.yearlyPrice
+  const familyMonthly = PRICING_TIERS.family.monthlyPrice
+  const familyAnnual = PRICING_TIERS.family.yearlyPrice
 
   const handleStartTrial = useCallback(async () => {
     if (!status.isAuthenticated) {
@@ -106,7 +122,7 @@ export function PricingContent() {
     }
 
     if (status.isPro) {
-      toast.info('You already have Pro!')
+      toast.info('You already have Pro or Family Plus!')
       return
     }
 
@@ -118,8 +134,8 @@ export function PricingContent() {
         toast.error(data.error || 'Could not start trial')
         return
       }
-      toast.success('Your 7-day Pro trial is active!', {
-        description: 'Enjoy full access to every feature.',
+      toast.success('Your 7-day free trial is active!', {
+        description: 'Enjoy full Pro access to every feature.',
       })
       router.push('/dashboard')
       router.refresh()
@@ -130,9 +146,9 @@ export function PricingContent() {
     }
   }, [status, router])
 
-  const handleCheckout = useCallback(async () => {
+  const handleCheckout = useCallback(async (plan: 'pro_monthly' | 'pro_yearly' | 'family_monthly' | 'family_yearly') => {
     if (!status.isAuthenticated) {
-      router.push(`/signup?plan=pro`)
+      router.push(`/signup?plan=${plan}`)
       return
     }
 
@@ -160,37 +176,35 @@ export function PricingContent() {
     } catch {
       toast.error('Something went wrong. Try again.')
     }
-  }, [plan, status, router, handleStartTrial])
+  }, [status, router, handleStartTrial])
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
       {/* ── Hero ── */}
       <div className="text-center mb-16">
         <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary/8 px-4 py-2 text-sm font-medium text-primary">
           <Sparkles className="h-4 w-4" />
-          Weeknights planned. Weekends curated.
+          Honest pricing, zero surprises
         </div>
 
-        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-[3.5rem] leading-[1.1] mb-5">
-          Stop deciding what&rsquo;s for dinner.
-          <span className="block text-gradient-sage mt-1">Start enjoying it.</span>
+        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl leading-[1.1] mb-5">
+          Stop stressing about meals.
         </h1>
-        <p className="mx-auto max-w-2xl text-lg text-muted-foreground leading-relaxed">
-          MealEase plans your weeknight meals in seconds — then surprises you with
-          a <strong className="text-foreground">dinner + movie night</strong> every weekend. One subscription, every mouth at the table.
+        <p className="mx-auto max-w-3xl text-lg text-muted-foreground leading-relaxed">
+          MealEaseAI helps you decide meals, plan smarter, and simplify family food life.
         </p>
 
         <div className="mt-8 flex items-center justify-center gap-3 text-sm text-muted-foreground">
-          <span className="flex items-center gap-1.5"><Check className="h-4 w-4 text-primary" /> 7-day free trial</span>
-          <span className="text-border">|</span>
-          <span className="flex items-center gap-1.5"><Check className="h-4 w-4 text-primary" /> No credit card</span>
-          <span className="text-border">|</span>
           <span className="flex items-center gap-1.5"><Check className="h-4 w-4 text-primary" /> Cancel anytime</span>
+          <span className="text-border">|</span>
+          <span className="flex items-center gap-1.5"><Check className="h-4 w-4 text-primary" /> Secure checkout</span>
+          <span className="text-border">|</span>
+          <span className="flex items-center gap-1.5"><Check className="h-4 w-4 text-primary" /> Loved by busy households</span>
         </div>
       </div>
 
       {/* ── Billing toggle ── */}
-      <div className="flex items-center justify-center gap-1 mb-12">
+      <div className="flex items-center justify-center gap-1 mb-16">
         <div className="inline-flex rounded-full border border-border/60 bg-muted/40 p-1">
           <button
             onClick={() => setIsAnnual(false)}
@@ -212,14 +226,14 @@ export function PricingContent() {
           >
             Annual
             <Badge className="border-0 bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-              -{ANNUAL_SAVINGS}%
+              Save 36–38%
             </Badge>
           </button>
         </div>
       </div>
 
       {/* ── Pricing cards ── */}
-      <div className="mx-auto mb-20 grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-2 items-start">
+      <div className="mx-auto mb-20 grid max-w-7xl grid-cols-1 gap-8 md:grid-cols-3 lg:gap-6 items-start">
         {/* Free tier */}
         <div className="relative flex flex-col rounded-3xl border border-border/60 bg-white/80 p-8">
           <div className="mb-6">
@@ -227,25 +241,23 @@ export function PricingContent() {
               <div className="rounded-2xl bg-muted p-3">
                 <Sparkles className="h-5 w-5 text-muted-foreground" />
               </div>
-              <div>
-                <h2 className="text-xl font-bold">Free</h2>
-                <p className="text-sm text-muted-foreground">
-                  Taste what MealEase can do
-                </p>
-              </div>
+              <h2 className="text-xl font-bold">Free</h2>
             </div>
-            <div className="mt-4">
+            <p className="text-sm text-muted-foreground mb-4">
+              Try MealEaseAI risk-free
+            </p>
+            <div>
               <p className="text-4xl font-bold tracking-tight">$0</p>
-              <p className="text-sm text-muted-foreground mt-1">No commitment</p>
+              <p className="text-sm text-muted-foreground mt-1">Forever free</p>
             </div>
           </div>
 
           <ul className="mb-8 flex-1 space-y-3.5">
             {[
-              'Instant meal previews',
-              '2 Tonight swipes per day',
-              '3-day weekly plan preview',
-              '3 kid recipe variations',
+              'Tonight Dinner',
+              '3 meal ideas per day',
+              'Simple grocery list',
+              'Basic dietary filters',
             ].map((f) => (
               <li key={f} className="flex items-start gap-3 text-sm">
                 <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
@@ -253,9 +265,10 @@ export function PricingContent() {
               </li>
             ))}
             {[
-              'Full 7-day planner',
-              'Grocery list',
-              'Weekend Mode',
+              'Unlimited generations',
+              'Weekly Planner',
+              'Pantry Mode',
+              'Kids Mode',
             ].map((f) => (
               <li key={f} className="flex items-start gap-3 text-sm text-muted-foreground/60">
                 <X className="mt-0.5 h-4 w-4 flex-shrink-0" />
@@ -265,54 +278,48 @@ export function PricingContent() {
           </ul>
 
           <Button asChild variant="outline" size="lg" className="w-full">
-            <Link href="/signup">Get started free</Link>
+            <Link href="/signup">Start Free</Link>
           </Button>
         </div>
 
         {/* Pro tier */}
-        <div className="relative flex flex-col rounded-3xl border-2 border-primary/30 bg-white p-8 shadow-xl shadow-primary/8 md:-translate-y-3">
-          <span className="absolute -top-3.5 left-7 rounded-full gradient-sage px-4 py-1.5 text-xs font-bold text-white tracking-wide shadow-md shadow-primary/20">
-            MOST POPULAR
-          </span>
-
+        <div className="relative flex flex-col rounded-3xl border-2 border-primary/30 bg-white p-8 shadow-xl shadow-primary/8">
           <div className="mb-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="rounded-2xl bg-gradient-to-br from-primary to-emerald-600 p-3 text-white shadow-md shadow-primary/20">
                 <Crown className="h-5 w-5" />
               </div>
-              <div>
-                <h2 className="text-xl font-bold">Pro</h2>
-                <p className="text-sm text-muted-foreground">
-                  Weeknights handled. Weekends elevated.
-                </p>
-              </div>
+              <h2 className="text-xl font-bold">Pro</h2>
             </div>
+            <p className="text-sm text-muted-foreground mb-4">
+              For individuals & couples
+            </p>
 
-            <div className="mt-4">
+            <div>
               {isAnnual ? (
                 <>
                   <div className="flex items-baseline gap-2">
                     <p className="text-4xl font-bold tracking-tight">
-                      ${ANNUAL_MONTHLY.toFixed(2)}
+                      ${(proAnnual / 12).toFixed(2)}
                       <span className="ml-1 text-base font-normal text-muted-foreground">/mo</span>
                     </p>
-                    <span className="text-sm text-muted-foreground line-through">${MONTHLY_PRICE}</span>
+                    <span className="text-sm text-muted-foreground line-through">${proMonthly}</span>
                   </div>
-                  <div className="flex items-center gap-2 mt-1.5">
-                    <Badge className="bg-emerald-100 text-emerald-800 border-0 text-[11px] font-bold">Save {ANNUAL_SAVINGS}%</Badge>
-                    <p className="text-sm text-muted-foreground">
-                      ${ANNUAL_PRICE}/year · billed annually
+                  <div className="mt-1.5">
+                    <Badge className="bg-emerald-100 text-emerald-800 border-0 text-[11px] font-bold">Save {PRO_ANNUAL_SAVINGS}%</Badge>
+                    <p className="text-sm text-muted-foreground mt-1.5">
+                      ${proAnnual}/year · billed annually
                     </p>
                   </div>
                 </>
               ) : (
                 <>
                   <p className="text-4xl font-bold tracking-tight">
-                    ${MONTHLY_PRICE}
+                    ${proMonthly}
                     <span className="ml-1 text-base font-normal text-muted-foreground">/month</span>
                   </p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Less than one takeout dinner
+                  <p className="text-sm text-muted-foreground mt-1.5">
+                    Billed monthly
                   </p>
                 </>
               )}
@@ -321,13 +328,15 @@ export function PricingContent() {
 
           <ul className="mb-6 flex-1 space-y-3.5">
             {[
-              'Full 7-day meal planner',
-              'Smart auto-built grocery list',
-              'Pantry Magic tools',
-              'Unlimited Tonight swipes',
-              'Adaptive learning for your household',
-              'Unlimited kid recipe variations',
-              'Image-to-meal & plan sharing',
+              'Unlimited meal generations',
+              'Full 7-day Weekly Planner',
+              'Save preferences',
+              'Household memory (1)',
+              'Budget meal mode',
+              'Healthy mode',
+              'Meal history',
+              'Faster AI responses',
+              'Unlimited regenerations',
             ].map((f) => (
               <li key={f} className="flex items-start gap-3 text-sm">
                 <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
@@ -336,86 +345,127 @@ export function PricingContent() {
             ))}
           </ul>
 
-          {/* Weekend Mode spotlight */}
-          <div className="mb-6 flex items-center gap-3 rounded-2xl border border-amber-200/70 bg-gradient-to-r from-amber-50/80 to-yellow-50/60 px-4 py-3.5">
-            <span className="text-2xl">🎬</span>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-amber-900">Weekend Mode included</p>
-              <p className="text-[12px] text-amber-700/70 mt-0.5 leading-snug">
-                Curated dinner + movie night every Fri & Sat — the perk members love most.
-              </p>
-            </div>
-          </div>
-
           <div className="space-y-2.5">
-            <Button
-              size="lg"
-              className="w-full gradient-sage border-0 text-white hover:opacity-90 shadow-md shadow-primary/15 gap-2 text-[15px]"
-              onClick={handleStartTrial}
-              disabled={isStartingTrial || (status.isPro && !paywallLoading)}
-            >
-              {isStartingTrial
-                ? 'Starting trial…'
-                : status.isPro
-                ? 'You have Pro'
-                : 'Try Pro free for 7 days'}
-              {!isStartingTrial && !status.isPro && <ArrowRight className="h-4 w-4" />}
-            </Button>
-            <p className="text-center text-xs text-muted-foreground">
-              No credit card required · Cancel anytime
-            </p>
-            {!status.isPro && (
-              <Button
-                variant="outline"
-                size="lg"
-                className="w-full"
-                onClick={handleCheckout}
-              >
-                Subscribe now — ${isAnnual ? `${ANNUAL_PRICE}/yr` : `${MONTHLY_PRICE}/mo`}
+            {!status.isPro ? (
+              <>
+                <Button
+                  size="lg"
+                  className="w-full gradient-sage border-0 text-white hover:opacity-90 shadow-md shadow-primary/15 gap-2 text-[15px]"
+                  onClick={handleStartTrial}
+                  disabled={isStartingTrial || paywallLoading}
+                >
+                  {isStartingTrial
+                    ? 'Starting trial…'
+                    : 'Upgrade to Pro'}
+                  {!isStartingTrial && <ArrowRight className="h-4 w-4" />}
+                </Button>
+                <p className="text-center text-xs text-muted-foreground">
+                  No credit card required · Cancel anytime
+                </p>
+              </>
+            ) : (
+              <Button disabled size="lg" className="w-full">
+                ✓ You have Pro
               </Button>
             )}
           </div>
         </div>
-      </div>
 
-      {/* ── Weekend Mode spotlight ── */}
-      <div className="mx-auto max-w-4xl mb-20">
-        <div className="relative overflow-hidden rounded-3xl border border-amber-200/60 bg-gradient-to-br from-amber-50/80 via-white to-yellow-50/40 px-8 py-10 sm:px-12 sm:py-12 text-center">
-          <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-amber-200/20 blur-3xl" />
-          <div className="pointer-events-none absolute -left-12 -bottom-12 h-40 w-40 rounded-full bg-yellow-200/15 blur-3xl" />
+        {/* Family Plus tier (highlighted) */}
+        <div className="relative flex flex-col rounded-3xl border-2 border-amber-400/60 bg-gradient-to-br from-white via-amber-50/30 to-yellow-50/40 p-8 shadow-2xl shadow-amber-200/30 md:scale-105 md:-translate-y-6">
+          <span className="absolute -top-4 right-8 rounded-full gradient-sage px-4 py-1.5 text-xs font-bold text-white tracking-wide shadow-md shadow-primary/20">
+            MOST POPULAR ⭐
+          </span>
 
-          <div className="relative">
-            <span className="text-5xl mb-4 block">🎬🍽️</span>
-            <Badge className="mb-4 border-amber-300 bg-amber-100 text-amber-900 text-xs font-bold">
-              PRO EXCLUSIVE
-            </Badge>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-3">
-              Weekend Mode
-            </h2>
-            <p className="mx-auto max-w-lg text-muted-foreground leading-relaxed">
-              Every Friday and Saturday, Pro members get a curated dinner + movie pairing —
-              a complete night-in experience picked just for you. No planning, no scrolling, just enjoy.
-            </p>
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-sm font-medium text-amber-900">
-              <span className="flex items-center gap-1.5 rounded-full bg-amber-100/80 px-3 py-1.5">
-                <Zap className="h-3.5 w-3.5" /> Auto-paired dinners
-              </span>
-              <span className="flex items-center gap-1.5 rounded-full bg-amber-100/80 px-3 py-1.5">
-                🎬 Curated movie picks
-              </span>
-              <span className="flex items-center gap-1.5 rounded-full bg-amber-100/80 px-3 py-1.5">
-                🔄 Swap until it&rsquo;s perfect
-              </span>
+          <div className="mb-6">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 p-3 text-white shadow-md shadow-amber-600/20">
+                <Gift className="h-5 w-5" />
+              </div>
+              <h2 className="text-xl font-bold">Family Plus</h2>
             </div>
-            {!status.isPro && (
-              <Button
-                size="lg"
-                className="mt-8 gradient-sage border-0 text-white hover:opacity-90 shadow-md shadow-primary/15 gap-2"
-                onClick={handleStartTrial}
-                disabled={isStartingTrial}
-              >
-                {isStartingTrial ? 'Starting trial…' : 'Unlock Weekend Mode — free for 7 days'}
-                {!isStartingTrial && <ArrowRight className="h-4 w-4" />}
+            <p className="text-sm text-muted-foreground mb-4">
+              Best for households & families
+            </p>
+
+            <div>
+              {isAnnual ? (
+                <>
+                  <div className="flex items-baseline gap-2">
+                    <p className="text-4xl font-bold tracking-tight">
+                      ${(familyAnnual / 12).toFixed(2)}
+                      <span className="ml-1 text-base font-normal text-muted-foreground">/mo</span>
+                    </p>
+                    <span className="text-sm text-muted-foreground line-through">${familyMonthly}</span>
+                  </div>
+                  <div className="mt-1.5">
+                    <Badge className="bg-emerald-100 text-emerald-800 border-0 text-[11px] font-bold">Save {FAMILY_ANNUAL_SAVINGS}%</Badge>
+                    <p className="text-sm text-muted-foreground mt-1.5">
+                      ${familyAnnual}/year · billed annually
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="text-4xl font-bold tracking-tight">
+                    ${familyMonthly}
+                    <span className="ml-1 text-base font-normal text-muted-foreground">/month</span>
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1.5">
+                    Billed monthly
+                  </p>
+                </>
+              )}
+            </div>
+          </div>
+
+          <ul className="mb-6 flex-1 space-y-3.5">
+            {[
+              'Everything in Pro, plus:',
+              '',
+              'Up to 6 family members',
+              'Kids Mode',
+              'Lunchbox Planner',
+              'Picky Eater Mode',
+              'Pantry Mode',
+              'Shared grocery lists',
+              'Family dashboard',
+              'Multi-profile balancing',
+              'Smart family planning',
+              'Household autopilot',
+              'Priority support',
+            ].map((f) => (
+              f === '' ? (
+                <div key="spacer" className="h-2" />
+              ) : f === 'Everything in Pro, plus:' ? (
+                <li key={f} className="text-sm font-semibold text-muted-foreground">{f}</li>
+              ) : (
+                <li key={f} className="flex items-start gap-3 text-sm">
+                  <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600" />
+                  <span>{f}</span>
+                </li>
+              )
+            ))}
+          </ul>
+
+          <div className="space-y-2.5">
+            {status.tier !== 'family' ? (
+              <>
+                <Button
+                  size="lg"
+                  className="w-full bg-gradient-to-r from-amber-500 to-orange-600 border-0 text-white hover:opacity-90 shadow-md shadow-amber-600/15 gap-2 text-[15px]"
+                  onClick={() => isAnnual ? handleCheckout('family_yearly') : handleCheckout('family_monthly')}
+                >
+                  Start Family Plus
+                  {<ArrowRight className="h-4 w-4" />}
+                </Button>
+                <p className="text-center text-xs text-muted-foreground">
+                  No credit card required · Cancel anytime
+                </p>
+              </>
+            ) : (
+              <Button disabled size="lg" className="w-full">
+                ✓ You have Family Plus
               </Button>
             )}
           </div>
@@ -456,27 +506,28 @@ export function PricingContent() {
       </div>
 
       {/* ── Comparison table ── */}
-      <div className="mx-auto max-w-3xl mb-20">
+      <div className="mx-auto max-w-5xl mb-20">
         <h2 className="text-2xl font-bold text-center mb-3 tracking-tight">
-          Free vs Pro — side by side
+          See what's included at each level
         </h2>
         <p className="text-center text-sm text-muted-foreground mb-8">
-          See exactly what you get at every level
+          Everything you need, nothing you don't
         </p>
         <div className="rounded-2xl border border-border/60 overflow-hidden">
-          <div className="grid grid-cols-3 bg-muted/50 text-sm font-semibold">
+          <div className="grid grid-cols-4 bg-muted/50 text-sm font-semibold sticky top-0">
             <div className="px-5 py-3.5">Feature</div>
             <div className="px-5 py-3.5 text-center">Free</div>
             <div className="px-5 py-3.5 text-center text-primary">Pro</div>
+            <div className="px-5 py-3.5 text-center text-amber-600 font-bold">Family Plus</div>
           </div>
-          {COMPARISON_FEATURES.map(({ feature, free, pro }, i) => (
+          {COMPARISON_FEATURES.map(({ feature, free, pro, family }, i) => (
             <div
               key={feature}
-              className={`grid grid-cols-3 text-sm ${
+              className={`grid grid-cols-4 text-sm ${
                 i % 2 === 0 ? 'bg-background' : 'bg-muted/20'
-              } ${feature.includes('Weekend') ? 'bg-amber-50/50' : ''}`}
+              }`}
             >
-              <div className={`px-5 py-3.5 font-medium ${feature.includes('Weekend') ? 'text-amber-900' : ''}`}>
+              <div className="px-5 py-3.5 font-medium">
                 {feature}
               </div>
               <div className="px-5 py-3.5 text-center text-muted-foreground">
@@ -501,6 +552,17 @@ export function PricingContent() {
                   pro
                 )}
               </div>
+              <div className="px-5 py-3.5 text-center font-medium text-amber-700">
+                {typeof family === 'boolean' ? (
+                  family ? (
+                    <Check className="mx-auto h-4 w-4 text-amber-600" />
+                  ) : (
+                    <span className="text-muted-foreground/40">—</span>
+                  )
+                ) : (
+                  family
+                )}
+              </div>
             </div>
           ))}
         </div>
@@ -513,7 +575,7 @@ export function PricingContent() {
           <div>
             <p className="font-bold text-sm">Risk-free guarantee</p>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Cancel anytime with one click. Full refund within 14 days if Pro isn&rsquo;t right for you. No questions asked.
+              Cancel anytime with one click from your account settings. Your plan stays active until the end of the current billing period.
             </p>
           </div>
         </div>
@@ -545,20 +607,21 @@ export function PricingContent() {
       {/* ── Bottom CTA ── */}
       <div className="text-center">
         <h3 className="text-xl font-bold tracking-tight mb-2">
-          Ready for stress-free dinners?
+          Choose your plan today
         </h3>
         <p className="text-muted-foreground mb-6 text-sm">
-          Join households who never ask &ldquo;what&rsquo;s for dinner?&rdquo; again.
+          No credit card needed. Upgrade anytime. Cancel anytime.
         </p>
-        {!status.isPro ? (
+        {!status.isAuthenticated ? (
           <Button
             size="lg"
             className="gradient-sage border-0 text-white hover:opacity-90 shadow-md shadow-primary/15 gap-2"
-            onClick={handleStartTrial}
-            disabled={isStartingTrial}
+            asChild
           >
-            {isStartingTrial ? 'Starting trial…' : 'Start your free trial'}
-            {!isStartingTrial && <ArrowRight className="h-4 w-4" />}
+            <Link href="/signup">
+              Start Free
+              <ArrowRight className="h-4 w-4" />
+            </Link>
           </Button>
         ) : (
           <Button asChild size="lg" variant="outline">
@@ -578,3 +641,4 @@ export function PricingContent() {
     </div>
   )
 }
+

@@ -1,5 +1,6 @@
 'use client'
 
+import type { SubscriptionTier } from '@/types'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -42,7 +43,7 @@ const navLinks = [
   { href: '/saved', label: 'Saved', icon: Bookmark },
 ]
 
-export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: string; subscriptionTier?: 'free' | 'plus' | 'pro' }) {
+export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: string; subscriptionTier?: SubscriptionTier }) {
   const pathname = usePathname()
   const router = useRouter()
   const { sidebarOpen, toggleSidebar } = useUIStore()

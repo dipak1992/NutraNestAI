@@ -8,7 +8,6 @@ import { LandingFeatures } from '@/components/landing/LandingFeatures'
 import { LandingSmartAI } from '@/components/landing/LandingSmartAI'
 import { LandingBeforeAfter } from '@/components/landing/LandingBeforeAfter'
 import { LandingTestimonials } from '@/components/landing/LandingTestimonials'
-import { LandingPricing } from '@/components/landing/LandingPricing'
 import { LandingFinalCTA } from '@/components/landing/LandingFinalCTA'
 import { Heart } from 'lucide-react'
 
@@ -98,7 +97,6 @@ export default function LandingPage() {
         <LandingSmartAI />
         <LandingBeforeAfter />
         <LandingTestimonials />
-        <LandingPricing />
         <LandingFinalCTA />
         <FriendlyDisclaimer />
       </main>

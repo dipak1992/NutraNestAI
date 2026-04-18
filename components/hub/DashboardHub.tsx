@@ -1,6 +1,8 @@
 'use client'
 
 import { useCallback, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { AnimatePresence } from 'framer-motion'
 import posthog from 'posthog-js'
 import { useOnboardingStore, useLightOnboardingStore } from '@/lib/store'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
@@ -9,6 +11,7 @@ import { ZeroCookSheet } from '@/components/zero-cook/ZeroCookSheet'
 import { ZeroCookTeaser } from '@/components/zero-cook/ZeroCookTeaser'
 import { householdFromMembers, fallbackHousehold } from '@/lib/decide/client'
 import { StreakBadge } from '@/components/habit/StreakBadge'
+import { PantryCapture } from './PantryCapture'
 import { HeroSection } from './HeroSection'
 import { TonightRecommendation } from './TonightRecommendation'
 import { SmartToolsRow } from './SmartToolsRow'
@@ -22,12 +25,14 @@ interface Props {
 
 export function DashboardHub({ userName }: Props) {
   const firstName = userName.includes('@') ? userName.split('@')[0] : userName
+  const router = useRouter()
 
   const [refreshKey, setRefreshKey] = useState(0)
   const tonightRef = useRef<HTMLDivElement>(null)
 
   const [zeroCookOpen, setZeroCookOpen] = useState(false)
   const [zeroCookTeaserOpen, setZeroCookTeaserOpen] = useState(false)
+  const [snapCookOpen, setSnapCookOpen] = useState(false)
 
   const {
     state: { members },
@@ -96,7 +101,25 @@ export function DashboardHub({ userName }: Props) {
             <TonightRecommendation refreshKey={refreshKey} />
           </div>
 
-          <SmartToolsRow />
+          <SmartToolsRow onSnapCook={() => setSnapCookOpen(true)} />
+
+          {/* Snap & Cook — PantryCapture overlay */}
+          <AnimatePresence>
+            {snapCookOpen && (
+              <div className="fixed inset-0 z-50 bg-white overflow-y-auto">
+                <PantryCapture
+                  onConfirm={(items) => {
+                    setSnapCookOpen(false)
+                    if (items.length > 0) {
+                      const q = encodeURIComponent(items.join(','))
+                      router.push(`/tonight?ingredients=${q}`)
+                    }
+                  }}
+                  onCancel={() => setSnapCookOpen(false)}
+                />
+              </div>
+            )}
+          </AnimatePresence>
 
           <ProgressCard />
 

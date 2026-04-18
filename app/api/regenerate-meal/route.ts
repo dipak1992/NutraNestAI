@@ -22,6 +22,8 @@ export async function POST(req: NextRequest) {
     }
 
     const plan = await regenerateMeals(body.request, body.modifier, body.currentMealContext)
+    // Track last meaningful activity for reactivation/winback emails
+    supabase.from('profiles').update({ last_active_at: new Date().toISOString() }).eq('user_id', user.id).then(() => {}, () => {})
     return NextResponse.json(plan)
   } catch (err) {
     logger.error('[regenerate-meal] Error', { error: err instanceof Error ? err.message : String(err) })

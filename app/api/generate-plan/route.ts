@@ -45,6 +45,9 @@ export async function POST(req: NextRequest) {
       p_feature_key: 'ai_plan_generation',
     }).then(() => {}, () => {})
 
+    // Track last meaningful activity for reactivation/winback emails
+    supabase.from('profiles').update({ last_active_at: new Date().toISOString() }).eq('user_id', user.id).then(() => {}, () => {})
+
     return NextResponse.json(plan)
   } catch (err) {
     logger.error('[generate-plan] Unhandled error', { error: err instanceof Error ? err.message : String(err) })

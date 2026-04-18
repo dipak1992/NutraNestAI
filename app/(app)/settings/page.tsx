@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Settings, User, Home, Leaf, LogOut, Trash2, Crown, Bell, Film } from 'lucide-react'
-import { getStageEmoji, stageLabelDisplay, ALLERGY_LABELS, CONDITION_LABELS } from '@/lib/utils'
+
 import { toast } from 'sonner'
 import { NotificationSettings } from '@/components/habit/NotificationSettings'
 
@@ -28,8 +28,12 @@ export default function SettingsPage() {
   const router = useRouter()
   const supabase = createClient()
   const { status } = usePaywallStatus()
-  const { state: { householdName, members, cuisinePreferences }, updateState } = useOnboardingStore()
-  const { cookingTimeMinutes, setCookingTimeMinutes, hasKids, kidsAgeGroup, setKidsAgeGroup } = useLightOnboardingStore()
+  const { state: { householdName, cuisinePreferences }, updateState } = useOnboardingStore()
+  const {
+    cookingTimeMinutes, setCookingTimeMinutes,
+    hasKids, kidsAgeGroup, setKidsAgeGroup,
+    householdType, pickyEater, lowEnergy, cuisines: lightCuisines,
+  } = useLightOnboardingStore()
   const [signingOut, setSigningOut] = useState(false)
   const [nameInput, setNameInput] = useState(householdName)
   const [deleteConfirm, setDeleteConfirm] = useState(false)
@@ -134,33 +138,62 @@ export default function SettingsPage() {
           </div>
 
           <div className="glass-card rounded-xl border border-border/60 p-5">
-            <h2 className="font-semibold mb-4">Members ({members.length})</h2>
-            {members.length > 0 ? (
-              <ul className="space-y-3">
-                {members.map((member) => (
-                  <li key={member.id} className="flex items-start gap-3 rounded-lg border border-border/40 bg-muted/20 p-3">
-                    <span className="text-xl mt-0.5">{getStageEmoji(member.stage ?? 'adult')}</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm">{member.name}</p>
-                      <p className="text-xs text-muted-foreground capitalize">{stageLabelDisplay(member.stage ?? 'adult')}</p>
-                      <div className="flex flex-wrap gap-1 mt-1.5">
-                        {member.allergies?.map((a) => (
-                          <Badge key={a.allergy} className="bg-amber-100 text-amber-700 border-0 text-xs">{ALLERGY_LABELS[a.allergy] ?? a.allergy}</Badge>
-                        ))}
-                        {member.conditions?.map((c) => (
-                          <Badge key={c.condition} className="bg-blue-100 text-blue-700 border-0 text-xs">{CONDITION_LABELS[c.condition] ?? c.condition}</Badge>
-                        ))}
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-semibold">Household Profile</h2>
+              <Button variant="outline" size="sm" onClick={() => router.push('/onboarding')}>
+                Edit Profile
+              </Button>
+            </div>
+
+            {!householdType ? (
+              <div className="text-center py-4 space-y-3">
+                <p className="text-sm text-muted-foreground">No profile set up yet. Complete onboarding so we can personalise every meal suggestion.</p>
+                <Button size="sm" className="gradient-sage text-white border-0" onClick={() => router.push('/onboarding')}>
+                  Set up household
+                </Button>
+              </div>
             ) : (
-              <p className="text-sm text-muted-foreground">No members yet. Complete onboarding to add family members.</p>
+              <div className="space-y-3">
+                {/* Household type row */}
+                <div className="flex items-center gap-3 rounded-lg border border-border/40 bg-muted/20 p-3">
+                  <span className="text-xl">
+                    {householdType === 'solo' ? '🧑' : householdType === 'couple' ? '👫' : '👨‍👩‍👧‍👦'}
+                  </span>
+                  <div>
+                    <p className="text-sm font-medium capitalize">{householdType === 'solo' ? 'Just me' : householdType === 'couple' ? 'Couple' : 'Family'}</p>
+                    <p className="text-xs text-muted-foreground">Household type</p>
+                  </div>
+                </div>
+
+                {/* Kids row */}
+                {householdType !== 'solo' && (
+                  <div className="flex items-center gap-3 rounded-lg border border-border/40 bg-muted/20 p-3">
+                    <span className="text-xl">{hasKids ? '👶' : '🧑‍🤝‍🧑'}</span>
+                    <div>
+                      <p className="text-sm font-medium">{hasKids ? 'Has kids' : 'Adults only'}</p>
+                      {hasKids && kidsAgeGroup && (
+                        <p className="text-xs text-muted-foreground capitalize">{kidsAgeGroup.replace('_', ' ')} age group</p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Trait badges */}
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {pickyEater && (
+                    <Badge className="bg-orange-100 text-orange-700 border-0 text-xs">🥄 Picky-eater friendly</Badge>
+                  )}
+                  {lowEnergy && (
+                    <Badge className="bg-blue-100 text-blue-700 border-0 text-xs">⚡ Low energy mode</Badge>
+                  )}
+                  {lightCuisines.length > 0 && (
+                    <Badge className="bg-green-100 text-green-700 border-0 text-xs">
+                      🍽️ {lightCuisines.slice(0, 2).join(', ')}{lightCuisines.length > 2 ? ` +${lightCuisines.length - 2}` : ''}
+                    </Badge>
+                  )}
+                </div>
+              </div>
             )}
-            <Button variant="outline" size="sm" className="mt-4" onClick={() => router.push('/onboarding')}>
-              Edit Members
-            </Button>
           </div>
 
           {hasKids && (

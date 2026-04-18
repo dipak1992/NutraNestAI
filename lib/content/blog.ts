@@ -1267,6 +1267,334 @@ const BLOG_POSTS: BlogPost[] = [
       },
     ],
   },
+
+  // ──────────────────────── SESSION 2: NEW SEO POSTS ─────────────────────────
+  {
+    slug: 'dinner-ideas-picky-kids-will-actually-eat',
+    title: 'Dinner Ideas Picky Kids Will Actually Eat',
+    metaTitle: 'Dinner Ideas Picky Kids Will Actually Eat (Low-Pressure Guide)',
+    excerpt:
+      'Feeding a picky eater does not require a separate menu — it requires one shared meal with a few smart adjustments.',
+    description:
+      'Practical dinner ideas for picky kids: choose-your-own formats, safe familiar components, and a low-pressure table routine that builds acceptance over time.',
+    category: 'Family & Kids',
+    tags: ['dinner ideas picky kids', 'picky eater meals', 'toddler dinner ideas'],
+    publishedAt: '2026-04-16',
+    readingTime: '6 min read',
+    heroImage: UNSPLASH('toddler,eating,dinner,highchair'),
+    heroImageAlt: 'Toddler eating a simple family dinner with familiar components',
+    heroImagePrompt:
+      'Realistic photo of a toddler at a dinner table with a simple plate of noodles, shredded chicken, and cucumber, warm kitchen light, calm home atmosphere',
+    internalLinks: [
+      { label: 'Healthy Toddler Dinners the Whole Family Can Eat', href: '/blog/healthy-toddler-dinners-the-whole-family-can-eat' },
+      { label: 'Quick Dinner Ideas When the Kids Are Melting Down', href: '/blog/quick-dinner-ideas-when-the-kids-are-melting-down' },
+      { label: 'Build your picky-eater plan with MealEase', href: '/' },
+    ],
+    ctaText: DEFAULT_CTA,
+    author: DEFAULT_AUTHOR,
+    sections: [
+      {
+        heading: 'Reduce pressure at the table, not the nutrition in the meal',
+        paragraphs: [
+          'Most picky-eater dinner problems are not about food — they are about pressure. Children who eat under high stress become more avoidant over time, not less. A low-pressure table routine does more long-term work than rotating to new recipes every week.',
+          'The goal is one shared family meal that always includes at least one component the child already accepts. You are not cooking two dinners — you are plating one dinner thoughtfully.',
+        ],
+      },
+      {
+        heading: 'Formats picky kids tend to accept',
+        paragraphs: [
+          'These dinner formats work because they separate components, let children have some control, and minimise mixed textures and mystery ingredients.',
+        ],
+        bullets: [
+          'Buttered noodles + a protein on the side: familiar and predictable.',
+          'Taco bar: lay out components separately and let the child build their own plate.',
+          'Pizza toast: bread, sauce, cheese — safe by design.',
+          'Rice + fried egg + cucumber slices: simple, recognisable, protein-complete.',
+          'Quesadilla triangle: plain cheese is always acceptable, add protein once accepted.',
+        ],
+      },
+      {
+        heading: 'Keep repeating — not replacing',
+        paragraphs: [
+          'Research on food acceptance in children consistently shows that repeated low-pressure exposure builds familiarity faster than constant rotation. If a child refuses broccoli eight times, the answer is not to stop serving broccoli — it is to keep offering it in small amounts without comment.',
+          'Pick five to seven dinners your family can rotate. That list is more valuable than a hundred new recipes.',
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: 'Should I make a separate dinner for my picky child?',
+        answer:
+          'In general, no. A separate dinner trains the expectation that food will be customised on demand. A better approach is one shared meal with at least one item the child already accepts.',
+      },
+      {
+        question: 'What do I do if my kid refuses every dinner?',
+        answer:
+          'Try the division of responsibility model: you decide what is served, they decide how much to eat. Remove pressure, stay consistent for two to four weeks, and expect slow progress rather than immediate change.',
+      },
+    ],
+  },
+  {
+    slug: 'weekly-meal-prep-for-families',
+    title: 'Weekly Meal Prep for Families: A Realistic Starting Guide',
+    metaTitle: 'Weekly Meal Prep for Families (A Realistic Starting Guide)',
+    excerpt:
+      'Family meal prep works best when you prep components — not complete meals — and use them across three or four dinners.',
+    description:
+      'How to start weekly meal prep for a family: component-first prep, a 30-minute Sunday routine, and a flexible system that adapts when the week goes sideways.',
+    category: 'Decision Fatigue',
+    tags: ['weekly meal prep for families', 'family meal prep', 'meal prep for the week'],
+    publishedAt: '2026-04-16',
+    readingTime: '6 min read',
+    heroImage: UNSPLASH('open,fridge,ingredients'),
+    heroImageAlt: 'Open fridge stocked with prepped family meal components',
+    heroImagePrompt:
+      'Realistic photo of a home fridge neatly stocked with prepped containers of rice, roasted vegetables, cooked chicken, and washed produce, soft kitchen light',
+    internalLinks: [
+      { label: 'Family Meal Planning for Busy Weeknights', href: '/blog/family-meal-planning-for-busy-weeknights' },
+      { label: 'The 5-Meal Rotation That Ended Our Dinner Chaos', href: '/blog/the-5-meal-rotation-that-ended-our-dinner-chaos' },
+      { label: 'Generate your weekly meal plan with MealEase', href: '/' },
+    ],
+    ctaText: DEFAULT_CTA,
+    author: DEFAULT_AUTHOR,
+    sections: [
+      {
+        heading: 'Prep components, not complete meals',
+        paragraphs: [
+          'The biggest mistake in family meal prep is cooking full recipes in advance. By Thursday, a reheated Monday dinner tastes like a Monday dinner. A better model is prepping components that can be recombined into different meals across the week.',
+          'Cook a batch of grains, roast a tray of vegetables, and prep one or two proteins. Those components become bowls, tacos, pastas, and stir-fries depending on the day.',
+        ],
+      },
+      {
+        heading: 'The 30-minute Sunday prep that changes the whole week',
+        paragraphs: [
+          'You do not need a four-hour prep session. A focused 30 minutes on Sunday removes the hardest part of every weeknight dinner.',
+        ],
+        bullets: [
+          'Cook a large batch of rice, quinoa, or pasta.',
+          'Roast one tray of vegetables at 425°F for 20–25 minutes.',
+          'Cook one protein: baked chicken thighs, ground beef, or hard-boiled eggs.',
+          'Wash and chop any raw produce you plan to use that week.',
+        ],
+      },
+      {
+        heading: 'Use the prep three different ways',
+        paragraphs: [
+          'On Monday, those components might become a grain bowl. On Wednesday, the same chicken and rice go into a quick stir-fry. On Friday, the roasted vegetables end up in a frittata or pasta. The prep does not constrain you — it gives you a running start each night.',
+          'When the week goes sideways and you skip prep, fall back on two or three rescue dinners that need no prep at all.',
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: 'How far in advance can I meal prep for the week?',
+        answer:
+          'Cooked grains and roasted vegetables keep well for four to five days in the fridge. Cooked proteins are best used within three to four days. Prep on Sunday for a full week of dinners through Thursday.',
+      },
+      {
+        question: "What's the most efficient family meal prep strategy?",
+        answer:
+          'Component prep beats full-meal prep almost every time. Focus on one grain, one batch of vegetables, and one protein. Those three things fuel four to five different dinners with almost no weeknight effort.',
+      },
+    ],
+  },
+  {
+    slug: 'cheap-family-dinners-under-ten-dollars',
+    title: 'Cheap Family Dinners: 8 Meals Under $10 That Feel Like Real Food',
+    metaTitle: 'Cheap Family Dinners Under $10 That Still Feel Like a Real Meal',
+    excerpt:
+      'Budget family dinners do not require sacrifice — they require a short list of reliable proteins and a few pantry staples.',
+    description:
+      'Eight cheap family dinner ideas that come in under $10 and still feel like a real meal, with a pantry-first shopping strategy that keeps costs low every week.',
+    category: 'Daily Problem',
+    tags: ['cheap family dinners', 'budget family meals', 'affordable dinner ideas'],
+    publishedAt: '2026-04-16',
+    readingTime: '6 min read',
+    heroImage: UNSPLASH('sheet,pan,sausage,potatoes'),
+    heroImageAlt: 'Sheet pan sausage and potato dinner — a budget family favourite',
+    heroImagePrompt:
+      'Realistic overhead photo of a sheet pan with roasted sausages, potatoes, and broccoli, warm natural light, a budget-friendly family dinner on a plain baking sheet',
+    internalLinks: [
+      { label: 'Pantry Meal Ideas When Payday Is Still Days Away', href: '/blog/pantry-meal-ideas-when-payday-is-still-days-away' },
+      { label: 'Family Meal Planning for Busy Weeknights', href: '/blog/family-meal-planning-for-busy-weeknights' },
+      { label: 'Plan budget-friendly dinners with MealEase', href: '/' },
+    ],
+    ctaText: DEFAULT_CTA,
+    author: DEFAULT_AUTHOR,
+    sections: [
+      {
+        heading: 'Budget dinner wins come from repetition, not sacrifice',
+        paragraphs: [
+          'The households that consistently eat well on a tight food budget are not eating sad meals — they are rotating a small number of cheap, reliably good dinners. The goal is not to find the cheapest possible meal each week. The goal is to find 6–8 meals your family likes that happen to be inexpensive.',
+          'Beans, eggs, canned fish, pasta, rice, lentils, and sausage are the building blocks. Learn to cook those well and the grocery bill shrinks without anyone noticing.',
+        ],
+      },
+      {
+        heading: 'Eight family dinners that come in under $10',
+        paragraphs: [
+          'These are based on a family of four and average grocery prices. Each one uses pantry staples and basic fresh ingredients.',
+        ],
+        bullets: [
+          'Spaghetti bolognese with ground beef and jarred sauce.',
+          'Bean and rice bowls with canned black beans, avocado, and salsa.',
+          'Sheet-pan sausages with potatoes and broccoli.',
+          'Lentil soup with carrots, onion, and a can of tomatoes.',
+          'Egg fried rice with frozen peas and soy sauce.',
+          'Black bean tacos with shredded cheese and lime crema.',
+          'Pasta with butter, frozen peas, and parmesan.',
+          'Pita pizzas with jarred sauce, mozzarella, and whatever toppings you have.',
+        ],
+      },
+      {
+        heading: 'Shop for formats, not recipes',
+        paragraphs: [
+          'The real money-saver in family cooking is buying ingredients that work across multiple meals rather than buying specific ingredients for one recipe. A bag of dried lentils feeds two dinners. A pack of chicken thighs covers three nights. Pantry staples — olive oil, canned tomatoes, dried pasta, rice, spices — amplify every cheap protein you buy.',
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: "What's the cheapest dinner to make for a family of four?",
+        answer:
+          'Pasta with butter and parmesan, bean and rice bowls, and egg fried rice are consistently among the cheapest family dinners — all under $5 for four people when using pantry staples.',
+      },
+      {
+        question: 'How do I cut the grocery bill without the family noticing?',
+        answer:
+          'Replace one expensive protein per week with a cheaper alternative: beans instead of ground beef in tacos, lentils instead of lamb in stews, eggs instead of chicken in stir-fries. The format stays the same; the cost drops.',
+      },
+    ],
+  },
+  {
+    slug: 'healthy-weeknight-dinners-for-busy-families',
+    title: 'Healthy Weeknight Dinners for Busy Families',
+    metaTitle: 'Healthy Weeknight Dinners for Busy Families (Quick and Realistic)',
+    excerpt:
+      'Healthy weeknight dinners do not require complex recipes — they require a reliable format and ingredients that do the work for you.',
+    description:
+      'Quick, healthy weeknight dinner ideas for families: five formats that are nutritious by design, a produce shortcut for busy nights, and a realistic definition of "healthy".',
+    category: 'Quick Meals',
+    tags: ['healthy weeknight dinners', 'quick healthy family dinner ideas', 'healthy family meals'],
+    publishedAt: '2026-04-16',
+    readingTime: '5 min read',
+    heroImage: UNSPLASH('healthy,dinner,herbs,lemon'),
+    heroImageAlt: 'Fresh herbs and lemon alongside a healthy family weeknight dinner',
+    heroImagePrompt:
+      'Realistic overhead photo of a healthy family dinner plate with grilled chicken, roasted vegetables, lemon wedges, and fresh herbs, bright natural light, clean presentation',
+    internalLinks: [
+      { label: 'Low-Sodium Family Dinners Without Bland Food', href: '/blog/low-sodium-family-dinners-without-bland-food' },
+      { label: '15-Minute Dinners for Busy Families', href: '/blog/15-minute-dinners-for-busy-families' },
+      { label: 'Build a healthy family plan with MealEase', href: '/' },
+    ],
+    ctaText: DEFAULT_CTA,
+    author: DEFAULT_AUTHOR,
+    sections: [
+      {
+        heading: 'A realistic definition of healthy',
+        paragraphs: [
+          'On a weeknight, a healthy dinner is one that has a protein source, a vegetable, and a reasonable amount of calories — not a meal that earns a nutrition score from a dietitian.',
+          'The families who eat well on weeknights are not cooking elaborate health recipes. They are cooking simple formats — a sheet pan, a stir-fry, a grain bowl — where the ingredients happen to be nutritious.',
+        ],
+      },
+      {
+        heading: 'Five formats that are healthy by default',
+        paragraphs: [
+          'These formats are healthy without any extra effort because they build produce and protein into the structure of the meal.',
+        ],
+        bullets: [
+          'Sheet-pan protein + roasted vegetables: one pan, protein-and-produce every time.',
+          'Grain bowl with a protein and whatever vegetables you have: inherently balanced.',
+          'Stir-fry with frozen mixed vegetables: fast, nutritious, flexible.',
+          'Baked or pan-seared fish with roasted potatoes and a green vegetable.',
+          'Soup with a legume base and whatever vegetables need using.',
+        ],
+      },
+      {
+        heading: 'The produce shortcut that makes healthy dinners actually happen',
+        paragraphs: [
+          'Fresh produce that needs washing and chopping gets skipped on tired nights. The fix is to buy pre-washed salad bags, pre-cut stir-fry vegetable packs, and steam-in-bag frozen vegetables. You do not lose much nutrition and you remove the highest-friction step between you and a healthy dinner.',
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: 'What counts as a healthy family dinner?',
+        answer:
+          'A practical definition: one protein source, at least one vegetable, a carbohydrate in a reasonable portion. If the meal hits those three marks, it is a healthy dinner — regardless of what cookbook it came from.',
+      },
+      {
+        question: 'How do I get kids to eat more vegetables at dinner?',
+        answer:
+          'Repeated low-pressure exposure works better than hiding vegetables or forcing servings. Serve a small amount of one vegetable alongside familiar foods every dinner. Do not comment on whether it gets eaten.',
+      },
+    ],
+  },
+  {
+    slug: 'one-pot-family-dinner-ideas',
+    title: 'One-Pot Family Dinner Ideas That Actually Work on Weeknights',
+    metaTitle: 'One-Pot Family Dinner Ideas That Work on Weeknights',
+    excerpt:
+      'One-pot dinners solve two problems at once: getting food on the table and keeping cleanup under five minutes.',
+    description:
+      'Easy one-pot family dinner ideas for weeknights — six proven recipes, the liquid ratio trick that makes them work, and a cleanup rule that keeps the kitchen sane.',
+    category: 'Quick Meals',
+    tags: ['one pot family dinners', 'easy one pot meals for family', 'one pot dinner recipes'],
+    publishedAt: '2026-04-16',
+    readingTime: '5 min read',
+    heroImage: UNSPLASH('one,pan,dinner,stove'),
+    heroImageAlt: 'One-pot family dinner simmering on a home stovetop',
+    heroImagePrompt:
+      'Realistic photo of a Dutch oven or deep skillet with a one-pot chicken and rice dinner simmering on a home stovetop, warm indoor light, steam rising',
+    internalLinks: [
+      { label: 'One-Pan Dinners That Clean Up in 5 Minutes', href: '/blog/one-pan-dinners-that-clean-up-in-5-minutes' },
+      { label: '15-Minute Dinners for Busy Families', href: '/blog/15-minute-dinners-for-busy-families' },
+      { label: 'Get your one-pot plan from MealEase', href: '/' },
+    ],
+    ctaText: DEFAULT_CTA,
+    author: DEFAULT_AUTHOR,
+    sections: [
+      {
+        heading: 'One pot means one cleanup, and that matters on weeknights',
+        paragraphs: [
+          'Most dinner friction is not about cooking — it is about cleanup. A meal that requires five pans feels exhausting before you start. A one-pot dinner changes the emotional calculus: you can make a full family meal and have the kitchen back in ten minutes.',
+          'One-pot cooking is also more forgiving. Liquid keeps the temperature even, flavors develop as everything cooks together, and timing is more flexible than stovetop methods where things can dry out or burn quickly.',
+        ],
+      },
+      {
+        heading: 'Six one-pot family dinners that everyone eats',
+        paragraphs: [
+          'These are built around a Dutch oven, deep skillet, or large saucepan. All six work for adults and can be adapted for younger children.',
+        ],
+        bullets: [
+          'One-pot pasta: pasta, broth, garlic, tomatoes — everything cooks together in the same pot.',
+          'Chicken and rice skillet: chicken thighs, rice, broth, peas — one pan, complete meal.',
+          'Classic chili: ground beef or beans, canned tomatoes, spices — low and slow.',
+          'Minestrone soup: whatever vegetables you have, beans, pasta, broth.',
+          'Beef and potato stew: chuck beef, potatoes, carrots, broth — hands-off after browning.',
+          'Thai peanut noodles: rice noodles, peanut butter, soy sauce, frozen edamame, lime.',
+        ],
+      },
+      {
+        heading: 'Build the liquid right and the rest takes care of itself',
+        paragraphs: [
+          'The most common one-pot mistake is not enough liquid. Grains and pasta absorb more than you expect, and low liquid causes sticking and uneven cooking. Use the ratio listed on the grain package and then add 10–15% more when cooking in a sealed pot with proteins.',
+          'Season the liquid, not just the surface. A well-seasoned broth makes a one-pot meal taste like it cooked all day.',
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: 'What is the easiest one-pot dinner for a family?',
+        answer:
+          'One-pot pasta is the lowest-barrier entry: pasta, canned tomatoes, garlic, broth, and any protein you have. Everything goes in one pot, takes about 20 minutes, and cleans up in two minutes.',
+      },
+      {
+        question: 'Can I make one-pot dinners ahead of time?',
+        answer:
+          'Soups, chilis, and stews improve overnight and reheat beautifully. One-pot pasta and rice dishes are best eaten fresh — they thicken as they sit and can become stodgy if reheated.',
+      },
+    ],
+  },
 ]
 
 export function getAllBlogPosts() {

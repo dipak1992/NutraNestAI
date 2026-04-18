@@ -12,7 +12,6 @@ import type { HouseholdType } from '@/lib/hooks/use-household-config'
 // ── localStorage-backed dedup store ────────────────────────────────────────────
 
 const LS_KEY = 'mealease_recent_support_lines'
-const VARIANT_KEY = 'mealease_support_message_variant'
 const MAX_RECENT = 14
 
 interface RecentEntry {
@@ -61,17 +60,9 @@ function recordLine(line: string): void {
 }
 
 function getMessageVariant(): 'control' | 'support-line' {
-  if (typeof window === 'undefined') return 'support-line'
-  try {
-    const existing = localStorage.getItem(VARIANT_KEY)
-    if (existing === 'control' || existing === 'support-line') return existing
-
-    const variant = new Date().getDate() % 2 === 0 ? 'control' : 'support-line'
-    localStorage.setItem(VARIANT_KEY, variant)
-    return variant
-  } catch {
-    return 'support-line'
-  }
+  // Keep the line visible for all users.
+  // We preserve the variant field for compatibility with existing analytics payloads.
+  return 'support-line'
 }
 
 // ── Hook ───────────────────────────────────────────────────────────────────────
@@ -98,12 +89,10 @@ export function useDashboardMessage(): DashboardMessage {
       recentLines,
       budgetSensitive,
     })
-    if (variant === 'support-line') {
-      recordLine(msg.supportLine)
-    }
+    recordLine(msg.supportLine)
     return {
       ...msg,
-      supportLine: variant === 'support-line' ? msg.supportLine : '',
+      supportLine: msg.supportLine,
       variant,
     }
   }, [householdType, budgetSensitive])

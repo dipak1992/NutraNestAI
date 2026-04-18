@@ -9,6 +9,8 @@ import { generateSmartMeal } from '@/lib/engine/engine'
 import { buildGroceryList } from '@/lib/planner/grocery'
 import { getPaywallStatus } from '@/lib/paywall/server'
 import { FREE_PLAN_PREVIEW_DAYS } from '@/lib/paywall/config'
+import { createClient } from '@/lib/supabase/server'
+import { getUserDietaryPrefs, applyPrefsToEngineRequest } from '@/lib/meal-engine/preferences'
 import type { SmartMealRequest } from '@/lib/engine/types'
 import type { LearnedBoosts } from '@/lib/learning/types'
 import type { StoreFormat } from '@/lib/planner/types'
@@ -41,7 +43,11 @@ export async function POST(req: Request) {
       )
     }
 
-    const { baseRequest, learnedBoosts, storeFormat = 'standard', weekStart, pantryItems = [] } = body
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const prefs = user ? await getUserDietaryPrefs(user.id) : null
+    const { baseRequest: rawBaseRequest, learnedBoosts, storeFormat = 'standard', weekStart, pantryItems = [] } = body
+    const baseRequest = prefs ? applyPrefsToEngineRequest(rawBaseRequest, prefs) : rawBaseRequest
 
     const { adultsCount = 1, kidsCount = 0, toddlersCount = 0, babiesCount = 0 } = baseRequest.household
     if (adultsCount + kidsCount + toddlersCount + babiesCount === 0) {

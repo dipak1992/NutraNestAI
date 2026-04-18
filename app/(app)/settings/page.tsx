@@ -10,10 +10,11 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Settings, User, Home, Leaf, LogOut, Trash2, Crown, Bell, Film } from 'lucide-react'
+import { Settings, User, Home, Leaf, LogOut, Trash2, Crown, Bell, Film, UtensilsCrossed } from 'lucide-react'
 
 import { toast } from 'sonner'
 import { NotificationSettings } from '@/components/habit/NotificationSettings'
+import { DietaryPreferencesTab } from '@/components/settings/DietaryPreferencesTab'
 
 const CUISINE_OPTIONS = ['Italian', 'Mexican', 'Asian', 'Mediterranean', 'American', 'Indian', 'Middle Eastern', 'Japanese', 'Thai', 'French', 'Nepali']
 const COOKING_TIME_OPTIONS = [
@@ -120,6 +121,7 @@ export default function SettingsPage() {
           <TabsList className="mb-6 w-full justify-start">
             <TabsTrigger value="household" className="gap-2"><Home className="h-4 w-4" />Household</TabsTrigger>
             <TabsTrigger value="preferences" className="gap-2"><Leaf className="h-4 w-4" />Preferences</TabsTrigger>
+            <TabsTrigger value="diet" className="gap-2"><UtensilsCrossed className="h-4 w-4" />Diet &amp; Allergies</TabsTrigger>
             <TabsTrigger value="account" className="gap-2"><User className="h-4 w-4" />Account</TabsTrigger>
             <TabsTrigger value="notifications" className="gap-2"><Bell className="h-4 w-4" />Notifications</TabsTrigger>
             <TabsTrigger value="billing" className="gap-2"><Crown className="h-4 w-4" />Billing</TabsTrigger>
@@ -265,6 +267,10 @@ export default function SettingsPage() {
               ))}
             </div>
           </div>
+        </TabsContent>
+
+        <TabsContent value="diet">
+          <DietaryPreferencesTab hasKids={hasKids ?? undefined} />
         </TabsContent>
 
         <TabsContent value="account" className="space-y-6">

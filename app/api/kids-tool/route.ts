@@ -4,6 +4,7 @@ import { rateLimit, rateLimitKeyFromRequest } from '@/lib/rate-limit'
 import { apiError, apiRateLimited } from '@/lib/api-response'
 import { generateText, stripJsonFences } from '@/lib/ai/service'
 import logger from '@/lib/logger'
+import { getUserDietaryPrefs, buildPreferenceContext } from '@/lib/meal-engine/preferences'
 
 export type KidsToolIntent = 'lunchbox' | 'snack' | 'bake' | 'picky' | 'fast'
 
@@ -62,11 +63,12 @@ export interface FastResult {
 
 export type KidsToolResult = LunchboxResult | SnackResult | BakeResult | PickyResult | FastResult
 
-function buildPrompt(intent: KidsToolIntent): { system: string; user: string } {
+function buildPrompt(intent: KidsToolIntent, prefContext: string): { system: string; user: string } {
+  const prefSuffix = prefContext ? `\n\n${prefContext}` : ''
   switch (intent) {
     case 'lunchbox':
       return {
-        system: `You are a friendly kids nutrition expert helping parents pack school lunchboxes. Return ONLY valid JSON. No markdown fences, no extra text.`,
+        system: `You are a friendly kids nutrition expert helping parents pack school lunchboxes. Return ONLY valid JSON. No markdown fences, no extra text.${prefSuffix}`,
         user: `Generate one creative and nutritious school lunchbox idea. Return this exact JSON shape:
 {
   "intent": "lunchbox",
@@ -83,7 +85,7 @@ Be creative but practical. Keep everything kid-friendly ages 4-12.`,
 
     case 'snack':
       return {
-        system: `You are a kids snack specialist helping parents find quick, healthy after-school snacks. Return ONLY valid JSON. No markdown fences, no extra text.`,
+        system: `You are a kids snack specialist helping parents find quick, healthy after-school snacks. Return ONLY valid JSON. No markdown fences, no extra text.${prefSuffix}`,
         user: `Generate one great after-school snack idea for kids. Return this exact JSON shape:
 {
   "intent": "snack",
@@ -99,7 +101,7 @@ Keep it healthy, fast, and fun for kids aged 4-12.`,
 
     case 'bake':
       return {
-        system: `You are a family baking expert who specializes in fun baking activities for parents and kids. Return ONLY valid JSON. No markdown fences, no extra text.`,
+        system: `You are a family baking expert who specializes in fun baking activities for parents and kids. Return ONLY valid JSON. No markdown fences, no extra text.${prefSuffix}`,
         user: `Generate one fun baking activity parents and kids can do together. Return this exact JSON shape:
 {
   "intent": "bake",
@@ -117,7 +119,7 @@ Make it genuinely fun, achievable for kids, with manageable mess.`,
 
     case 'picky':
       return {
-        system: `You are a pediatric feeding specialist helping parents with picky eaters. You specialize in bridge meals — familiar foods kids are likely to accept. Return ONLY valid JSON. No markdown fences, no extra text.`,
+        system: `You are a pediatric feeding specialist helping parents with picky eaters. You specialize in bridge meals — familiar foods kids are likely to accept. Return ONLY valid JSON. No markdown fences, no extra text.${prefSuffix}`,
         user: `Generate one picky eater bridge meal a picky child is likely to accept. Return this exact JSON shape:
 {
   "intent": "picky",
@@ -133,7 +135,7 @@ acceptance_score is an integer 1-10 (10 = highest picky-eater acceptance). Focus
 
     case 'fast':
       return {
-        system: `You are a quick-meal expert for busy parents who need food on the table in 5 minutes or less. Return ONLY valid JSON. No markdown fences, no extra text.`,
+        system: `You are a quick-meal expert for busy parents who need food on the table in 5 minutes or less. Return ONLY valid JSON. No markdown fences, no extra text.${prefSuffix}`,
         user: `Generate one ultra-fast meal ready in 5 minutes or less for hungry kids. Return this exact JSON shape:
 {
   "intent": "fast",
@@ -165,7 +167,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid intent. Use: lunchbox, snack, bake, picky, fast' }, { status: 400 })
     }
 
-    const { system, user: userPrompt } = buildPrompt(intent)
+    const prefs = await getUserDietaryPrefs(user.id)
+    const prefContext = prefs ? buildPreferenceContext(prefs, { includeKidsSettings: true }) : ''
+
+    const { system, user: userPrompt } = buildPrompt(intent, prefContext)
     const { text } = await generateText({ system, user: userPrompt, maxTokens: 1024 })
     const clean = stripJsonFences(text)
     const result = JSON.parse(clean) as KidsToolResult

@@ -26,6 +26,7 @@ export async function POST(req: NextRequest) {
       excludeTitles?: string[]
       swapMeal?: boolean
       swapEntertainment?: boolean
+      entertainmentPrefs?: EntertainmentPrefs
     }
 
     // Load user preferences from DB
@@ -45,7 +46,7 @@ export async function POST(req: NextRequest) {
       babiesCount: 0,
     }
 
-    const entertainmentPrefs: EntertainmentPrefs = prefs?.entertainment_prefs ?? {
+    const entertainmentPrefs: EntertainmentPrefs = body.entertainmentPrefs ?? prefs?.entertainment_prefs ?? {
       language: 'English',
       genre: ['Comedy', 'Drama'],
       watchStyle: hasKids ? 'family' : 'couple',

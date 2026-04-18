@@ -6,6 +6,7 @@ import { AnimatePresence } from 'framer-motion'
 import posthog from 'posthog-js'
 import { useOnboardingStore, useLightOnboardingStore } from '@/lib/store'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
+import { useHouseholdConfig } from '@/lib/hooks/use-household-config'
 import { OnboardingPromptPopup } from '@/components/onboarding/OnboardingPromptPopup'
 import { ZeroCookSheet } from '@/components/zero-cook/ZeroCookSheet'
 import { ZeroCookTeaser } from '@/components/zero-cook/ZeroCookTeaser'
@@ -39,6 +40,7 @@ export function DashboardHub({ userName }: Props) {
   } = useOnboardingStore()
   const light = useLightOnboardingStore()
   const { status: paywallStatus } = usePaywallStatus()
+  const householdConfig = useHouseholdConfig()
 
   const getHousehold = useCallback(
     () =>
@@ -93,15 +95,16 @@ export function DashboardHub({ userName }: Props) {
             firstName={firstName}
             onQuickDecide={handleQuickDecide}
             onZeroCook={handleZeroCook}
+            householdConfig={householdConfig}
           />
 
-          <WeekendModeCard />
+          <WeekendModeCard weekendSubtitle={householdConfig.weekendSubtitle} />
 
           <div ref={tonightRef}>
             <TonightRecommendation refreshKey={refreshKey} />
           </div>
 
-          <SmartToolsRow onSnapCook={() => setSnapCookOpen(true)} />
+          <SmartToolsRow onSnapCook={() => setSnapCookOpen(true)} householdConfig={householdConfig} />
 
           {/* Snap & Cook — PantryCapture overlay */}
           <AnimatePresence>

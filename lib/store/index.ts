@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { AIGeneratedPlan, HouseholdMember, KidsAgeGroup } from '@/types'
+import type { AIGeneratedPlan, EntertainmentPrefs, HouseholdMember, KidsAgeGroup } from '@/types'
 
 // Local OnboardingState — flat structure used by settings/onboarding pages
 export interface OnboardingState {
@@ -144,6 +144,7 @@ export interface LightOnboardingData {
   lowEnergy: boolean
   country: string
   storePreference: string
+  entertainmentPrefs: EntertainmentPrefs | null
   completedAt: string | null
 }
 
@@ -158,6 +159,7 @@ type LightOnboardingStore = LightOnboardingData & {
   setLowEnergy: (v: boolean) => void
   setCountry: (v: string) => void
   setStorePreference: (v: string) => void
+  setEntertainmentPrefs: (v: EntertainmentPrefs | null) => void
   markCompleted: () => void
   reset: () => void
 }
@@ -173,6 +175,7 @@ const initialLightOnboarding: LightOnboardingData = {
   lowEnergy: false,
   country: '',
   storePreference: '',
+  entertainmentPrefs: null,
   completedAt: null,
 }
 
@@ -190,6 +193,7 @@ export const useLightOnboardingStore = create<LightOnboardingStore>()(
       setLowEnergy: (lowEnergy) => set({ lowEnergy }),
       setCountry: (country) => set({ country }),
       setStorePreference: (storePreference) => set({ storePreference }),
+      setEntertainmentPrefs: (entertainmentPrefs) => set({ entertainmentPrefs }),
       markCompleted: () => set({ completedAt: new Date().toISOString() }),
       reset: () => set(initialLightOnboarding),
     }),

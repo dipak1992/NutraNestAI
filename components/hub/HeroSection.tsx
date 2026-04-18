@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
+import type { useHouseholdConfig } from '@/lib/hooks/use-household-config'
 
 function getGreeting(): { greeting: string; subtext: string } {
   const h = new Date().getHours()
@@ -16,10 +17,12 @@ interface Props {
   firstName: string
   onQuickDecide: () => void
   onZeroCook: () => void
+  householdConfig: ReturnType<typeof useHouseholdConfig>
 }
 
-export function HeroSection({ firstName, onQuickDecide, onZeroCook }: Props) {
+export function HeroSection({ firstName, onQuickDecide, onZeroCook, householdConfig }: Props) {
   const { greeting, subtext } = useMemo(() => getGreeting(), [])
+  const dynamicGreeting = householdConfig.greeting(firstName)
 
   return (
     <section className="mb-8">
@@ -28,7 +31,7 @@ export function HeroSection({ firstName, onQuickDecide, onZeroCook }: Props) {
         <h1 className="text-[26px] font-bold text-foreground tracking-tight leading-tight">
           {greeting}, {firstName} 👋
         </h1>
-        <p className="text-sm text-muted-foreground mt-1.5">{subtext}</p>
+        <p className="text-sm text-muted-foreground mt-1.5">{dynamicGreeting}</p>
       </div>
 
       {/* 3 Primary Action Cards */}

@@ -11,7 +11,11 @@ function isWeekendWindow(): boolean {
   return day === 0 || day === 6 || (day === 5 && hour >= 17)
 }
 
-export function WeekendModeCard() {
+interface Props {
+  weekendSubtitle?: string
+}
+
+export function WeekendModeCard({ weekendSubtitle }: Props) {
   const show = useMemo(() => isWeekendWindow(), [])
 
   if (!show) return null
@@ -32,7 +36,7 @@ export function WeekendModeCard() {
             <div className="flex-1 min-w-0">
               <p className="text-[15px] font-bold text-amber-900">Weekend Mode</p>
               <p className="text-xs text-amber-700/80 mt-0.5">
-                Dinner + movie night — curated for you
+                {weekendSubtitle ?? 'Dinner + movie night — curated for you'}
               </p>
             </div>
             <span className="text-[10px] font-semibold text-amber-600 bg-amber-100 rounded-full px-2.5 py-1 whitespace-nowrap">

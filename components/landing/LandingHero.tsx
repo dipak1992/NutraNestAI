@@ -60,7 +60,7 @@ export function LandingHero() {
               className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/8 border border-primary/15 mb-8"
             >
               <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-              <span className="text-sm font-medium text-primary">3,200+ families use MealEase</span>
+              <span className="text-sm font-medium text-primary">3,200+ households use MealEase</span>
             </motion.div>
 
             {/* Rotating headline */}
@@ -85,7 +85,7 @@ export function LandingHero() {
               transition={{ delay: 0.3, duration: 0.5 }}
               className="text-lg sm:text-xl text-muted-foreground leading-relaxed mb-8 max-w-lg mx-auto lg:mx-0"
             >
-              MealEase learns your taste, plans meals, adapts for your family,
+              MealEase learns your taste, plans meals, adapts for your household,
               helps when you&apos;re busy — and even uses food already at home.
             </motion.p>
 

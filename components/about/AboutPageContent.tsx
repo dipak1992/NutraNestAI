@@ -40,7 +40,7 @@ const BLUR_DATA =
 
 /* ── feature grid data ── */
 const features = [
-  { icon: '✨', title: 'AI meal recommendations', sub: 'Personalized to your family every day' },
+  { icon: '✨', title: 'AI meal recommendations', sub: 'Personalized to your household every day' },
   { icon: '📅', title: 'Weekly meal plans', sub: 'Full 7-day plans in one tap' },
   { icon: '🧠', title: "I Don't Want to Think", sub: 'Dinner decided in under 5 seconds' },
   { icon: '📸', title: 'Snap & Cook', sub: 'Your fridge → a real meal tonight' },
@@ -81,7 +81,7 @@ export function AboutPageContent() {
               variants={fadeUp}
               className="mt-6 mx-auto max-w-xl text-lg sm:text-xl text-muted-foreground leading-relaxed"
             >
-              We built MealEase because we lived this problem — every single night, in our own kitchen, with our own two kids.
+              We built MealEase because we lived this problem — every single night, in our own kitchen, juggling schedules and hungry kids.
             </motion.p>
           </motion.div>
         </div>
@@ -341,11 +341,11 @@ export function AboutPageContent() {
           </motion.h2>
 
           <motion.p variants={fadeUp} className="text-[16px] leading-8 text-muted-foreground">
-            MealEase exists so that parents everywhere can have their evenings back. Not the cooking — we
+            MealEase exists so that people everywhere can have their evenings back. Not the cooking — we
             actually enjoy cooking when it&apos;s a genuine choice. We want to eliminate the decision
             fatigue, the mental overhead, the weekly grocery debate, the quiet{' '}
             <em>&ldquo;I don&apos;t know, what do you want?&rdquo;</em> loop that slowly chips away at the
-            one hour of the day that should belong to your family.
+            one hour of the day that should belong to you.
           </motion.p>
 
           <motion.p variants={fadeUp} className="text-[16px] leading-8 text-muted-foreground">
@@ -368,7 +368,7 @@ export function AboutPageContent() {
           className="rounded-3xl border border-border/60 bg-muted/25 px-7 py-9 sm:px-10 sm:py-11 space-y-5"
         >
           <motion.p variants={fadeUp} className="text-[16px] leading-8 text-muted-foreground">
-            If MealEase gives even one family a calmer evening — a shorter grocery debate, one less round of{' '}
+            If MealEase gives even one household a calmer evening — a shorter grocery debate, one less round of{' '}
             <em>&ldquo;what should we eat?&rdquo;</em>, one night where dinner just happens — then
             it&apos;s doing exactly what we hoped it would do.
           </motion.p>
@@ -418,7 +418,7 @@ export function AboutPageContent() {
         >
           <h2 className="text-2xl font-bold mb-3">Ready to end the dinner debate?</h2>
           <p className="text-muted-foreground mb-7 text-[15px] leading-relaxed">
-            Join thousands of families who already know what&apos;s for dinner tonight.
+            Join thousands of households who already know what&apos;s for dinner tonight.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Button asChild size="lg" className="gradient-sage border-0 text-white hover:opacity-90">

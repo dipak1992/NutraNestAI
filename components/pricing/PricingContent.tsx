@@ -37,16 +37,16 @@ const TESTIMONIALS = [
     emoji: '👩‍👧‍👦',
   },
   {
-    quote: 'We used to blow $60 on Friday takeout. Now MealEase plans a fun dinner and a movie — the whole family is happier and our wallet is, too.',
+    quote: 'Living solo, I used to default to the same 3 takeout places. Now MealEase keeps things interesting — and Weekend Mode gives me a movie night I actually look forward to.',
     name: 'James K.',
-    role: 'Dad of 3',
-    emoji: '👨‍👧‍👦',
+    role: 'Works from home',
+    emoji: '👨‍💻',
   },
   {
-    quote: 'The weekday planner alone is worth it, but Weekend Mode made Pro a no-brainer. My picky eater actually gets excited for Friday night.',
+    quote: 'My partner and I could never agree on dinner. Now MealEase picks something we both love and Weekend Mode is our new Friday ritual.',
     name: 'Priya R.',
-    role: 'Mom of 1',
-    emoji: '👩‍👦',
+    role: 'Half of a busy couple',
+    emoji: '💑',
   },
 ]
 
@@ -56,7 +56,7 @@ const COMPARISON_FEATURES = [
   { feature: 'Smart grocery list', free: false, pro: true },
   { feature: 'Pantry Magic tools', free: false, pro: true },
   { feature: 'Image-to-meal', free: false, pro: true },
-  { feature: 'Family meal variations', free: '3 max', pro: 'Unlimited' },
+  { feature: 'Household meal variations', free: '3 max', pro: 'Unlimited' },
   { feature: 'Adaptive learning', free: false, pro: true },
   { feature: 'Plan publishing & sharing', free: false, pro: true },
   { feature: 'Weekend Mode 🎬', free: false, pro: true },
@@ -69,15 +69,15 @@ const FAQ = [
   },
   {
     q: 'What can I do on the free plan?',
-    a: 'Preview meal ideas instantly, try 2 Tonight swipes per day, and see 3 days of your weekly plan. It\'s enough to feel whether MealEase fits your family.',
+    a: 'Preview meal ideas instantly, try 2 Tonight swipes per day, and see 3 days of your weekly plan. It\'s enough to feel whether MealEase fits your routine.',
   },
   {
     q: 'What is Weekend Mode?',
-    a: 'Every Friday and Saturday evening, Pro users get a curated dinner + movie pairing — a complete night-in experience picked just for your family. Think of it as a personal concierge for your weekend.',
+    a: 'Every Friday and Saturday evening, Pro users get a curated dinner + movie pairing — a complete night-in experience picked just for you. Think of it as a personal concierge for your weekend.',
   },
   {
     q: 'Is annual billing worth it?',
-    a: `Annual saves you ${ANNUAL_SAVINGS}% compared to monthly — that's $${(MONTHLY_PRICE * 12 - ANNUAL_PRICE).toFixed(2)} back in your pocket every year. Most families choose annual after their first month.`,
+    a: `Annual saves you ${ANNUAL_SAVINGS}% compared to monthly — that's $${(MONTHLY_PRICE * 12 - ANNUAL_PRICE).toFixed(2)} back in your pocket every year. Most users choose annual after their first month.`,
   },
   {
     q: 'Can I cancel anytime?',
@@ -85,7 +85,7 @@ const FAQ = [
   },
   {
     q: 'Does one plan cover my whole family?',
-    a: 'Yes. One Pro subscription covers every family member — adults, kids, toddlers, babies. MealEase adapts each meal for every age at the table.',
+    a: 'Yes. One Pro subscription covers your entire household — whether you\'re solo, a couple, or a full family. MealEase adapts each meal for everyone at the table.',
   },
 ]
 
@@ -176,7 +176,7 @@ export function PricingContent() {
           <span className="block text-gradient-sage mt-1">Start enjoying it.</span>
         </h1>
         <p className="mx-auto max-w-2xl text-lg text-muted-foreground leading-relaxed">
-          MealEase plans your weeknight meals in seconds — then surprises your family with
+          MealEase plans your weeknight meals in seconds — then surprises you with
           a <strong className="text-foreground">dinner + movie night</strong> every weekend. One subscription, every mouth at the table.
         </p>
 
@@ -325,7 +325,7 @@ export function PricingContent() {
               'Smart auto-built grocery list',
               'Pantry Magic tools',
               'Unlimited Tonight swipes',
-              'Adaptive learning for your family',
+              'Adaptive learning for your household',
               'Unlimited kid recipe variations',
               'Image-to-meal & plan sharing',
             ].map((f) => (
@@ -342,7 +342,7 @@ export function PricingContent() {
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-amber-900">Weekend Mode included</p>
               <p className="text-[12px] text-amber-700/70 mt-0.5 leading-snug">
-                Curated dinner + movie night every Fri & Sat — the perk families love most.
+                Curated dinner + movie night every Fri & Sat — the perk members love most.
               </p>
             </div>
           </div>
@@ -394,7 +394,7 @@ export function PricingContent() {
             </h2>
             <p className="mx-auto max-w-lg text-muted-foreground leading-relaxed">
               Every Friday and Saturday, Pro members get a curated dinner + movie pairing —
-              a complete night-in experience picked just for your family. No planning, no scrolling, just enjoy.
+              a complete night-in experience picked just for you. No planning, no scrolling, just enjoy.
             </p>
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-sm font-medium text-amber-900">
               <span className="flex items-center gap-1.5 rounded-full bg-amber-100/80 px-3 py-1.5">
@@ -430,7 +430,7 @@ export function PricingContent() {
               <Star key={i} className="h-5 w-5 fill-amber-400 text-amber-400" />
             ))}
           </div>
-          <h2 className="text-2xl font-bold tracking-tight">Families are loving this</h2>
+          <h2 className="text-2xl font-bold tracking-tight">People are loving this</h2>
           <p className="mt-2 text-sm text-muted-foreground">Real feedback from real households</p>
         </div>
         <div className="grid gap-6 sm:grid-cols-3">
@@ -513,7 +513,7 @@ export function PricingContent() {
           <div>
             <p className="font-bold text-sm">Risk-free guarantee</p>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Cancel anytime with one click. Full refund within 14 days if Pro isn&rsquo;t right for your family. No questions asked.
+              Cancel anytime with one click. Full refund within 14 days if Pro isn&rsquo;t right for you. No questions asked.
             </p>
           </div>
         </div>
@@ -548,7 +548,7 @@ export function PricingContent() {
           Ready for stress-free dinners?
         </h3>
         <p className="text-muted-foreground mb-6 text-sm">
-          Join families who never ask &ldquo;what&rsquo;s for dinner?&rdquo; again.
+          Join households who never ask &ldquo;what&rsquo;s for dinner?&rdquo; again.
         </p>
         {!status.isPro ? (
           <Button

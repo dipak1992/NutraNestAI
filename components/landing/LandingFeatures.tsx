@@ -44,9 +44,9 @@ const FEATURES = [
   },
   {
     icon: Users,
-    title: 'Family Mode',
-    description: 'One meal, every version. Cook once — each family member gets their own adapted plate. Baby-safe, allergy-aware, diet-compatible.',
-    tag: 'For families',
+    title: 'Household Mode',
+    description: 'One meal, every version. Cook once — each person gets their own adapted plate. Baby-safe, allergy-aware, diet-compatible.',
+    tag: 'For everyone',
     gradient: 'from-emerald-500 to-teal-600',
     iconBg: 'bg-emerald-100',
     iconColor: 'text-emerald-600',

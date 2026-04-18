@@ -33,6 +33,7 @@ export default function SettingsPage() {
     cookingTimeMinutes, setCookingTimeMinutes,
     hasKids, kidsAgeGroup, setKidsAgeGroup,
     householdType, pickyEater, lowEnergy, cuisines: lightCuisines,
+    entertainmentPrefs, setEntertainmentPrefs,
   } = useLightOnboardingStore()
   const [signingOut, setSigningOut] = useState(false)
   const [nameInput, setNameInput] = useState(householdName)
@@ -40,10 +41,10 @@ export default function SettingsPage() {
   const [deleting, setDeleting] = useState(false)
   const [managingBilling, setManagingBilling] = useState(false)
 
-  // Entertainment prefs state
-  const [entLanguage, setEntLanguage] = useState('English')
-  const [entGenres, setEntGenres] = useState<string[]>(['Comedy', 'Drama'])
-  const [entWatchStyle, setEntWatchStyle] = useState<'solo' | 'couple' | 'family'>('couple')
+  // Entertainment prefs state — initialise from Zustand store
+  const [entLanguage, setEntLanguage] = useState(entertainmentPrefs?.language ?? 'English')
+  const [entGenres, setEntGenres] = useState<string[]>(entertainmentPrefs?.genre ?? ['Comedy', 'Drama'])
+  const [entWatchStyle, setEntWatchStyle] = useState<'solo' | 'couple' | 'family'>(entertainmentPrefs?.watchStyle ?? 'couple')
   const [savingEnt, setSavingEnt] = useState(false)
 
   async function handleSignOut() {
@@ -419,19 +420,22 @@ export default function SettingsPage() {
                 onClick={async () => {
                   setSavingEnt(true)
                   try {
+                    const prefs = {
+                      language: entLanguage.trim() || 'English',
+                      genre: entGenres,
+                      watchStyle: entWatchStyle,
+                    }
                     const res = await fetch('/api/settings', {
                       method: 'PATCH',
                       headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        entertainmentPrefs: {
-                          language: entLanguage.trim() || 'English',
-                          genre: entGenres,
-                          watchStyle: entWatchStyle,
-                        },
-                      }),
+                      body: JSON.stringify({ entertainmentPrefs: prefs }),
                     })
-                    if (res.ok) toast.success('Entertainment preferences saved')
-                    else toast.error('Failed to save preferences')
+                    if (res.ok) {
+                      setEntertainmentPrefs(prefs)
+                      toast.success('Entertainment preferences saved')
+                    } else {
+                      toast.error('Failed to save preferences')
+                    }
                   } catch {
                     toast.error('Failed to save preferences')
                   } finally {

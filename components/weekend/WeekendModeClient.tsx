@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react'
 import Link from 'next/link'
 import type { EntertainmentResult } from '@/types'
 import type { SmartMealResult } from '@/lib/engine/types'
+import { useLightOnboardingStore } from '@/lib/store'
 
 interface WeekendModeData {
   meal: SmartMealResult
@@ -22,6 +23,7 @@ export default function WeekendModeClient({ initialData }: WeekendModeClientProp
   const [usedTonight, setUsedTonight] = useState(false)
   const [recipeExpanded, setRecipeExpanded] = useState(false)
   const [seenTitles, setSeenTitles] = useState<string[]>([initialData.entertainment.title])
+  const entertainmentPrefs = useLightOnboardingStore((s) => s.entertainmentPrefs)
 
   const fetchNew = useCallback(
     async (opts: { swapMeal?: boolean; swapEntertainment?: boolean }) => {
@@ -29,12 +31,12 @@ export default function WeekendModeClient({ initialData }: WeekendModeClientProp
       const res = await fetch('/api/weekend-mode', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...opts, excludeTitles }),
+        body: JSON.stringify({ ...opts, excludeTitles, entertainmentPrefs: entertainmentPrefs ?? undefined }),
       })
       if (!res.ok) throw new Error('Failed')
       return res.json() as Promise<WeekendModeData>
     },
-    [seenTitles],
+    [seenTitles, entertainmentPrefs],
   )
 
   async function handleSwapMeal() {

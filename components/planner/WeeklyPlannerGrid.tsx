@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { DAY_LABELS, DAY_FULL, GROCERY_ICONS } from '@/lib/planner/types'
 import type { SmartMealResult } from '@/lib/engine/types'
@@ -60,6 +61,8 @@ interface MealDayCardProps {
 function MealDayCard({ meal, dayLabel, date, onRegenerate, isRegenerating }: MealDayCardProps) {
   const [showVariations, setShowVariations] = useState(false)
   const [showIngredients, setShowIngredients] = useState(false)
+  const [showSteps, setShowSteps] = useState(false)
+  const router = useRouter()
   const style = getStyle(meal.cuisineType)
   const pantryItems = meal.ingredients.filter((i) => i.fromPantry)
   const toBuyItems = meal.ingredients.filter((i) => !i.fromPantry)
@@ -136,6 +139,28 @@ function MealDayCard({ meal, dayLabel, date, onRegenerate, isRegenerating }: Mea
         )}
       </div>
 
+      {/* Toggle: Cooking steps */}
+      {meal.steps && meal.steps.length > 0 && (
+        <div className="border-t border-current/10">
+          <button
+            onClick={() => setShowSteps((v) => !v)}
+            className="w-full flex items-center justify-between px-4 py-2 text-sm font-medium hover:bg-black/5 transition-colors"
+          >
+            <span>📋 {meal.steps.length} cooking step{meal.steps.length !== 1 ? 's' : ''}</span>
+            {showSteps ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </button>
+          {showSteps && (
+            <ol className="px-4 pb-3 space-y-1.5 list-decimal list-inside">
+              {meal.steps.map((step, idx) => (
+                <li key={idx} className="text-xs leading-relaxed text-muted-foreground">
+                  {step}
+                </li>
+              ))}
+            </ol>
+          )}
+        </div>
+      )}
+
       {/* Toggle: Family variations */}
       {meal.variations && meal.variations.length > 0 && (
         <div className="border-t border-current/10">
@@ -184,6 +209,19 @@ function MealDayCard({ meal, dayLabel, date, onRegenerate, isRegenerating }: Mea
           )}
         </div>
       )}
+
+      {/* View Full Recipe */}
+      <div className="border-t border-current/10 px-4 py-2">
+        <button
+          onClick={() => {
+            sessionStorage.setItem('tonight-meal', JSON.stringify(meal))
+            router.push('/tonight/recipe')
+          }}
+          className="w-full text-center text-sm font-semibold text-primary hover:underline"
+        >
+          🍳 View Full Recipe
+        </button>
+      </div>
 
       {/* Selection reason */}
       {meal.meta?.selectionReason && (

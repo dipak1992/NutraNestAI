@@ -120,8 +120,9 @@ export function OneShotSuggestion({ mode = 'tonight', title }: Props) {
     if (!meal) return
     recordLike(meal)
     sendSignal(meal.id, 'cooked', { mode })
-    setCookedFeedback(true)
-    setFeedbackGiven(false)
+    // Store meal for the recipe page, then open grocery prompt
+    sessionStorage.setItem('tonight-meal', JSON.stringify(meal))
+    setGroceryPromptOpen(true)
   }
 
   const handleFeedback = (rating: 'loved' | 'okay' | 'disliked') => {
@@ -146,9 +147,7 @@ export function OneShotSuggestion({ mode = 'tonight', title }: Props) {
       })
     }
     setGroceryPromptOpen(false)
-    // Also store meal for recipe access later
-    sessionStorage.setItem('tonight-meal', JSON.stringify(meal))
-    router.push('/grocery-list')
+    router.push('/tonight/recipe')
   }
 
   const handleSkipGrocery = () => {

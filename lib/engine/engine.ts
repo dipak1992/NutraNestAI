@@ -339,6 +339,42 @@ export function generateSmartMeal(
   return assembleMeal(best.meal, request, pantry, locality, best.score, best.reasons, poolExhausted)
 }
 
+// ── Cuisine → Image URL map (curated Unsplash direct links) ──
+
+const CUISINE_IMAGES: Record<string, string[]> = {
+  italian:    ['https://images.unsplash.com/photo-1498579150354-977475b7ea0b?w=800&h=400&fit=crop', 'https://images.unsplash.com/photo-1595295333158-4742f28fbd85?w=800&h=400&fit=crop'],
+  mexican:    ['https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=800&h=400&fit=crop', 'https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=800&h=400&fit=crop'],
+  asian:      ['https://images.unsplash.com/photo-1512058564366-18510be2db19?w=800&h=400&fit=crop', 'https://images.unsplash.com/photo-1617093727343-374698b1b08d?w=800&h=400&fit=crop'],
+  chinese:    ['https://images.unsplash.com/photo-1585032226651-759b368d7246?w=800&h=400&fit=crop', 'https://images.unsplash.com/photo-1563245372-f21724e3856d?w=800&h=400&fit=crop'],
+  japanese:   ['https://images.unsplash.com/photo-1553621042-f6e147245754?w=800&h=400&fit=crop', 'https://images.unsplash.com/photo-1580822184713-fc5400e7fe10?w=800&h=400&fit=crop'],
+  indian:     ['https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=800&h=400&fit=crop', 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=800&h=400&fit=crop'],
+  thai:       ['https://images.unsplash.com/photo-1562565652-a0d8f0c59eb4?w=800&h=400&fit=crop', 'https://images.unsplash.com/photo-1559314809-0d155014e29e?w=800&h=400&fit=crop'],
+  mediterranean: ['https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800&h=400&fit=crop', 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&h=400&fit=crop'],
+  american:   ['https://images.unsplash.com/photo-1550547660-d9450f859349?w=800&h=400&fit=crop', 'https://images.unsplash.com/photo-1432139509613-5c4255a1d197?w=800&h=400&fit=crop'],
+  korean:     ['https://images.unsplash.com/photo-1498654896293-37aacf113fd9?w=800&h=400&fit=crop', 'https://images.unsplash.com/photo-1590301157890-4810ed352733?w=800&h=400&fit=crop'],
+  nepali:     ['https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=800&h=400&fit=crop', 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=800&h=400&fit=crop'],
+  comfort:    ['https://images.unsplash.com/photo-1547592180-85f173990554?w=800&h=400&fit=crop', 'https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?w=800&h=400&fit=crop'],
+  french:     ['https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=400&fit=crop', 'https://images.unsplash.com/photo-1600891964092-4316c288032e?w=800&h=400&fit=crop'],
+  greek:      ['https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800&h=400&fit=crop', 'https://images.unsplash.com/photo-1529059997568-3d847b1154f0?w=800&h=400&fit=crop'],
+}
+
+const FALLBACK_IMAGES = [
+  'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&h=400&fit=crop',
+  'https://images.unsplash.com/photo-1493770348161-369560ae357d?w=800&h=400&fit=crop',
+  'https://images.unsplash.com/photo-1506354666786-959d6d497f1a?w=800&h=400&fit=crop',
+]
+
+function pickCuisineImage(cuisineType: string, mealId: string): string {
+  const key = cuisineType.toLowerCase()
+  // Try exact match, then partial match
+  const images = CUISINE_IMAGES[key]
+    ?? Object.entries(CUISINE_IMAGES).find(([k]) => key.includes(k) || k.includes(key))?.[1]
+    ?? FALLBACK_IMAGES
+  // Use mealId hash for deterministic but varied selection
+  const hash = mealId.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0)
+  return images[hash % images.length]
+}
+
 // ════════════════════════════════════════════════════════════
 // Assembly Pipeline
 // ════════════════════════════════════════════════════════════
@@ -427,6 +463,7 @@ function assembleMeal(
     tagline: effectiveTagline,
     description: meal.description,
     cuisineType: meal.cuisineTags[0],
+    imageUrl: pickCuisineImage(meal.cuisineTags[0], meal.id),
     prepTime: meal.prepTime,
     cookTime: meal.cookTime,
     totalTime: meal.prepTime + meal.cookTime,

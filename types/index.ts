@@ -6,7 +6,7 @@ export type LifeStage = 'adult' | 'baby' | 'toddler' | 'kid';
 export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
 export type BudgetLevel = 'low' | 'medium' | 'high';
 export type CookingTime = 'quick' | 'moderate' | 'any';
-export type SubscriptionTier = 'free' | 'plus' | 'pro' | 'family';
+export type SubscriptionTier = 'free' | 'pro' | 'family';
 
 export type Allergy =
   | 'peanuts'

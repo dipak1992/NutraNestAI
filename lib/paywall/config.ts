@@ -1,6 +1,7 @@
 import type { SubscriptionTier } from '@/types'
 
 // ── Pricing tiers & values (SOURCE OF TRUTH) ─────────────────────────────────
+// All price IDs must be configured in Vercel ENV vars before checkout works
 
 export const PRICING_TIERS = {
   free: {
@@ -25,6 +26,9 @@ export const PRICING_TIERS = {
     yearlyPriceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_FAMILY_YEARLY,
   },
 } as const
+
+// ── Stripe trial days (configurable via ENV) ──────────────────────────────────
+export const STRIPE_TRIAL_DAYS = parseInt(process.env.STRIPE_TRIAL_DAYS || '7', 10)
 
 // ── Free plan limits ──────────────────────────────────────────────────────
 
@@ -69,16 +73,16 @@ export const FAMILY_ANNUAL_SAVINGS = Math.round((1 - PRICING_TIERS.family.yearly
 // ── Tier normalization & checks ───────────────────────────────────────────
 
 export function normalizeTier(tier: string | null | undefined): SubscriptionTier {
-  if (tier === 'pro' || tier === 'family' || tier === 'plus') return tier === 'plus' ? 'pro' : (tier as SubscriptionTier)
+  if (tier === 'pro' || tier === 'family') return tier as SubscriptionTier
   return 'free'
 }
 
 export function isProTier(tier: SubscriptionTier | string | null | undefined): boolean {
-  const normalized = normalizeTier(typeof tier === 'string' ? tier : undefined)
+  const normalized = typeof tier === 'string' ? normalizeTier(tier) : 'free'
   return normalized === 'pro' || normalized === 'family'
 }
 
 export function isFamilyTier(tier: SubscriptionTier | string | null | undefined): boolean {
-  const normalized = normalizeTier(typeof tier === 'string' ? tier : undefined)
+  const normalized = typeof tier === 'string' ? normalizeTier(tier) : 'free'
   return normalized === 'family'
 }

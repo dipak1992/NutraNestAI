@@ -4,7 +4,7 @@
 // with the Supabase profiles table.
 //
 // Events handled:
-//   checkout.session.completed    → upgrade user to pro
+//   checkout.session.completed    → upgrade user to pro/family
 //   customer.subscription.updated → sync tier on plan change
 //   customer.subscription.deleted → downgrade to free
 //   invoice.payment_failed        → log (no immediate downgrade)
@@ -14,6 +14,8 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { serverEnv } from '@/lib/env'
 import { publicEnv } from '@/lib/env'
+import { mapPriceIdToTier, extractTierFromSubscription } from '@/lib/paywall/stripe-mapping'
+import type { SubscriptionTier } from '@/types'
 
 // Use service-role client so we can update any user's profile (bypasses RLS)
 function adminSupabase() {
@@ -66,39 +68,42 @@ async function verifyStripeSignature(
   return signatures.some((sig) => sig === expected)
 }
 
-// ── Subscription → tier mapping ───────────────────────────────────────────────
-
-function tierFromStatus(status: string): 'pro' | 'free' {
-  // active / trialing = pro; everything else = free
-  return status === 'active' || status === 'trialing' ? 'pro' : 'free'
-}
-
 // ── Event handlers ────────────────────────────────────────────────────────────
 
 async function handleCheckoutCompleted(session: Record<string, unknown>) {
   const userId = session['client_reference_id'] as string | null
   const customerId = session['customer'] as string | null
   const subscriptionId = session['subscription'] as string | null
+  const metadata = session['metadata'] as Record<string, unknown> | null
 
   if (!userId || !customerId) {
     console.error('[stripe-webhook] checkout.session.completed missing user/customer')
     return
   }
 
+  // Extract tier from metadata (plan selected during checkout)
+  let tier: SubscriptionTier = 'pro'
+  if (metadata?.plan) {
+    const plan = String(metadata.plan)
+    if (plan.includes('family')) tier = 'family'
+    else if (plan.includes('pro')) tier = 'pro'
+  }
+
   const supabase = adminSupabase()
   const { error } = await supabase
     .from('profiles')
     .update({
-      subscription_tier: 'pro',
+      subscription_tier: tier,
       stripe_customer_id: customerId,
       stripe_subscription_id: subscriptionId ?? null,
+      trial_started_at: null, // Clear trial flag when they convert
     })
     .eq('id', userId)
 
   if (error) {
     console.error('[stripe-webhook] checkout update failed:', error.message)
   } else {
-    console.log('[stripe-webhook] upgraded user to pro:', userId)
+    console.log(`[stripe-webhook] upgraded user ${userId} to ${tier}`)
   }
 }
 
@@ -106,35 +111,58 @@ async function handleSubscriptionUpserted(sub: Record<string, unknown>) {
   const customerId = sub['customer'] as string | null
   const subscriptionId = sub['id'] as string | null
   const status = sub['status'] as string
-  const priceId = (
-    (
-      (sub['items'] as Record<string, unknown>)?.['data'] as Array<
-        Record<string, unknown>
-      >
-    )?.[0]?.['price'] as Record<string, unknown> | undefined
-  )?.['id'] as string | undefined
+  const items = sub['items'] as Record<string, unknown> | undefined
+  const itemsData = items?.['data'] as Array<Record<string, unknown>> | undefined
 
   if (!customerId) {
     console.error('[stripe-webhook] subscription event missing customer')
     return
   }
 
-  const tier = tierFromStatus(status)
-  const supabase = adminSupabase()
+  // Extract price ID from subscription items
+  let priceId: string | undefined
+  let tier: SubscriptionTier = 'free'
+  let billingInterval: 'monthly' | 'yearly' | null = null
 
+  if (itemsData && itemsData.length > 0) {
+    const price = itemsData[0]['price'] as Record<string, unknown> | undefined
+    priceId = price?.['id'] as string | undefined
+    const interval = price?.['recurring'] as Record<string, unknown> | undefined
+    const intervalValue = interval?.['interval'] as string | undefined
+
+    // Map price ID to tier
+    if (priceId) {
+      const mapping = mapPriceIdToTier(priceId)
+      if (mapping) {
+        tier = mapping.tier
+        billingInterval = mapping.interval
+      }
+    }
+  }
+
+  // If subscription is not active/trialing, downgrade to free
+  if (status !== 'active' && status !== 'trialing') {
+    tier = 'free'
+    billingInterval = null
+  }
+
+  const supabase = adminSupabase()
   const { error } = await supabase
     .from('profiles')
     .update({
       subscription_tier: tier,
       stripe_subscription_id: subscriptionId ?? null,
-      ...(priceId ? { stripe_price_id: priceId } : {}),
+      stripe_price_id: priceId ?? null,
+      billing_interval: billingInterval,
     })
     .eq('stripe_customer_id', customerId)
 
   if (error) {
     console.error('[stripe-webhook] subscription upsert failed:', error.message)
   } else {
-    console.log(`[stripe-webhook] subscription synced → ${tier} for customer:`, customerId)
+    console.log(
+      `[stripe-webhook] subscription synced → ${tier} (${billingInterval}) for customer: ${customerId}`,
+    )
   }
 }
 
@@ -149,6 +177,7 @@ async function handleSubscriptionDeleted(sub: Record<string, unknown>) {
       subscription_tier: 'free',
       stripe_subscription_id: null,
       stripe_price_id: null,
+      billing_interval: null,
     })
     .eq('stripe_customer_id', customerId)
 

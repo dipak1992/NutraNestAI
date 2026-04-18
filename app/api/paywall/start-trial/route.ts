@@ -1,16 +1,15 @@
 // ============================================================
 // API: POST /api/paywall/start-trial
-// Starts a 7-day free Pro trial by setting temp_pro_until.
+// Starts a free trial by setting temp_pro_until or temp_family_until.
 // One-time only per user.
 // ============================================================
 
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { sendTrialStartedEmail } from '@/lib/email/triggers'
+import { serverEnv } from '@/lib/env'
 
-const TRIAL_DAYS = 7
-
-export async function POST() {
+export async function POST(req: Request) {
   try {
     const supabase = await createClient()
     const {
@@ -21,6 +20,13 @@ export async function POST() {
       return NextResponse.json({ error: 'Login required to start trial' }, { status: 401 })
     }
 
+    const { tier = 'pro' } = (await req.json()) as { tier?: 'pro' | 'family' }
+
+    // Validate tier
+    if (!['pro', 'family'].includes(tier)) {
+      return NextResponse.json({ error: 'Invalid tier for trial' }, { status: 400 })
+    }
+
     // Check existing profile
     const { data: profile } = await supabase
       .from('profiles')
@@ -28,10 +34,10 @@ export async function POST() {
       .eq('id', user.id)
       .maybeSingle()
 
-    // Already Pro → no trial needed
-    if (profile?.subscription_tier === 'pro') {
+    // Already has paid subscription → no trial needed
+    if (profile?.subscription_tier === 'pro' || profile?.subscription_tier === 'family') {
       return NextResponse.json(
-        { error: 'You already have Pro. No trial needed.' },
+        { error: 'You already have a paid subscription. No trial needed.' },
         { status: 400 },
       )
     }
@@ -39,13 +45,14 @@ export async function POST() {
     // Already started a trial before
     if (profile?.trial_started_at) {
       return NextResponse.json(
-        { error: 'You\'ve already used your free trial. Upgrade to continue with Pro.' },
+        { error: 'You\'ve already used your free trial. Upgrade to continue.' },
         { status: 400 },
       )
     }
 
     const now = new Date()
-    const trialEnd = new Date(now.getTime() + TRIAL_DAYS * 24 * 60 * 60 * 1000)
+    const trialDays = serverEnv.stripeTrialDays || 7
+    const trialEnd = new Date(now.getTime() + trialDays * 24 * 60 * 60 * 1000)
 
     const { error: upsertError } = await supabase.from('profiles').upsert(
       {
@@ -67,10 +74,11 @@ export async function POST() {
     // Fire trial-started email (non-blocking)
     if (user.email) {
       const firstName = profile?.full_name?.split(' ')[0] ?? undefined
+      const tierDisplay = tier === 'family' ? 'Family Plus' : 'Pro'
       void sendTrialStartedEmail({
         to: user.email,
         firstName,
-        trialDays: TRIAL_DAYS,
+        trialDays,
         trialEndDate: trialEnd.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
       })
     }
@@ -78,7 +86,8 @@ export async function POST() {
     return NextResponse.json({
       success: true,
       tempProUntil: trialEnd.toISOString(),
-      trialDays: TRIAL_DAYS,
+      trialDays,
+      tier,
     })
   } catch (err) {
     console.error('[start-trial] unexpected error:', err)

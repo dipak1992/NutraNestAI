@@ -12,6 +12,15 @@ export const publicEnv = {
   posthogKey: process.env.NEXT_PUBLIC_POSTHOG_KEY ?? '',
   posthogHost: process.env.NEXT_PUBLIC_POSTHOG_HOST ?? 'https://us.i.posthog.com',
   stripePublishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? '',
+  // Stripe price IDs (public, used on client for pricing display)
+  stripePricingTierPro: {
+    monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_MONTHLY ?? '',
+    yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_YEARLY ?? '',
+  },
+  stripePricingTierFamily: {
+    monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_FAMILY_MONTHLY ?? '',
+    yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_FAMILY_YEARLY ?? '',
+  },
 } as const
 
 // ─── Server-only ──────────────────────────────────────────────────────────────
@@ -22,8 +31,20 @@ export const serverEnv = {
   openaiApiKey: process.env.OPENAI_API_KEY ?? '',
   resendApiKey: process.env.RESEND_API_KEY ?? '',
   sentryDsn: process.env.SENTRY_DSN ?? '',
+  // Stripe server-side keys
   stripeSecretKey: process.env.STRIPE_SECRET_KEY ?? '',
   stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET ?? '',
+  // Stripe price IDs (server-side backup)
+  stripePricingTierPro: {
+    monthly: process.env.STRIPE_PRICE_PRO_MONTHLY ?? '',
+    yearly: process.env.STRIPE_PRICE_PRO_YEARLY ?? '',
+  },
+  stripePricingTierFamily: {
+    monthly: process.env.STRIPE_PRICE_FAMILY_MONTHLY ?? '',
+    yearly: process.env.STRIPE_PRICE_FAMILY_YEARLY ?? '',
+  },
+  // Trial configuration
+  stripeTrialDays: parseInt(process.env.STRIPE_TRIAL_DAYS ?? '7', 10),
   adminEmail: process.env.ADMIN_EMAIL ?? '',
 } as const
 

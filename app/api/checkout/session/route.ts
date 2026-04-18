@@ -12,10 +12,10 @@ import { getSiteUrl } from '@/lib/seo'
 type Plan = 'pro_monthly' | 'pro_yearly' | 'family_monthly' | 'family_yearly'
 
 const PRICE_IDS: Record<Plan, string | undefined> = {
-  pro_monthly:      process.env.STRIPE_PRICE_PRO_MONTHLY,
-  pro_yearly:       process.env.STRIPE_PRICE_PRO_YEARLY,
-  family_monthly:   process.env.STRIPE_PRICE_FAMILY_MONTHLY,
-  family_yearly:    process.env.STRIPE_PRICE_FAMILY_YEARLY,
+  pro_monthly:      serverEnv.stripePricingTierPro.monthly,
+  pro_yearly:       serverEnv.stripePricingTierPro.yearly,
+  family_monthly:   serverEnv.stripePricingTierFamily.monthly,
+  family_yearly:    serverEnv.stripePricingTierFamily.yearly,
 }
 
 const PLAN_DISPLAY_NAMES: Record<Plan, string> = {
@@ -23,6 +23,13 @@ const PLAN_DISPLAY_NAMES: Record<Plan, string> = {
   pro_yearly:     'Pro',
   family_monthly: 'Family Plus',
   family_yearly:  'Family Plus',
+}
+
+const PLAN_TIERS: Record<Plan, 'pro' | 'family'> = {
+  pro_monthly:    'pro',
+  pro_yearly:     'pro',
+  family_monthly: 'family',
+  family_yearly:  'family',
 }
 
 export async function POST(req: Request) {
@@ -57,6 +64,7 @@ export async function POST(req: Request) {
     }
 
     const site = getSiteUrl().replace(/\/$/, '')
+    const tier = PLAN_TIERS[plan]
 
     // Stripe Checkout Session via REST API
     const body = new URLSearchParams()
@@ -69,8 +77,10 @@ export async function POST(req: Request) {
     body.set('client_reference_id', user.id)
     body.set('allow_promotion_codes', 'true')
     body.set('automatic_tax[enabled]', 'true')
+    // Metadata for webhook to extract tier (backup if price ID lookup fails)
     body.set('subscription_data[metadata][user_id]', user.id)
     body.set('subscription_data[metadata][plan]', plan)
+    body.set('subscription_data[metadata][tier]', tier)
 
     const res = await fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',

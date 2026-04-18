@@ -1,11 +1,20 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Clock, ChefHat, RefreshCw, ShoppingCart, Flame } from 'lucide-react'
 import posthog from 'posthog-js'
 import { useOnboardingStore, useLightOnboardingStore } from '@/lib/store'
 import { useLearningStore } from '@/lib/learning/store'
+import { useWeeklyPlanStore } from '@/lib/planner/store'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog'
 import {
   decideMeal,
   sendSignal,
@@ -19,15 +28,18 @@ interface Props {
 }
 
 export function TonightRecommendation({ refreshKey }: Props) {
+  const router = useRouter()
   const [meal, setMeal] = useState<SmartMealResult | null>(null)
   const [loading, setLoading] = useState(true)
   const [swapping, setSwapping] = useState(false)
   const [cooked, setCooked] = useState(false)
+  const [groceryPromptOpen, setGroceryPromptOpen] = useState(false)
   const shownIdsRef = useRef<string[]>([])
 
   const { state: { members } } = useOnboardingStore()
   const light = useLightOnboardingStore()
   const { getBoosts, recordLike, recordReject } = useLearningStore()
+  const { addCustomItem } = useWeeklyPlanStore()
 
   const getHousehold = useCallback(() =>
     members?.length
@@ -70,7 +82,9 @@ export function TonightRecommendation({ refreshKey }: Props) {
     recordLike(meal)
     sendSignal(meal.id, 'cooked', { mode: 'tonight' })
     posthog.capture('meal_cooked', { meal_id: meal.id, meal_name: meal.title, mode: 'tonight' })
+    sessionStorage.setItem('tonight-meal', JSON.stringify(meal))
     setCooked(true)
+    setGroceryPromptOpen(true)
   }, [meal, recordLike])
 
   const handleSwap = useCallback(async () => {
@@ -87,8 +101,38 @@ export function TonightRecommendation({ refreshKey }: Props) {
   }, [meal, recordReject, fetchMeal])
 
   const handleOrder = useCallback(() => {
-    if (meal) sendSignal(meal.id, 'accepted', { intent: 'order_ingredients' })
-  }, [meal])
+    if (!meal) return
+    sendSignal(meal.id, 'accepted', { intent: 'order_ingredients' })
+    posthog.capture('meal_order', { meal_id: meal.id, meal_name: meal.title })
+    for (const item of meal.shoppingList) {
+      addCustomItem({
+        name: item.name,
+        quantity: parseFloat(item.quantity) || 1,
+        unit: item.unit,
+        category: item.category,
+      })
+    }
+    router.push('/grocery-list')
+  }, [meal, addCustomItem, router])
+
+  const handleAddToGrocery = useCallback(() => {
+    if (!meal) return
+    for (const item of meal.shoppingList) {
+      addCustomItem({
+        name: item.name,
+        quantity: parseFloat(item.quantity) || 1,
+        unit: item.unit,
+        category: item.category,
+      })
+    }
+    setGroceryPromptOpen(false)
+    router.push('/tonight/recipe')
+  }, [meal, addCustomItem, router])
+
+  const handleSkipGrocery = useCallback(() => {
+    setGroceryPromptOpen(false)
+    router.push('/tonight/recipe')
+  }, [router])
 
   const h = new Date().getHours()
   const mealLabel = h < 14 ? "Today's lunch pick" : "Tonight's pick"
@@ -136,6 +180,22 @@ export function TonightRecommendation({ refreshKey }: Props) {
             transition={{ duration: 0.2 }}
             className="rounded-2xl bg-white border border-border/60 overflow-hidden shadow-sm"
           >
+            {/* Meal image */}
+            <div className="relative w-full h-40 overflow-hidden">
+              {meal.imageUrl ? (
+                <img
+                  src={meal.imageUrl}
+                  alt={meal.title}
+                  className="w-full h-full object-cover"
+                  loading="eager"
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-emerald-100 via-amber-50 to-orange-100 flex items-center justify-center">
+                  <span className="text-5xl">🍽️</span>
+                </div>
+              )}
+            </div>
+
             <div className="p-5">
               <h3 className="text-lg font-bold text-foreground leading-snug">
                 {meal.title}
@@ -212,6 +272,32 @@ export function TonightRecommendation({ refreshKey }: Props) {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Grocery prompt after Cook */}
+      <Dialog open={groceryPromptOpen} onOpenChange={setGroceryPromptOpen}>
+        <DialogContent className="max-w-sm mx-auto">
+          <DialogHeader>
+            <DialogTitle className="text-lg">Add to grocery list? 🛒</DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground mt-1">
+              We can add the ingredients for <span className="font-semibold">{meal?.title}</span> to your grocery list.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4 flex flex-col gap-3">
+            <button
+              onClick={handleAddToGrocery}
+              className="w-full rounded-xl bg-gradient-to-r from-emerald-500 to-green-500 text-white font-semibold py-3 text-sm hover:from-emerald-600 hover:to-green-600 transition-all"
+            >
+              Yes, add ingredients
+            </button>
+            <button
+              onClick={handleSkipGrocery}
+              className="w-full text-sm text-muted-foreground py-2"
+            >
+              Skip, show me the recipe
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </section>
   )
 }

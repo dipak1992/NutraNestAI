@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createSupabaseServiceClient } from '@/lib/supabase/service'
 import { serverEnv } from '@/lib/env'
 import { Badge } from '@/components/ui/badge'
-import { Users, Crown } from 'lucide-react'
+import { Users, Crown, Mail, AlertTriangle } from 'lucide-react'
 
 export default async function AdminPage() {
   const supabase = await createClient()
@@ -14,16 +14,21 @@ export default async function AdminPage() {
   }
 
   const serviceClient = createSupabaseServiceClient()
+  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
 
-  const [totalResult, proResult, usersResult] = await Promise.all([
+  const [totalResult, proResult, usersResult, emailSentResult, emailFailedResult] = await Promise.all([
     serviceClient.from('profiles').select('id', { count: 'exact', head: true }),
     serviceClient.from('profiles').select('id', { count: 'exact', head: true }).eq('subscription_tier', 'pro'),
     serviceClient.auth.admin.listUsers({ perPage: 20, page: 1 }),
+    serviceClient.from('email_logs').select('id', { count: 'exact', head: true }).eq('status', 'sent').gte('created_at', weekAgo),
+    serviceClient.from('email_logs').select('id', { count: 'exact', head: true }).eq('status', 'failed').gte('created_at', weekAgo),
   ])
 
   const totalUsers = totalResult.count ?? 0
   const proUsers = proResult.count ?? 0
   const freeUsers = totalUsers - proUsers
+  const emailsSentThisWeek = emailSentResult.count ?? 0
+  const emailsFailedThisWeek = emailFailedResult.count ?? 0
   const recentUsers = (usersResult.data?.users ?? [])
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
@@ -37,8 +42,8 @@ export default async function AdminPage() {
         <p className="text-muted-foreground mt-1">Platform metrics and recent sign-ups</p>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-8">
+      {/* User Stats */}
+      <div className="grid grid-cols-3 gap-4 mb-4">
         <div className="glass-card rounded-xl border border-border/60 p-5 text-center">
           <p className="text-3xl font-bold">{totalUsers}</p>
           <p className="text-sm text-muted-foreground mt-1">Total Users</p>
@@ -52,6 +57,24 @@ export default async function AdminPage() {
         <div className="glass-card rounded-xl border border-border/60 p-5 text-center">
           <p className="text-3xl font-bold">{freeUsers}</p>
           <p className="text-sm text-muted-foreground mt-1">Free Users</p>
+        </div>
+      </div>
+
+      {/* Email Stats (7-day) */}
+      <div className="grid grid-cols-2 gap-4 mb-8">
+        <div className="glass-card rounded-xl border border-border/60 p-5 text-center">
+          <p className="text-3xl font-bold text-green-600">{emailsSentThisWeek}</p>
+          <p className="text-sm text-muted-foreground mt-1 flex items-center justify-center gap-1">
+            <Mail className="h-3.5 w-3.5" /> Emails Sent (7d)
+          </p>
+        </div>
+        <div className="glass-card rounded-xl border border-border/60 p-5 text-center">
+          <p className={`text-3xl font-bold ${emailsFailedThisWeek > 0 ? 'text-red-500' : 'text-muted-foreground'}`}>
+            {emailsFailedThisWeek}
+          </p>
+          <p className="text-sm text-muted-foreground mt-1 flex items-center justify-center gap-1">
+            <AlertTriangle className="h-3.5 w-3.5" /> Failed (7d)
+          </p>
         </div>
       </div>
 

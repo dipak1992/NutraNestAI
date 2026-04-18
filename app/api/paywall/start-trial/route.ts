@@ -6,6 +6,7 @@
 
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { sendTrialStartedEmail } from '@/lib/email/triggers'
 
 const TRIAL_DAYS = 7
 
@@ -23,7 +24,7 @@ export async function POST() {
     // Check existing profile
     const { data: profile } = await supabase
       .from('profiles')
-      .select('subscription_tier, temp_pro_until, trial_started_at')
+      .select('subscription_tier, temp_pro_until, trial_started_at, full_name')
       .eq('id', user.id)
       .maybeSingle()
 
@@ -53,6 +54,7 @@ export async function POST() {
         subscription_tier: 'free',
         temp_pro_until: trialEnd.toISOString(),
         trial_started_at: now.toISOString(),
+        trial_ends_at: trialEnd.toISOString(),
       },
       { onConflict: 'id' },
     )
@@ -60,6 +62,17 @@ export async function POST() {
     if (upsertError) {
       console.error('[start-trial] upsert error:', upsertError)
       return NextResponse.json({ error: 'Could not start trial. Try again.' }, { status: 500 })
+    }
+
+    // Fire trial-started email (non-blocking)
+    if (user.email) {
+      const firstName = profile?.full_name?.split(' ')[0] ?? undefined
+      void sendTrialStartedEmail({
+        to: user.email,
+        firstName,
+        trialDays: TRIAL_DAYS,
+        trialEndDate: trialEnd.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+      })
     }
 
     return NextResponse.json({

@@ -312,13 +312,14 @@ async function handleReactivationEmails(supabase: SupabaseClient) {
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
 
-  // Users inactive for 7–30 days (not so far gone they need winback)
+  // Users inactive for 7–30 days (not so far gone they need winback) — cap at 100 per run
   const { data: profiles, error } = await supabase
     .from('profiles')
     .select('user_id, email, first_name, last_active_at')
     .not('email', 'is', null)
     .lte('last_active_at', sevenDaysAgo)
     .gte('last_active_at', thirtyDaysAgo)
+    .limit(100)
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
@@ -351,12 +352,13 @@ async function handleReactivationEmails(supabase: SupabaseClient) {
 async function handleWinbackEmails(supabase: SupabaseClient) {
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
 
-  // Users inactive for 30+ days
+  // Users inactive for 30+ days — cap at 50 per run to stay within Resend free tier
   const { data: profiles, error } = await supabase
     .from('profiles')
     .select('user_id, email, first_name, last_active_at')
     .not('email', 'is', null)
     .lte('last_active_at', thirtyDaysAgo)
+    .limit(50)
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })

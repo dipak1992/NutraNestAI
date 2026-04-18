@@ -2,6 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { sendWelcomeEmail, alertAdminNewUser } from '@/lib/email/triggers'
 
 /**
  * Supabase PKCE auth callback handler.
@@ -60,6 +61,16 @@ export async function GET(request: NextRequest) {
   if (error) {
     const msg = encodeURIComponent(error.message)
     return NextResponse.redirect(`${origin}/login?error=${msg}`)
+  }
+
+  // Fire welcome email on new signup (signalled by ?next=/onboarding)
+  if (next === '/onboarding') {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user?.email) {
+      const firstName = user.user_metadata?.full_name?.split(' ')[0] ?? user.user_metadata?.name?.split(' ')[0]
+      void sendWelcomeEmail({ to: user.email, firstName })
+      void alertAdminNewUser({ userEmail: user.email, userId: user.id })
+    }
   }
 
   return NextResponse.redirect(`${origin}${next}`)

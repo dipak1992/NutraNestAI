@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServiceClient } from '@/lib/supabase/service'
-import { sendDinnerReminderEmail, sendWeeklyReminderEmail, sendWeekendReminderEmail, sendAdminWeeklySummary } from '@/lib/email/triggers'
+import {
+  sendDinnerReminderEmail,
+  sendWeeklyReminderEmail,
+  sendWeekendReminderEmail,
+  sendAdminWeeklySummary,
+  sendTrialEndingSoonEmail,
+  sendReactivationEmail,
+  sendChurnWinbackEmail,
+} from '@/lib/email/triggers'
 import { isDinnerReminderDue, isWeeklyReminderDue, isWeekendReminderDue } from '@/lib/email/scheduler'
 
 /**
@@ -31,6 +39,9 @@ export async function GET(request: NextRequest) {
   if (type === 'weekly') return handleWeeklyReminders(supabase)
   if (type === 'weekend') return handleWeekendReminders(supabase)
   if (type === 'admin-summary') return handleAdminSummary(supabase)
+  if (type === 'trial-ending') return handleTrialEndingReminders(supabase)
+  if (type === 'reactivation') return handleReactivationEmails(supabase)
+  if (type === 'winback') return handleWinbackEmails(supabase)
 
   return NextResponse.json({ error: 'Unknown type' }, { status: 400 })
 }
@@ -236,6 +247,55 @@ async function handleAdminSummary(supabase: SupabaseClient) {
   return NextResponse.json({ ok: true })
 }
 
+// ─── Trial ending reminders ──────────────────────────────────────────────────
+
+async function handleTrialEndingReminders(supabase: SupabaseClient) {
+  // Find profiles whose trial ends within the next 3 days and haven't been emailed yet.
+  // Requires a `trial_ends_at` column on profiles (populated when trial starts via Stripe webhook).
+  const threeDaysFromNow = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString()
+  const now = new Date().toISOString()
+
+  const { data: profiles, error } = await supabase
+    .from('profiles')
+    .select('id, email, full_name, trial_ends_at, trial_ending_email_sent_at')
+    .not('trial_ends_at', 'is', null)
+    .gte('trial_ends_at', now)
+    .lte('trial_ends_at', threeDaysFromNow)
+    .is('trial_ending_email_sent_at', null)
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  let sent = 0
+
+  for (const profile of (profiles ?? [])) {
+    if (!profile.email) continue
+
+    const trialEnd = new Date(profile.trial_ends_at as string)
+    const daysLeft = Math.ceil((trialEnd.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+    const firstName = (profile.full_name as string | null)?.split(' ')[0] ?? undefined
+    const trialEndDate = trialEnd.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+
+    const result = await sendTrialEndingSoonEmail({
+      to: profile.email as string,
+      firstName,
+      daysLeft,
+      trialEndDate,
+    })
+
+    if (result.success) {
+      await supabase
+        .from('profiles')
+        .update({ trial_ending_email_sent_at: new Date().toISOString() })
+        .eq('id', profile.id)
+      sent++
+    }
+  }
+
+  return NextResponse.json({ ok: true, sent })
+}
+
 /** Monday of the current week as YYYY-MM-DD (UTC). Consistent with weekStartKey() in lib/email/scheduler.ts. */
 function getWeekStart(): string {
   const d = new Date()
@@ -244,5 +304,83 @@ function getWeekStart(): string {
   const start = new Date(d)
   start.setUTCDate(d.getUTCDate() + diff)
   return start.toISOString().slice(0, 10)
+}
+
+// ─── Reactivation emails (7-day inactive users) ──────────────────────────────
+
+async function handleReactivationEmails(supabase: SupabaseClient) {
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+
+  // Users inactive for 7–30 days (not so far gone they need winback)
+  const { data: profiles, error } = await supabase
+    .from('profiles')
+    .select('user_id, email, first_name, last_active_at')
+    .not('email', 'is', null)
+    .lte('last_active_at', sevenDaysAgo)
+    .gte('last_active_at', thirtyDaysAgo)
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  let sent = 0
+
+  for (const profile of (profiles ?? []) as Array<{ user_id: string; email: string; first_name: string | null; last_active_at: string | null }>) {
+    if (!profile.email) continue
+
+    const lastActiveDate = profile.last_active_at
+      ? new Date(profile.last_active_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+      : undefined
+
+    const result = await sendReactivationEmail({
+      to: profile.email,
+      firstName: profile.first_name ?? undefined,
+      lastActiveDate,
+      userId: profile.user_id,
+    })
+
+    if (result.success) sent++
+  }
+
+  return NextResponse.json({ ok: true, sent })
+}
+
+// ─── Churn winback emails (30-day inactive users) ────────────────────────────
+
+async function handleWinbackEmails(supabase: SupabaseClient) {
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+
+  // Users inactive for 30+ days
+  const { data: profiles, error } = await supabase
+    .from('profiles')
+    .select('user_id, email, first_name, last_active_at')
+    .not('email', 'is', null)
+    .lte('last_active_at', thirtyDaysAgo)
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  let sent = 0
+
+  for (const profile of (profiles ?? []) as Array<{ user_id: string; email: string; first_name: string | null; last_active_at: string | null }>) {
+    if (!profile.email) continue
+
+    const daysSince = profile.last_active_at
+      ? Math.floor((Date.now() - new Date(profile.last_active_at).getTime()) / (1000 * 60 * 60 * 24))
+      : 30
+
+    const result = await sendChurnWinbackEmail({
+      to: profile.email,
+      firstName: profile.first_name ?? undefined,
+      daysSince,
+      userId: profile.user_id,
+    })
+
+    if (result.success) sent++
+  }
+
+  return NextResponse.json({ ok: true, sent })
 }
 

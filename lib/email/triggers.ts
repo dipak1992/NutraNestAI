@@ -13,6 +13,10 @@ import { WeekendReminderEmail } from './templates/weekend-reminder'
 import { DinnerReminderEmail } from './templates/dinner-reminder'
 import { ReferralRewardEmail } from './templates/referral-reward'
 import { SupportConfirmationEmail } from './templates/support-confirmation'
+import { TrialStartedEmail } from './templates/trial-started'
+import { TrialEndingSoonEmail } from './templates/trial-ending-soon'
+import { ReactivationEmail } from './templates/reactivation'
+import { ChurnWinbackEmail } from './templates/churn-winback'
 
 // Admin templates
 import {
@@ -272,6 +276,79 @@ export async function sendAdminWeeklySummary(params: {
     subject: `[MealEase] Weekly summary — ${params.weekStart}`,
     react: createElement(AdminWeeklySummaryEmail, params),
     skipLog: true,
+  })
+}
+
+export async function sendTrialStartedEmail(params: {
+  to: string
+  firstName?: string
+  trialDays?: number
+  trialEndDate?: string
+}) {
+  return sendEmail({
+    to: params.to,
+    subject: `Your ${params.trialDays ?? 14}-day MealEase Pro trial has started`,
+    react: createElement(TrialStartedEmail, params),
+  })
+}
+
+export async function sendTrialEndingSoonEmail(params: {
+  to: string
+  firstName?: string
+  daysLeft?: number
+  trialEndDate?: string
+  upgradeUrl?: string
+}) {
+  return sendEmail({
+    to: params.to,
+    subject: `Your MealEase trial ends in ${params.daysLeft ?? 3} day${(params.daysLeft ?? 3) !== 1 ? 's' : ''}`,
+    react: createElement(TrialEndingSoonEmail, params),
+  })
+}
+
+export async function sendReactivationEmail(params: {
+  to: string
+  firstName?: string
+  lastActiveDate?: string
+  userId?: string
+}) {
+  const today = getTodayKey()
+  const unsubscribeUrl = params.userId
+    ? `${SITE_URL}/api/unsubscribe?token=${generateUnsubscribeToken(params.userId)}`
+    : undefined
+  return sendEmail({
+    to: params.to,
+    subject: 'Your meal plans are waiting for you',
+    react: createElement(ReactivationEmail, { firstName: params.firstName, lastActiveDate: params.lastActiveDate }),
+    idempotencyKey: `reactivation:${params.to}:${today.slice(0, 7)}`, // once per month
+    headers: unsubscribeUrl
+      ? { 'List-Unsubscribe': `<${unsubscribeUrl}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' }
+      : undefined,
+  })
+}
+
+export async function sendChurnWinbackEmail(params: {
+  to: string
+  firstName?: string
+  daysSince?: number
+  userId?: string
+}) {
+  const today = getTodayKey()
+  const unsubscribeUrl = params.userId
+    ? `${SITE_URL}/api/unsubscribe?token=${generateUnsubscribeToken(params.userId)}`
+    : undefined
+  return sendEmail({
+    to: params.to,
+    subject: `Hey ${params.firstName ?? 'there'}, still thinking about dinner?`,
+    react: createElement(ChurnWinbackEmail, {
+      firstName: params.firstName,
+      daysSince: params.daysSince,
+      unsubscribeUrl,
+    }),
+    idempotencyKey: `winback:${params.to}:${today.slice(0, 7)}`, // once per month
+    headers: unsubscribeUrl
+      ? { 'List-Unsubscribe': `<${unsubscribeUrl}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' }
+      : undefined,
   })
 }
 

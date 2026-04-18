@@ -5,6 +5,13 @@ import { serverEnv } from '@/lib/env'
 import { createSupabaseServiceClient } from '@/lib/supabase/service'
 import logger from '@/lib/logger'
 import { getPostHogClient } from '@/lib/posthog-server'
+import {
+  sendProConfirmationEmail,
+  sendPaymentReceiptEmail,
+  sendTrialStartedEmail,
+  alertAdminNewPro,
+  alertAdminFailedPayment,
+} from '@/lib/email/triggers'
 
 export async function POST(req: NextRequest) {
   const body = await req.text()
@@ -58,6 +65,19 @@ export async function POST(req: NextRequest) {
             event: 'subscription_activated',
             properties: { price_id: priceId, stripe_subscription_id: session.subscription as string },
           })
+
+          // Send pro confirmation + admin alert (non-blocking)
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('email, full_name')
+            .eq('id', userId)
+            .single()
+
+          if (profile?.email) {
+            const firstName = profile.full_name?.split(' ')[0]
+            void sendProConfirmationEmail({ to: profile.email, firstName })
+            void alertAdminNewPro({ userEmail: profile.email, userId })
+          }
         }
         break
       }
@@ -71,7 +91,7 @@ export async function POST(req: NextRequest) {
           // Find user by stripe_customer_id
           const { data: profile } = await supabase
             .from('profiles')
-            .select('id')
+            .select('id, email, full_name')
             .eq('stripe_customer_id', customerId)
             .single()
 
@@ -100,6 +120,22 @@ export async function POST(req: NextRequest) {
               userId: profile.id,
               invoiceId: invoice.id,
             })
+
+            // Send payment receipt email (non-blocking)
+            if (profile.email) {
+              const firstName = profile.full_name?.split(' ')[0]
+              const amountFormatted = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: invoice.currency.toUpperCase(),
+              }).format(invoice.amount_paid / 100)
+              void sendPaymentReceiptEmail({
+                to: profile.email,
+                firstName,
+                amount: amountFormatted,
+                date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                invoiceId: invoice.number ?? invoice.id,
+              })
+            }
           }
         }
         break
@@ -146,6 +182,65 @@ export async function POST(req: NextRequest) {
             event: 'subscription_cancelled',
             properties: { stripe_subscription_id: sub.id },
           })
+        }
+        break
+      }
+
+      case 'customer.subscription.created': {
+        const sub = event.data.object as Stripe.Subscription
+        const userId = sub.metadata.supabase_user_id
+        if (userId && sub.status === 'trialing' && sub.trial_end) {
+          const trialEndDate = new Date(sub.trial_end * 1000)
+          const trialDays = Math.round((trialEndDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+          const trialEndDateFormatted = trialEndDate.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })
+
+          // Persist trial_ends_at so the cron can query it
+          await supabase
+            .from('profiles')
+            .update({ trial_ends_at: trialEndDate.toISOString() })
+            .eq('id', userId)
+
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('email, full_name')
+            .eq('id', userId)
+            .single()
+
+          if (profile?.email) {
+            const firstName = profile.full_name?.split(' ')[0]
+            void sendTrialStartedEmail({
+              to: profile.email,
+              firstName,
+              trialDays,
+              trialEndDate: trialEndDateFormatted,
+            })
+          }
+
+          logger.info('[stripe-webhook] Trial started', { userId, trialEnd: trialEndDate.toISOString() })
+        }
+        break
+      }
+
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object as Stripe.Invoice
+        const customerId =
+          typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.toString()
+
+        if (customerId) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('id, email, full_name')
+            .eq('stripe_customer_id', customerId)
+            .single()
+
+          if (profile?.email) {
+            logger.warn('[stripe-webhook] Payment failed', { userId: profile.id, invoiceId: invoice.id })
+            void alertAdminFailedPayment({ userEmail: profile.email, userId: profile.id })
+          }
         }
         break
       }

@@ -33,6 +33,18 @@
     {
       "path": "/api/email/reminders?type=admin-summary",
       "schedule": "0 10 * * 1"
+    },
+    {
+      "path": "/api/email/reminders?type=trial-ending",
+      "schedule": "0 10 * * *"
+    },
+    {
+      "path": "/api/email/reminders?type=reactivation",
+      "schedule": "0 11 * * *"
+    },
+    {
+      "path": "/api/email/reminders?type=winback",
+      "schedule": "0 12 * * 1"
     }
   ]
 }

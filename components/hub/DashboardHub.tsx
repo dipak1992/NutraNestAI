@@ -7,6 +7,8 @@ import posthog from 'posthog-js'
 import { useOnboardingStore, useLightOnboardingStore } from '@/lib/store'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 import { useHouseholdConfig } from '@/lib/hooks/use-household-config'
+import { useDashboardMessage } from '@/lib/hooks/use-dashboard-message'
+import { showRewardToast } from '@/lib/reward-toast'
 import { OnboardingPromptPopup } from '@/components/onboarding/OnboardingPromptPopup'
 import { ZeroCookSheet } from '@/components/zero-cook/ZeroCookSheet'
 import { ZeroCookTeaser } from '@/components/zero-cook/ZeroCookTeaser'
@@ -41,6 +43,7 @@ export function DashboardHub({ userName }: Props) {
   const light = useLightOnboardingStore()
   const { status: paywallStatus } = usePaywallStatus()
   const householdConfig = useHouseholdConfig()
+  const { supportLine, timeBlock } = useDashboardMessage()
 
   const getHousehold = useCallback(
     () =>
@@ -56,6 +59,7 @@ export function DashboardHub({ userName }: Props) {
 
   const handleQuickDecide = useCallback(() => {
     posthog.capture('hub_tile_tapped', { tile: 'quick' })
+    showRewardToast('mealGenerated')
     setRefreshKey((k) => k + 1)
     setTimeout(() => {
       tonightRef.current?.scrollIntoView({
@@ -68,6 +72,7 @@ export function DashboardHub({ userName }: Props) {
   const handleZeroCook = useCallback(() => {
     posthog.capture('hub_tile_tapped', { tile: 'zero-cook' })
     if (paywallStatus.isPro) {
+      showRewardToast('zeroCook')
       setZeroCookOpen(true)
     } else {
       setZeroCookTeaserOpen(true)
@@ -96,6 +101,8 @@ export function DashboardHub({ userName }: Props) {
             onQuickDecide={handleQuickDecide}
             onZeroCook={handleZeroCook}
             householdConfig={householdConfig}
+            supportLine={supportLine}
+            timeBlock={timeBlock}
           />
 
           <WeekendModeCard
@@ -107,7 +114,13 @@ export function DashboardHub({ userName }: Props) {
             <TonightRecommendation refreshKey={refreshKey} />
           </div>
 
-          <SmartToolsRow onSnapCook={() => setSnapCookOpen(true)} householdConfig={householdConfig} />
+          <SmartToolsRow
+            onSnapCook={() => {
+              showRewardToast('snapCook')
+              setSnapCookOpen(true)
+            }}
+            householdConfig={householdConfig}
+          />
 
           {/* Snap & Cook — PantryCapture overlay */}
           <AnimatePresence>

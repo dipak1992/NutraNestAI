@@ -8,6 +8,7 @@ import posthog from 'posthog-js'
 import { useOnboardingStore, useLightOnboardingStore } from '@/lib/store'
 import { useLearningStore } from '@/lib/learning/store'
 import { useWeeklyPlanStore } from '@/lib/planner/store'
+import { showRewardToast } from '@/lib/reward-toast'
 import {
   Dialog,
   DialogContent,
@@ -82,6 +83,7 @@ export function TonightRecommendation({ refreshKey }: Props) {
     recordLike(meal)
     sendSignal(meal.id, 'cooked', { mode: 'tonight' })
     posthog.capture('meal_cooked', { meal_id: meal.id, meal_name: meal.title, mode: 'tonight' })
+    showRewardToast('mealCooked')
     sessionStorage.setItem('tonight-meal', JSON.stringify(meal))
     setCooked(true)
     setGroceryPromptOpen(true)

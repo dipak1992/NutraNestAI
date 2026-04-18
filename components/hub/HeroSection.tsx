@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
 import type { useHouseholdConfig } from '@/lib/hooks/use-household-config'
+import { SupportLine } from './SupportLine'
+import type { TimeBlock } from '@/lib/dashboard-messages'
 
 function getGreeting(): { greeting: string; subtext: string } {
   const h = new Date().getHours()
@@ -18,9 +20,18 @@ interface Props {
   onQuickDecide: () => void
   onZeroCook: () => void
   householdConfig: ReturnType<typeof useHouseholdConfig>
+  supportLine?: string
+  timeBlock?: TimeBlock
 }
 
-export function HeroSection({ firstName, onQuickDecide, onZeroCook, householdConfig }: Props) {
+export function HeroSection({
+  firstName,
+  onQuickDecide,
+  onZeroCook,
+  householdConfig,
+  supportLine,
+  timeBlock,
+}: Props) {
   const { greeting, subtext } = useMemo(() => getGreeting(), [])
   const dynamicGreeting = householdConfig.greeting(firstName)
 
@@ -32,6 +43,9 @@ export function HeroSection({ firstName, onQuickDecide, onZeroCook, householdCon
           {greeting}, {firstName} 👋
         </h1>
         <p className="text-sm text-muted-foreground mt-1.5">{dynamicGreeting}</p>
+        {supportLine && timeBlock ? (
+          <SupportLine line={supportLine} timeBlock={timeBlock} />
+        ) : null}
       </div>
 
       {/* 3 Primary Action Cards */}

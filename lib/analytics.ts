@@ -20,6 +20,10 @@ export const Analytics = {
   EMAIL_CAPTURED:         'email_captured',
   ONBOARDING_STARTED:     'onboarding_started',
   ONBOARDING_COMPLETED:   'onboarding_completed',
+  // Dashboard message system
+  SUPPORT_MESSAGE_SEEN:   'support_message_seen',
+  SUPPORT_MESSAGE_CLICK:  'support_message_click',
+  REWARD_TOAST_SHOWN:     'reward_toast_shown',
 } as const
 
 export type AnalyticsEvent = (typeof Analytics)[keyof typeof Analytics]

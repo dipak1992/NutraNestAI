@@ -26,20 +26,24 @@ create index if not exists idx_push_subscriptions_is_active
 alter table public.push_subscriptions enable row level security;
 
 -- Users can manage only their own subscriptions.
-create policy if not exists "users_can_select_own_push_subscriptions"
+drop policy if exists "users_can_select_own_push_subscriptions" on public.push_subscriptions;
+create policy "users_can_select_own_push_subscriptions"
   on public.push_subscriptions for select
   using (auth.uid() = user_id);
 
-create policy if not exists "users_can_insert_own_push_subscriptions"
+drop policy if exists "users_can_insert_own_push_subscriptions" on public.push_subscriptions;
+create policy "users_can_insert_own_push_subscriptions"
   on public.push_subscriptions for insert
   with check (auth.uid() = user_id);
 
-create policy if not exists "users_can_update_own_push_subscriptions"
+drop policy if exists "users_can_update_own_push_subscriptions" on public.push_subscriptions;
+create policy "users_can_update_own_push_subscriptions"
   on public.push_subscriptions for update
   using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
 
-create policy if not exists "users_can_delete_own_push_subscriptions"
+drop policy if exists "users_can_delete_own_push_subscriptions" on public.push_subscriptions;
+create policy "users_can_delete_own_push_subscriptions"
   on public.push_subscriptions for delete
   using (auth.uid() = user_id);
 

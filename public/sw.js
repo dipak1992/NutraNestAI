@@ -43,16 +43,14 @@ self.addEventListener('fetch', (event) => {
 
   if (request.method !== 'GET') return
 
-  // Network-first for APIs, fallback to cache when offline.
+  // Never cache API responses to avoid stale authenticated data.
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(
       fetch(request)
-        .then((response) => {
-          const copy = response.clone()
-          caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, copy))
-          return response
-        })
-        .catch(() => caches.match(request))
+        .catch(() => new Response(JSON.stringify({ error: 'Offline' }), {
+          status: 503,
+          headers: { 'Content-Type': 'application/json' },
+        }))
     )
     return
   }

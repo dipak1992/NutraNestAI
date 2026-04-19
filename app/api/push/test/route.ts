@@ -1,9 +1,17 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import webpush from 'web-push'
 import { createClient } from '@/lib/supabase/server'
 import { getServerVapidConfig } from '@/lib/push/vapid'
+import { apiRateLimited } from '@/lib/api-response'
+import { rateLimit, rateLimitKeyFromRequest } from '@/lib/rate-limit'
 
-export async function POST() {
+export async function POST(req: NextRequest) {
+  // Keep the test endpoint disabled in production unless explicitly enabled.
+  const enableInProd = process.env.ENABLE_PUSH_TEST_ENDPOINT === 'true'
+  if (process.env.NODE_ENV === 'production' && !enableInProd) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  }
+
   const supabase = await createClient()
   const {
     data: { user },
@@ -12,6 +20,13 @@ export async function POST() {
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+
+  const rl = await rateLimit({
+    key: `push-test:${user.id}:${rateLimitKeyFromRequest(req)}`,
+    limit: 3,
+    windowMs: 10 * 60_000,
+  })
+  if (!rl.success) return apiRateLimited(rl.reset)
 
   const vapid = getServerVapidConfig()
   if (!vapid) {

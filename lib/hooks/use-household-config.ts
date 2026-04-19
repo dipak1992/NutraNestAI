@@ -65,9 +65,9 @@ const smartToolLabelMap: Record<HouseholdType, string> = {
 }
 
 const greetingMap: Record<HouseholdType, (name: string) => string> = {
-  solo: (name) => `Hey ${name}, what sounds good tonight?`,
-  couple: (name) => `Hey ${name}, planning a night for two?`,
-  family: (name) => `Hey ${name}, what's the family craving?`,
+  solo: () => 'What sounds good tonight?',
+  couple: () => 'Planning a night for two?',
+  family: () => "What's the family craving?",
 }
 
 // ─── Kids tools with time-of-day priority ─────────────────────────────────────

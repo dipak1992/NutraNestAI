@@ -1,17 +1,19 @@
 'use client'
 
 import { useEffect } from 'react'
-import { publicEnv } from '@/lib/env'
 import { subscribeForPush } from '@/lib/push/subscribe'
 
 export function PushSubscriptionManager() {
   useEffect(() => {
-    if (Notification.permission === 'granted') {
+    const notificationApi = typeof window !== 'undefined' ? window.Notification : undefined
+    if (!notificationApi) return
+
+    if (notificationApi.permission === 'granted') {
       void subscribeForPush()
     }
 
     const onPermissionChange = () => {
-      if (Notification.permission === 'granted') {
+      if (notificationApi.permission === 'granted') {
         void subscribeForPush()
       }
     }

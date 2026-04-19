@@ -170,7 +170,7 @@ export function LandingHero() {
             </motion.div>
           </div>
 
-          {/* Right: Dashboard mockup */}
+          {/* Right: Product highlights (desktop) */}
           <motion.div
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
@@ -181,17 +181,7 @@ export function LandingHero() {
               {/* Glow behind */}
               <div className="absolute -inset-6 bg-gradient-to-br from-emerald-300/20 via-cyan-100/30 to-amber-200/25 rounded-[2rem] blur-2xl" />
 
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.9, duration: 0.5 }}
-                className="absolute -right-5 -top-5 rounded-xl border border-emerald-200 bg-white/95 px-3 py-2 shadow-lg"
-              >
-                <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Tonight confidence</p>
-                <p className="text-sm font-bold text-emerald-700">{activePreview.score}</p>
-              </motion.div>
-
-              {/* Main dashboard card */}
+              {/* Main product card */}
               <div className="relative bg-white rounded-3xl shadow-2xl border border-border/40 overflow-hidden">
                 {/* Top bar */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-border/40">
@@ -199,10 +189,10 @@ export function LandingHero() {
                     <div className="h-7 w-7 rounded-lg bg-primary text-white flex items-center justify-center text-xs font-bold">M</div>
                     <span className="text-sm font-bold text-gradient-sage">MealEase</span>
                   </div>
-                  <span className="text-xs text-muted-foreground">Tonight&apos;s Pick</span>
+                  <span className="text-xs text-muted-foreground">Family Command Center</span>
                 </div>
 
-                {/* Tonight card */}
+                {/* Product highlight card */}
                 <div className="p-6">
                   <div className="rounded-2xl overflow-hidden border border-border/30 mb-4">
                     <div className={`aspect-[16/10] bg-gradient-to-br ${activePreview.tone} p-4`}>
@@ -216,7 +206,7 @@ export function LandingHero() {
                     </div>
                     <div className="p-4 bg-white">
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-bold text-foreground">{activePreview.title}</h3>
+                        <h3 className="font-bold text-foreground">{activePreview.reason}</h3>
                         <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">{activePreview.score}</span>
                       </div>
                       <div className="flex gap-4 text-xs text-muted-foreground">

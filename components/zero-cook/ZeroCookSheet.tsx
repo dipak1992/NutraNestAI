@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo } from 'react'
 import { usePostHog } from 'posthog-js/react'
+import { toast } from 'sonner'
 import {
   Sheet,
   SheetContent,
@@ -14,7 +15,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useZeroCookRecommend } from './useZeroCookRecommend'
 import { ZeroCookMealCard } from './ZeroCookMealCard'
 import { getSmartCTA } from '@/lib/zero-cook/providers'
-import type { HouseholdMode, ZeroCookRequest } from '@/lib/zero-cook/types'
+import type { HouseholdMode, ZeroCookMeal, ZeroCookRequest } from '@/lib/zero-cook/types'
 
 interface ZeroCookSheetProps {
   open: boolean
@@ -54,16 +55,60 @@ export function ZeroCookSheet({
   countryCode,
 }: ZeroCookSheetProps) {
   const posthog = usePostHog()
-  const { meals, isLoading, error, fetch } = useZeroCookRecommend()
+  const { meals, isLoading, error, fetch: fetchRecommendations } = useZeroCookRecommend()
   const cta = useMemo(() => getSmartCTA(), [])
   const description = useMemo(() => getModeDescription(householdType), [householdType])
+
+  async function handleSave(meal: ZeroCookMeal) {
+    const savable = {
+      id: `zero-${meal.id}`,
+      title: meal.name,
+      tagline: meal.reason,
+      description: meal.reason,
+      cuisineType: meal.cuisineType,
+      prepTime: 0,
+      cookTime: 0,
+      totalTime: 0,
+      estimatedCost: 0,
+      servings: 1,
+      difficulty: 'easy' as const,
+      tags: ['zero-cook', 'delivery'],
+      ingredients: [],
+      steps: ['Open preferred delivery provider and place your order.'],
+      variations: [],
+      leftoverTip: null,
+      shoppingList: [],
+      meta: {
+        score: 8,
+        matchedPantryItems: [],
+        pantryUtilization: 0,
+        simplifiedForEnergy: true,
+        pickyEaterAdjusted: false,
+        localityApplied: false,
+        selectionReason: 'Saved from Zero-Cook mode',
+      },
+    }
+
+    const res = await fetch('/api/content/meals', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ meal: savable }),
+    })
+
+    if (res.ok) {
+      toast.success('Meal saved', { description: 'Find it in Saved Meals.' })
+    } else {
+      const data = (await res.json().catch(() => null)) as { error?: string } | null
+      toast.error(data?.error ?? 'Could not save this meal')
+    }
+  }
 
   useEffect(() => {
     if (!open) return
     posthog?.capture('delivery_feature_opened', {
       household_mode: householdType,
     })
-    fetch({
+    fetchRecommendations({
       householdType,
       household,
       cuisinePreferences,
@@ -107,6 +152,7 @@ export function ZeroCookSheet({
               meal={meal}
               index={i}
               countryCode={countryCode}
+              onSave={handleSave}
               onProviderSelect={(provider, meal, url, source) => {
                 try {
                   localStorage.setItem(

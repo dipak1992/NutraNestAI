@@ -109,6 +109,6 @@ export function useHouseholdConfig(): HouseholdConfig {
     smartToolLabel: smartToolLabelMap[householdType],
     showFamilyMode: householdType === 'family',
     cardLabels: cardLabelMap[householdType],
-    kidsPriorityTools: hasKids ? getKidsPriorityTools() : [],
+    kidsPriorityTools: hasKids || householdType === 'family' ? getKidsPriorityTools() : [],
   }
 }

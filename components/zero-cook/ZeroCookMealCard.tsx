@@ -13,9 +13,10 @@ interface ZeroCookMealCardProps {
   index: number
   countryCode?: string
   onProviderSelect: (provider: string, meal: ZeroCookMeal, url: string, source: 'primary' | 'more') => void
+  onSave?: (meal: ZeroCookMeal) => void
 }
 
-export function ZeroCookMealCard({ meal, index, countryCode, onProviderSelect }: ZeroCookMealCardProps) {
+export function ZeroCookMealCard({ meal, index, countryCode, onProviderSelect, onSave }: ZeroCookMealCardProps) {
   const [showMoreProviders, setShowMoreProviders] = useState(false)
   const links = useMemo(() => getProviderLinks(meal.searchQuery, countryCode), [meal.searchQuery, countryCode])
   const primaryLink = links.find((l) => l.provider === meal.bestProvider) ?? links[0]
@@ -69,6 +70,17 @@ export function ZeroCookMealCard({ meal, index, countryCode, onProviderSelect }:
           {showMoreProviders ? 'Hide Options' : secondaryLabel}
         </Button>
       </div>
+
+      {onSave ? (
+        <Button
+          size="sm"
+          variant="secondary"
+          className="w-full"
+          onClick={() => onSave(meal)}
+        >
+          Save meal
+        </Button>
+      ) : null}
 
       {showMoreProviders ? (
         <ProviderButtons

@@ -23,6 +23,7 @@ import {
   fallbackHousehold,
 } from '@/lib/decide/client'
 import type { SmartMealResult } from '@/lib/engine/types'
+import { SaveMealButton } from '@/components/content/SaveMealButton'
 
 interface Props {
   refreshKey: number
@@ -146,14 +147,17 @@ export function TonightRecommendation({ refreshKey }: Props) {
           {mealLabel}
         </h2>
         {meal && !loading && (
-          <button
-            onClick={() => void handleSwap()}
-            disabled={swapping}
-            className="flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors disabled:opacity-40"
-          >
-            <RefreshCw className={`h-3 w-3 ${swapping ? 'animate-spin' : ''}`} />
-            Swap
-          </button>
+          <div className="flex items-center gap-1.5">
+            <SaveMealButton meal={meal} className="h-7 w-7" />
+            <button
+              onClick={() => void handleSwap()}
+              disabled={swapping}
+              className="flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors disabled:opacity-40"
+            >
+              <RefreshCw className={`h-3 w-3 ${swapping ? 'animate-spin' : ''}`} />
+              Swap
+            </button>
+          </div>
         )}
       </div>
 

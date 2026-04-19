@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { toast } from 'sonner'
 import { PaywallDialog } from '@/components/paywall/PaywallDialog'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 import {
@@ -22,6 +23,146 @@ import type {
   PickyResult,
   FastResult,
 } from '@/app/api/kids-tool/route'
+
+const KIDS_HISTORY_STORAGE_KEY = 'nutrinest-kids-tool-history'
+
+type KidsHistory = Partial<Record<KidsToolIntent, string[]>>
+
+function readKidsHistory(): KidsHistory {
+  if (typeof window === 'undefined') return {}
+  try {
+    const raw = sessionStorage.getItem(KIDS_HISTORY_STORAGE_KEY)
+    if (!raw) return {}
+    return JSON.parse(raw) as KidsHistory
+  } catch {
+    return {}
+  }
+}
+
+function writeKidsHistory(next: KidsHistory): void {
+  if (typeof window === 'undefined') return
+  try {
+    sessionStorage.setItem(KIDS_HISTORY_STORAGE_KEY, JSON.stringify(next))
+  } catch {
+    // no-op
+  }
+}
+
+function getKidsResultTitle(result: KidsToolResult): string {
+  switch (result.intent) {
+    case 'lunchbox':
+      return result.main_item
+    case 'snack':
+      return result.name
+    case 'bake':
+      return result.activity_name
+    case 'picky':
+      return result.meal_name
+    case 'fast':
+      return result.meal_name
+  }
+}
+
+function buildSavableKidsMeal(result: KidsToolResult) {
+  let prep = '10 min'
+  switch (result.intent) {
+    case 'lunchbox':
+      prep = result.prep_time
+      break
+    case 'snack':
+      prep = result.prep_time
+      break
+    case 'bake':
+      prep = result.prep_time
+      break
+    case 'fast':
+      prep = `${result.ready_in_minutes} min`
+      break
+    case 'picky':
+      prep = '15 min'
+      break
+  }
+  const prepTimeParsed = Number.parseInt(prep, 10)
+  const prepTime = Number.isFinite(prepTimeParsed) ? Math.max(prepTimeParsed, 5) : 10
+
+  let ingredientNames: string[] = []
+  switch (result.intent) {
+    case 'lunchbox':
+      ingredientNames = [result.main_item, result.fruit, result.side_snack, result.optional_treat].filter(Boolean)
+      break
+    case 'snack':
+      ingredientNames = result.ingredients
+      break
+    case 'bake':
+      ingredientNames = result.ingredients
+      break
+    case 'fast':
+      ingredientNames = result.ingredients_needed
+      break
+    case 'picky':
+      ingredientNames = [result.meal_name]
+      break
+  }
+
+  const description =
+    result.intent === 'lunchbox'
+      ? result.tip
+      : result.intent === 'snack'
+        ? result.why_kids_love_it
+        : result.intent === 'bake'
+          ? result.fun_tip
+          : result.intent === 'picky'
+            ? result.why_it_may_work
+            : result.shortcut_tip
+
+  const steps =
+    result.intent === 'bake'
+      ? result.steps
+      : [
+          result.intent === 'lunchbox'
+            ? `Prepare and pack in ${result.prep_time}.`
+            : result.intent === 'snack'
+              ? `Prepare in ${result.prep_time}.`
+              : result.intent === 'picky'
+                ? result.serving_tip
+                : result.shortcut_tip,
+        ].filter(Boolean)
+
+  return {
+    id: `kids-${result.intent}-${Date.now()}`,
+    title: getKidsResultTitle(result),
+    tagline: result.section_title,
+    description,
+    cuisineType: 'kids',
+    prepTime,
+    cookTime: 0,
+    totalTime: prepTime,
+    estimatedCost: 0,
+    servings: 2,
+    difficulty: 'easy' as const,
+    tags: ['kids-tool', result.intent],
+    ingredients: ingredientNames.map((name) => ({
+      name,
+      quantity: '',
+      unit: '',
+      fromPantry: false,
+      category: 'other' as const,
+    })),
+    steps,
+    variations: [],
+    leftoverTip: null,
+    shoppingList: [],
+    meta: {
+      score: result.intent === 'picky' ? result.acceptance_score : result.intent === 'fast' ? result.urgency_score : 8,
+      matchedPantryItems: [],
+      pantryUtilization: 0,
+      simplifiedForEnergy: true,
+      pickyEaterAdjusted: result.intent === 'picky',
+      localityApplied: false,
+      selectionReason: `Saved from kids tool (${result.intent})`,
+    },
+  }
+}
 
 // ─── Tool metadata ────────────────────────────────────────────────────────────
 
@@ -412,7 +553,7 @@ function FastCard({ result }: { result: FastResult }) {
   )
 }
 
-function ResultCard({ result, onSwap }: { result: KidsToolResult; onSwap: () => void }) {
+function ResultCard({ result, onSwap, onSave, saving }: { result: KidsToolResult; onSwap: () => void; onSave: () => void; saving: boolean }) {
   const meta = TOOL_META[result.intent as KidsToolIntent] ?? TOOL_META.lunchbox
 
   return (
@@ -450,6 +591,9 @@ function ResultCard({ result, onSwap }: { result: KidsToolResult; onSwap: () => 
       >
         <Button size="lg" className="flex-1 shadow-md">
           {meta.primaryCta}
+        </Button>
+        <Button size="lg" variant="secondary" className="flex-1" onClick={onSave} disabled={saving}>
+          {saving ? 'Saving…' : 'Save for later'}
         </Button>
         <Button
           variant="outline"
@@ -493,13 +637,19 @@ function KidsToolPageInner() {
   const [result, setResult] = useState<KidsToolResult | null>(null)
   const [error, setError] = useState(false)
   const [paywallOpen, setPaywallOpen] = useState(false)
-  const [target, setTarget] = useState<string>('whole_family')
+  const [saving, setSaving] = useState(false)
+  const [targetMember, setTargetMember] = useState<string>('whole_family')
   const [memberTargets, setMemberTargets] = useState<Array<{ id: string; label: string }>>([])
   const { status, loading: paywallLoading } = usePaywallStatus()
   const animationDoneRef = useRef(false)
   const fetchPendingRef = useRef(false)
+  const historyRef = useRef<KidsHistory>({})
 
   const meta = TOOL_META[intent]
+
+  useEffect(() => {
+    historyRef.current = readKidsHistory()
+  }, [])
 
   const fetchResult = useCallback(async () => {
     setLoading(true)
@@ -507,13 +657,16 @@ function KidsToolPageInner() {
     animationDoneRef.current = false
     fetchPendingRef.current = true
     try {
+      const excludeTitles = (historyRef.current[intent] ?? []).slice(-10)
       const res = await fetch('/api/kids-tool', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           intent,
-          targetMode: target === 'whole_family' || target === 'adults_only' ? target : undefined,
-          targetMemberId: target !== 'whole_family' && target !== 'adults_only' ? target : undefined,
+          targetMode: targetMember === 'whole_family' ? 'whole_family' : undefined,
+          targetMemberId: targetMember !== 'whole_family' ? targetMember : undefined,
+          excludeTitles,
+          requestNonce: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
         }),
       })
 
@@ -525,12 +678,19 @@ function KidsToolPageInner() {
       if (res.ok) {
         const data = (await res.json()) as KidsToolResult
         setResult(data)
+        const title = getKidsResultTitle(data)
+        const nextHistory: KidsHistory = {
+          ...historyRef.current,
+          [intent]: [...(historyRef.current[intent] ?? []), title].slice(-16),
+        }
+        historyRef.current = nextHistory
+        writeKidsHistory(nextHistory)
 
         if (intent === 'lunchbox') {
-          posthog.capture(Analytics.LUNCHBOX_GENERATED, { target })
+          posthog.capture(Analytics.LUNCHBOX_GENERATED, { target: targetMember })
         }
         if (intent === 'picky') {
-          posthog.capture(Analytics.PICKY_EATER_TOOL_USED, { target })
+          posthog.capture(Analytics.PICKY_EATER_TOOL_USED, { target: targetMember })
         }
 
         fetchPendingRef.current = false
@@ -545,7 +705,7 @@ function KidsToolPageInner() {
       setError(true)
       setLoading(false)
     }
-  }, [intent, router])
+  }, [intent, router, targetMember])
 
   useEffect(() => {
     if (!paywallLoading) {
@@ -568,6 +728,9 @@ function KidsToolPageInner() {
             .filter((m: any) => ['child', 'toddler', 'baby'].includes(m.role))
             .map((m: any) => ({ id: m.id as string, label: `${m.first_name} (${m.role})` }))
           setMemberTargets(children)
+          if (children.length === 1) {
+            setTargetMember(children[0].id)
+          }
         })
         .catch(() => null)
 
@@ -579,6 +742,28 @@ function KidsToolPageInner() {
     setResult(null)
     fetchResult()
   }, [fetchResult])
+
+  const handleSave = useCallback(async () => {
+    if (!result) return
+    setSaving(true)
+    try {
+      const meal = buildSavableKidsMeal(result)
+      const res = await fetch('/api/content/meals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ meal }),
+      })
+      if (!res.ok) {
+        const data = (await res.json().catch(() => null)) as { error?: string } | null
+        throw new Error(data?.error ?? 'Could not save right now')
+      }
+      toast.success('Saved for later', { description: 'Find it in Saved Meals.' })
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Could not save')
+    } finally {
+      setSaving(false)
+    }
+  }, [result])
 
   return (
     <div className="min-h-dvh bg-background">
@@ -602,20 +787,38 @@ function KidsToolPageInner() {
       </header>
 
       <main className="mx-auto max-w-xl px-4 py-8 sm:py-12">
-        <div className="mb-4 rounded-xl border border-border/60 bg-card p-3">
-          <p className="text-xs font-medium text-muted-foreground mb-2">Help for</p>
-          <select
-            className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
-            value={target}
-            onChange={(e) => setTarget(e.target.value)}
-          >
-            <option value="whole_family">Whole family dinner</option>
-            <option value="adults_only">Adults only tonight</option>
-            {memberTargets.map((m) => (
-              <option key={m.id} value={m.id}>{m.label}</option>
-            ))}
-          </select>
-        </div>
+        {memberTargets.length > 1 && (
+          <div className="mb-4 rounded-xl border border-border/60 bg-card p-3">
+            <p className="text-xs font-medium text-muted-foreground mb-2">Target</p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setTargetMember('whole_family')}
+                className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                  targetMember === 'whole_family'
+                    ? 'border-primary bg-primary/10 text-primary'
+                    : 'border-border bg-background text-foreground/80 hover:border-primary/40'
+                }`}
+              >
+                Whole Family
+              </button>
+              {memberTargets.map((m) => (
+                <button
+                  key={m.id}
+                  type="button"
+                  onClick={() => setTargetMember(m.id)}
+                  className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                    targetMember === m.id
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-border bg-background text-foreground/80 hover:border-primary/40'
+                  }`}
+                >
+                  {m.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         <AnimatePresence mode="sync">
           {loading ? (
@@ -642,7 +845,7 @@ function KidsToolPageInner() {
               </Button>
             </motion.div>
           ) : result ? (
-            <ResultCard key="result" result={result} onSwap={handleSwap} />
+            <ResultCard key="result" result={result} onSwap={handleSwap} onSave={handleSave} saving={saving} />
           ) : null}
         </AnimatePresence>
 

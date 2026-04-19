@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Clock, ChefHat, RefreshCw, ShoppingCart, Flame, ChevronDown, ChevronUp, Leaf, ExternalLink } from 'lucide-react'
 import type { SmartMealResult } from '@/lib/engine/types'
+import { SaveMealButton } from '@/components/content/SaveMealButton'
 
 // ── Helpers ─────────────────────────────────────────────────
 
@@ -91,6 +92,7 @@ export function MealCard({ meal, pantryMatch, swapping, onCook, onSwap, onOrder 
               {Math.round(meal.meta.pantryUtilization * 100)}% pantry
             </span>
           )}
+          <SaveMealButton meal={meal} className="ml-auto h-7 w-7" />
         </div>
       </div>
 

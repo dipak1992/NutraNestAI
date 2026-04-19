@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
-import { Bookmark, Pencil, Trash2, Globe, Lock, Calendar, Search } from 'lucide-react'
+import { Bookmark, Pencil, Trash2, Globe, Lock, Calendar, Search, PlusCircle, ChefHat } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
@@ -11,6 +12,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { ShareButton } from '@/components/content/ShareButton'
 import { EditMealModal } from '@/components/content/EditMealModal'
 import type { SavedMealSummary } from '@/lib/content/types'
+import type { SmartMealResult } from '@/lib/engine/types'
+import { useWeeklyPlanStore } from '@/lib/planner/store'
 
 const CUISINE_EMOJI: Record<string, string> = {
   italian: '🍝',
@@ -30,11 +33,13 @@ function cuisineEmoji(type?: string | null) {
 }
 
 export default function SavedMealsPage() {
+  const router = useRouter()
   const [meals, setMeals] = useState<SavedMealSummary[]>([])
   const [loading, setLoading] = useState(true)
   const [editTarget, setEditTarget] = useState<SavedMealSummary | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<SavedMealSummary | null>(null)
   const [search, setSearch] = useState('')
+  const { plan, selectedDayIndex, setPlan, setSelectedDayIndex } = useWeeklyPlanStore()
 
   useEffect(() => {
     fetch('/api/content/meals')
@@ -73,6 +78,43 @@ export default function SavedMealsPage() {
 
   function handleEditSaved(id: string, updates: Partial<SavedMealSummary>) {
     setMeals((prev) => prev.map((m) => (m.id === id ? { ...m, ...updates } : m)))
+  }
+
+  async function fetchMealData(id: string): Promise<SmartMealResult | null> {
+    const res = await fetch(`/api/content/meals/${id}`)
+    if (!res.ok) return null
+    const data = await res.json() as { meal?: { meal_data?: SmartMealResult } }
+    return data.meal?.meal_data ?? null
+  }
+
+  async function handleCookAgain(meal: SavedMealSummary) {
+    const mealData = await fetchMealData(meal.id)
+    if (!mealData) {
+      toast.error('Could not load meal details.')
+      return
+    }
+    sessionStorage.setItem('tonight-meal', JSON.stringify(mealData))
+    router.push('/tonight/recipe')
+  }
+
+  async function handleAddToWeek(meal: SavedMealSummary) {
+    const mealData = await fetchMealData(meal.id)
+    if (!mealData) {
+      toast.error('Could not load meal details.')
+      return
+    }
+
+    const targetDay = plan.days.find((d) => d.meal === null)?.dayIndex ?? selectedDayIndex ?? 0
+    const nextPlan = {
+      ...plan,
+      days: plan.days.map((d) => d.dayIndex === targetDay ? { ...d, meal: mealData } : d),
+      generatedAt: new Date().toISOString(),
+    }
+
+    setPlan(nextPlan)
+    setSelectedDayIndex(targetDay)
+    toast.success('Added to weekly plan', { description: `Placed on ${new Date(nextPlan.days[targetDay].date).toLocaleDateString('en-US', { weekday: 'long' })}.` })
+    router.push('/planner')
   }
 
   return (
@@ -183,6 +225,24 @@ export default function SavedMealsPage() {
                 >
                   <Pencil className="h-3.5 w-3.5" />
                   Edit
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 text-xs gap-1.5"
+                  onClick={() => void handleCookAgain(meal)}
+                >
+                  <ChefHat className="h-3.5 w-3.5" />
+                  Cook again
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 text-xs gap-1.5"
+                  onClick={() => void handleAddToWeek(meal)}
+                >
+                  <PlusCircle className="h-3.5 w-3.5" />
+                  Add to week
                 </Button>
                 <Button
                   variant="ghost"

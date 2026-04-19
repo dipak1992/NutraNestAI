@@ -1,7 +1,7 @@
 'use client'
 
 import { Suspense, useEffect, useState, useRef, useCallback } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { BLURRED_PLAN_PREVIEW } from '@/lib/tonight-meals'
 import { SmartInput } from '@/components/dashboard/SmartInput'
+import { SaveMealButton } from '@/components/content/SaveMealButton'
 import type { SmartMealResult } from '@/lib/engine/types'
 
 const TONIGHT_SWIPE_STORAGE_KEY = 'nutrinest-tonight-swipes'
@@ -326,6 +327,7 @@ function BlurredPlanPreview() {
 // ── Main Tonight Page ──
 
 function TonightPageInner() {
+  const router = useRouter()
   const searchParams = useSearchParams()
   const mode = (searchParams.get('mode') as 'quick' | 'tired' | 'pantry' | 'inspiration') || 'quick'
   const needsInput = mode === 'pantry' || mode === 'inspiration'
@@ -469,9 +471,19 @@ function TonightPageInner() {
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/95">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
-          <Link href="/" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <button
+            type="button"
+            onClick={() => {
+              if (typeof window !== 'undefined' && window.history.length > 1) {
+                router.back()
+              } else {
+                router.push('/dashboard')
+              }
+            }}
+            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
             <ArrowLeft className="h-4 w-4" /> Back
-          </Link>
+          </button>
           <div className="flex items-center gap-2 font-bold text-sm">
             <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-white">
               <Leaf className="h-3.5 w-3.5" />
@@ -692,14 +704,17 @@ function TonightPageInner() {
                 transition={{ delay: 1.4 }}
                 className="text-center mt-8"
               >
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleAnotherMeal}
-                  className="gap-2"
-                >
-                  <RefreshCw className="h-3.5 w-3.5" /> Try a different meal
-                </Button>
+                <div className="flex items-center justify-center gap-2">
+                  <SaveMealButton meal={meal} className="h-9 w-9 rounded-md border border-border/60" />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleAnotherMeal}
+                    className="gap-2"
+                  >
+                    <RefreshCw className="h-3.5 w-3.5" /> Try a different meal
+                  </Button>
+                </div>
                 {!status.isAuthenticated && (
                   <p className="mt-2 text-xs text-muted-foreground">
                     {GUEST_SWIPE_LIMIT - guestSwipesUsed > 0

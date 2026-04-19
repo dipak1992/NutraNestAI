@@ -9,6 +9,45 @@ import { generateSlug } from '@/lib/content/types'
 import type { SmartMealRequest, SmartMealResult } from '@/lib/engine/types'
 import type { LearnedBoosts } from '@/lib/learning/types'
 
+function dedupeStrings(values: Array<string | undefined | null>): string[] {
+  return Array.from(new Set(values.filter((v): v is string => !!v)))
+}
+
+function getTimeAwareDefaults(now = new Date()): Pick<SmartMealRequest, 'maxCookTime' | 'lowEnergy' | 'cuisinePreferences'> {
+  const hour = now.getHours()
+  const isWeekend = now.getDay() === 0 || now.getDay() === 6
+
+  if (isWeekend) {
+    return {
+      maxCookTime: 50,
+      lowEnergy: false,
+      cuisinePreferences: ['comfort'],
+    }
+  }
+
+  if (hour < 11) {
+    return {
+      maxCookTime: 20,
+      lowEnergy: true,
+      cuisinePreferences: ['mediterranean'],
+    }
+  }
+
+  if (hour < 17) {
+    return {
+      maxCookTime: 25,
+      lowEnergy: true,
+      cuisinePreferences: ['asian'],
+    }
+  }
+
+  return {
+    maxCookTime: 40,
+    lowEnergy: false,
+    cuisinePreferences: ['comfort'],
+  }
+}
+
 export async function POST(req: NextRequest) {
   const rl = await rateLimit({ key: rateLimitKeyFromRequest(req), limit: 30, windowMs: 60_000 })
   if (!rl.success) return apiRateLimited(rl.reset)
@@ -37,13 +76,53 @@ export async function POST(req: NextRequest) {
 
     const { learnedBoosts, ...mealRequest } = body
 
+    let historyExcludeIds: string[] = []
+    try {
+      const { data: recent } = await supabase
+        .from('recently_shown_meals')
+        .select('meal_id, shown_at')
+        .eq('user_id', user.id)
+        .in('source_mode', ['smart-meal', 'weekly-plan', 'tonight'])
+        .order('shown_at', { ascending: false })
+        .limit(20)
+      historyExcludeIds = (recent ?? []).map((r) => r.meal_id).filter(Boolean)
+    } catch {
+      historyExcludeIds = []
+    }
+
+    const timeDefaults = getTimeAwareDefaults()
+
+    const mergedRequest: SmartMealRequest = {
+      ...mealRequest,
+      household: { adultsCount, kidsCount, toddlersCount, babiesCount },
+      maxCookTime: mealRequest.maxCookTime ?? timeDefaults.maxCookTime,
+      lowEnergy: mealRequest.lowEnergy ?? timeDefaults.lowEnergy,
+      cuisinePreferences:
+        mealRequest.cuisinePreferences && mealRequest.cuisinePreferences.length > 0
+          ? mealRequest.cuisinePreferences
+          : timeDefaults.cuisinePreferences,
+      excludeIds: dedupeStrings([...(mealRequest.excludeIds ?? []), ...historyExcludeIds]),
+    }
+
     const result = generateSmartMeal(
-      {
-        ...mealRequest,
-        household: { adultsCount, kidsCount, toddlersCount, babiesCount },
-      },
+      mergedRequest,
       learnedBoosts,
     )
+
+    try {
+      await supabase.from('recently_shown_meals').insert({
+        user_id: user.id,
+        meal_id: result.id,
+        source_mode: 'smart-meal',
+        metadata: {
+          title: result.title,
+          hour: new Date().getHours(),
+          weekend: [0, 6].includes(new Date().getDay()),
+        },
+      })
+    } catch {
+      // non-fatal
+    }
 
     // ── AI escape hatch: pool exhausted → generate via AI ───
     if (result.meta.poolExhausted) {

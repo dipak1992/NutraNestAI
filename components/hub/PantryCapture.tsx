@@ -51,7 +51,7 @@ export function PantryCapture({ onConfirm, onCancel }: Props) {
   const [error, setError] = useState<string | null>(null)
   const [paywallOpen, setPaywallOpen] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
-  const { status } = usePaywallStatus()
+  const { status, loading: paywallStatusLoading } = usePaywallStatus()
 
   // ── Camera / file pick ────────────────────────────────────
 
@@ -412,7 +412,7 @@ export function PantryCapture({ onConfirm, onCancel }: Props) {
         onOpenChange={setPaywallOpen}
         title="Unlock Unlimited Snap & Cook"
         description="Free accounts get 3 Snap & Cook scans per week. Upgrade to Pro for unlimited scans and faster meal decisions."
-        isAuthenticated={status.isAuthenticated}
+        isAuthenticated={paywallStatusLoading || status.isAuthenticated}
         redirectPath="/dashboard"
       />
     </>

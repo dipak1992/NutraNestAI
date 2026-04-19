@@ -3,6 +3,25 @@ import { NextResponse } from 'next/server'
 
 type Params = Promise<{ id: string }>
 
+export async function GET(_req: Request, { params }: { params: Params }) {
+  const { id } = await params
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const { data, error } = await supabase
+    .from('saved_meals')
+    .select('id, slug, title, description, cuisine_type, meal_data, is_public, created_at, published_at')
+    .eq('id', id)
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+
+  return NextResponse.json({ meal: data })
+}
+
 export async function PATCH(req: Request, { params }: { params: Params }) {
   const { id } = await params
   const supabase = await createClient()

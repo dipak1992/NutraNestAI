@@ -22,11 +22,17 @@ export async function POST(req: NextRequest) {
     // body is optional — continue with defaults
   }
 
+  const now = new Date()
+  const hour = now.getHours()
+  const isWeekend = [0, 6].includes(now.getDay())
+  const maxCookTime = isWeekend ? 50 : hour < 11 ? 20 : hour < 17 ? 25 : 35
+  const lowEnergy = hour < 17
+
   const result = generateSmartMeal(
     {
       household: { adultsCount: 2, kidsCount: 0, toddlersCount: 0, babiesCount: 0 },
-      lowEnergy: true,
-      maxCookTime: 30,
+      lowEnergy,
+      maxCookTime,
       excludeIds,
     },
     undefined, // no personalisation for guests

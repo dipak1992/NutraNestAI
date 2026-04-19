@@ -11,7 +11,7 @@ interface Props {
 }
 
 export function SmartToolsRow({ onSnapCook, householdConfig, canSeeKidsTools = false }: Props) {
-  const { hasKids, kidsPriorityTools, smartToolLabel, householdType } = householdConfig
+  const { kidsPriorityTools, smartToolLabel, householdType } = householdConfig
 
   return (
     <section className="mb-8">
@@ -65,7 +65,7 @@ export function SmartToolsRow({ onSnapCook, householdConfig, canSeeKidsTools = f
       </div>
 
       {/* Kids tools — shown only when hasKids=true, horizontal scroll row */}
-      {hasKids && canSeeKidsTools && kidsPriorityTools.length > 0 && (
+      {canSeeKidsTools && kidsPriorityTools.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}

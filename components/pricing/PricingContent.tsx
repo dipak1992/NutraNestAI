@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import posthog from 'posthog-js'
 import { toast } from 'sonner'
 import {
   Check,
@@ -115,7 +116,31 @@ export function PricingContent() {
   const familyMonthly = PRICING_TIERS.family.monthlyPrice
   const familyAnnual = PRICING_TIERS.family.yearlyPrice
 
+  const trackDeliveryDrivenConversion = useCallback((targetPlan: string) => {
+    try {
+      const raw = localStorage.getItem('mealease_delivery_last_used_at')
+      if (!raw) return
+
+      const usedAt = new Date(raw).getTime()
+      if (Number.isNaN(usedAt)) return
+
+      // Attribute conversion if checkout/trial starts within 7 days of delivery use.
+      const withinAttributionWindow = Date.now() - usedAt <= 1000 * 60 * 60 * 24 * 7
+      if (!withinAttributionWindow) return
+
+      posthog.capture('conversion_to_paid_after_use', {
+        target_plan: targetPlan,
+        source_feature: 'zero_cook_delivery',
+        used_at: raw,
+      })
+    } catch {
+      // non-fatal
+    }
+  }, [])
+
   const handleStartTrial = useCallback(async () => {
+    trackDeliveryDrivenConversion('pro_trial')
+
     if (!status.isAuthenticated) {
       router.push('/signup?plan=pro&trial=1')
       return
@@ -144,9 +169,11 @@ export function PricingContent() {
     } finally {
       setIsStartingTrial(false)
     }
-  }, [status, router])
+  }, [status, router, trackDeliveryDrivenConversion])
 
   const handleCheckout = useCallback(async (plan: 'pro_monthly' | 'pro_yearly' | 'family_monthly' | 'family_yearly') => {
+    trackDeliveryDrivenConversion(plan)
+
     if (!status.isAuthenticated) {
       router.push(`/signup?plan=${plan}`)
       return
@@ -176,7 +203,7 @@ export function PricingContent() {
     } catch {
       toast.error('Something went wrong. Try again.')
     }
-  }, [status, router, handleStartTrial])
+  }, [status, router, handleStartTrial, trackDeliveryDrivenConversion])
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">

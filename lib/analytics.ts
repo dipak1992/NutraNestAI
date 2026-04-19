@@ -20,6 +20,12 @@ export const Analytics = {
   EMAIL_CAPTURED:         'email_captured',
   ONBOARDING_STARTED:     'onboarding_started',
   ONBOARDING_COMPLETED:   'onboarding_completed',
+  DELIVERY_FEATURE_OPENED:'delivery_feature_opened',
+  SUGGESTION_CLICKED:     'suggestion_clicked',
+  PROVIDER_SELECTED:      'provider_selected',
+  REDIRECT_COMPLETED:     'redirect_completed',
+  RETURNED_USER:          'returned_user',
+  CONVERSION_TO_PAID_AFTER_USE: 'conversion_to_paid_after_use',
   // Dashboard message system
   SUPPORT_MESSAGE_SEEN:   'support_message_seen',
   SUPPORT_MESSAGE_CLICK:  'support_message_click',

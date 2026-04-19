@@ -614,9 +614,21 @@ export function HomeHub({ userName }: Props) {
     <ZeroCookSheet
       open={zeroCookOpen}
       onOpenChange={setZeroCookOpen}
+      householdType={
+        light.householdType === 'couple'
+          ? 'couple'
+          : light.householdType === 'family'
+            ? 'family'
+            : 'single'
+      }
       household={getHousehold()}
       cuisinePreferences={light.cuisines}
       budget={light.cookingTimeMinutes && light.cookingTimeMinutes <= 15 ? 'low' : undefined}
+      dislikedFoods={light.dislikedFoods}
+      pickyEater={light.pickyEater}
+      lowEnergy={light.lowEnergy}
+      healthyGoal={false}
+      countryCode={light.country || undefined}
     />
     <ZeroCookTeaser
       open={zeroCookTeaserOpen}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence } from 'framer-motion'
 import posthog from 'posthog-js'
@@ -80,6 +80,38 @@ export function DashboardHub({ displayName }: Props) {
     }
   }, [paywallStatus.isPro])
 
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState !== 'visible') return
+
+      try {
+        const raw = sessionStorage.getItem('mealease_delivery_redirected')
+        if (!raw) return
+        const parsed = JSON.parse(raw) as { provider?: string; at?: number }
+
+        if (parsed.at && Date.now() - parsed.at < 1000 * 60 * 120) {
+          posthog.capture('returned_user', {
+            provider: parsed.provider,
+            source: 'delivery_redirect',
+          })
+        }
+
+        sessionStorage.removeItem('mealease_delivery_redirected')
+      } catch {
+        // non-fatal
+      }
+    }
+
+    document.addEventListener('visibilitychange', onVisible)
+    window.addEventListener('focus', onVisible)
+    onVisible()
+
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible)
+      window.removeEventListener('focus', onVisible)
+    }
+  }, [])
+
   return (
     <>
       <OnboardingPromptPopup />
@@ -155,6 +187,13 @@ export function DashboardHub({ displayName }: Props) {
       <ZeroCookSheet
         open={zeroCookOpen}
         onOpenChange={setZeroCookOpen}
+        householdType={
+          light.householdType === 'couple'
+            ? 'couple'
+            : light.householdType === 'family'
+              ? 'family'
+              : 'single'
+        }
         household={getHousehold()}
         cuisinePreferences={light.cuisines}
         budget={
@@ -162,6 +201,11 @@ export function DashboardHub({ displayName }: Props) {
             ? 'low'
             : undefined
         }
+        dislikedFoods={light.dislikedFoods}
+        pickyEater={light.pickyEater}
+        lowEnergy={light.lowEnergy}
+        healthyGoal={false}
+        countryCode={light.country || undefined}
       />
 
       <ZeroCookTeaser

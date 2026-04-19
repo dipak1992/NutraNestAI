@@ -12,9 +12,12 @@ export interface ZeroCookMeal {
   popularityLabel: string
   bestProvider: DeliveryProvider
   searchQuery: string
+  primaryActionLabel: string
+  secondaryActionLabel: string
 }
 
-export type DeliveryProvider = 'ubereats' | 'doordash' | 'grubhub'
+export type DeliveryProvider = 'ubereats' | 'doordash' | 'instacart' | 'grubhub'
+export type HouseholdMode = 'single' | 'couple' | 'family'
 
 export interface ProviderLink {
   provider: DeliveryProvider
@@ -25,6 +28,7 @@ export interface ProviderLink {
 }
 
 export interface ZeroCookRequest {
+  householdType?: HouseholdMode
   household: {
     adultsCount: number
     kidsCount: number
@@ -35,6 +39,15 @@ export interface ZeroCookRequest {
   budget?: 'low' | 'medium' | 'high'
   allergies?: string[]
   dietaryRestrictions?: string[]
+  dislikedFoods?: string[]
+  pickyEater?: boolean
+  healthyGoal?: boolean
+  lowEnergy?: boolean
+  pastAcceptedMeals?: string[]
+  timeOfDay?: 'morning' | 'afternoon' | 'evening' | 'late'
+  location?: {
+    countryCode?: string
+  }
 }
 
 export interface ZeroCookResponse {

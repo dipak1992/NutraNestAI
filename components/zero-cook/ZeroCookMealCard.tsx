@@ -1,19 +1,26 @@
 'use client'
 
+import { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import type { ZeroCookMeal } from '@/lib/zero-cook/types'
 import { getProviderLinks } from '@/lib/zero-cook/providers'
-import { ProviderButtons } from './ProviderButtons'
+import { ProviderButtons, openProviderLink } from './ProviderButtons'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 
 interface ZeroCookMealCardProps {
   meal: ZeroCookMeal
   index: number
-  onProviderSelect: (provider: string, meal: ZeroCookMeal, url: string) => void
+  countryCode?: string
+  onProviderSelect: (provider: string, meal: ZeroCookMeal, url: string, source: 'primary' | 'more') => void
 }
 
-export function ZeroCookMealCard({ meal, index, onProviderSelect }: ZeroCookMealCardProps) {
-  const links = getProviderLinks(meal.searchQuery)
+export function ZeroCookMealCard({ meal, index, countryCode, onProviderSelect }: ZeroCookMealCardProps) {
+  const [showMoreProviders, setShowMoreProviders] = useState(false)
+  const links = useMemo(() => getProviderLinks(meal.searchQuery, countryCode), [meal.searchQuery, countryCode])
+  const primaryLink = links.find((l) => l.provider === meal.bestProvider) ?? links[0]
+
+  const secondaryLabel = meal.secondaryActionLabel || 'See More'
 
   return (
     <motion.div
@@ -40,11 +47,35 @@ export function ZeroCookMealCard({ meal, index, onProviderSelect }: ZeroCookMeal
         <span className="capitalize">🍽 {meal.cuisineType}</span>
       </div>
 
-      {/* Provider buttons */}
-      <ProviderButtons
-        links={links}
-        onSelect={(provider, url) => onProviderSelect(provider, meal, url)}
-      />
+      <div className="grid grid-cols-2 gap-2">
+        <Button
+          size="sm"
+          className="w-full"
+          onClick={() => {
+            if (!primaryLink) return
+            openProviderLink(primaryLink, (provider, url) =>
+              onProviderSelect(provider, meal, url, 'primary'),
+            )
+          }}
+        >
+          {meal.primaryActionLabel || 'Order Now'}
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="w-full"
+          onClick={() => setShowMoreProviders((v) => !v)}
+        >
+          {showMoreProviders ? 'Hide Options' : secondaryLabel}
+        </Button>
+      </div>
+
+      {showMoreProviders ? (
+        <ProviderButtons
+          links={links}
+          onSelect={(provider, url) => onProviderSelect(provider, meal, url, 'more')}
+        />
+      ) : null}
     </motion.div>
   )
 }

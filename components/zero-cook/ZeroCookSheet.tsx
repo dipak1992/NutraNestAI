@@ -14,31 +14,68 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useZeroCookRecommend } from './useZeroCookRecommend'
 import { ZeroCookMealCard } from './ZeroCookMealCard'
 import { getSmartCTA } from '@/lib/zero-cook/providers'
-import type { ZeroCookRequest } from '@/lib/zero-cook/types'
+import type { HouseholdMode, ZeroCookRequest } from '@/lib/zero-cook/types'
 
 interface ZeroCookSheetProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+  householdType: HouseholdMode
   household: ZeroCookRequest['household']
   cuisinePreferences?: string[]
   budget?: 'low' | 'medium' | 'high'
+  dietaryRestrictions?: string[]
+  allergies?: string[]
+  dislikedFoods?: string[]
+  pickyEater?: boolean
+  healthyGoal?: boolean
+  lowEnergy?: boolean
+  countryCode?: string
+}
+
+function getModeDescription(mode: HouseholdMode): string {
+  if (mode === 'single') return 'Too busy to cook? We picked tonight\'s best options.'
+  if (mode === 'couple') return 'Dinner for two without the debate.'
+  return 'Feed everyone fast tonight.'
 }
 
 export function ZeroCookSheet({
   open,
   onOpenChange,
+  householdType,
   household,
   cuisinePreferences,
   budget,
+  dietaryRestrictions,
+  allergies,
+  dislikedFoods,
+  pickyEater,
+  healthyGoal,
+  lowEnergy,
+  countryCode,
 }: ZeroCookSheetProps) {
   const posthog = usePostHog()
   const { meals, isLoading, error, fetch } = useZeroCookRecommend()
   const cta = useMemo(() => getSmartCTA(), [])
+  const description = useMemo(() => getModeDescription(householdType), [householdType])
 
   useEffect(() => {
     if (!open) return
-    posthog?.capture('zero_cook_opened')
-    fetch({ household, cuisinePreferences, budget })
+    posthog?.capture('delivery_feature_opened', {
+      household_mode: householdType,
+    })
+    fetch({
+      householdType,
+      household,
+      cuisinePreferences,
+      budget,
+      dietaryRestrictions,
+      allergies,
+      dislikedFoods,
+      pickyEater,
+      healthyGoal,
+      lowEnergy,
+      location: { countryCode },
+    })
   }, [open]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
@@ -46,9 +83,7 @@ export function ZeroCookSheet({
       <SheetContent side="bottom" className="max-h-[85dvh] overflow-y-auto rounded-t-2xl">
         <SheetHeader>
           <SheetTitle>🛵 {cta}</SheetTitle>
-          <SheetDescription>
-            We picked the best delivery options for your household — just tap to order.
-          </SheetDescription>
+          <SheetDescription>{description}</SheetDescription>
         </SheetHeader>
 
         <div className="space-y-3 px-4">
@@ -71,16 +106,34 @@ export function ZeroCookSheet({
               key={meal.id}
               meal={meal}
               index={i}
-              onProviderSelect={(provider, meal, url) => {
-                posthog?.capture('zero_cook_provider_selected', {
+              countryCode={countryCode}
+              onProviderSelect={(provider, meal, url, source) => {
+                try {
+                  localStorage.setItem(
+                    'mealease_delivery_last_used_at',
+                    new Date().toISOString(),
+                  )
+                } catch {
+                  // non-fatal
+                }
+
+                posthog?.capture('suggestion_clicked', {
+                  meal_id: meal.id,
+                  meal_name: meal.name,
+                  household_mode: householdType,
+                  source,
+                })
+                posthog?.capture('provider_selected', {
                   provider,
                   meal_id: meal.id,
                   meal_name: meal.name,
                   cuisine: meal.cuisineType,
+                  household_mode: householdType,
                 })
-                posthog?.capture('zero_cook_redirect_started', {
+                posthog?.capture('redirect_completed', {
                   provider,
                   url,
+                  household_mode: householdType,
                 })
               }}
             />

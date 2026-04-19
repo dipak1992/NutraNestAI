@@ -13,7 +13,13 @@ const PROVIDERS: Record<DeliveryProvider, { label: string; emoji: string; deepSc
     label: 'DoorDash',
     emoji: '🔴',
     deepScheme: 'doordash://search?query=',
-    webBase: 'https://www.doordash.com/search/store/',
+    webBase: 'https://www.doordash.com/search/store/?q=',
+  },
+  instacart: {
+    label: 'Instacart',
+    emoji: '🟣',
+    deepScheme: 'instacart://search?query=',
+    webBase: 'https://www.instacart.com/store/search_v3/',
   },
   grubhub: {
     label: 'Grubhub',
@@ -23,9 +29,35 @@ const PROVIDERS: Record<DeliveryProvider, { label: string; emoji: string; deepSc
   },
 }
 
-export function getProviderLinks(searchQuery: string): ProviderLink[] {
+function getDefaultPriority(): DeliveryProvider[] {
+  const raw = process.env.NEXT_PUBLIC_DELIVERY_PROVIDER_PRIORITY_DEFAULT ?? 'ubereats,doordash,instacart,grubhub'
+  const parsed = raw
+    .split(',')
+    .map((p) => p.trim().toLowerCase())
+    .filter((p): p is DeliveryProvider => p in PROVIDERS)
+  return parsed.length > 0 ? parsed : ['ubereats', 'doordash', 'instacart', 'grubhub']
+}
+
+export function resolveProviderPriority(countryCode?: string): DeliveryProvider[] {
+  const cc = (countryCode ?? '').toUpperCase()
+  if (cc) {
+    const key = `NEXT_PUBLIC_DELIVERY_PROVIDER_PRIORITY_${cc}` as keyof NodeJS.ProcessEnv
+    const raw = process.env[key]
+    if (raw) {
+      const parsed = raw
+        .split(',')
+        .map((p) => p.trim().toLowerCase())
+        .filter((p): p is DeliveryProvider => p in PROVIDERS)
+      if (parsed.length > 0) return parsed
+    }
+  }
+
+  return getDefaultPriority()
+}
+
+export function getProviderLinks(searchQuery: string, countryCode?: string): ProviderLink[] {
   const q = encodeURIComponent(searchQuery)
-  return (['ubereats', 'doordash', 'grubhub'] as DeliveryProvider[]).map((provider) => {
+  return resolveProviderPriority(countryCode).map((provider) => {
     const cfg = PROVIDERS[provider]
     return {
       provider,

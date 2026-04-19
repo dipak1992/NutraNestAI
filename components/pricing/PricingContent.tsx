@@ -285,6 +285,7 @@ export function PricingContent() {
               'Tonight Dinner',
               '3 meal ideas per day',
               'Simple grocery list',
+              'Snap & Cook (3 scans/week)',
               'Basic dietary filters',
             ].map((f) => (
               <li key={f} className="flex items-start gap-3 text-sm">
@@ -453,6 +454,7 @@ export function PricingContent() {
               'Everything in Pro, plus:',
               '',
               'Up to 6 family members',
+              'Snap & Cook (unlimited scans)',
               'Kids Mode',
               'Lunchbox Planner',
               'Picky Eater Mode',

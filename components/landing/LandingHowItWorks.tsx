@@ -41,20 +41,12 @@ const STEPS = [
 
 export function LandingHowItWorks() {
   return (
-    <section id="how-it-works" className="relative overflow-hidden py-24 sm:py-32 bg-[#FAFBFA]">
-      {/* Background image */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 z-0"
-        style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1506368249639-73a05d6f6488?auto=format&fit=crop&w=1920&q=80')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          opacity: 0.45,
-        }}
-      />
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1] bg-[#FAFBFA]/65" />
-      <div className="relative z-[2] mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+    <section id="how-it-works" className="relative overflow-hidden py-24 sm:py-32 bg-[#f7faf8]">
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-[radial-gradient(900px_500px_at_12%_8%,rgba(139,92,246,0.12),transparent_58%),radial-gradient(900px_520px_at_88%_92%,rgba(16,185,129,0.14),transparent_56%),linear-gradient(180deg,#f7faf8_0%,#f3f8f5_55%,#ffffff_100%)]" />
+        <div className="absolute inset-0 opacity-35 [background-image:linear-gradient(rgba(15,23,42,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(15,23,42,0.03)_1px,transparent_1px)] [background-size:44px_44px]" />
+      </div>
+      <div className="relative z-[1] mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Section header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -69,6 +61,9 @@ export function LandingHowItWorks() {
             <br className="hidden sm:block" />
             about dinner again.
           </h2>
+          <p className="mt-4 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
+            Set your household once. MealEase handles the daily decisions with premium-level personalization.
+          </p>
         </motion.div>
 
         {/* Steps */}
@@ -91,7 +86,7 @@ export function LandingHowItWorks() {
                   {/* Glow */}
                   <div className={`absolute -inset-4 bg-gradient-to-b ${step.glow} to-transparent rounded-3xl blur-2xl opacity-60`} />
 
-                  <div className="relative">
+                  <div className="relative rounded-2xl border border-white/70 bg-white/80 backdrop-blur p-6 shadow-sm">
                     {/* Number + Icon */}
                     <div className="mx-auto mb-6 relative">
                       <div className={`mx-auto h-16 w-16 rounded-2xl ${step.bg} border ${step.border} flex items-center justify-center shadow-sm`}>

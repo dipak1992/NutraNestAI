@@ -49,19 +49,11 @@ const TIMELINE = [
 export function LandingSmartAI() {
   return (
     <section className="relative overflow-hidden py-24 sm:py-32 bg-slate-950 text-white">
-      {/* Background image */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 z-0"
-        style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=1920&q=80')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          opacity: 0.45,
-        }}
-      />
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1] bg-slate-950/72" />
-      <div className="relative z-[2] mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-[radial-gradient(860px_460px_at_18%_8%,rgba(139,92,246,0.20),transparent_58%),radial-gradient(820px_460px_at_88%_88%,rgba(16,185,129,0.18),transparent_56%),linear-gradient(180deg,#020617_0%,#0b1320_55%,#020617_100%)]" />
+        <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(148,163,184,0.2)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.2)_1px,transparent_1px)] [background-size:44px_44px]" />
+      </div>
+      <div className="relative z-[1] mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         {/* Section header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -75,7 +67,7 @@ export function LandingSmartAI() {
             Gets smarter{' '}
             <span className="bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent">every week.</span>
           </h2>
-          <p className="text-lg text-white/50 max-w-2xl mx-auto">
+          <p className="text-lg text-white/65 max-w-2xl mx-auto">
             MealEase doesn&apos;t just follow rules — it learns. Every interaction makes your experience more personal.
           </p>
         </motion.div>
@@ -118,7 +110,7 @@ export function LandingSmartAI() {
                         <span className="text-xs font-bold uppercase tracking-wider text-white/40">{step.day}</span>
                       </div>
                       <h3 className="font-bold text-lg text-white mb-2">{step.title}</h3>
-                      <p className="text-sm text-white/50 leading-relaxed">{step.description}</p>
+                      <p className="text-sm text-white/70 leading-relaxed">{step.description}</p>
                     </div>
                   </div>
 

@@ -84,19 +84,10 @@ const item = {
 export function LandingFeatures() {
   return (
     <section className="relative overflow-hidden py-24 sm:py-32 bg-white">
-      {/* Background image */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 z-0"
-        style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1543353071-873f17a7a088?auto=format&fit=crop&w=1920&q=80')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          opacity: 0.45,
-        }}
-      />
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1] bg-white/65" />
-      <div className="relative z-[2] mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-[radial-gradient(800px_420px_at_85%_8%,rgba(245,158,11,0.11),transparent_58%),radial-gradient(780px_460px_at_8%_90%,rgba(16,185,129,0.11),transparent_56%),linear-gradient(180deg,#ffffff_0%,#f8fbf9_62%,#ffffff_100%)]" />
+      </div>
+      <div className="relative z-[1] mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -128,10 +119,10 @@ export function LandingFeatures() {
               <motion.div
                 key={f.title}
                 variants={item}
-                className="group relative rounded-2xl border border-border/60 bg-white p-6 hover:shadow-lg hover:border-border transition-all overflow-hidden"
+                className="group relative rounded-2xl border border-border/60 bg-white/85 backdrop-blur p-6 hover:shadow-xl hover:shadow-emerald-900/10 hover:border-emerald-200/70 transition-all overflow-hidden"
               >
                 {/* Subtle gradient on hover */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${f.gradient} opacity-0 group-hover:opacity-[0.03] transition-opacity duration-300`} />
+                <div className={`absolute inset-0 bg-gradient-to-br ${f.gradient} opacity-0 group-hover:opacity-[0.06] transition-opacity duration-300`} />
 
                 <div className="relative">
                   {/* Tag */}

@@ -6,6 +6,7 @@ import { apiError, apiRateLimited, apiSuccess } from '@/lib/api-response'
 import logger from '@/lib/logger'
 import type { SmartMealRequest } from '@/lib/engine/types'
 import type { LearnedBoosts } from '@/lib/learning/types'
+import { buildFamilyEngineOverrides, getFamilyMembers, getUserTier, mergeUnique } from '@/lib/family/service'
 
 type Mode = 'tonight' | 'surprise' | 'swap'
 
@@ -83,12 +84,39 @@ export async function POST(req: NextRequest) {
     ...serverExcludes,
   ]))
 
+  let familyOverrides: ReturnType<typeof buildFamilyEngineOverrides> | null = null
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      const tier = await getUserTier(supabase as any, user.id)
+      if (tier === 'family') {
+        const members = await getFamilyMembers(supabase as any, user.id)
+        if (members.length > 0) {
+          familyOverrides = buildFamilyEngineOverrides(members)
+        }
+      }
+    }
+  } catch {
+    // Non-fatal: keep existing request behavior when family lookup fails.
+  }
+
   const { learnedBoosts, mode: _mode, excludeIds: _ex, ...rest } = body
   void _mode; void _ex
 
   const mealRequest: SmartMealRequest = {
     ...rest,
-    household: { adultsCount, kidsCount, toddlersCount, babiesCount },
+    household: familyOverrides?.household ?? { adultsCount, kidsCount, toddlersCount, babiesCount },
+    allergies: mergeUnique(rest.allergies, familyOverrides?.allergies),
+    dietaryRestrictions: mergeUnique(rest.dietaryRestrictions, familyOverrides?.dietaryRestrictions),
+    cuisinePreferences: mergeUnique(rest.cuisinePreferences, familyOverrides?.cuisinePreferences),
+    preferredProteins: mergeUnique(rest.preferredProteins, familyOverrides?.preferredProteins),
+    pickyEater: familyOverrides?.pickyEater?.active
+      ? {
+          active: true,
+          dislikedFoods: mergeUnique(rest.pickyEater?.dislikedFoods, familyOverrides.pickyEater.dislikedFoods),
+        }
+      : rest.pickyEater,
     maxCookTime: rest.maxCookTime ?? autoMaxCookTime,
     excludeIds,
   }

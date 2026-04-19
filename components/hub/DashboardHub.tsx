@@ -22,6 +22,7 @@ import { SmartToolsRow } from './SmartToolsRow'
 import { WeekendModeCard } from './WeekendModeCard'
 import { ProgressCard } from './ProgressCard'
 import { ShareFooter } from './ShareFooter'
+import type { FamilyHouseholdSummary } from '@/lib/family/types'
 
 interface Props {
   displayName: string
@@ -45,6 +46,7 @@ export function DashboardHub({ displayName }: Props) {
   const { status: paywallStatus } = usePaywallStatus()
   const householdConfig = useHouseholdConfig()
   const { supportLine, timeBlock } = useDashboardMessage()
+  const [familySummary, setFamilySummary] = useState<FamilyHouseholdSummary | null>(null)
 
   const getHousehold = useCallback(
     () =>
@@ -112,6 +114,25 @@ export function DashboardHub({ displayName }: Props) {
     }
   }, [])
 
+  useEffect(() => {
+    if (!paywallStatus.isFamily) return
+
+    fetch('/api/family/members', { cache: 'no-store' })
+      .then(async (res) => {
+        if (!res.ok) return null
+        return res.json()
+      })
+      .then((data) => {
+        if (data?.summary) {
+          setFamilySummary(data.summary as FamilyHouseholdSummary)
+          posthog.capture('retention_by_household_size', {
+            household_size: data.summary.totalMembers,
+          })
+        }
+      })
+      .catch(() => null)
+  }, [paywallStatus.isFamily])
+
   return (
     <>
       <OnboardingPromptPopup />
@@ -134,6 +155,8 @@ export function DashboardHub({ displayName }: Props) {
             onQuickDecide={handleQuickDecide}
             onZeroCook={handleZeroCook}
             householdConfig={householdConfig}
+            familyHeadline={paywallStatus.isFamily ? familySummary?.headline : null}
+            familyBullets={paywallStatus.isFamily ? familySummary?.bullets : undefined}
           />
 
           <WeekendModeCard

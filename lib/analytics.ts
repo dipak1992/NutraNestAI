@@ -30,6 +30,12 @@ export const Analytics = {
   SUPPORT_MESSAGE_SEEN:   'support_message_seen',
   SUPPORT_MESSAGE_CLICK:  'support_message_click',
   REWARD_TOAST_SHOWN:     'reward_toast_shown',
+  MEMBER_ADDED:           'member_added',
+  CHILD_PROFILE_ADDED:    'child_profile_added',
+  FAMILY_PLAN_GENERATED:  'family_plan_generated',
+  PICKY_EATER_TOOL_USED:  'picky_eater_tool_used',
+  LUNCHBOX_GENERATED:     'lunchbox_generated',
+  RETENTION_BY_HOUSEHOLD_SIZE: 'retention_by_household_size',
 } as const
 
 export type AnalyticsEvent = (typeof Analytics)[keyof typeof Analytics]

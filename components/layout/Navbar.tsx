@@ -16,6 +16,7 @@ import {
   X,
   LogOut,
   User,
+  Users,
   Bookmark,
   Crown,
   Gift,
@@ -49,6 +50,8 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
   const { sidebarOpen, toggleSidebar } = useUIStore()
   const [signingOut, setSigningOut] = useState(false)
   const isPro = subscriptionTier === 'pro'
+  const isFamily = subscriptionTier === 'family'
+  const isPaid = isPro || isFamily
 
   async function handleSignOut() {
     setSigningOut(true)
@@ -87,6 +90,20 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
               {label}
             </Link>
           ))}
+          {isFamily ? (
+            <Link
+              href="/family"
+              className={cn(
+                'flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                pathname?.startsWith('/family')
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+              )}
+            >
+              <Users className="h-4 w-4" />
+              Family Settings
+            </Link>
+          ) : null}
         </nav>
 
         {/* Right side */}
@@ -97,13 +114,15 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
               'inline-flex capitalize',
               isPro
                 ? 'border-amber-300 bg-amber-50 text-amber-800'
+                : isFamily
+                  ? 'border-emerald-300 bg-emerald-50 text-emerald-800'
                 : 'border-primary/20 bg-primary/5 text-primary',
             )}
           >
-            {isPro ? <Crown className="mr-1.5 h-3 w-3" /> : null}
+            {isPaid ? <Crown className="mr-1.5 h-3 w-3" /> : null}
             {subscriptionTier}
           </Badge>
-          {!isPro && (
+          {!isPaid && (
             <Button asChild size="sm" className="hidden sm:inline-flex">
               <Link href="/pricing?intent=pro">Upgrade to Pro</Link>
             </Button>
@@ -133,10 +152,16 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
                 <BarChart3 className="h-4 w-4" />
                 Insights
               </DropdownMenuItem>
-              {!isPro && (
+              {!isPaid && (
                 <DropdownMenuItem render={<Link href="/pricing?intent=pro" />}>
                   <Crown className="h-4 w-4" />
                   Upgrade to Pro
+                </DropdownMenuItem>
+              )}
+              {isFamily && (
+                <DropdownMenuItem render={<Link href="/family" />}>
+                  <Users className="h-4 w-4" />
+                  Family Settings
                 </DropdownMenuItem>
               )}
               <DropdownMenuItem render={<Link href="/referral" />}>
@@ -202,7 +227,17 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
                 <Settings className="h-4 w-4" />
                 Settings
               </Link>
-              {!isPro && (
+              {isFamily && (
+                <Link
+                  href="/family"
+                  onClick={() => useUIStore.getState().setSidebarOpen(false)}
+                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                >
+                  <Users className="h-4 w-4" />
+                  Family Settings
+                </Link>
+              )}
+              {!isPaid && (
                 <Link
                   href="/pricing?intent=pro"
                   onClick={() => useUIStore.getState().setSidebarOpen(false)}

@@ -143,9 +143,16 @@ export default function SettingsPage() {
           <div className="glass-card rounded-xl border border-border/60 p-5">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-semibold">Household Profile</h2>
-              <Button variant="outline" size="sm" onClick={() => router.push('/onboarding')}>
-                Edit Profile
-              </Button>
+              <div className="flex gap-2">
+                {status.isFamily ? (
+                  <Button variant="outline" size="sm" onClick={() => router.push('/family')}>
+                    Family Settings
+                  </Button>
+                ) : null}
+                <Button variant="outline" size="sm" onClick={() => router.push('/onboarding')}>
+                  Edit Profile
+                </Button>
+              </div>
             </div>
 
             {!householdType ? (

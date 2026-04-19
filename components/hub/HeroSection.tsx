@@ -18,6 +18,8 @@ interface Props {
   onQuickDecide: () => void
   onZeroCook: () => void
   householdConfig: ReturnType<typeof useHouseholdConfig>
+  familyHeadline?: string | null
+  familyBullets?: string[]
 }
 
 export function HeroSection({
@@ -25,6 +27,8 @@ export function HeroSection({
   onQuickDecide,
   onZeroCook,
   householdConfig,
+  familyHeadline,
+  familyBullets,
 }: Props) {
   const { greeting, subtext } = useMemo(() => getGreeting(), [])
   const dynamicGreeting = householdConfig.greeting(firstName)
@@ -36,7 +40,16 @@ export function HeroSection({
         <h1 className="text-[26px] font-bold text-foreground tracking-tight leading-tight">
           {greeting}, {firstName} 👋
         </h1>
-        <p className="text-sm text-muted-foreground mt-1.5">{dynamicGreeting}</p>
+        <p className="text-sm text-muted-foreground mt-1.5">{familyHeadline ?? dynamicGreeting}</p>
+        {familyBullets && familyBullets.length > 0 ? (
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {familyBullets.slice(0, 5).map((item) => (
+              <span key={item} className="rounded-full border border-border/60 bg-white px-2.5 py-1 text-[11px] text-muted-foreground">
+                {item}
+              </span>
+            ))}
+          </div>
+        ) : null}
       </div>
 
       {/* 3 Primary Action Cards */}

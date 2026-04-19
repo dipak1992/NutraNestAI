@@ -14,6 +14,7 @@ import { getUserDietaryPrefs, applyPrefsToEngineRequest } from '@/lib/meal-engin
 import type { SmartMealRequest } from '@/lib/engine/types'
 import type { LearnedBoosts } from '@/lib/learning/types'
 import type { StoreFormat } from '@/lib/planner/types'
+import { buildFamilyEngineOverrides, getFamilyMembers, mergeUnique } from '@/lib/family/service'
 
 interface WeeklyPlanRequest {
   baseRequest: SmartMealRequest
@@ -49,7 +50,20 @@ export async function POST(req: Request) {
     const { baseRequest: rawBaseRequest, learnedBoosts, storeFormat = 'standard', weekStart, pantryItems = [] } = body
     const baseRequest = prefs ? applyPrefsToEngineRequest(rawBaseRequest, prefs) : rawBaseRequest
 
-    const { adultsCount = 1, kidsCount = 0, toddlersCount = 0, babiesCount = 0 } = baseRequest.household
+    let familyOverrides: ReturnType<typeof buildFamilyEngineOverrides> | null = null
+    if (user && paywall.isFamily) {
+      try {
+        const members = await getFamilyMembers(supabase as any, user.id)
+        if (members.length > 0) {
+          familyOverrides = buildFamilyEngineOverrides(members)
+        }
+      } catch {
+        // Non-fatal: keep current planner fallback behavior.
+      }
+    }
+
+    const household = familyOverrides?.household ?? baseRequest.household
+    const { adultsCount = 1, kidsCount = 0, toddlersCount = 0, babiesCount = 0 } = household
     if (adultsCount + kidsCount + toddlersCount + babiesCount === 0) {
       return NextResponse.json(
         { error: 'Household must have at least one member' },
@@ -65,6 +79,16 @@ export async function POST(req: Request) {
       const meal = generateSmartMeal(
         {
           ...baseRequest,
+          allergies: mergeUnique(baseRequest.allergies, familyOverrides?.allergies),
+          dietaryRestrictions: mergeUnique(baseRequest.dietaryRestrictions, familyOverrides?.dietaryRestrictions),
+          cuisinePreferences: mergeUnique(baseRequest.cuisinePreferences, familyOverrides?.cuisinePreferences),
+          preferredProteins: mergeUnique(baseRequest.preferredProteins, familyOverrides?.preferredProteins),
+          pickyEater: familyOverrides?.pickyEater?.active
+            ? {
+                active: true,
+                dislikedFoods: mergeUnique(baseRequest.pickyEater?.dislikedFoods, familyOverrides.pickyEater.dislikedFoods),
+              }
+            : baseRequest.pickyEater,
           household: { adultsCount, kidsCount, toddlersCount, babiesCount },
           excludeIds: usedIds,
         },

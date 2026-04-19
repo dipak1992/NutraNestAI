@@ -92,6 +92,11 @@ export interface EngineMeta {
   pickyEaterAdjusted: boolean
   localityApplied: boolean
   selectionReason: string
+  acceptanceScore?: number
+  familyHarmonyScore?: number
+  easeScore?: number
+  budgetScore?: number
+  prepTimeScore?: number
   /** True when < 2 viable candidates remained after allergen/dietary filtering */
   poolExhausted?: boolean
 }

@@ -8,6 +8,8 @@ import { useOnboardingStore, useLightOnboardingStore } from '@/lib/store'
 import { useLearningStore } from '@/lib/learning/store'
 import { buildGroceryList } from '@/lib/planner/grocery'
 import { DAY_FULL } from '@/lib/planner/types'
+import posthog from 'posthog-js'
+import { Analytics } from '@/lib/analytics'
 
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 import { WeeklyPlannerGrid } from './WeeklyPlannerGrid'
@@ -180,6 +182,12 @@ export function WeeklyPlannerV2() {
         })
       } else {
         setShowPlannerLock(false)
+        if (status.isFamily) {
+          posthog.capture(Analytics.FAMILY_PLAN_GENERATED, {
+            household_size: memberCount,
+            planned_days: 7,
+          })
+        }
         toast.success('Week planned!', { description: '7 meals + grocery list ready.' })
       }
     } catch {

@@ -11,6 +11,8 @@ import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 import {
   ArrowLeft, RefreshCw, Sparkles, Clock, Flame, ChefHat, Leaf, Star,
 } from 'lucide-react'
+import posthog from 'posthog-js'
+import { Analytics } from '@/lib/analytics'
 import type {
   KidsToolIntent,
   KidsToolResult,
@@ -491,6 +493,8 @@ function KidsToolPageInner() {
   const [result, setResult] = useState<KidsToolResult | null>(null)
   const [error, setError] = useState(false)
   const [paywallOpen, setPaywallOpen] = useState(false)
+  const [target, setTarget] = useState<string>('whole_family')
+  const [memberTargets, setMemberTargets] = useState<Array<{ id: string; label: string }>>([])
   const { status, loading: paywallLoading } = usePaywallStatus()
   const animationDoneRef = useRef(false)
   const fetchPendingRef = useRef(false)
@@ -506,7 +510,11 @@ function KidsToolPageInner() {
       const res = await fetch('/api/kids-tool', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ intent }),
+        body: JSON.stringify({
+          intent,
+          targetMode: target === 'whole_family' || target === 'adults_only' ? target : undefined,
+          targetMemberId: target !== 'whole_family' && target !== 'adults_only' ? target : undefined,
+        }),
       })
 
       if (res.status === 401) {
@@ -517,6 +525,14 @@ function KidsToolPageInner() {
       if (res.ok) {
         const data = (await res.json()) as KidsToolResult
         setResult(data)
+
+        if (intent === 'lunchbox') {
+          posthog.capture(Analytics.LUNCHBOX_GENERATED, { target })
+        }
+        if (intent === 'picky') {
+          posthog.capture(Analytics.PICKY_EATER_TOOL_USED, { target })
+        }
+
         fetchPendingRef.current = false
         if (animationDoneRef.current) setLoading(false)
       } else {
@@ -541,6 +557,20 @@ function KidsToolPageInner() {
         setPaywallOpen(true)
         return
       }
+
+      fetch('/api/family/members', { cache: 'no-store' })
+        .then(async (res) => {
+          if (!res.ok) return null
+          return res.json()
+        })
+        .then((data) => {
+          const children = (data?.members ?? [])
+            .filter((m: any) => ['child', 'toddler', 'baby'].includes(m.role))
+            .map((m: any) => ({ id: m.id as string, label: `${m.first_name} (${m.role})` }))
+          setMemberTargets(children)
+        })
+        .catch(() => null)
+
       fetchResult()
     }
   }, [paywallLoading]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -572,6 +602,21 @@ function KidsToolPageInner() {
       </header>
 
       <main className="mx-auto max-w-xl px-4 py-8 sm:py-12">
+        <div className="mb-4 rounded-xl border border-border/60 bg-card p-3">
+          <p className="text-xs font-medium text-muted-foreground mb-2">Help for</p>
+          <select
+            className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+            value={target}
+            onChange={(e) => setTarget(e.target.value)}
+          >
+            <option value="whole_family">Whole family dinner</option>
+            <option value="adults_only">Adults only tonight</option>
+            {memberTargets.map((m) => (
+              <option key={m.id} value={m.id}>{m.label}</option>
+            ))}
+          </select>
+        </div>
+
         <AnimatePresence mode="sync">
           {loading ? (
             <LoadingPhase

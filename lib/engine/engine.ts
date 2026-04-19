@@ -106,6 +106,10 @@ const STAGE_META: Record<Stage, { label: string; emoji: string }> = {
   baby: { label: 'Baby (6-12mo)', emoji: '🍼' },
 }
 
+function clampScore(v: number): number {
+  return Math.max(1, Math.min(10, Math.round(v)))
+}
+
 // ── Substitute Options for Shopping List ────────────────────
 
 const SUBSTITUTE_MAP: Record<string, string[]> = {
@@ -446,6 +450,50 @@ function assembleMeal(
   const pantryMatches = ingredients.filter(i => i.fromPantry)
   const pantryUtil = ingredients.length > 0 ? pantryMatches.length / ingredients.length : 0
 
+  const totalHousehold =
+    request.household.adultsCount +
+    request.household.kidsCount +
+    request.household.toddlersCount +
+    request.household.babiesCount
+  const hasKids = request.household.kidsCount + request.household.toddlersCount + request.household.babiesCount > 0
+
+  const acceptanceScore = clampScore(
+    (hasKids ? meal.kidFriendlyScore : 7)
+    - (request.pickyEater?.active ? 1 : 0)
+    + (meal.difficulty === 'easy' ? 1 : 0)
+  )
+
+  const familyHarmonyScore = clampScore(
+    acceptanceScore
+    + (meal.variations ? Math.min(Object.keys(meal.variations).length - 1, 2) : 0)
+    + (totalHousehold >= 4 ? 1 : 0)
+  )
+
+  const easeScore = clampScore(
+    (meal.difficulty === 'easy' ? 9 : meal.difficulty === 'moderate' ? 6 : 3)
+    + (request.lowEnergy && meal.simplifiedSteps ? 1 : 0)
+  )
+
+  const budgetScore = clampScore(
+    request.budget
+      ? (
+          (request.budget === 'low' && meal.costLevel === 'low') ||
+          (request.budget === 'medium' && (meal.costLevel === 'low' || meal.costLevel === 'medium')) ||
+          request.budget === 'high'
+        )
+        ? 9
+        : 4
+      : 7
+  )
+
+  const prepTimeScore = clampScore(
+    request.maxCookTime
+      ? meal.prepTime + meal.cookTime <= request.maxCookTime
+        ? 9
+        : 3
+      : 7
+  )
+
   const meta: EngineMeta = {
     score,
     matchedPantryItems: pantryMatches.map(i => i.name),
@@ -453,6 +501,11 @@ function assembleMeal(
     simplifiedForEnergy: !!(request.lowEnergy && meal.simplifiedSteps),
     pickyEaterAdjusted: !!(request.pickyEater?.active),
     localityApplied,
+    acceptanceScore,
+    familyHarmonyScore,
+    easeScore,
+    budgetScore,
+    prepTimeScore,
     selectionReason: reasons.join('. '),
     ...(poolExhausted ? { poolExhausted: true } : {}),
   }

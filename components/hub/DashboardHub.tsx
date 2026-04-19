@@ -151,6 +151,7 @@ export function DashboardHub({ displayName }: Props) {
               setSnapCookOpen(true)
             }}
             householdConfig={householdConfig}
+            canSeeKidsTools={paywallStatus.isFamily}
           />
 
           {/* Lower support line: keep header minimal while preserving subtle guidance */}

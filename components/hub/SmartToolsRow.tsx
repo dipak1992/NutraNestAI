@@ -7,9 +7,10 @@ import type { useHouseholdConfig } from '@/lib/hooks/use-household-config'
 interface Props {
   onSnapCook?: () => void
   householdConfig: ReturnType<typeof useHouseholdConfig>
+  canSeeKidsTools?: boolean
 }
 
-export function SmartToolsRow({ onSnapCook, householdConfig }: Props) {
+export function SmartToolsRow({ onSnapCook, householdConfig, canSeeKidsTools = false }: Props) {
   const { hasKids, kidsPriorityTools, smartToolLabel, householdType } = householdConfig
 
   return (
@@ -64,7 +65,7 @@ export function SmartToolsRow({ onSnapCook, householdConfig }: Props) {
       </div>
 
       {/* Kids tools — shown only when hasKids=true, horizontal scroll row */}
-      {hasKids && kidsPriorityTools.length > 0 && (
+      {hasKids && canSeeKidsTools && kidsPriorityTools.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}

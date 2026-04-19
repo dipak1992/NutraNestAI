@@ -3,6 +3,8 @@
 import { useCallback, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Camera, Pencil, X, Loader2, Plus, ArrowRight } from 'lucide-react'
+import { PaywallDialog } from '@/components/paywall/PaywallDialog'
+import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 
 interface Props {
   onConfirm: (items: string[]) => void
@@ -16,7 +18,9 @@ export function PantryCapture({ onConfirm, onCancel }: Props) {
   const [items, setItems] = useState<string[]>([])
   const [manualInput, setManualInput] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [paywallOpen, setPaywallOpen] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+  const { status } = usePaywallStatus()
 
   // ── Camera / file pick ────────────────────────────────────
 
@@ -43,6 +47,12 @@ export function PantryCapture({ onConfirm, onCancel }: Props) {
 
       if (!res.ok) {
         const body = await res.json().catch(() => null)
+        if (res.status === 402) {
+          setPaywallOpen(true)
+          setError(body?.error ?? 'Free Snap & Cook quota reached. Upgrade for unlimited scans.')
+          setPhase('choose')
+          return
+        }
         throw new Error(body?.error ?? 'Scan failed')
       }
 
@@ -97,12 +107,13 @@ export function PantryCapture({ onConfirm, onCancel }: Props) {
   }, [items, onConfirm])
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -8 }}
-      transition={{ duration: 0.2 }}
-    >
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -8 }}
+        transition={{ duration: 0.2 }}
+      >
       {/* Hidden file input */}
       <input
         ref={fileRef}
@@ -368,6 +379,16 @@ export function PantryCapture({ onConfirm, onCancel }: Props) {
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.div>
+      </motion.div>
+
+      <PaywallDialog
+        open={paywallOpen}
+        onOpenChange={setPaywallOpen}
+        title="Unlock Unlimited Snap & Cook"
+        description="Free accounts get 3 Snap & Cook scans per week. Upgrade to Pro for unlimited scans and faster meal decisions."
+        isAuthenticated={status.isAuthenticated}
+        redirectPath="/dashboard"
+      />
+    </>
   )
 }

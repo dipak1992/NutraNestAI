@@ -3,6 +3,7 @@ import OpenAI from 'openai'
 import { createClient } from '@/lib/supabase/server'
 import { rateLimit, rateLimitKeyFromRequest } from '@/lib/rate-limit'
 import { apiError, apiRateLimited, apiSuccess, withErrorHandler } from '@/lib/api-response'
+import { normalizeTier } from '@/lib/paywall/config'
 
 let _openai: OpenAI | null = null
 function getOpenAI() {
@@ -20,6 +21,74 @@ export const POST = withErrorHandler('pantry/vision', async (req: Request) => {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return apiError('Authentication required', 401)
+
+  // Snap & Cook paywall: keep visible for free users, allow 3 scans/week, then gate.
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('subscription_tier, temp_pro_until')
+    .eq('id', user.id)
+    .maybeSingle()
+
+  const tier = normalizeTier(profile?.subscription_tier)
+  const isTempPro = !!profile?.temp_pro_until && new Date(profile.temp_pro_until) > new Date()
+  const isPaidOrTrial = tier === 'pro' || tier === 'family' || isTempPro
+
+  if (!isPaidOrTrial) {
+    const now = new Date()
+    const weekStart = new Date(now)
+    weekStart.setDate(now.getDate() - 6)
+
+    const weekStartIso = weekStart.toISOString().slice(0, 10)
+    const todayIso = now.toISOString().slice(0, 10)
+
+    const { data: weeklyUsage } = await supabase
+      .from('feature_usage')
+      .select('usage_count')
+      .eq('user_id', user.id)
+      .eq('feature_key', 'snap_cook_scan')
+      .gte('usage_date', weekStartIso)
+
+    const used = (weeklyUsage ?? []).reduce((acc, row) => acc + (row.usage_count ?? 0), 0)
+    const limit = 3
+
+    if (used >= limit) {
+      return Response.json(
+        {
+          success: false,
+          error: 'Free Snap & Cook limit reached (3 scans/week). Upgrade for unlimited scans.',
+          code: 'snap_cook_quota_exceeded',
+          quota: { used, limit, period: 'week' },
+        },
+        { status: 402 },
+      )
+    }
+
+    const { data: todayUsage } = await supabase
+      .from('feature_usage')
+      .select('usage_count')
+      .eq('user_id', user.id)
+      .eq('feature_key', 'snap_cook_scan')
+      .eq('usage_date', todayIso)
+      .maybeSingle()
+
+    if (todayUsage) {
+      await supabase
+        .from('feature_usage')
+        .update({ usage_count: (todayUsage.usage_count ?? 0) + 1 })
+        .eq('user_id', user.id)
+        .eq('feature_key', 'snap_cook_scan')
+        .eq('usage_date', todayIso)
+    } else {
+      await supabase
+        .from('feature_usage')
+        .insert({
+          user_id: user.id,
+          feature_key: 'snap_cook_scan',
+          usage_date: todayIso,
+          usage_count: 1,
+        })
+    }
+  }
 
   const body = await req.json()
   const { image } = body as { image?: string }

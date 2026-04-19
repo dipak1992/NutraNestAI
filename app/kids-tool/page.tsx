@@ -537,7 +537,7 @@ function KidsToolPageInner() {
         router.replace(`/login?redirect=/kids-tool%3Fmode%3D${intent}`)
         return
       }
-      if (!status.isPro && !status.isAuthenticated) {
+      if (!status.isFamily) {
         setPaywallOpen(true)
         return
       }

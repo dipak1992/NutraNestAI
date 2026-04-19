@@ -5,6 +5,7 @@ import { apiError, apiRateLimited } from '@/lib/api-response'
 import { generateText, stripJsonFences } from '@/lib/ai/service'
 import logger from '@/lib/logger'
 import { getUserDietaryPrefs, buildPreferenceContext } from '@/lib/meal-engine/preferences'
+import { normalizeTier } from '@/lib/paywall/config'
 
 export type KidsToolIntent = 'lunchbox' | 'snack' | 'bake' | 'picky' | 'fast'
 
@@ -158,6 +159,17 @@ export async function POST(req: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return apiError('Unauthenticated', 401)
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('subscription_tier')
+    .eq('id', user.id)
+    .maybeSingle()
+
+  const tier = normalizeTier(profile?.subscription_tier)
+  if (tier !== 'family') {
+    return apiError('Kids tools are available on Family Plus only.', 403)
+  }
 
   try {
     const body = (await req.json()) as { intent?: string }

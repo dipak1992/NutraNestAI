@@ -23,6 +23,7 @@ const PREVIEW_MEALS = [
     score: '98% match',
     reason: 'Low effort + kid-approved flavors',
     tone: 'from-emerald-500/15 to-cyan-500/10',
+    image: '/images/suggested-meal.svg',
   },
   {
     title: 'One-Pan Chicken Pesto Rice',
@@ -30,6 +31,7 @@ const PREVIEW_MEALS = [
     score: '96% match',
     reason: 'Uses pantry staples already at home',
     tone: 'from-amber-500/15 to-orange-500/10',
+    image: '/images/suggested-meal.svg',
   },
   {
     title: 'Creamy Tomato Pasta',
@@ -37,6 +39,7 @@ const PREVIEW_MEALS = [
     score: '95% match',
     reason: 'Fast comfort pick for busy evenings',
     tone: 'from-rose-500/15 to-fuchsia-500/10',
+    image: '/images/suggested-meal.svg',
   },
 ]
 
@@ -196,12 +199,19 @@ export function LandingHero() {
                 <div className="p-6">
                   <div className="rounded-2xl overflow-hidden border border-border/30 mb-4">
                     <div className={`aspect-[16/10] bg-gradient-to-br ${activePreview.tone} p-4`}>
-                      <div className="h-full w-full rounded-xl border border-white/70 bg-white/85 backdrop-blur px-4 py-3 flex flex-col justify-between">
+                      <div className="h-full w-full rounded-xl border border-white/70 bg-white/85 backdrop-blur p-3 flex gap-3">
+                        <img
+                          src={activePreview.image}
+                          alt={activePreview.title}
+                          className="h-full w-[52%] rounded-lg object-cover border border-white/70"
+                        />
+                        <div className="flex-1 px-1 py-1 flex flex-col justify-between">
                         <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 w-fit">
                           <Sparkles className="h-3 w-3" />
                           AI picked for your household
                         </div>
-                        <p className="text-xs text-foreground/75">{activePreview.reason}</p>
+                          <p className="text-xs text-foreground/75">{activePreview.reason}</p>
+                        </div>
                       </div>
                     </div>
                     <div className="p-4 bg-white">

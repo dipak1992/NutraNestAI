@@ -1,8 +1,9 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { Providers } from '@/components/providers'
 import { Toaster } from '@/components/ui/sonner'
+import { PWAServiceWorkerRegister } from '@/components/pwa/PWAServiceWorkerRegister'
 import { getSiteUrl } from '@/lib/seo'
 
 const inter = Inter({
@@ -24,12 +25,12 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/icon', type: 'image/png', sizes: '32x32' },
+      { url: '/icons/favicon-32.png', type: 'image/png', sizes: '32x32' },
     ],
     apple: [
-      { url: '/apple-icon', type: 'image/png', sizes: '180x180' },
+      { url: '/icons/apple-touch-icon-180.png', type: 'image/png', sizes: '180x180' },
     ],
-    shortcut: '/icon',
+    shortcut: '/icons/favicon-32.png',
   },
   openGraph: {
     title: 'MealEase – Make family meals easy',
@@ -45,6 +46,14 @@ export const metadata: Metadata = {
     description: 'From one idea to a full meal plan for your whole family — in seconds.',
     images: ['/twitter-image'],
   },
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: 'cover',
+  themeColor: '#16a34a',
 }
 
 export default function RootLayout({
@@ -66,7 +75,7 @@ export default function RootLayout({
               '@type': 'Organization',
               name: 'MealEase',
               url: getSiteUrl(),
-              logo: `${getSiteUrl()}/icon`,
+              logo: `${getSiteUrl()}/icons/icon-192.png`,
               description:
                 'MealEase helps you decide what to cook with simple, smart meal plans for your whole family.',
               sameAs: [],
@@ -74,6 +83,7 @@ export default function RootLayout({
           }}
         />
         <Providers>
+          <PWAServiceWorkerRegister />
           {children}
           <Toaster richColors position="top-right" />
         </Providers>

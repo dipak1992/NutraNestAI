@@ -3,6 +3,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { PostHogProvider } from '@/components/providers/PostHogProvider'
+import { PushSubscriptionManager } from '@/components/pwa/PushSubscriptionManager'
 import { useState } from 'react'
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -21,7 +22,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <PostHogProvider>
       <QueryClientProvider client={queryClient}>
-        <TooltipProvider delay={300}>{children}</TooltipProvider>
+        <TooltipProvider delay={300}>
+          <PushSubscriptionManager />
+          {children}
+        </TooltipProvider>
       </QueryClientProvider>
     </PostHogProvider>
   )

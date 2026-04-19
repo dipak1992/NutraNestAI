@@ -13,6 +13,37 @@ interface Props {
 
 type Phase = 'choose' | 'scanning' | 'manual' | 'review'
 
+async function compressImageForVision(file: File): Promise<string> {
+  const rawDataUrl = await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+
+  const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const img = new Image()
+    img.onload = () => resolve(img)
+    img.onerror = reject
+    img.src = rawDataUrl
+  })
+
+  const maxSide = 1600
+  const scale = Math.min(1, maxSide / Math.max(image.width, image.height))
+  const width = Math.max(1, Math.round(image.width * scale))
+  const height = Math.max(1, Math.round(image.height * scale))
+
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return rawDataUrl
+
+  ctx.drawImage(image, 0, 0, width, height)
+  return canvas.toDataURL('image/jpeg', 0.82)
+}
+
 export function PantryCapture({ onConfirm, onCancel }: Props) {
   const [phase, setPhase] = useState<Phase>('choose')
   const [items, setItems] = useState<string[]>([])
@@ -32,12 +63,7 @@ export function PantryCapture({ onConfirm, onCancel }: Props) {
     setError(null)
 
     try {
-      const dataUrl = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader()
-        reader.onload = () => resolve(reader.result as string)
-        reader.onerror = reject
-        reader.readAsDataURL(file)
-      })
+      const dataUrl = await compressImageForVision(file)
 
       const res = await fetch('/api/pantry/vision', {
         method: 'POST',

@@ -21,6 +21,7 @@ export const publicEnv = {
     monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_FAMILY_MONTHLY ?? '',
     yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_FAMILY_YEARLY ?? '',
   },
+  webPushPublicKey: process.env.NEXT_PUBLIC_WEB_PUSH_PUBLIC_KEY ?? '',
 } as const
 
 // ─── Server-only ──────────────────────────────────────────────────────────────
@@ -46,6 +47,8 @@ export const serverEnv = {
   // Trial configuration
   stripeTrialDays: parseInt(process.env.STRIPE_TRIAL_DAYS ?? '7', 10),
   adminEmail: process.env.ADMIN_EMAIL ?? '',
+  webPushPrivateKey: process.env.WEB_PUSH_PRIVATE_KEY ?? '',
+  webPushSubject: process.env.WEB_PUSH_SUBJECT ?? '',
 } as const
 
 // ─── Runtime validation (call once at startup for critical keys) ──────────────

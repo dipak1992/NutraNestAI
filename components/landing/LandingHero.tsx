@@ -23,7 +23,7 @@ const PREVIEW_MEALS = [
     score: '98% match',
     reason: 'Low effort + kid-approved flavors',
     tone: 'from-emerald-500/15 to-cyan-500/10',
-    image: '/images/suggested-meal.svg',
+    badges: ['Kid-friendly', 'One pan', 'High protein'],
   },
   {
     title: 'One-Pan Chicken Pesto Rice',
@@ -31,7 +31,7 @@ const PREVIEW_MEALS = [
     score: '96% match',
     reason: 'Uses pantry staples already at home',
     tone: 'from-amber-500/15 to-orange-500/10',
-    image: '/images/suggested-meal.svg',
+    badges: ['Pantry-first', 'No fuss', 'Balanced'],
   },
   {
     title: 'Creamy Tomato Pasta',
@@ -39,14 +39,13 @@ const PREVIEW_MEALS = [
     score: '95% match',
     reason: 'Fast comfort pick for busy evenings',
     tone: 'from-rose-500/15 to-fuchsia-500/10',
-    image: '/images/suggested-meal.svg',
+    badges: ['Comfort', 'Budget', 'Weeknight'],
   },
 ]
 
 export function LandingHero() {
   const [headlineIdx, setHeadlineIdx] = useState(0)
   const [previewIdx, setPreviewIdx] = useState(0)
-  const [imageFailed, setImageFailed] = useState(false)
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -61,10 +60,6 @@ export function LandingHero() {
     }, 3200)
     return () => clearInterval(timer)
   }, [])
-
-  useEffect(() => {
-    setImageFailed(false)
-  }, [previewIdx])
 
   const activePreview = PREVIEW_MEALS[previewIdx]
 
@@ -205,34 +200,46 @@ export function LandingHero() {
                   <div className="rounded-2xl overflow-hidden border border-border/30 mb-4">
                     <div className={`aspect-[16/10] bg-gradient-to-br ${activePreview.tone} p-4`}>
                       <div className="h-full w-full rounded-xl border border-white/70 bg-white/85 backdrop-blur p-3 flex gap-3">
-                        <div className="h-full w-[52%] rounded-lg overflow-hidden border border-white/70">
-                          {!imageFailed ? (
-                            <img
-                              src={activePreview.image}
-                              alt={activePreview.title}
-                              className="h-full w-full object-cover"
-                              onError={() => setImageFailed(true)}
-                            />
-                          ) : (
-                            <div className="h-full w-full bg-gradient-to-br from-emerald-200 via-amber-100 to-rose-200 p-3 flex items-end">
-                              <p className="text-[11px] font-semibold text-emerald-900 bg-white/75 rounded-md px-2 py-1">
-                                Suggested meal preview
-                              </p>
+                        <div className="h-full w-[52%] rounded-lg overflow-hidden border border-white/70 bg-gradient-to-br from-emerald-100 via-amber-50 to-rose-100 relative">
+                          <div className="absolute -top-6 -right-5 h-24 w-24 rounded-full bg-emerald-400/25 blur-xl" />
+                          <div className="absolute -bottom-6 -left-4 h-20 w-20 rounded-full bg-amber-400/30 blur-xl" />
+                          <div className="relative h-full p-3 flex flex-col justify-between">
+                            <span className="inline-flex items-center rounded-full bg-white/80 px-2.5 py-1 text-[10px] font-semibold text-emerald-800 w-fit">
+                              Tonight's Best Fit
+                            </span>
+                            <div className="space-y-2">
+                              <div className="h-2 rounded-full bg-white/60 overflow-hidden">
+                                <div className="h-full w-[96%] rounded-full bg-emerald-500" />
+                              </div>
+                              <div className="h-2 rounded-full bg-white/60 overflow-hidden">
+                                <div className="h-full w-[88%] rounded-full bg-amber-500" />
+                              </div>
+                              <div className="h-2 rounded-full bg-white/60 overflow-hidden">
+                                <div className="h-full w-[91%] rounded-full bg-cyan-500" />
+                              </div>
                             </div>
-                          )}
+                          </div>
                         </div>
                         <div className="flex-1 px-1 py-1 flex flex-col justify-between">
-                        <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 w-fit">
-                          <Sparkles className="h-3 w-3" />
-                          AI picked for your household
-                        </div>
+                          <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 w-fit">
+                            <Sparkles className="h-3 w-3" />
+                            AI picked for your household
+                          </div>
+                          <h4 className="text-sm font-bold text-foreground leading-tight">{activePreview.title}</h4>
                           <p className="text-xs text-foreground/75">{activePreview.reason}</p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {activePreview.badges.map((badge) => (
+                              <span key={badge} className="rounded-full bg-white border border-border/50 px-2 py-0.5 text-[10px] font-medium text-foreground/80">
+                                {badge}
+                              </span>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     </div>
                     <div className="p-4 bg-white">
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-bold text-foreground">{activePreview.reason}</h3>
+                        <h3 className="font-bold text-foreground">{activePreview.title}</h3>
                         <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">{activePreview.score}</span>
                       </div>
                       <div className="flex gap-4 text-xs text-muted-foreground">

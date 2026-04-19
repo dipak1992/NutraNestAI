@@ -35,6 +35,7 @@ export function TonightRecommendation({ refreshKey }: Props) {
   const [swapping, setSwapping] = useState(false)
   const [cooked, setCooked] = useState(false)
   const [groceryPromptOpen, setGroceryPromptOpen] = useState(false)
+  const [imageError, setImageError] = useState(false)
   const shownIdsRef = useRef<string[]>([])
 
   const { state: { members } } = useOnboardingStore()
@@ -51,6 +52,7 @@ export function TonightRecommendation({ refreshKey }: Props) {
   const fetchMeal = useCallback(async () => {
     setLoading(true)
     setCooked(false)
+    setImageError(false)
     try {
       const res = await decideMeal({
         mode: 'tonight',
@@ -183,16 +185,17 @@ export function TonightRecommendation({ refreshKey }: Props) {
             className="rounded-2xl bg-white border border-border/60 overflow-hidden shadow-sm"
           >
             {/* Meal image */}
-            <div className="relative w-full h-40 overflow-hidden">
-              {meal.imageUrl ? (
+            <div className="relative w-full h-40 overflow-hidden bg-gradient-to-br from-emerald-100 via-amber-50 to-orange-100">
+              {meal.imageUrl && !imageError ? (
                 <img
                   src={meal.imageUrl}
                   alt={meal.title}
                   className="w-full h-full object-cover"
                   loading="eager"
+                  onError={() => setImageError(true)}
                 />
               ) : (
-                <div className="w-full h-full bg-gradient-to-br from-emerald-100 via-amber-50 to-orange-100 flex items-center justify-center">
+                <div className="w-full h-full flex items-center justify-center">
                   <span className="text-5xl">🍽️</span>
                 </div>
               )}

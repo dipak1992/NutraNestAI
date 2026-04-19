@@ -193,4 +193,5 @@ export interface MealCandidate {
   leftoverTip: string | null
   keyIngredients: string[]
   relatedTerms: string[]
+  imageUrl?: string // per-meal image; falls back to cuisine-based if not provided
 }

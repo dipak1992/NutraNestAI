@@ -14,6 +14,7 @@ import { ZeroCookSheet } from '@/components/zero-cook/ZeroCookSheet'
 import { ZeroCookTeaser } from '@/components/zero-cook/ZeroCookTeaser'
 import { householdFromMembers, fallbackHousehold } from '@/lib/decide/client'
 import { StreakBadge } from '@/components/habit/StreakBadge'
+import { SupportLine } from './SupportLine'
 import { PantryCapture } from './PantryCapture'
 import { HeroSection } from './HeroSection'
 import { TonightRecommendation } from './TonightRecommendation'
@@ -23,11 +24,11 @@ import { ProgressCard } from './ProgressCard'
 import { ShareFooter } from './ShareFooter'
 
 interface Props {
-  userName: string
+  displayName: string
 }
 
-export function DashboardHub({ userName }: Props) {
-  const firstName = userName.includes('@') ? userName.split('@')[0] : userName
+export function DashboardHub({ displayName }: Props) {
+  const firstName = displayName
   const router = useRouter()
 
   const [refreshKey, setRefreshKey] = useState(0)
@@ -101,8 +102,6 @@ export function DashboardHub({ userName }: Props) {
             onQuickDecide={handleQuickDecide}
             onZeroCook={handleZeroCook}
             householdConfig={householdConfig}
-            supportLine={supportLine}
-            timeBlock={timeBlock}
           />
 
           <WeekendModeCard
@@ -121,6 +120,13 @@ export function DashboardHub({ userName }: Props) {
             }}
             householdConfig={householdConfig}
           />
+
+          {/* Lower support line: keep header minimal while preserving subtle guidance */}
+          {supportLine && timeBlock ? (
+            <div className="mt-4 rounded-2xl border border-border/50 bg-white/70 px-4 py-3">
+              <SupportLine line={supportLine} timeBlock={timeBlock} />
+            </div>
+          ) : null}
 
           {/* Snap & Cook — PantryCapture overlay */}
           <AnimatePresence>

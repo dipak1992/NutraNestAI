@@ -28,6 +28,12 @@ import { PRICING_TIERS, PRO_ANNUAL_SAVINGS, FAMILY_ANNUAL_SAVINGS } from '@/lib/
 
 const TESTIMONIALS = [
   {
+    quote: 'I recommend MealEase to clients who struggle with meal planning. The allergy support and family adaptation is better than anything else I\'ve seen.',
+    name: 'Priya R.',
+    role: 'Registered Dietitian',
+    emoji: '👩‍⚕️',
+  },
+  {
     quote: "I used to spend 30 minutes every evening deciding what to cook. Now I just open MealEase and dinner is planned in seconds. My kids actually eat what I make.",
     name: 'Sarah M.',
     role: 'Mom of 3',
@@ -38,12 +44,6 @@ const TESTIMONIALS = [
     name: 'James K.',
     role: 'Works from home',
     emoji: '👨‍💻',
-  },
-  {
-    quote: 'Family Plus changed everything. My partner and I finally have a system, the kids get kid-friendly options, and our grocery budget actually makes sense now.',
-    name: 'Priya R.',
-    role: 'Parent of 2',
-    emoji: '👨‍👩‍👧‍👦',
   },
 ]
 
@@ -100,7 +100,7 @@ const FAQ = [
   },
   {
     q: 'Is there a free trial?',
-    a: 'Free users can try everything without signing up. Paid plans don\'t require a credit card to start — upgrade anytime.',
+    a: 'Free users can try everything without signing up. Upgrade anytime — all paid plans include a 7-day free trial.',
   },
 ]
 
@@ -386,7 +386,7 @@ export function PricingContent() {
                 >
                   {isStartingTrial
                     ? 'Starting trial…'
-                    : 'Start Free 7-Day Trial'}
+                    : 'Start Free Trial'}
                   {!isStartingTrial && <ArrowRight className="h-4 w-4" />}
                 </Button>
                 <p className="text-center text-xs text-muted-foreground">
@@ -452,7 +452,6 @@ export function PricingContent() {
           <ul className="mb-6 flex-1 space-y-3.5">
             {[
               'Everything in Pro, plus:',
-              '',
               'Up to 6 family members',
               'Snap & Cook (unlimited scans)',
               'Kids Mode',
@@ -599,6 +598,7 @@ export function PricingContent() {
             </div>
           ))}
         </div>
+        <p className="text-xs text-muted-foreground text-center mt-2 sm:hidden">Swipe to see all plans →</p>
         </div>
         </div>
       </div>

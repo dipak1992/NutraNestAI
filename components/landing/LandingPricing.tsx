@@ -32,7 +32,7 @@ export function LandingPricing() {
         >
           <p className="text-sm font-semibold uppercase tracking-wider text-primary mb-3">Pricing</p>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground mb-4">
-            Simple plans for every household.
+            One plan. Fully unlocked.
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             No tiers, no upsells, no feature gates. Just MealEase, fully unlocked.

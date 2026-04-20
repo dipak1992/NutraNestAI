@@ -13,14 +13,6 @@ const TESTIMONIALS = [
     stars: 5,
   },
   {
-    name: 'Sarah M.',
-    role: 'Mom of 3, Austin TX',
-    text: '"I used to spend 40 minutes deciding what to cook. Now I open MealEase, tap once, and dinner is handled. My husband thinks I became a chef."',
-    avatar: 'SM',
-    color: 'bg-violet-100 text-violet-700',
-    stars: 5,
-  },
-  {
     name: 'James K.',
     role: 'Software engineer, remote',
     text: '"Zero-Cook Mode is genius. After a 10-hour day, it finds me the perfect takeout that still fits my macros. I\'ve saved so much on random delivery orders."',
@@ -29,11 +21,11 @@ const TESTIMONIALS = [
     stars: 4,
   },
   {
-    name: 'David L.',
-    role: 'Dad of 2, Seattle WA',
-    text: '"Snap & Cook literally saved us $300 last month. We photograph the fridge on Sunday and get a whole week of meals from what we already have."',
-    avatar: 'DL',
-    color: 'bg-amber-100 text-amber-700',
+    name: 'Sarah M.',
+    role: 'Mom of 3, Austin TX',
+    text: '"I used to spend 40 minutes deciding what to cook. Now I open MealEase, tap once, and dinner is handled. My husband thinks I became a chef."',
+    avatar: 'SM',
+    color: 'bg-violet-100 text-violet-700',
     stars: 5,
   },
   {
@@ -43,6 +35,14 @@ const TESTIMONIALS = [
     avatar: 'MT',
     color: 'bg-rose-100 text-rose-700',
     stars: 4,
+  },
+  {
+    name: 'David L.',
+    role: 'Dad of 2, Seattle WA',
+    text: '"Snap & Cook saves us so much. We photograph the fridge on Sunday and get a whole week of meals from what we already have."',
+    avatar: 'DL',
+    color: 'bg-amber-100 text-amber-700',
+    stars: 5,
   },
   {
     name: 'Carlos G.',

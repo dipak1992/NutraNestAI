@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ArrowRight, ChevronDown, Users, ShieldCheck, Zap } from 'lucide-react'
-import { motion } from 'framer-motion'
 
 export function LandingHero() {
 
@@ -19,41 +18,29 @@ export function LandingHero() {
       <div className="relative z-[1] mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-20 sm:py-28 w-full">
         <div className="text-center max-w-3xl mx-auto">
             {/* Trust pill */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
+            <div
               className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 backdrop-blur border border-emerald-600/20 mb-8 shadow-sm"
             >
               <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse" />
               <span className="text-sm font-medium text-emerald-800">3,200+ households use MealEase</span>
-            </motion.div>
+            </div>
 
             {/* Headline */}
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
+            <h1
               className="text-4xl sm:text-5xl lg:text-[3.5rem] xl:text-6xl font-bold tracking-tight leading-[1.08] text-foreground mb-6"
             >
               Dinner stress ends here.
-            </motion.h1>
+            </h1>
 
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
+            <p
               className="text-lg sm:text-xl text-muted-foreground leading-relaxed mb-8 max-w-2xl mx-auto"
             >
               Premium meal planning that adapts to your family, schedule, and pantry,
               then gives you a confident dinner decision in seconds.
-            </motion.p>
+            </p>
 
             {/* CTAs */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.5 }}
+            <div
               className="flex flex-col sm:flex-row gap-3 justify-center mb-4"
             >
               <Button asChild size="lg" className="h-14 px-8 text-base font-semibold rounded-2xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all">
@@ -68,21 +55,15 @@ export function LandingHero() {
                   See How It Works
                 </Link>
               </Button>
-            </motion.div>
+            </div>
 
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.7, duration: 0.5 }}
+            <p
               className="text-sm text-muted-foreground"
             >
               Cancel anytime · No commitment
-            </motion.p>
+            </p>
 
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8, duration: 0.5 }}
+            <div
               className="mt-7 grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-3xl mx-auto"
             >
               <div className="rounded-xl border border-white/70 bg-white/80 backdrop-blur px-3 py-2.5 shadow-sm">
@@ -106,7 +87,7 @@ export function LandingHero() {
                 </div>
                 <p className="mt-1 text-lg font-bold text-foreground">Always on</p>
               </div>
-            </motion.div>
+            </div>
         </div>
       </div>
       <div id="hero-sentinel" />

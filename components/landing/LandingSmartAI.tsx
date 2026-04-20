@@ -60,7 +60,7 @@ export function LandingSmartAI() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-20"
+          className="text-center mb-14"
         >
           <p className="text-sm font-semibold uppercase tracking-wider text-emerald-400 mb-3">Smart AI</p>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
@@ -77,7 +77,7 @@ export function LandingSmartAI() {
           {/* Vertical line */}
           <div className="absolute left-6 lg:left-1/2 lg:-translate-x-px top-0 bottom-0 w-0.5 bg-gradient-to-b from-violet-500 via-primary to-amber-500 opacity-30" />
 
-          <div className="space-y-12">
+          <div className="space-y-8">
             {TIMELINE.map((step, i) => {
               const Icon = step.icon
               const isLeft = i % 2 === 0

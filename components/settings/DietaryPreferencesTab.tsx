@@ -4,12 +4,21 @@ import { useEffect, useState, useCallback } from 'react'
 import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { useLightOnboardingStore } from '@/lib/store'
 import type {
   UserDietaryPreferences,
   EatingStyle,
   KidsSpiceTolerance,
 } from '@/lib/meal-engine/preferences-types'
 import { DEFAULT_PREFS } from '@/lib/meal-engine/preferences-types'
+
+const COOKING_TIME_OPTIONS = [
+  { label: '< 20 min', value: 20 },
+  { label: '30 min', value: 30 },
+  { label: '45 min', value: 45 },
+  { label: '1 hour', value: 60 },
+  { label: 'No limit', value: 120 },
+]
 
 // ── Option definitions ────────────────────────────────────────────────────────
 
@@ -149,6 +158,7 @@ interface DietaryPreferencesTabProps {
 }
 
 export function DietaryPreferencesTab({ hasKids = false }: DietaryPreferencesTabProps) {
+  const { cookingTimeMinutes, setCookingTimeMinutes } = useLightOnboardingStore()
   const [prefs, setPrefs] = useState<Omit<UserDietaryPreferences, 'user_id' | 'updated_at'>>(
     DEFAULT_PREFS,
   )
@@ -329,6 +339,30 @@ export function DietaryPreferencesTab({ hasKids = false }: DietaryPreferencesTab
               label={opt.label}
               selected={prefs.goals.includes(opt.value)}
               onClick={() => toggleMulti('goals', opt.value)}
+            />
+          ))}
+        </div>
+      </SectionCard>
+
+      {/* Max Cooking Time */}
+      <SectionCard
+        title="Max Cooking Time"
+        description="We'll only suggest meals you can realistically make."
+      >
+        <div className="flex flex-wrap gap-2">
+          {COOKING_TIME_OPTIONS.map((opt) => (
+            <Chip
+              key={opt.value}
+              label={opt.label}
+              selected={cookingTimeMinutes === opt.value}
+              onClick={() => {
+                setCookingTimeMinutes(opt.value)
+                fetch('/api/settings', {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ cookingTimeMinutes: opt.value }),
+                }).catch(() => null)
+              }}
             />
           ))}
         </div>

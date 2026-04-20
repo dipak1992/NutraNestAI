@@ -39,6 +39,17 @@ export async function PATCH(req: NextRequest) {
       )
     }
 
+    // Sync cuisines to user_dietary_preferences so the AI engine can read them
+    if (Array.isArray(body.cuisines)) {
+      promises.push(
+        supabase
+          .from('user_dietary_preferences')
+          .update({ cuisine_love: body.cuisines, updated_at: new Date().toISOString() })
+          .eq('user_id', user.id)
+          .then()
+      )
+    }
+
     await Promise.all(promises)
 
     return NextResponse.json({ ok: true })

@@ -9,7 +9,6 @@ import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 import { useHouseholdConfig } from '@/lib/hooks/use-household-config'
 import { useDashboardMessage } from '@/lib/hooks/use-dashboard-message'
 import { showRewardToast } from '@/lib/reward-toast'
-import { OnboardingPromptPopup } from '@/components/onboarding/OnboardingPromptPopup'
 import { ZeroCookSheet } from '@/components/zero-cook/ZeroCookSheet'
 import { ZeroCookTeaser } from '@/components/zero-cook/ZeroCookTeaser'
 import { householdFromMembers, fallbackHousehold } from '@/lib/decide/client'
@@ -135,8 +134,6 @@ export function DashboardHub({ displayName }: Props) {
 
   return (
     <>
-      <OnboardingPromptPopup />
-
       <div
         className="min-h-screen"
         style={{
@@ -158,6 +155,22 @@ export function DashboardHub({ displayName }: Props) {
             familyHeadline={paywallStatus.isFamily ? familySummary?.headline : null}
             familyBullets={paywallStatus.isFamily ? familySummary?.bullets : undefined}
           />
+
+          {!light.completedAt && (
+            <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50/80 p-4 flex items-start gap-3">
+              <span className="text-lg flex-shrink-0">🌿</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-amber-900">Personalise your meals</p>
+                <p className="text-xs text-amber-700/80 mt-0.5">Takes 30 seconds — tells AI exactly what your household loves.</p>
+              </div>
+              <button
+                onClick={() => router.push('/onboarding')}
+                className="flex-shrink-0 text-xs font-semibold text-amber-800 bg-amber-200 hover:bg-amber-300 rounded-lg px-3 py-1.5 transition-colors"
+              >
+                Set up →
+              </button>
+            </div>
+          )}
 
           <WeekendModeCard
             weekendTitle={householdConfig.weekendTitle}

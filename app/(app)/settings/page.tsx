@@ -10,28 +10,19 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Settings, User, Home, Leaf, LogOut, Trash2, Crown, Bell, Film, UtensilsCrossed } from 'lucide-react'
+import { Settings, User, Home, LogOut, Trash2, Crown, Bell, Film, UtensilsCrossed } from 'lucide-react'
 
 import { toast } from 'sonner'
 import { NotificationSettings } from '@/components/habit/NotificationSettings'
 import { DietaryPreferencesTab } from '@/components/settings/DietaryPreferencesTab'
 
-const CUISINE_OPTIONS = ['Italian', 'Mexican', 'Asian', 'Mediterranean', 'American', 'Indian', 'Middle Eastern', 'Japanese', 'Thai', 'French', 'Nepali']
-const COOKING_TIME_OPTIONS = [
-  { label: '< 20 min', value: 20 },
-  { label: '30 min', value: 30 },
-  { label: '45 min', value: 45 },
-  { label: '1 hour', value: 60 },
-  { label: 'No limit', value: 120 },
-]
 
 export default function SettingsPage() {
   const router = useRouter()
   const supabase = createClient()
   const { status } = usePaywallStatus()
-  const { state: { householdName, cuisinePreferences }, updateState } = useOnboardingStore()
+  const { state: { householdName }, updateState } = useOnboardingStore()
   const {
-    cookingTimeMinutes, setCookingTimeMinutes,
     hasKids, kidsAgeGroup, setKidsAgeGroup,
     householdType, pickyEater, lowEnergy, cuisines: lightCuisines,
     entertainmentPrefs, setEntertainmentPrefs,
@@ -69,17 +60,6 @@ export default function SettingsPage() {
       }).catch(() => null)
       toast.success('Household name updated')
     }
-  }
-
-  function toggleCuisine(c: string) {
-    const current = cuisinePreferences ?? []
-    const next = current.includes(c) ? current.filter((x) => x !== c) : [...current, c]
-    updateState({ cuisinePreferences: next })
-    fetch('/api/settings', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ cuisines: next }),
-    }).catch(() => null)
   }
 
   async function handleDeleteAccount() {
@@ -120,8 +100,7 @@ export default function SettingsPage() {
         <div className="overflow-x-auto">
           <TabsList className="mb-6 w-full justify-start">
             <TabsTrigger value="household" className="gap-2"><Home className="h-4 w-4" />Household</TabsTrigger>
-            <TabsTrigger value="preferences" className="gap-2"><Leaf className="h-4 w-4" />Preferences</TabsTrigger>
-            <TabsTrigger value="diet" className="gap-2"><UtensilsCrossed className="h-4 w-4" />Diet &amp; Allergies</TabsTrigger>
+            <TabsTrigger value="preferences" className="gap-2"><UtensilsCrossed className="h-4 w-4" />Preferences</TabsTrigger>
             <TabsTrigger value="account" className="gap-2"><User className="h-4 w-4" />Account</TabsTrigger>
             <TabsTrigger value="notifications" className="gap-2"><Bell className="h-4 w-4" />Notifications</TabsTrigger>
             <TabsTrigger value="billing" className="gap-2"><Crown className="h-4 w-4" />Billing</TabsTrigger>
@@ -234,49 +213,7 @@ export default function SettingsPage() {
           )}
         </TabsContent>
 
-        <TabsContent value="preferences" className="space-y-6">
-          <div className="glass-card rounded-xl border border-border/60 p-5">
-            <h2 className="font-semibold mb-4">Cuisine Preferences</h2>
-            <div className="flex flex-wrap gap-2">
-              {CUISINE_OPTIONS.map((c) => {
-                const selected = cuisinePreferences?.includes(c)
-                return (
-                  <button
-                    key={c}
-                    onClick={() => toggleCuisine(c)}
-                    className={`px-3 py-1.5 rounded-full text-sm transition-colors ${selected ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80 text-foreground'}`}
-                  >
-                    {c}
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-
-          <div className="glass-card rounded-xl border border-border/60 p-5">
-            <h2 className="font-semibold mb-4">Max Cooking Time</h2>
-            <div className="flex flex-wrap gap-2">
-              {COOKING_TIME_OPTIONS.map((opt) => (
-                <button
-                  key={opt.value}
-                  onClick={() => {
-                    setCookingTimeMinutes(opt.value)
-                    fetch('/api/settings', {
-                      method: 'PATCH',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ cookingTimeMinutes: opt.value }),
-                    }).catch(() => null)
-                  }}
-                  className={`px-4 py-2 rounded-full text-sm transition-colors ${cookingTimeMinutes === opt.value ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80 text-foreground'}`}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="diet">
+        <TabsContent value="preferences">
           <DietaryPreferencesTab hasKids={hasKids ?? undefined} />
         </TabsContent>
 

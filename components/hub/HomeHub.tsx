@@ -14,7 +14,6 @@ import { StreakBadge } from '@/components/habit/StreakBadge'
 import { TodayCard } from '@/components/habit/TodayCard'
 import { InsightCards } from '@/components/habit/InsightCards'
 import { useOnboardingStore, useLightOnboardingStore } from '@/lib/store'
-import { OnboardingPromptPopup } from '@/components/onboarding/OnboardingPromptPopup'
 import { useLearningStore } from '@/lib/learning/store'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 import { DEMO_WEEKLY_PLAN } from '@/lib/demo-data'
@@ -298,7 +297,6 @@ export function HomeHub({ userName }: Props) {
 
   return (
     <>
-    <OnboardingPromptPopup />
     <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, #fef7f0 0%, #f0fdf4 15%, #ffffff 40%, #ffffff 100%)' }}>
       {/* ── Sub-nav when a tile is active ── */}
       {activeTile && (

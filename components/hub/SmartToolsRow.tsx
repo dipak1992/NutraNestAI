@@ -5,12 +5,11 @@ import { motion } from 'framer-motion'
 import type { useHouseholdConfig } from '@/lib/hooks/use-household-config'
 
 interface Props {
-  onSnapCook?: () => void
   householdConfig: ReturnType<typeof useHouseholdConfig>
   canSeeKidsTools?: boolean
 }
 
-export function SmartToolsRow({ onSnapCook, householdConfig, canSeeKidsTools = false }: Props) {
+export function SmartToolsRow({ householdConfig, canSeeKidsTools = false }: Props) {
   const { kidsPriorityTools, smartToolLabel, householdType } = householdConfig
 
   return (
@@ -19,22 +18,8 @@ export function SmartToolsRow({ onSnapCook, householdConfig, canSeeKidsTools = f
         Smart Tools
       </h2>
 
-      {/* Standard 3-tool grid — always visible */}
-      <div className="grid grid-cols-3 gap-2.5">
-        {/* Snap & Cook — opens PantryCapture inline */}
-        <motion.div whileTap={{ scale: 0.96 }}>
-          <button
-            type="button"
-            onClick={onSnapCook}
-            className="flex flex-col items-center gap-2.5 rounded-2xl bg-white border border-border/60 px-3 py-4 hover:border-primary/30 hover:shadow-md transition-all text-center w-full"
-          >
-            <span className="text-2xl">📸</span>
-            <span className="text-[11px] font-semibold text-foreground leading-tight">
-              Snap &amp; Cook
-            </span>
-          </button>
-        </motion.div>
-
+      {/* Standard 2-tool grid — always visible */}
+      <div className="grid grid-cols-2 gap-2.5">
         {/* Household-aware tool */}
         <motion.div whileTap={{ scale: 0.96 }}>
           <Link

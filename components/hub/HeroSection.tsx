@@ -16,7 +16,7 @@ function getGreeting(): { greeting: string; subtext: string } {
 interface Props {
   firstName: string
   onQuickDecide: () => void
-  onZeroCook: () => void
+  onSnapCook: () => void
   householdConfig: ReturnType<typeof useHouseholdConfig>
   familyHeadline?: string | null
   familyBullets?: string[]
@@ -25,7 +25,7 @@ interface Props {
 export function HeroSection({
   firstName,
   onQuickDecide,
-  onZeroCook,
+  onSnapCook,
   householdConfig,
   familyHeadline,
   familyBullets,
@@ -74,20 +74,20 @@ export function HeroSection({
           </div>
         </motion.button>
 
-        {/* 🚚 Zero-Cook — label adapts to household type */}
+        {/* � Snap & Cook — scan fridge, get a recipe */}
         <motion.button
           whileTap={{ scale: 0.98 }}
-          onClick={onZeroCook}
+          onClick={onSnapCook}
           className="w-full px-5 py-4 rounded-2xl text-left transition-all bg-white border border-border/60 hover:border-primary/30 hover:shadow-md"
         >
           <div className="flex items-center gap-4">
-            <span className="text-3xl">🚚</span>
+            <span className="text-3xl">📸</span>
             <div className="flex-1 min-w-0">
               <p className="text-[15px] font-semibold text-foreground">
-                {householdConfig.cardLabels.zeroCook.title}
+                Snap &amp; Cook
               </p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                {householdConfig.cardLabels.zeroCook.sub}
+                Scan your fridge — get a recipe instantly
               </p>
             </div>
             <ChevronRight className="h-4 w-4 text-muted-foreground/40 flex-shrink-0" />

@@ -9,8 +9,6 @@ import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 import { useHouseholdConfig } from '@/lib/hooks/use-household-config'
 import { useDashboardMessage } from '@/lib/hooks/use-dashboard-message'
 import { showRewardToast } from '@/lib/reward-toast'
-import { ZeroCookSheet } from '@/components/zero-cook/ZeroCookSheet'
-import { ZeroCookTeaser } from '@/components/zero-cook/ZeroCookTeaser'
 import { householdFromMembers, fallbackHousehold } from '@/lib/decide/client'
 import { StreakBadge } from '@/components/habit/StreakBadge'
 import { SupportLine } from './SupportLine'
@@ -34,8 +32,6 @@ export function DashboardHub({ displayName }: Props) {
   const [refreshKey, setRefreshKey] = useState(0)
   const tonightRef = useRef<HTMLDivElement>(null)
 
-  const [zeroCookOpen, setZeroCookOpen] = useState(false)
-  const [zeroCookTeaserOpen, setZeroCookTeaserOpen] = useState(false)
   const [snapCookOpen, setSnapCookOpen] = useState(false)
 
   const {
@@ -69,48 +65,6 @@ export function DashboardHub({ displayName }: Props) {
         block: 'center',
       })
     }, 100)
-  }, [])
-
-  const handleZeroCook = useCallback(() => {
-    posthog.capture('hub_tile_tapped', { tile: 'zero-cook' })
-    if (paywallStatus.isPro) {
-      showRewardToast('zeroCook')
-      setZeroCookOpen(true)
-    } else {
-      setZeroCookTeaserOpen(true)
-    }
-  }, [paywallStatus.isPro])
-
-  useEffect(() => {
-    const onVisible = () => {
-      if (document.visibilityState !== 'visible') return
-
-      try {
-        const raw = sessionStorage.getItem('mealease_delivery_redirected')
-        if (!raw) return
-        const parsed = JSON.parse(raw) as { provider?: string; at?: number }
-
-        if (parsed.at && Date.now() - parsed.at < 1000 * 60 * 120) {
-          posthog.capture('returned_user', {
-            provider: parsed.provider,
-            source: 'delivery_redirect',
-          })
-        }
-
-        sessionStorage.removeItem('mealease_delivery_redirected')
-      } catch {
-        // non-fatal
-      }
-    }
-
-    document.addEventListener('visibilitychange', onVisible)
-    window.addEventListener('focus', onVisible)
-    onVisible()
-
-    return () => {
-      document.removeEventListener('visibilitychange', onVisible)
-      window.removeEventListener('focus', onVisible)
-    }
   }, [])
 
   useEffect(() => {
@@ -150,7 +104,10 @@ export function DashboardHub({ displayName }: Props) {
           <HeroSection
             firstName={firstName}
             onQuickDecide={handleQuickDecide}
-            onZeroCook={handleZeroCook}
+            onSnapCook={() => {
+              showRewardToast('snapCook')
+              setSnapCookOpen(true)
+            }}
             householdConfig={householdConfig}
             familyHeadline={paywallStatus.isFamily ? familySummary?.headline : null}
             familyBullets={paywallStatus.isFamily ? familySummary?.bullets : undefined}
@@ -182,10 +139,6 @@ export function DashboardHub({ displayName }: Props) {
           </div>
 
           <SmartToolsRow
-            onSnapCook={() => {
-              showRewardToast('snapCook')
-              setSnapCookOpen(true)
-            }}
             householdConfig={householdConfig}
             canSeeKidsTools={paywallStatus.isFamily}
           />
@@ -221,34 +174,6 @@ export function DashboardHub({ displayName }: Props) {
         </div>
       </div>
 
-      <ZeroCookSheet
-        open={zeroCookOpen}
-        onOpenChange={setZeroCookOpen}
-        householdType={
-          light.householdType === 'couple'
-            ? 'couple'
-            : light.householdType === 'family'
-              ? 'family'
-              : 'single'
-        }
-        household={getHousehold()}
-        cuisinePreferences={light.cuisines}
-        budget={
-          light.cookingTimeMinutes && light.cookingTimeMinutes <= 15
-            ? 'low'
-            : undefined
-        }
-        dislikedFoods={light.dislikedFoods}
-        pickyEater={light.pickyEater}
-        lowEnergy={light.lowEnergy}
-        healthyGoal={false}
-        countryCode={light.country || undefined}
-      />
-
-      <ZeroCookTeaser
-        open={zeroCookTeaserOpen}
-        onOpenChange={setZeroCookTeaserOpen}
-      />
     </>
   )
 }

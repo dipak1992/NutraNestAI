@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useRef, useState, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { ArrowLeft, Sparkles, FlameKindling, ChevronRight, BookMarked } from 'lucide-react'
@@ -17,8 +18,6 @@ import { useOnboardingStore, useLightOnboardingStore } from '@/lib/store'
 import { useLearningStore } from '@/lib/learning/store'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 import { DEMO_WEEKLY_PLAN } from '@/lib/demo-data'
-import { ZeroCookSheet } from '@/components/zero-cook/ZeroCookSheet'
-import { ZeroCookTeaser } from '@/components/zero-cook/ZeroCookTeaser'
 import {
   decideMeal,
   sendSignal,
@@ -30,14 +29,14 @@ import type { SmartChipId, LifeStage } from '@/types'
 
 // ── Intent tiles ────────────────────────────────────────────
 
-type HubTile = 'quick' | 'pantry' | 'surprise' | 'plan' | 'zero-cook'
+type HubTile = 'quick' | 'pantry' | 'surprise' | 'plan' | 'rescue'
 
 const TILES: { id: HubTile; emoji: string; label: string; hint: string }[] = [
   { id: 'quick',    emoji: '⚡', label: "Don't want to think", hint: 'One tap — dinner decided' },
-  { id: 'pantry',   emoji: '🥫', label: 'Use what I have',     hint: 'Meals from your pantry' },
+  { id: 'pantry',   emoji: '🫙', label: 'Use what I have',     hint: 'Meals from your pantry' },
   { id: 'surprise', emoji: '✨', label: 'Surprise me',         hint: "Something new you'll love" },
   { id: 'plan',     emoji: '📅', label: 'Plan my week',        hint: '7 dinners, zero repeats' },
-  { id: 'zero-cook', emoji: '🛵', label: "Don't cook tonight",  hint: 'Get it delivered — we pick for you' },
+  { id: 'rescue',   emoji: '🧊', label: 'Rescue my fridge',    hint: "Cook what's about to expire" },
 ]
 
 // ── Chip → request modifier ─────────────────────────────────
@@ -90,13 +89,12 @@ export function HomeHub({ userName }: Props) {
   const [swapping, setSwapping] = useState(false)
   const [activeChip, setActiveChip] = useState<SmartChipId | null>(null)
   const [pantryPhase, setPantryPhase] = useState<'capture' | 'results' | null>(null)
-  const [zeroCookOpen, setZeroCookOpen] = useState(false)
-  const [zeroCookTeaserOpen, setZeroCookTeaserOpen] = useState(false)
   const shownIdsRef = useRef<string[]>([])
 
   // ── Stores ───────────────────────────────────────────────
   const { state: { members } } = useOnboardingStore()
   const light = useLightOnboardingStore()
+  const router = useRouter()
   const { feedbackHistory, getBoosts, recordLike, recordReject } = useLearningStore()
   const { status: paywallStatus } = usePaywallStatus()
 
@@ -216,12 +214,10 @@ export function HomeHub({ userName }: Props) {
     if (id === 'plan') return // navigates via Link
     posthog.capture('hub_tile_tapped', { tile: id })
 
-    if (id === 'zero-cook') {
-      if (paywallStatus.isPro) {
-        setZeroCookOpen(true)
-      } else {
-        setZeroCookTeaserOpen(true)
-      }
+    if (id === 'rescue') {
+      setActiveTile('rescue')
+      setActiveChip(null)
+      setPantryPhase('capture')
       return
     }
 
@@ -233,7 +229,7 @@ export function HomeHub({ userName }: Props) {
     if (id === 'quick')    void fetchQuick()
     if (id === 'surprise') void fetchSurprise()
     if (id === 'pantry')   setPantryPhase('capture')
-  }, [fetchQuick, fetchSurprise, fetchPantry, paywallStatus.isPro])
+  }, [fetchQuick, fetchSurprise, fetchPantry])
 
   const handleBack = useCallback(() => {
     if (activeTile === 'pantry' && pantryPhase === 'results') {
@@ -515,12 +511,21 @@ export function HomeHub({ userName }: Props) {
           {/* ═══════════════════════════════════════════════════════
               RESULT SCREEN — shows after tapping a tile
              ═══════════════════════════════════════════════════════ */}
-          {/* ── PANTRY CAPTURE PHASE ── */}
-          {activeTile === 'pantry' && pantryPhase === 'capture' && (
+          {/* ── PANTRY / RESCUE CAPTURE PHASE ── */}
+          {(activeTile === 'pantry' || activeTile === 'rescue') && pantryPhase === 'capture' && (
             <PantryCapture
               onConfirm={(items) => {
-                setPantryPhase('results')
-                void fetchPantry(items)
+                if (activeTile === 'rescue') {
+                  setActiveTile(null)
+                  setPantryPhase(null)
+                  if (items.length > 0) {
+                    const q = encodeURIComponent(items.join(','))
+                    router.push(`/tonight?ingredients=${q}&mode=rescue`)
+                  }
+                } else {
+                  setPantryPhase('results')
+                  void fetchPantry(items)
+                }
               }}
               onCancel={() => {
                 setActiveTile(null)
@@ -529,7 +534,7 @@ export function HomeHub({ userName }: Props) {
             />
           )}
 
-          {activeTile && activeTile !== 'plan' && !(activeTile === 'pantry' && pantryPhase === 'capture') && (
+          {activeTile && activeTile !== 'plan' && activeTile !== 'rescue' && !(activeTile === 'pantry' && pantryPhase === 'capture') && (
             <motion.div
               key={`result-${activeTile}`}
               initial={{ opacity: 0, y: 16 }}
@@ -608,30 +613,6 @@ export function HomeHub({ userName }: Props) {
       </div>
     </div>
 
-    {/* Zero-Cook sheets (rendered outside main layout) */}
-    <ZeroCookSheet
-      open={zeroCookOpen}
-      onOpenChange={setZeroCookOpen}
-      householdType={
-        light.householdType === 'couple'
-          ? 'couple'
-          : light.householdType === 'family'
-            ? 'family'
-            : 'single'
-      }
-      household={getHousehold()}
-      cuisinePreferences={light.cuisines}
-      budget={light.cookingTimeMinutes && light.cookingTimeMinutes <= 15 ? 'low' : undefined}
-      dislikedFoods={light.dislikedFoods}
-      pickyEater={light.pickyEater}
-      lowEnergy={light.lowEnergy}
-      healthyGoal={false}
-      countryCode={light.country || undefined}
-    />
-    <ZeroCookTeaser
-      open={zeroCookTeaserOpen}
-      onOpenChange={setZeroCookTeaserOpen}
-    />
     </>
   )
 }

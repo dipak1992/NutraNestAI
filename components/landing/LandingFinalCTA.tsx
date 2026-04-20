@@ -43,7 +43,7 @@ export function LandingFinalCTA() {
           </Link>
 
           <p className="text-sm text-white/30 mt-6">
-            Free 7-day trial &middot; No credit card required
+            Free 7-day trial &middot; Cancel anytime
           </p>
         </motion.div>
       </div>

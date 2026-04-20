@@ -1,30 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { ArrowRight, Play, Users, ShieldCheck, Zap } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
-
-const HEADLINES = [
-  'Stop thinking about what to eat.',
-  'Dinner decisions, solved.',
-  'What are you eating tonight? We already know.',
-  "AI that knows what you'll actually eat.",
-  'Your smartest meal plan starts tonight.',
-  'Never stare at your fridge again.',
-  'Dinner stress ends here.',
-]
+import { ArrowRight, ChevronDown, Users, ShieldCheck, Zap } from 'lucide-react'
+import { motion } from 'framer-motion'
 
 export function LandingHero() {
-  const [headlineIdx, setHeadlineIdx] = useState(0)
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setHeadlineIdx((i) => (i + 1) % HEADLINES.length)
-    }, 4000)
-    return () => clearInterval(timer)
-  }, [])
 
   return (
     <section className="relative overflow-hidden min-h-[90vh] flex items-center bg-[#f6f8f7]">
@@ -48,21 +29,15 @@ export function LandingHero() {
               <span className="text-sm font-medium text-emerald-800">3,200+ households use MealEase</span>
             </motion.div>
 
-            {/* Rotating headline */}
-            <div className="h-[120px] sm:h-[140px] lg:h-[160px] mb-6 relative overflow-hidden">
-              <AnimatePresence mode="wait">
-                <motion.h1
-                  key={headlineIdx}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -30 }}
-                  transition={{ duration: 0.5 }}
-                  className="text-4xl sm:text-5xl lg:text-[3.5rem] xl:text-6xl font-bold tracking-tight leading-[1.08] text-foreground absolute inset-x-0"
-                >
-                  {HEADLINES[headlineIdx]}
-                </motion.h1>
-              </AnimatePresence>
-            </div>
+            {/* Headline */}
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="text-4xl sm:text-5xl lg:text-[3.5rem] xl:text-6xl font-bold tracking-tight leading-[1.08] text-foreground mb-6"
+            >
+              Dinner stress ends here.
+            </motion.h1>
 
             <motion.p
               initial={{ opacity: 0 }}
@@ -89,7 +64,7 @@ export function LandingHero() {
               </Button>
               <Button asChild size="lg" variant="outline" className="h-14 px-8 text-base font-medium rounded-2xl border-border/80 hover:bg-muted/50">
                 <Link href="#how-it-works">
-                  <Play className="mr-2 h-4 w-4" />
+                  <ChevronDown className="mr-2 h-4 w-4" />
                   See How It Works
                 </Link>
               </Button>
@@ -101,7 +76,7 @@ export function LandingHero() {
               transition={{ delay: 0.7, duration: 0.5 }}
               className="text-sm text-muted-foreground"
             >
-              No credit card required · Cancel anytime
+              Cancel anytime · No commitment
             </motion.p>
 
             <motion.div

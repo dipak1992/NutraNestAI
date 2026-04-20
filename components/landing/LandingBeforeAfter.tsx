@@ -17,7 +17,7 @@ const AFTER = [
   'See a meal everyone will love — in 3 seconds',
   'Every family member\'s needs already factored in',
   'Grocery list auto-generated',
-  'Save $400+/month on takeout',
+  'Save $150+/month on takeout',
   'Zero food waste, zero stress',
 ]
 

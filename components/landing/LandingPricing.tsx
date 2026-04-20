@@ -32,7 +32,7 @@ export function LandingPricing() {
         >
           <p className="text-sm font-semibold uppercase tracking-wider text-primary mb-3">Pricing</p>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground mb-4">
-            One plan. Everything included.
+            Simple plans for every household.
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             No tiers, no upsells, no feature gates. Just MealEase, fully unlocked.
@@ -63,7 +63,7 @@ export function LandingPricing() {
               <span className="text-lg text-muted-foreground">/month</span>
             </div>
             <p className="text-sm text-muted-foreground mb-8">
-              7-day free trial &middot; Cancel anytime &middot; No credit card required to start
+              7-day free trial &middot; Cancel anytime
             </p>
 
             {/* CTA */}

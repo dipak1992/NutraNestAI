@@ -28,7 +28,7 @@ import { PRICING_TIERS, PRO_ANNUAL_SAVINGS, FAMILY_ANNUAL_SAVINGS } from '@/lib/
 
 const TESTIMONIALS = [
   {
-    quote: "I used to spend 30 minutes every evening deciding what to cook. Now I just open MealEaseAI and dinner is planned in seconds. My kids actually eat what I make.",
+    quote: "I used to spend 30 minutes every evening deciding what to cook. Now I just open MealEase and dinner is planned in seconds. My kids actually eat what I make.",
     name: 'Sarah M.',
     role: 'Mom of 3',
     emoji: '👩‍👧‍👧',
@@ -71,8 +71,8 @@ const COMPARISON_FEATURES = [
 
 const FAQ = [
   {
-    q: 'Is MealEaseAI free?',
-    a: 'Yes. Free users get Tonight Dinner, 3 meal ideas daily, and simple grocery lists. Perfect to try MealEaseAI risk-free.',
+    q: 'Is MealEase free?',
+    a: 'Yes. Free users get Tonight Dinner, 3 meal ideas daily, and simple grocery lists. Perfect to try MealEase risk-free.',
   },
   {
     q: 'What do I get with Pro?',
@@ -96,7 +96,7 @@ const FAQ = [
   },
   {
     q: 'Do you support allergies and preferences?',
-    a: 'Yes. MealEaseAI supports dietary filters and personalized household preferences at every tier.',
+    a: 'Yes. MealEase supports dietary filters and personalized household preferences at every tier.',
   },
   {
     q: 'Is there a free trial?',
@@ -219,7 +219,7 @@ export function PricingContent() {
           Stop stressing about meals.
         </h1>
         <p className="mx-auto max-w-3xl text-lg text-muted-foreground leading-relaxed">
-          MealEaseAI helps you decide meals, plan smarter, and simplify family food life.
+          MealEase helps you decide meals, plan smarter, and simplify family food life.
         </p>
 
         <div className="mt-8 flex items-center justify-center gap-3 text-sm text-muted-foreground">
@@ -272,7 +272,7 @@ export function PricingContent() {
               <h2 className="text-xl font-bold">Free</h2>
             </div>
             <p className="text-sm text-muted-foreground mb-4">
-              Try MealEaseAI risk-free
+              Try MealEase risk-free
             </p>
             <div>
               <p className="text-4xl font-bold tracking-tight">$0</p>
@@ -386,11 +386,11 @@ export function PricingContent() {
                 >
                   {isStartingTrial
                     ? 'Starting trial…'
-                    : 'Upgrade to Pro'}
+                    : 'Start Free 7-Day Trial'}
                   {!isStartingTrial && <ArrowRight className="h-4 w-4" />}
                 </Button>
                 <p className="text-center text-xs text-muted-foreground">
-                  No credit card required · Cancel anytime
+                  7-day free trial · Cancel anytime
                 </p>
               </>
             ) : (
@@ -491,7 +491,7 @@ export function PricingContent() {
                   {<ArrowRight className="h-4 w-4" />}
                 </Button>
                 <p className="text-center text-xs text-muted-foreground">
-                  No credit card required · Cancel anytime
+                  Cancel anytime · No commitment
                 </p>
               </>
             ) : (
@@ -545,6 +545,8 @@ export function PricingContent() {
           Everything you need, nothing you don't
         </p>
         <div className="rounded-2xl border border-border/60 overflow-hidden">
+          <div className="overflow-x-auto">
+          <div className="min-w-[600px]">
           <div className="grid grid-cols-4 bg-muted/50 text-sm font-semibold sticky top-0">
             <div className="px-5 py-3.5">Feature</div>
             <div className="px-5 py-3.5 text-center">Free</div>
@@ -597,6 +599,8 @@ export function PricingContent() {
             </div>
           ))}
         </div>
+        </div>
+        </div>
       </div>
 
       {/* ── Guarantee ── */}
@@ -641,7 +645,7 @@ export function PricingContent() {
           Choose your plan today
         </h3>
         <p className="text-muted-foreground mb-6 text-sm">
-          No credit card needed. Upgrade anytime. Cancel anytime.
+          Upgrade anytime. Cancel anytime.
         </p>
         {!status.isAuthenticated ? (
           <Button

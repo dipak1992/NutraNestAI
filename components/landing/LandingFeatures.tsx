@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import {
-  Sparkles, Calendar, Camera, Truck, Users, Sun, Heart,
+  Sparkles, Calendar, Camera, Truck, Users, Sun,
 } from 'lucide-react'
 
 const FEATURES = [
@@ -59,15 +59,6 @@ const FEATURES = [
     gradient: 'from-yellow-500 to-amber-600',
     iconBg: 'bg-yellow-100',
     iconColor: 'text-yellow-600',
-  },
-  {
-    icon: Heart,
-    title: 'Cuisine Love',
-    description: 'Craving Thai? Italian comfort? Mexican street food? Tell MealEase your cuisine mood and it finds the perfect match for tonight.',
-    tag: 'Explore',
-    gradient: 'from-pink-500 to-rose-600',
-    iconBg: 'bg-pink-100',
-    iconColor: 'text-pink-600',
   },
 ]
 

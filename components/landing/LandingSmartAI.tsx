@@ -15,7 +15,7 @@ const TIMELINE = [
     dotColor: 'bg-violet-500',
   },
   {
-    day: 'Day 5',
+    day: 'Day 3',
     icon: TrendingUp,
     title: 'Learning patterns',
     description: 'It notices you prefer quick meals on weekdays and adventurous recipes on weekends. Suggestions shift.',
@@ -25,7 +25,7 @@ const TIMELINE = [
     dotColor: 'bg-blue-500',
   },
   {
-    day: 'Day 10',
+    day: 'Week 1',
     icon: Brain,
     title: 'Knows your household',
     description: 'Family favorites rise to the top. Rejected ingredients disappear. Portion sizes adapt. It just clicks.',
@@ -35,7 +35,7 @@ const TIMELINE = [
     dotColor: 'bg-primary',
   },
   {
-    day: 'Day 20',
+    day: 'Week 2',
     icon: Target,
     title: 'Feels like a personal chef',
     description: 'Meal suggestions feel eerily accurate. Seasonal picks, budget awareness, mood matching — all automatic.',

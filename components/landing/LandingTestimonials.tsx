@@ -5,11 +5,20 @@ import { Star } from 'lucide-react'
 
 const TESTIMONIALS = [
   {
+    name: 'Priya R.',
+    role: 'Registered Dietitian',
+    text: '"I recommend MealEase to clients who struggle with meal planning. The allergy support and family adaptation is better than anything else I\'ve seen."',
+    avatar: 'PR',
+    color: 'bg-emerald-100 text-emerald-700',
+    stars: 5,
+  },
+  {
     name: 'Sarah M.',
     role: 'Mom of 3, Austin TX',
     text: '"I used to spend 40 minutes deciding what to cook. Now I open MealEase, tap once, and dinner is handled. My husband thinks I became a chef."',
     avatar: 'SM',
     color: 'bg-violet-100 text-violet-700',
+    stars: 5,
   },
   {
     name: 'James K.',
@@ -17,13 +26,7 @@ const TESTIMONIALS = [
     text: '"Zero-Cook Mode is genius. After a 10-hour day, it finds me the perfect takeout that still fits my macros. I\'ve saved so much on random delivery orders."',
     avatar: 'JK',
     color: 'bg-blue-100 text-blue-700',
-  },
-  {
-    name: 'Priya R.',
-    role: 'Registered Dietitian',
-    text: '"I recommend MealEase to clients who struggle with meal planning. The allergy support and family adaptation is better than anything else I\'ve seen."',
-    avatar: 'PR',
-    color: 'bg-emerald-100 text-emerald-700',
+    stars: 4,
   },
   {
     name: 'David L.',
@@ -31,6 +34,7 @@ const TESTIMONIALS = [
     text: '"Snap & Cook literally saved us $300 last month. We photograph the fridge on Sunday and get a whole week of meals from what we already have."',
     avatar: 'DL',
     color: 'bg-amber-100 text-amber-700',
+    stars: 5,
   },
   {
     name: 'Michelle T.',
@@ -38,6 +42,7 @@ const TESTIMONIALS = [
     text: '"I work 12-hour shifts. MealEase plans my week while I sleep. I come home to a plan, a grocery list, and zero stress. Absolute game changer."',
     avatar: 'MT',
     color: 'bg-rose-100 text-rose-700',
+    stars: 4,
   },
   {
     name: 'Carlos G.',
@@ -45,6 +50,7 @@ const TESTIMONIALS = [
     text: '"My daughter is allergic to dairy and nuts. MealEase factors that in automatically. I don\'t have to triple-check every recipe anymore."',
     avatar: 'CG',
     color: 'bg-teal-100 text-teal-700',
+    stars: 5,
   },
 ]
 
@@ -96,7 +102,7 @@ export function LandingTestimonials() {
               {/* Stars */}
               <div className="flex gap-0.5 mb-4">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
+                  <Star key={i} className={`h-4 w-4 ${i < t.stars ? 'fill-amber-400 text-amber-400' : 'fill-muted text-muted'}`} />
                 ))}
               </div>
 

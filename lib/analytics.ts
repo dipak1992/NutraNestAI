@@ -36,6 +36,15 @@ export const Analytics = {
   PICKY_EATER_TOOL_USED:  'picky_eater_tool_used',
   LUNCHBOX_GENERATED:     'lunchbox_generated',
   RETENTION_BY_HOUSEHOLD_SIZE: 'retention_by_household_size',
+  // Kids tool CTAs
+  KIDS_CTA_START_BAKING:  'cta_clicked_start_baking',
+  KIDS_CTA_TRY_THIS:      'cta_clicked_try_this',
+  KIDS_CTA_MAKE_THIS:     'cta_clicked_make_this',
+  KIDS_CTA_PACK_THIS:     'cta_clicked_pack_this',
+  KIDS_CTA_MAKE_NOW:      'cta_clicked_make_now',
+  KIDS_SAVE_CLICKED:      'kids_save_clicked',
+  KIDS_SHARE_CLICKED:     'kids_share_clicked',
+  KIDS_SWAP_CLICKED:      'kids_swap_clicked',
 } as const
 
 export type AnalyticsEvent = (typeof Analytics)[keyof typeof Analytics]

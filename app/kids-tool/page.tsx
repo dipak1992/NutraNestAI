@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import posthog from 'posthog-js'
 import { Analytics } from '@/lib/analytics'
+import { getKidsResultTitle, buildSavableKidsMeal } from '@/lib/kids-tool-utils'
 import type {
   KidsToolIntent,
   KidsToolResult,
@@ -48,121 +49,7 @@ function writeKidsHistory(next: KidsHistory): void {
   }
 }
 
-function getKidsResultTitle(result: KidsToolResult): string {
-  switch (result.intent) {
-    case 'lunchbox':
-      return result.main_item
-    case 'snack':
-      return result.name
-    case 'bake':
-      return result.activity_name
-    case 'picky':
-      return result.meal_name
-    case 'fast':
-      return result.meal_name
-  }
-}
-
-function buildSavableKidsMeal(result: KidsToolResult) {
-  let prep = '10 min'
-  switch (result.intent) {
-    case 'lunchbox':
-      prep = result.prep_time
-      break
-    case 'snack':
-      prep = result.prep_time
-      break
-    case 'bake':
-      prep = result.prep_time
-      break
-    case 'fast':
-      prep = `${result.ready_in_minutes} min`
-      break
-    case 'picky':
-      prep = '15 min'
-      break
-  }
-  const prepTimeParsed = Number.parseInt(prep, 10)
-  const prepTime = Number.isFinite(prepTimeParsed) ? Math.max(prepTimeParsed, 5) : 10
-
-  let ingredientNames: string[] = []
-  switch (result.intent) {
-    case 'lunchbox':
-      ingredientNames = [result.main_item, result.fruit, result.side_snack, result.optional_treat].filter(Boolean)
-      break
-    case 'snack':
-      ingredientNames = result.ingredients
-      break
-    case 'bake':
-      ingredientNames = result.ingredients
-      break
-    case 'fast':
-      ingredientNames = result.ingredients_needed
-      break
-    case 'picky':
-      ingredientNames = [result.meal_name]
-      break
-  }
-
-  const description =
-    result.intent === 'lunchbox'
-      ? result.tip
-      : result.intent === 'snack'
-        ? result.why_kids_love_it
-        : result.intent === 'bake'
-          ? result.fun_tip
-          : result.intent === 'picky'
-            ? result.why_it_may_work
-            : result.shortcut_tip
-
-  const steps =
-    result.intent === 'bake'
-      ? result.steps
-      : [
-          result.intent === 'lunchbox'
-            ? `Prepare and pack in ${result.prep_time}.`
-            : result.intent === 'snack'
-              ? `Prepare in ${result.prep_time}.`
-              : result.intent === 'picky'
-                ? result.serving_tip
-                : result.shortcut_tip,
-        ].filter(Boolean)
-
-  return {
-    id: `kids-${result.intent}-${Date.now()}`,
-    title: getKidsResultTitle(result),
-    tagline: result.section_title,
-    description,
-    cuisineType: 'kids',
-    prepTime,
-    cookTime: 0,
-    totalTime: prepTime,
-    estimatedCost: 0,
-    servings: 2,
-    difficulty: 'easy' as const,
-    tags: ['kids-tool', result.intent],
-    ingredients: ingredientNames.map((name) => ({
-      name,
-      quantity: '',
-      unit: '',
-      fromPantry: false,
-      category: 'other' as const,
-    })),
-    steps,
-    variations: [],
-    leftoverTip: null,
-    shoppingList: [],
-    meta: {
-      score: result.intent === 'picky' ? result.acceptance_score : result.intent === 'fast' ? result.urgency_score : 8,
-      matchedPantryItems: [],
-      pantryUtilization: 0,
-      simplifiedForEnergy: true,
-      pickyEaterAdjusted: result.intent === 'picky',
-      localityApplied: false,
-      selectionReason: `Saved from kids tool (${result.intent})`,
-    },
-  }
-}
+// getKidsResultTitle and buildSavableKidsMeal are in @/lib/kids-tool-utils
 
 // ─── Tool metadata ────────────────────────────────────────────────────────────
 
@@ -172,6 +59,8 @@ const TOOL_META: Record<KidsToolIntent, {
   section_title: string
   tagline: string
   primaryCta: string
+  secondaryCta: string
+  analyticsEvent: string
   loadingSteps: string[]
 }> = {
   lunchbox: {
@@ -180,6 +69,8 @@ const TOOL_META: Record<KidsToolIntent, {
     section_title: 'Lunchbox Ideas',
     tagline: 'A packed lunch they\'ll actually eat',
     primaryCta: 'Pack This',
+    secondaryCta: 'Swap',
+    analyticsEvent: Analytics.KIDS_CTA_PACK_THIS,
     loadingSteps: [
       'Thinking about what kids love…',
       'Building a balanced lunchbox…',
@@ -193,6 +84,8 @@ const TOOL_META: Record<KidsToolIntent, {
     section_title: 'Snack Rescue',
     tagline: 'A quick snack they\'ll love',
     primaryCta: 'Make This',
+    secondaryCta: 'Try Another',
+    analyticsEvent: Analytics.KIDS_CTA_MAKE_THIS,
     loadingSteps: [
       'Looking for kid-approved snacks…',
       'Checking for healthy and fast…',
@@ -206,6 +99,8 @@ const TOOL_META: Record<KidsToolIntent, {
     section_title: 'Bake Together',
     tagline: 'A fun baking project for you and the kids',
     primaryCta: 'Start Baking',
+    secondaryCta: 'Try Easier',
+    analyticsEvent: Analytics.KIDS_CTA_START_BAKING,
     loadingSteps: [
       'Choosing a fun baking activity…',
       'Checking mess level and age fit…',
@@ -219,6 +114,8 @@ const TOOL_META: Record<KidsToolIntent, {
     section_title: 'Picky Eater Wins',
     tagline: 'A meal even picky eaters will try',
     primaryCta: 'Try This',
+    secondaryCta: 'Safer Option',
+    analyticsEvent: Analytics.KIDS_CTA_TRY_THIS,
     loadingSteps: [
       'Finding something picky eaters accept…',
       'Checking acceptance likelihood…',
@@ -232,6 +129,8 @@ const TOOL_META: Record<KidsToolIntent, {
     section_title: 'Ready in 5 Minutes',
     tagline: 'Food on the table in 5 minutes or less',
     primaryCta: 'Make Now',
+    secondaryCta: 'Even Faster',
+    analyticsEvent: Analytics.KIDS_CTA_MAKE_NOW,
     loadingSteps: [
       'Finding the fastest option…',
       'Checking pantry staples…',
@@ -553,7 +452,13 @@ function FastCard({ result }: { result: FastResult }) {
   )
 }
 
-function ResultCard({ result, onSwap, onSave, saving }: { result: KidsToolResult; onSwap: () => void; onSave: () => void; saving: boolean }) {
+function ResultCard({ result, onSwap, onSave, onPrimary, saving }: {
+  result: KidsToolResult
+  onSwap: () => void
+  onSave: () => void
+  onPrimary: () => void
+  saving: boolean
+}) {
   const meta = TOOL_META[result.intent as KidsToolIntent] ?? TOOL_META.lunchbox
 
   async function handleShare() {
@@ -566,6 +471,7 @@ function ResultCard({ result, onSwap, onSave, saving }: { result: KidsToolResult
         await navigator.clipboard.writeText(text)
         toast.success('Copied to clipboard!')
       }
+      posthog.capture(Analytics.KIDS_SHARE_CLICKED, { intent: result.intent })
     } catch (e) {
       if (e instanceof Error && e.name !== 'AbortError') toast.error('Could not share')
     }
@@ -602,30 +508,41 @@ function ResultCard({ result, onSwap, onSave, saving }: { result: KidsToolResult
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
-        className="mt-8 flex flex-col sm:flex-row gap-3"
+        className="mt-8 flex flex-col gap-3"
       >
-        <Button size="lg" className="flex-1 shadow-md">
+        {/* Primary — full width, prominent */}
+        <Button size="lg" className="w-full shadow-md" onClick={onPrimary}>
           {meta.primaryCta}
         </Button>
-        <Button size="lg" variant="secondary" className="flex-1" onClick={onSave} disabled={saving}>
-          {saving ? 'Saving…' : 'Save for later'}
-        </Button>
-        <Button
-          variant="outline"
-          size="lg"
-          onClick={onSwap}
-          className="flex-1 gap-2"
-        >
-          <RefreshCw className="h-4 w-4" /> Swap
-        </Button>
-        <Button
-          variant="ghost"
-          size="lg"
-          onClick={handleShare}
-          className="flex-1 gap-2"
-        >
-          <Share2 className="h-4 w-4" /> Share
-        </Button>
+
+        {/* Secondary row */}
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => { posthog.capture(Analytics.KIDS_SWAP_CLICKED, { intent: result.intent }); onSwap() }}
+            className="flex-1 gap-1.5"
+          >
+            <RefreshCw className="h-3.5 w-3.5" /> {meta.secondaryCta}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => { posthog.capture(Analytics.KIDS_SAVE_CLICKED, { intent: result.intent }); onSave() }}
+            disabled={saving}
+            className="flex-1 gap-1.5"
+          >
+            ❤️ {saving ? 'Saving…' : 'Save'}
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleShare}
+            className="flex-1 gap-1.5"
+          >
+            <Share2 className="h-3.5 w-3.5" /> Share
+          </Button>
+        </div>
       </motion.div>
 
       {/* Back to dashboard */}
@@ -766,6 +683,17 @@ function KidsToolPageInner() {
     fetchResult()
   }, [fetchResult])
 
+  const handlePrimary = useCallback(() => {
+    if (!result) return
+    posthog.capture(TOOL_META[intent].analyticsEvent, { intent })
+    try {
+      sessionStorage.setItem('kids-tool-result', JSON.stringify(result))
+    } catch {
+      // no-op
+    }
+    router.push(`/kids-tool/result?intent=${intent}`)
+  }, [result, intent, router])
+
   const handleSave = useCallback(async () => {
     if (!result) return
     setSaving(true)
@@ -868,7 +796,7 @@ function KidsToolPageInner() {
               </Button>
             </motion.div>
           ) : result ? (
-            <ResultCard key="result" result={result} onSwap={handleSwap} onSave={handleSave} saving={saving} />
+            <ResultCard key="result" result={result} onSwap={handleSwap} onSave={handleSave} onPrimary={handlePrimary} saving={saving} />
           ) : null}
         </AnimatePresence>
 

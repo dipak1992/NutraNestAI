@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { ArrowLeft, Clock, ChefHat, Users, ShieldCheck } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import type { SmartMealResult, SmartVariation } from '@/lib/engine/types'
@@ -53,6 +52,7 @@ function MemberVariation({ variation }: { variation: SmartVariation }) {
 export default function TonightRecipePage() {
   const router = useRouter()
   const [meal, setMeal] = useState<SmartMealResult | null>(null)
+  const [imgFailed, setImgFailed] = useState(false)
 
   useEffect(() => {
     const raw = sessionStorage.getItem('tonight-meal')
@@ -78,13 +78,19 @@ export default function TonightRecipePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50/40 to-white">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link
-          href="/tonight"
+        <button
+          type="button"
+          onClick={() => {
+            try {
+              const src = sessionStorage.getItem('recipe-back')
+              if (src) { router.push(src) } else { router.back() }
+            } catch { router.back() }
+          }}
           className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Tonight&apos;s Pick
-        </Link>
+          Back
+        </button>
 
         {/* Header */}
         <div className="mb-8">
@@ -112,15 +118,20 @@ export default function TonightRecipePage() {
 
         {/* Meal image */}
         <div className="relative w-full h-64 rounded-2xl overflow-hidden mb-8">
-          {meal.imageUrl ? (
+          {meal.imageUrl && !imgFailed ? (
             <img
               src={meal.imageUrl}
               alt={meal.title}
               className="w-full h-full object-cover"
+              onError={() => setImgFailed(true)}
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-emerald-100 via-amber-50 to-orange-100 flex items-center justify-center">
+            <div className="w-full h-full bg-gradient-to-br from-emerald-100 via-amber-50 to-orange-100 flex flex-col items-center justify-center gap-3">
               <span className="text-7xl">🍽️</span>
+              <div className="text-center">
+                <p className="font-semibold text-gray-800 text-sm">{meal.title}</p>
+                <p className="text-xs text-muted-foreground">Easy • Personalized • Ready Tonight</p>
+              </div>
             </div>
           )}
         </div>

@@ -28,6 +28,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { PaywallDialog } from '@/components/paywall/PaywallDialog'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
+import { ShareMealButton } from '@/components/content/ShareMealButton'
 import type { SmartMealResult, SmartVariation } from '@/lib/engine/types'
 
 // ── Constants ──
@@ -812,11 +813,14 @@ function KidsPageInner() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.8 }}
-                  className="text-center mt-8"
+                  className="flex flex-col items-center gap-3 mt-8"
                 >
-                  <Button variant="outline" size="sm" onClick={handleTryAnother} className="gap-2">
-                    <RefreshCw className="h-3.5 w-3.5" /> Try a different recipe
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button variant="outline" size="sm" onClick={handleTryAnother} className="gap-2">
+                      <RefreshCw className="h-3.5 w-3.5" /> Try a different recipe
+                    </Button>
+                    {meal && <ShareMealButton meal={meal} />}
+                  </div>
                   {recipesRemaining !== null && (
                     <p className="mt-2 text-xs text-muted-foreground">
                       {recipesRemaining > 0

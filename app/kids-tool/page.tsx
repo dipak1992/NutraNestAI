@@ -10,7 +10,7 @@ import { toast } from 'sonner'
 import { PaywallDialog } from '@/components/paywall/PaywallDialog'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 import {
-  ArrowLeft, RefreshCw, Sparkles, Clock, Flame, ChefHat, Leaf, Star,
+  ArrowLeft, RefreshCw, Sparkles, Clock, Flame, ChefHat, Leaf, Star, Share2,
 } from 'lucide-react'
 import posthog from 'posthog-js'
 import { Analytics } from '@/lib/analytics'
@@ -556,6 +556,21 @@ function FastCard({ result }: { result: FastResult }) {
 function ResultCard({ result, onSwap, onSave, saving }: { result: KidsToolResult; onSwap: () => void; onSave: () => void; saving: boolean }) {
   const meta = TOOL_META[result.intent as KidsToolIntent] ?? TOOL_META.lunchbox
 
+  async function handleShare() {
+    const title = getKidsResultTitle(result)
+    const text = `MealEase picked this for the kids: ${title} 🍽️\n\nTry it at mealease.app`
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, text })
+      } else {
+        await navigator.clipboard.writeText(text)
+        toast.success('Copied to clipboard!')
+      }
+    } catch (e) {
+      if (e instanceof Error && e.name !== 'AbortError') toast.error('Could not share')
+    }
+  }
+
   return (
     <motion.div
       key="result"
@@ -602,6 +617,14 @@ function ResultCard({ result, onSwap, onSave, saving }: { result: KidsToolResult
           className="flex-1 gap-2"
         >
           <RefreshCw className="h-4 w-4" /> Swap
+        </Button>
+        <Button
+          variant="ghost"
+          size="lg"
+          onClick={handleShare}
+          className="flex-1 gap-2"
+        >
+          <Share2 className="h-4 w-4" /> Share
         </Button>
       </motion.div>
 

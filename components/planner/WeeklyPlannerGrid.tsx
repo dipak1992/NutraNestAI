@@ -215,6 +215,7 @@ function MealDayCard({ meal, dayLabel, date, onRegenerate, isRegenerating }: Mea
         <button
           onClick={() => {
             sessionStorage.setItem('tonight-meal', JSON.stringify(meal))
+            sessionStorage.setItem('recipe-back', '/planner')
             router.push('/tonight/recipe')
           }}
           className="w-full text-center text-sm font-semibold text-primary hover:underline"

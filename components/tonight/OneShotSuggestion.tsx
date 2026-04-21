@@ -147,6 +147,7 @@ export function OneShotSuggestion({ mode = 'tonight', title }: Props) {
       })
     }
     setGroceryPromptOpen(false)
+    sessionStorage.setItem('recipe-back', '/tonight')
     router.push('/tonight/recipe')
   }
 
@@ -155,6 +156,7 @@ export function OneShotSuggestion({ mode = 'tonight', title }: Props) {
     setGroceryPromptOpen(false)
     // Store meal in sessionStorage for the recipe detail page
     sessionStorage.setItem('tonight-meal', JSON.stringify(meal))
+    sessionStorage.setItem('recipe-back', '/tonight')
     router.push('/tonight/recipe')
   }
 

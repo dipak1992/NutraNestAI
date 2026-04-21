@@ -199,11 +199,13 @@ export function TonightRecommendation({ refreshKey }: Props) {
       })
     }
     setGroceryMeal(null)
+    sessionStorage.setItem('recipe-back', '/dashboard')
     router.push('/tonight/recipe')
   }, [groceryMeal, addCustomItem, router])
 
   const handleSkipGrocery = useCallback(() => {
     setGroceryMeal(null)
+    sessionStorage.setItem('recipe-back', '/dashboard')
     router.push('/tonight/recipe')
   }, [router])
 

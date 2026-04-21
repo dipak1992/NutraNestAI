@@ -94,6 +94,7 @@ export default function SavedMealsPage() {
       return
     }
     sessionStorage.setItem('tonight-meal', JSON.stringify(mealData))
+    sessionStorage.setItem('recipe-back', '/saved')
     router.push('/tonight/recipe')
   }
 

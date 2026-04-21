@@ -56,7 +56,10 @@ export function MealCard({ meal, pantryMatch, swapping, onCook, onSwap, onOrder 
   const toBuyItems = meal.ingredients?.filter((i) => !i.fromPantry) ?? []
 
   function handleViewRecipe() {
-    try { sessionStorage.setItem('__meal', JSON.stringify(meal)) } catch {}
+    try {
+      sessionStorage.setItem('tonight-meal', JSON.stringify(meal))
+      sessionStorage.setItem('recipe-back', '/dashboard')
+    } catch {}
     router.push('/tonight/recipe')
   }
 

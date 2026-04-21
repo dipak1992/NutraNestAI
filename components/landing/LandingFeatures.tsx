@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import {
-  Sparkles, Calendar, Camera, Truck, Users, Sun,
+  Sparkles, Calendar, Camera, Users, Sun,
 } from 'lucide-react'
 
 const FEATURES = [
@@ -32,15 +32,6 @@ const FEATURES = [
     gradient: 'from-amber-500 to-orange-600',
     iconBg: 'bg-amber-100',
     iconColor: 'text-amber-600',
-  },
-  {
-    icon: Truck,
-    title: 'Zero-Cook Mode',
-    description: 'Too tired to cook? Get curated delivery and takeout picks that match your taste profile. Restaurant quality, no cooking required.',
-    tag: 'New',
-    gradient: 'from-rose-500 to-pink-600',
-    iconBg: 'bg-rose-100',
-    iconColor: 'text-rose-600',
   },
   {
     icon: Users,

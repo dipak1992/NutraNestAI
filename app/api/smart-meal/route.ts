@@ -211,25 +211,9 @@ async function generateAIMeal(
   const cleaned = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim()
   const meal = JSON.parse(cleaned) as SmartMealResult
 
-  // Convert AI's imageUrl keyword into a cuisine-based image if it's not a full URL
+  // If AI didn't return a real URL, remove imageUrl so components render emoji fallback
   if (!meal.imageUrl || !meal.imageUrl.startsWith('http')) {
-    const CUISINE_FALLBACK: Record<string, string> = {
-      italian: 'https://images.unsplash.com/photo-1498579150354-977475b7ea0b?w=800&h=400&fit=crop',
-      mexican: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=800&h=400&fit=crop',
-      asian: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=800&h=400&fit=crop',
-      indian: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=800&h=400&fit=crop',
-      thai: 'https://images.unsplash.com/photo-1562565652-a0d8f0c59eb4?w=800&h=400&fit=crop',
-      chinese: 'https://images.unsplash.com/photo-1585032226651-759b368d7246?w=800&h=400&fit=crop',
-      japanese: 'https://images.unsplash.com/photo-1553621042-f6e147245754?w=800&h=400&fit=crop',
-      korean: 'https://images.unsplash.com/photo-1498654896293-37aacf113fd9?w=800&h=400&fit=crop',
-      mediterranean: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800&h=400&fit=crop',
-      american: 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=800&h=400&fit=crop',
-      nepali: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=800&h=400&fit=crop',
-    }
-    const key = (meal.cuisineType ?? '').toLowerCase()
-    meal.imageUrl = CUISINE_FALLBACK[key]
-      ?? Object.entries(CUISINE_FALLBACK).find(([k]) => key.includes(k))?.[1]
-      ?? 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&h=400&fit=crop'
+    delete meal.imageUrl
   }
 
   return meal

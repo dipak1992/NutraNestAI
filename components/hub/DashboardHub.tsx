@@ -30,6 +30,7 @@ export function DashboardHub({ displayName }: Props) {
   const router = useRouter()
 
   const [refreshKey, setRefreshKey] = useState(0)
+  const [tonightVisible, setTonightVisible] = useState(false)
   const tonightRef = useRef<HTMLDivElement>(null)
 
   const [snapCookOpen, setSnapCookOpen] = useState(false)
@@ -58,6 +59,7 @@ export function DashboardHub({ displayName }: Props) {
   const handleQuickDecide = useCallback(() => {
     posthog.capture('hub_tile_tapped', { tile: 'quick' })
     showRewardToast('mealGenerated')
+    setTonightVisible(true)
     setRefreshKey((k) => k + 1)
     setTimeout(() => {
       tonightRef.current?.scrollIntoView({
@@ -135,7 +137,7 @@ export function DashboardHub({ displayName }: Props) {
           />
 
           <div ref={tonightRef}>
-            <TonightRecommendation refreshKey={refreshKey} />
+            {tonightVisible && <TonightRecommendation refreshKey={refreshKey} />}
           </div>
 
           <SmartToolsRow

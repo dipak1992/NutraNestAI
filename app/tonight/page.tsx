@@ -17,6 +17,7 @@ import {
 import { BLURRED_PLAN_PREVIEW } from '@/lib/tonight-meals'
 import { SmartInput } from '@/components/dashboard/SmartInput'
 import { SaveMealButton } from '@/components/content/SaveMealButton'
+import { ShareMealButton } from '@/components/content/ShareMealButton'
 import type { SmartMealResult } from '@/lib/engine/types'
 
 const TONIGHT_SWIPE_STORAGE_KEY = 'nutrinest-tonight-swipes'
@@ -706,6 +707,7 @@ function TonightPageInner() {
               >
                 <div className="flex items-center justify-center gap-2">
                   <SaveMealButton meal={meal} className="h-9 w-9 rounded-md border border-border/60" />
+                  <ShareMealButton meal={meal} className="h-9 w-9 rounded-md border border-border/60" />
                   <Button
                     variant="outline"
                     size="sm"

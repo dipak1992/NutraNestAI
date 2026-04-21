@@ -147,8 +147,8 @@ function DraggableCard({
     <motion.div
       className="absolute inset-0 rounded-3xl cursor-grab active:cursor-grabbing"
       style={{ y, opacity, scale, zIndex: 30 }}
-      drag="y"
-      dragConstraints={{ top: -600, bottom: 600 }}
+      drag={true}
+      dragConstraints={{ left: 0, right: 0, top: -600, bottom: 600 }}
       dragElastic={0.7}
       onDragEnd={handleDragEnd}
     >

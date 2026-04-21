@@ -126,7 +126,7 @@ export function LandingHero() {
                 <video
                   ref={videoRef}
                   className="w-full h-full object-cover"
-                  src="https://notebooklm.google.com/notebook/569e829e-f721-448c-bc6b-1d1e990a7101/artifact/05f85fa6-2a18-4bff-8991-2aa55709b601"
+                  src="/hero.mp4"
                   autoPlay
                   muted
                   loop

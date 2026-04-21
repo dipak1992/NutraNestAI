@@ -1,24 +1,20 @@
 'use client'
 
-import { useRef } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { ArrowRight, Play, Users, ShieldCheck, Zap } from 'lucide-react'
+import { ArrowRight, Play, Sparkles, Users, ShieldCheck, Zap } from 'lucide-react'
 
 export function LandingHero() {
-  const videoRef = useRef<HTMLVideoElement>(null)
-
   function handleWatch() {
-    if (!videoRef.current) return
-    const rect = videoRef.current.getBoundingClientRect()
-    const inView = rect.top >= 0 && rect.bottom <= window.innerHeight
-    if (!inView) {
-      videoRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    const section = document.getElementById('how-it-works-media')
+    if (!section) return
+
+    section.scrollIntoView({ behavior: 'smooth', block: 'center' })
+
+    const video = section.querySelector('video')
+    if (video instanceof HTMLVideoElement) {
+      video.play().catch(() => undefined)
     }
-    videoRef.current.muted = false
-    videoRef.current.play().catch(() => {
-      if (videoRef.current) videoRef.current.muted = true
-    })
   }
 
   return (
@@ -105,42 +101,62 @@ export function LandingHero() {
             </div>
           </div>
 
-          {/* ── Right: Video ── */}
-          {/* Mobile: natural grid order puts this below the copy column.
-              Desktop: sits in the right lg:grid-col automatically. */}
+          {/* ── Right: Premium preview ── */}
           <div className="w-full">
-            {/* Premium device-frame container */}
-            <div className="relative rounded-[20px] overflow-hidden shadow-[0_24px_80px_-12px_rgba(0,0,0,0.20),0_0_0_1px_rgba(0,0,0,0.05)]">
-              {/* macOS-style window chrome */}
-              <div className="flex items-center gap-1.5 px-4 py-3 bg-white/90 backdrop-blur-md border-b border-black/[0.06]">
-                <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
-                <span className="h-3 w-3 rounded-full bg-[#ffbd2e]" />
-                <span className="h-3 w-3 rounded-full bg-[#27c840]" />
-                <div className="ml-3 flex-1 h-[22px] rounded-md bg-black/[0.05] flex items-center justify-center">
-                  <span className="text-[11px] text-muted-foreground/50 font-medium tracking-tight select-none">mealease.app</span>
-                </div>
-              </div>
+            <div className="relative overflow-hidden rounded-[28px] border border-white/70 bg-white/80 p-5 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.18),0_0_0_1px_rgba(0,0,0,0.05)] backdrop-blur-xl">
+              <div className="absolute inset-x-8 top-0 h-24 bg-gradient-to-b from-emerald-200/50 to-transparent blur-2xl" />
 
-              {/* Video — gradient bg acts as loading fallback thumbnail */}
-              <div className="aspect-video bg-gradient-to-br from-emerald-100/80 via-white to-amber-100/60">
-                <video
-                  ref={videoRef}
-                  className="w-full h-full object-cover"
-                  src="/hero.mp4"
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  preload="metadata"
-                />
+              <div className="relative rounded-[22px] border border-black/[0.06] bg-[#fcfdfc] p-4 shadow-[0_12px_40px_-18px_rgba(0,0,0,0.28)]">
+                <div className="mb-4 flex items-center justify-between rounded-2xl border border-emerald-100 bg-white px-4 py-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">Tonight&apos;s plan</p>
+                    <p className="mt-1 text-lg font-semibold text-foreground">Creamy pesto salmon bowls</p>
+                  </div>
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700">
+                    <Sparkles className="h-5 w-5" />
+                  </div>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-[1.4fr_0.9fr]">
+                  <div className="rounded-2xl bg-[linear-gradient(145deg,#eaf8f1_0%,#ffffff_55%,#fff3df_100%)] p-4">
+                    <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-emerald-800 shadow-sm">
+                      <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                      Personalized for 4 people
+                    </div>
+                    <div className="space-y-3">
+                      <div className="rounded-2xl bg-white/90 p-3 shadow-sm">
+                        <p className="text-sm font-semibold text-foreground">Swap suggestions</p>
+                        <p className="mt-1 text-sm text-muted-foreground">Dairy-free sauce for mom, soft veggie sides for the kids.</p>
+                      </div>
+                      <div className="rounded-2xl bg-white/90 p-3 shadow-sm">
+                        <p className="text-sm font-semibold text-foreground">Pantry matched</p>
+                        <p className="mt-1 text-sm text-muted-foreground">Uses rice, frozen peas, and garlic you already have.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="rounded-2xl border border-black/[0.06] bg-white p-4 shadow-sm">
+                      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Prep time</p>
+                      <p className="mt-2 text-3xl font-bold text-foreground">22 min</p>
+                    </div>
+                    <div className="rounded-2xl border border-black/[0.06] bg-white p-4 shadow-sm">
+                      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Smart grocery list</p>
+                      <ul className="mt-3 space-y-2 text-sm text-foreground">
+                        <li>Salmon fillets</li>
+                        <li>Basil pesto</li>
+                        <li>Cucumber + avocado</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Floating caption */}
-            <div className="mt-3 flex justify-end">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/70 backdrop-blur border border-black/[0.06] shadow-sm text-xs font-medium text-muted-foreground">
+            <div className="mt-4 flex justify-end">
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-black/[0.06] bg-white/70 px-3 py-1 backdrop-blur shadow-sm text-xs font-medium text-muted-foreground">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Live demo &middot; No setup required
+                Watch the full walkthrough below
               </div>
             </div>
           </div>

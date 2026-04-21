@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { MessageSquare, Brain, Utensils } from 'lucide-react'
+import { MessageSquare, Brain, PauseCircle, PlayCircle, Utensils } from 'lucide-react'
 
 const STEPS = [
   {
@@ -64,6 +64,60 @@ export function LandingHowItWorks() {
           <p className="mt-4 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
             Set your household once. MealEase handles the daily decisions with premium-level personalization.
           </p>
+        </motion.div>
+
+        <motion.div
+          id="how-it-works-media"
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.55 }}
+          className="mb-16 sm:mb-20"
+        >
+          <div className="relative overflow-hidden rounded-[28px] border border-white/70 bg-white/75 p-4 shadow-[0_28px_90px_-18px_rgba(0,0,0,0.18),0_0_0_1px_rgba(0,0,0,0.05)] backdrop-blur-xl sm:p-5">
+            <div className="absolute inset-x-10 top-0 h-28 bg-gradient-to-b from-violet-200/45 via-emerald-200/25 to-transparent blur-3xl" />
+
+            <div className="relative rounded-[22px] overflow-hidden border border-black/[0.06] bg-[#fbfcfb]">
+              <div className="flex items-center gap-1.5 px-4 py-3 bg-white/90 backdrop-blur-md border-b border-black/[0.06]">
+                <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
+                <span className="h-3 w-3 rounded-full bg-[#ffbd2e]" />
+                <span className="h-3 w-3 rounded-full bg-[#27c840]" />
+                <div className="ml-3 flex-1 h-[22px] rounded-md bg-black/[0.05] flex items-center justify-center px-3">
+                  <span className="truncate text-[11px] text-muted-foreground/60 font-medium tracking-tight select-none">MealEase walkthrough</span>
+                </div>
+              </div>
+
+              <div className="aspect-video bg-gradient-to-br from-emerald-100/75 via-white to-amber-100/60">
+                <video
+                  className="h-full w-full object-cover"
+                  src="/hero.mp4"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
+                  controls
+                />
+              </div>
+            </div>
+
+            <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-lg font-semibold text-foreground">See the full MealEase flow in under a minute</p>
+                <p className="mt-1 text-sm sm:text-base text-muted-foreground">Start in the hero, watch the walkthrough here, then move straight into features without any cramped transitions.</p>
+              </div>
+              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-black/[0.06] bg-white/85 px-3 py-1.5 shadow-sm">
+                  <PauseCircle className="h-4 w-4 text-violet-600" />
+                  Pause anytime
+                </span>
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-black/[0.06] bg-white/85 px-3 py-1.5 shadow-sm">
+                  <PlayCircle className="h-4 w-4 text-emerald-600" />
+                  Continue when ready
+                </span>
+              </div>
+            </div>
+          </div>
         </motion.div>
 
         {/* Steps */}

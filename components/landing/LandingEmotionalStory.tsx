@@ -17,18 +17,20 @@ export function LandingEmotionalStory() {
           className="object-cover object-center hidden md:block"
           quality={85}
         />
-        {/* Mobile-optimized portrait image */}
+        {/* Mobile-optimized portrait image — family-mobile.jpg, focal point upper-center for faces */}
         <Image
           src="/mobile/family-mobile.jpg"
           alt=""
           fill
           sizes="(max-width: 767px) 100vw, 0px"
-          className="object-cover object-[center_25%] md:hidden"
-          quality={80}
+          className="object-cover object-[center_20%] md:hidden"
+          quality={85}
         />
         {/* Multi-layer premium overlay */}
-        <div className="absolute inset-0 bg-slate-950/75" />
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-slate-950/70 to-slate-950/90" />
+        {/* Base darkening — slightly heavier on mobile for story text legibility */}
+        <div className="absolute inset-0 bg-slate-950/75 md:bg-slate-950/75" />
+        {/* Vertical gradient — deeper bottom fade on mobile so founder card reads cleanly */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-slate-950/65 to-slate-950/92 md:from-slate-950/40 md:via-slate-950/70 md:to-slate-950/90" />
         <div className="absolute inset-0 bg-gradient-to-r from-slate-950/50 via-transparent to-slate-950/50" />
         {/* Warm emotional tint */}
         <div className="absolute inset-0 bg-gradient-to-br from-violet-950/30 via-transparent to-amber-950/20" />

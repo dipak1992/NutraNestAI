@@ -20,14 +20,15 @@ export function LandingFinalCTA() {
           className="object-cover object-bottom hidden md:block"
           quality={80}
         />
-        {/* Mobile-optimized portrait image */}
+        {/* Mobile-optimized portrait image — family warmth for emotional close */}
         <Image
           src="/mobile/family-mobile.jpg"
           alt=""
           fill
+          priority
           sizes="(max-width: 767px) 100vw, 0px"
-          className="object-cover object-[center_30%] md:hidden"
-          quality={75}
+          className="object-cover object-[center_28%] md:hidden"
+          quality={80}
         />
         {/* Deep cinematic overlay */}
         <div className="absolute inset-0 bg-slate-950/80" />

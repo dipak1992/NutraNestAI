@@ -92,14 +92,14 @@ export function LandingTestimonials() {
           className="object-cover object-center hidden md:block"
           quality={80}
         />
-        {/* Mobile-optimized portrait image */}
+        {/* Mobile-optimized portrait image — date-night for warm ambient mood */}
         <Image
-          src="/mobile/family-mobile.jpg"
+          src="/mobile/date-night-mobile.jpg"
           alt=""
           fill
           sizes="(max-width: 767px) 100vw, 0px"
-          className="object-cover object-[center_40%] md:hidden"
-          quality={75}
+          className="object-cover object-[center_35%] md:hidden"
+          quality={80}
         />
         {/* Heavy cream overlay for card readability */}
         <div className="absolute inset-0 bg-white/92" />

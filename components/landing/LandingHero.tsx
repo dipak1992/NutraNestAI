@@ -52,24 +52,24 @@ export function LandingHero() {
           quality={85}
         />
 
-        {/* Mobile-optimized portrait image */}
+        {/* Mobile-optimized portrait image — hero-mobile.jpg, focal point upper-center for face/food prominence */}
         <Image
           src="/mobile/hero-mobile.jpg"
           alt=""
           fill
           priority
           sizes="(max-width: 767px) 100vw, 0px"
-          className="object-cover object-[center_30%] md:hidden"
-          quality={80}
+          className="object-cover object-[center_25%] md:hidden"
+          quality={85}
         />
 
         {/* Premium multi-layer overlay system */}
-        {/* Base darkening */}
-        <div className="absolute inset-0 bg-black/40" />
-        {/* Warm gradient from left for text readability */}
+        {/* Base darkening — slightly heavier on mobile for text legibility */}
+        <div className="absolute inset-0 bg-black/40 md:bg-black/40" />
+        {/* Warm gradient from left for text readability — stronger bottom-up on mobile */}
         <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-slate-950/50 to-transparent" />
-        {/* Bottom fade for seamless section transition */}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-slate-950/20" />
+        {/* Bottom fade — deeper on mobile so CTA text pops */}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-slate-950/20 to-slate-950/20 md:from-slate-950/60 md:via-transparent md:to-slate-950/20" />
         {/* Subtle warm tint */}
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-950/20 via-transparent to-amber-950/15" />
         {/* Fine grain texture for premium feel */}

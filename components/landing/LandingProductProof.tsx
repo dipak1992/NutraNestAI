@@ -193,8 +193,8 @@ export function LandingProductProof() {
                       src={mode.image}
                       alt={`${mode.label} lifestyle`}
                       fill
-                      sizes="(max-width: 1024px) 100vw, 50vw"
-                      className="object-cover object-center"
+                      sizes="(max-width: 767px) 100vw, (max-width: 1024px) 100vw, 50vw"
+                      className="object-cover object-center transition-transform duration-700 group-hover:scale-[1.02]"
                       quality={85}
                     />
                     {/* Cinematic overlay for UI card readability */}

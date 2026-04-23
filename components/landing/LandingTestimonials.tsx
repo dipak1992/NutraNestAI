@@ -83,13 +83,23 @@ export function LandingTestimonials() {
     <section className="relative overflow-hidden py-24 sm:py-32">
       {/* ── Ambient date-night background ── */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
+        {/* Desktop image */}
         <Image
           src="/landing/date-night.jpg"
           alt=""
           fill
-          sizes="100vw"
-          className="object-cover object-center"
+          sizes="(max-width: 767px) 0px, 100vw"
+          className="object-cover object-center hidden md:block"
           quality={80}
+        />
+        {/* Mobile-optimized portrait image */}
+        <Image
+          src="/mobile/family-mobile.jpg"
+          alt=""
+          fill
+          sizes="(max-width: 767px) 100vw, 0px"
+          className="object-cover object-[center_40%] md:hidden"
+          quality={75}
         />
         {/* Heavy cream overlay for card readability */}
         <div className="absolute inset-0 bg-white/92" />

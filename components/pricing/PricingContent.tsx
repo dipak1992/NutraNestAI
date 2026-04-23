@@ -217,7 +217,8 @@ export function PricingContent() {
       {/* ═══════════════════ HERO ═══════════════════ */}
       <section className="relative overflow-hidden pt-20 pb-8">
         <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
-          <Image src="/landing/family-dinner.jpg" alt="" fill sizes="100vw" className="object-cover object-center" quality={75} />
+          <Image src="/landing/family-dinner.jpg" alt="" fill sizes="(max-width: 767px) 0px, 100vw" className="object-cover object-center hidden md:block" quality={75} />
+          <Image src="/mobile/family-mobile.jpg" alt="" fill sizes="(max-width: 767px) 100vw, 0px" className="object-cover object-[center_30%] md:hidden" quality={70} />
           <div className="absolute inset-0 bg-white/[0.94]" />
           <div className="absolute inset-0 bg-gradient-to-b from-white via-transparent to-white" />
           <div className="absolute inset-0 bg-[radial-gradient(800px_400px_at_50%_20%,rgba(16,185,129,0.08),transparent_60%)]" />

@@ -29,27 +29,38 @@ export function LandingHero() {
     <section className="relative overflow-hidden min-h-[92vh] flex items-center">
       {/* ── Cinematic photo/video background ── */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
-        {/* Video background (auto-plays muted, falls back to poster image) */}
+        {/* Video background — desktop only (auto-plays muted, falls back to poster) */}
         <video
           autoPlay
           muted
           loop
           playsInline
           poster="/landing/hero.jpg"
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover hidden md:block"
         >
           <source src="/hero.mp4" type="video/mp4" />
         </video>
 
-        {/* Fallback static image for no-JS / slow connections */}
+        {/* Desktop fallback image */}
         <Image
           src="/landing/hero.jpg"
           alt=""
           fill
           priority
-          sizes="100vw"
-          className="object-cover object-center"
+          sizes="(max-width: 767px) 0px, 100vw"
+          className="object-cover object-center hidden md:block"
           quality={85}
+        />
+
+        {/* Mobile-optimized portrait image */}
+        <Image
+          src="/mobile/hero-mobile.jpg"
+          alt=""
+          fill
+          priority
+          sizes="(max-width: 767px) 100vw, 0px"
+          className="object-cover object-[center_30%] md:hidden"
+          quality={80}
         />
 
         {/* Premium multi-layer overlay system */}

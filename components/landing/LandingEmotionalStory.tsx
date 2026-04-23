@@ -8,13 +8,23 @@ export function LandingEmotionalStory() {
     <section className="relative overflow-hidden py-24 sm:py-32 text-white">
       {/* ── Cinematic family dinner background ── */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
+        {/* Desktop image */}
         <Image
           src="/landing/family-dinner.jpg"
           alt=""
           fill
-          sizes="100vw"
-          className="object-cover object-center"
+          sizes="(max-width: 767px) 0px, 100vw"
+          className="object-cover object-center hidden md:block"
           quality={85}
+        />
+        {/* Mobile-optimized portrait image */}
+        <Image
+          src="/mobile/family-mobile.jpg"
+          alt=""
+          fill
+          sizes="(max-width: 767px) 100vw, 0px"
+          className="object-cover object-[center_25%] md:hidden"
+          quality={80}
         />
         {/* Multi-layer premium overlay */}
         <div className="absolute inset-0 bg-slate-950/75" />

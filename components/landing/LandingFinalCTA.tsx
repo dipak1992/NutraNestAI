@@ -11,13 +11,23 @@ export function LandingFinalCTA() {
     <section className="relative py-28 sm:py-36 text-white overflow-hidden">
       {/* ── Cinematic background image ── */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
+        {/* Desktop image */}
         <Image
           src="/landing/family-dinner.jpg"
           alt=""
           fill
-          sizes="100vw"
-          className="object-cover object-bottom"
+          sizes="(max-width: 767px) 0px, 100vw"
+          className="object-cover object-bottom hidden md:block"
           quality={80}
+        />
+        {/* Mobile-optimized portrait image */}
+        <Image
+          src="/mobile/family-mobile.jpg"
+          alt=""
+          fill
+          sizes="(max-width: 767px) 100vw, 0px"
+          className="object-cover object-[center_30%] md:hidden"
+          quality={75}
         />
         {/* Deep cinematic overlay */}
         <div className="absolute inset-0 bg-slate-950/80" />

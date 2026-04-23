@@ -1,9 +1,11 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
+import { ProductDemoModal } from '@/components/landing/ProductDemoModal'
 import {
   ArrowRight,
   Play,
@@ -15,33 +17,13 @@ import {
 } from 'lucide-react'
 
 export function LandingHero() {
-  function handleWatch() {
-    const section = document.getElementById('how-it-works-media')
-    if (!section) return
-    section.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    const video = section.querySelector('video')
-    if (video instanceof HTMLVideoElement) {
-      video.play().catch(() => undefined)
-    }
-  }
+  const [demoOpen, setDemoOpen] = useState(false)
 
   return (
     <section className="relative overflow-hidden min-h-[92vh] flex items-center">
-      {/* ── Cinematic photo/video background ── */}
+      {/* ── Cinematic photo background ── */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
-        {/* Video background — desktop only (auto-plays muted, falls back to poster) */}
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          poster="/landing/hero.jpg"
-          className="absolute inset-0 h-full w-full object-cover hidden md:block"
-        >
-          <source src="/hero.mp4" type="video/mp4" />
-        </video>
-
-        {/* Desktop fallback image */}
+        {/* Desktop hero image */}
         <Image
           src="/landing/hero.jpg"
           alt=""
@@ -124,7 +106,7 @@ export function LandingHero() {
               <Button
                 size="lg"
                 variant="outline"
-                onClick={handleWatch}
+                onClick={() => setDemoOpen(true)}
                 className="h-14 px-8 text-base font-medium rounded-2xl border-white/20 bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 hover:border-white/30 gap-2.5"
               >
                 <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20">
@@ -228,6 +210,9 @@ export function LandingHero() {
         </div>
       </div>
       <div id="hero-sentinel" />
+
+      {/* Product demo modal */}
+      <ProductDemoModal open={demoOpen} onClose={() => setDemoOpen(false)} />
     </section>
   )
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Moon, Calendar, Camera, DollarSign, Sparkles, ChevronRight, Clock, Users, ShieldCheck } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -26,6 +27,7 @@ const MODES = [
       servings: '4',
       tags: ['Dairy-free option', 'Kid-friendly', 'High protein'],
     },
+    image: '/landing/app-cooking.jpg',
   },
   {
     id: 'autopilot',
@@ -47,6 +49,7 @@ const MODES = [
       servings: '4',
       tags: ['$68 grocery total', '7 unique meals', 'Auto-balanced'],
     },
+    image: '/landing/grocery.jpg',
   },
   {
     id: 'snap',
@@ -68,6 +71,7 @@ const MODES = [
       servings: '3',
       tags: ['85% pantry match', 'Only 2 items to buy', 'Quick prep'],
     },
+    image: '/landing/pantry.jpg',
   },
   {
     id: 'budget',
@@ -89,6 +93,7 @@ const MODES = [
       servings: '4',
       tags: ['$3.20/serving', 'Pantry staples', 'Family favorite'],
     },
+    image: '/landing/grocery.jpg',
   },
 ]
 
@@ -179,47 +184,63 @@ export function LandingProductProof() {
                 </div>
               </div>
 
-              {/* Right: Polished UI preview */}
+              {/* Right: Lifestyle image + UI preview overlay */}
               <div className="relative">
-                <div className="relative overflow-hidden rounded-[24px] border border-white/70 bg-white/85 p-4 shadow-[0_20px_60px_-12px_rgba(0,0,0,0.15),0_0_0_1px_rgba(0,0,0,0.04)] backdrop-blur-xl">
-                  <div className="absolute inset-x-6 top-0 h-20 bg-gradient-to-b from-emerald-200/30 to-transparent blur-2xl" />
+                {/* Lifestyle photography background */}
+                <div className="relative overflow-hidden rounded-[28px] shadow-[0_24px_80px_-12px_rgba(0,0,0,0.18)]">
+                  <div className="relative h-[420px] sm:h-[480px] w-full">
+                    <Image
+                      src={mode.image}
+                      alt={`${mode.label} lifestyle`}
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                      className="object-cover object-center"
+                      quality={85}
+                    />
+                    {/* Cinematic overlay for UI card readability */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/10" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent" />
+                  </div>
 
-                  <div className="relative rounded-[18px] border border-black/[0.06] bg-[#fcfdfc] p-5">
-                    {/* Mode badge */}
-                    <div className={cn('inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold text-white mb-4', mode.activeBg)}>
-                      {mode.emoji} {mode.label} Mode
-                    </div>
-
-                    {/* Meal preview */}
-                    <h4 className="text-xl font-bold text-foreground mb-2">{mode.preview.title}</h4>
-
-                    <div className="flex items-center gap-4 mb-4">
-                      <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                        <Clock className="h-3.5 w-3.5 text-primary" />
-                        {mode.preview.time}
-                      </span>
-                      <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                        <Users className="h-3.5 w-3.5 text-primary" />
-                        Serves {mode.preview.servings}
-                      </span>
-                    </div>
-
-                    {/* Tags */}
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {mode.preview.tags.map((tag) => (
-                        <span key={tag} className="inline-flex items-center rounded-full bg-emerald-50 border border-emerald-200/60 px-3 py-1 text-xs font-medium text-emerald-800">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* Fake action bar */}
-                    <div className="flex items-center gap-2 pt-4 border-t border-black/[0.06]">
-                      <div className="flex-1 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-sm font-semibold text-primary">
-                        Cook This Tonight
+                  {/* Floating UI preview card over the image */}
+                  <div className="absolute bottom-0 inset-x-0 p-4 sm:p-6">
+                    <div className="rounded-[20px] border border-white/15 bg-white/[0.1] backdrop-blur-xl p-5 shadow-[0_12px_40px_-10px_rgba(0,0,0,0.3)]">
+                      {/* Mode badge */}
+                      <div className={cn('inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold text-white mb-3', mode.activeBg)}>
+                        {mode.emoji} {mode.label} Mode
                       </div>
-                      <div className="h-10 w-10 rounded-xl border border-border/60 flex items-center justify-center text-muted-foreground">
-                        <ChevronRight className="h-4 w-4" />
+
+                      {/* Meal preview */}
+                      <h4 className="text-lg font-bold text-white mb-2">{mode.preview.title}</h4>
+
+                      <div className="flex items-center gap-4 mb-3">
+                        <span className="inline-flex items-center gap-1 text-xs text-white/70">
+                          <Clock className="h-3.5 w-3.5 text-emerald-400" />
+                          {mode.preview.time}
+                        </span>
+                        <span className="inline-flex items-center gap-1 text-xs text-white/70">
+                          <Users className="h-3.5 w-3.5 text-emerald-400" />
+                          Serves {mode.preview.servings}
+                        </span>
+                      </div>
+
+                      {/* Tags */}
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        {mode.preview.tags.map((tag) => (
+                          <span key={tag} className="inline-flex items-center rounded-full bg-white/10 border border-white/15 px-2.5 py-0.5 text-xs font-medium text-white/90">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* Action bar */}
+                      <div className="flex items-center gap-2 pt-3 border-t border-white/10">
+                        <div className="flex-1 h-9 rounded-xl bg-emerald-500/20 flex items-center justify-center text-sm font-semibold text-emerald-300">
+                          Cook This Tonight
+                        </div>
+                        <div className="h-9 w-9 rounded-xl border border-white/15 flex items-center justify-center text-white/60">
+                          <ChevronRight className="h-4 w-4" />
+                        </div>
                       </div>
                     </div>
                   </div>

@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Star, Quote } from 'lucide-react'
 
@@ -79,8 +80,26 @@ const item = {
 
 export function LandingTestimonials() {
   return (
-    <section className="py-24 sm:py-32 bg-white">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+    <section className="relative overflow-hidden py-24 sm:py-32">
+      {/* ── Ambient date-night background ── */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
+        <Image
+          src="/landing/date-night.jpg"
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover object-center"
+          quality={80}
+        />
+        {/* Heavy cream overlay for card readability */}
+        <div className="absolute inset-0 bg-white/92" />
+        {/* Subtle warm tint from the photo */}
+        <div className="absolute inset-0 bg-gradient-to-b from-amber-50/30 via-transparent to-emerald-50/20" />
+        {/* Soft vignette */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(255,255,255,0.6)_100%)]" />
+      </div>
+
+      <div className="relative z-[1] mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Section header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -107,7 +126,7 @@ export function LandingTestimonials() {
           className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-14"
         >
           {TRUST_STATS.map((stat) => (
-            <div key={stat.label} className="rounded-2xl border border-border/60 bg-[#fafbfa] p-4 text-center">
+            <div key={stat.label} className="rounded-2xl border border-border/60 bg-white/80 backdrop-blur-sm p-4 text-center shadow-sm">
               <p className="text-2xl sm:text-3xl font-bold text-foreground">{stat.value}</p>
               <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
             </div>
@@ -126,7 +145,7 @@ export function LandingTestimonials() {
             <motion.div
               key={t.name}
               variants={item}
-              className="group rounded-2xl border border-border/60 bg-white p-6 hover:shadow-lg hover:shadow-black/[0.04] transition-all duration-300"
+              className="group rounded-2xl border border-border/60 bg-white/85 backdrop-blur-sm p-6 hover:shadow-lg hover:shadow-black/[0.04] hover:bg-white transition-all duration-300"
             >
               {/* Quote icon */}
               <Quote className="h-5 w-5 text-primary/20 mb-3" />

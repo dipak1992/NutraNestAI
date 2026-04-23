@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Zap, Calendar, Users } from 'lucide-react'
 
@@ -16,6 +17,7 @@ const OUTCOMES = [
     iconColor: 'text-orange-600',
     iconBg: 'bg-orange-100',
     statColor: 'text-orange-700',
+    image: null,
   },
   {
     icon: Calendar,
@@ -29,6 +31,7 @@ const OUTCOMES = [
     iconColor: 'text-blue-600',
     iconBg: 'bg-blue-100',
     statColor: 'text-blue-700',
+    image: null,
   },
   {
     icon: Users,
@@ -42,6 +45,7 @@ const OUTCOMES = [
     iconColor: 'text-violet-600',
     iconBg: 'bg-violet-100',
     statColor: 'text-violet-700',
+    image: '/landing/grocery.jpg',
   },
 ]
 
@@ -95,30 +99,47 @@ export function LandingOutcomes() {
               <motion.div
                 key={o.title}
                 variants={item}
-                className={`group relative rounded-2xl border ${o.border} bg-gradient-to-br ${o.gradient} p-7 hover:shadow-xl hover:shadow-black/[0.06] transition-all duration-300`}
+                className={`group relative rounded-2xl border ${o.border} bg-gradient-to-br ${o.gradient} overflow-hidden hover:shadow-xl hover:shadow-black/[0.06] transition-all duration-300`}
               >
-                {/* Emoji + Icon */}
-                <div className="flex items-center gap-3 mb-5">
-                  <span className="text-3xl">{o.emoji}</span>
-                  <div className={`h-10 w-10 rounded-xl ${o.iconBg} flex items-center justify-center`}>
-                    <Icon className={`h-5 w-5 ${o.iconColor}`} />
+                {/* Optional lifestyle image accent */}
+                {o.image && (
+                  <div className="relative h-36 w-full overflow-hidden">
+                    <Image
+                      src={o.image}
+                      alt=""
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      className="object-cover object-center group-hover:scale-105 transition-transform duration-700"
+                      quality={80}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-violet-50 via-violet-50/80 to-transparent" />
                   </div>
-                </div>
+                )}
 
-                {/* Title */}
-                <h3 className="text-xl font-bold text-foreground mb-3 leading-snug">
-                  {o.title}
-                </h3>
+                <div className="p-7">
+                  {/* Emoji + Icon */}
+                  <div className="flex items-center gap-3 mb-5">
+                    <span className="text-3xl">{o.emoji}</span>
+                    <div className={`h-10 w-10 rounded-xl ${o.iconBg} flex items-center justify-center`}>
+                      <Icon className={`h-5 w-5 ${o.iconColor}`} />
+                    </div>
+                  </div>
 
-                {/* Description */}
-                <p className="text-sm text-muted-foreground leading-relaxed mb-6">
-                  {o.description}
-                </p>
+                  {/* Title */}
+                  <h3 className="text-xl font-bold text-foreground mb-3 leading-snug">
+                    {o.title}
+                  </h3>
 
-                {/* Stat */}
-                <div className="pt-4 border-t border-black/[0.06]">
-                  <p className={`text-2xl font-bold ${o.statColor}`}>{o.stat}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{o.statLabel}</p>
+                  {/* Description */}
+                  <p className="text-sm text-muted-foreground leading-relaxed mb-6">
+                    {o.description}
+                  </p>
+
+                  {/* Stat */}
+                  <div className="pt-4 border-t border-black/[0.06]">
+                    <p className={`text-2xl font-bold ${o.statColor}`}>{o.stat}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{o.statLabel}</p>
+                  </div>
                 </div>
               </motion.div>
             )

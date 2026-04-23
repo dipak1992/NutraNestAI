@@ -1,17 +1,32 @@
 'use client'
 
+import Image from 'next/image'
 import { motion } from 'framer-motion'
 
 export function LandingEmotionalStory() {
   return (
-    <section className="relative overflow-hidden py-24 sm:py-32 bg-slate-950 text-white">
-      {/* Background */}
+    <section className="relative overflow-hidden py-24 sm:py-32 text-white">
+      {/* ── Cinematic family dinner background ── */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-[radial-gradient(900px_500px_at_20%_20%,rgba(139,92,246,0.18),transparent_58%),radial-gradient(860px_480px_at_80%_80%,rgba(245,158,11,0.15),transparent_55%),linear-gradient(180deg,#020617_0%,#0b1320_55%,#020617_100%)]" />
-        <div className="absolute inset-0 opacity-15 [background-image:linear-gradient(rgba(148,163,184,0.15)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.15)_1px,transparent_1px)] [background-size:48px_48px]" />
+        <Image
+          src="/landing/family-dinner.jpg"
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover object-center"
+          quality={85}
+        />
+        {/* Multi-layer premium overlay */}
+        <div className="absolute inset-0 bg-slate-950/75" />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-slate-950/70 to-slate-950/90" />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/50 via-transparent to-slate-950/50" />
+        {/* Warm emotional tint */}
+        <div className="absolute inset-0 bg-gradient-to-br from-violet-950/30 via-transparent to-amber-950/20" />
+        {/* Subtle grain */}
+        <div className="absolute inset-0 opacity-[0.04] [background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIiBmaWx0ZXI9InVybCgjYSkiIG9wYWNpdHk9IjAuMDUiLz48L3N2Zz4=')]" />
       </div>
 
-      {/* Decorative orbs */}
+      {/* Decorative light leaks */}
       <div className="absolute z-[1] top-1/4 left-[10%] h-72 w-72 rounded-full bg-violet-500/10 blur-[100px]" />
       <div className="absolute z-[1] bottom-1/4 right-[10%] h-56 w-56 rounded-full bg-amber-500/10 blur-[80px]" />
 
@@ -29,7 +44,7 @@ export function LandingEmotionalStory() {
           </p>
 
           {/* Big emotional headline */}
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-[3.5rem] font-bold tracking-tight leading-[1.15] mb-8">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-[3.5rem] font-bold tracking-tight leading-[1.15] mb-8 drop-shadow-[0_2px_16px_rgba(0,0,0,0.4)]">
             The hardest part of dinner{' '}
             <br className="hidden sm:block" />
             was never{' '}
@@ -67,16 +82,23 @@ export function LandingEmotionalStory() {
             </p>
           </div>
 
-          {/* Signature */}
+          {/* Founder signature with real photo */}
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.4, duration: 0.5 }}
-            className="mt-12 inline-flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm px-6 py-4"
+            className="mt-12 inline-flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.06] backdrop-blur-md px-6 py-4 shadow-lg"
           >
-            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-bold text-lg">
-              M
+            <div className="relative h-14 w-14 rounded-full overflow-hidden ring-2 ring-emerald-400/30 ring-offset-2 ring-offset-slate-950 flex-shrink-0">
+              <Image
+                src="/images/founders-family.jpg"
+                alt="The MealEase founding family"
+                fill
+                sizes="56px"
+                className="object-cover"
+                quality={80}
+              />
             </div>
             <div className="text-left">
               <p className="text-sm font-semibold text-white">The MealEase Team</p>

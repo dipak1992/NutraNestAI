@@ -2,11 +2,9 @@ import { PublicSiteHeader } from '@/components/layout/PublicSiteHeader'
 import { PublicSiteFooter } from '@/components/layout/PublicSiteFooter'
 import { StickyMobileCta } from '@/components/landing/StickyMobileCta'
 import { LandingHero } from '@/components/landing/LandingHero'
-import { LandingPain } from '@/components/landing/LandingPain'
-import { LandingHowItWorks } from '@/components/landing/LandingHowItWorks'
-import { LandingFeatures } from '@/components/landing/LandingFeatures'
-import { LandingSmartAI } from '@/components/landing/LandingSmartAI'
-import { LandingBeforeAfter } from '@/components/landing/LandingBeforeAfter'
+import { LandingOutcomes } from '@/components/landing/LandingOutcomes'
+import { LandingProductProof } from '@/components/landing/LandingProductProof'
+import { LandingEmotionalStory } from '@/components/landing/LandingEmotionalStory'
 import { LandingTestimonials } from '@/components/landing/LandingTestimonials'
 import { LandingFinalCTA } from '@/components/landing/LandingFinalCTA'
 import { Heart } from 'lucide-react'
@@ -91,11 +89,9 @@ export default function LandingPage() {
       <PublicSiteHeader />
       <main>
         <LandingHero />
-        <LandingPain />
-        <LandingHowItWorks />
-        <LandingFeatures />
-        <LandingSmartAI />
-        <LandingBeforeAfter />
+        <LandingOutcomes />
+        <LandingProductProof />
+        <LandingEmotionalStory />
         <LandingTestimonials />
         <LandingFinalCTA />
         <FriendlyDisclaimer />

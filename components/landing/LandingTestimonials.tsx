@@ -1,57 +1,70 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Star } from 'lucide-react'
+import { Star, Quote } from 'lucide-react'
 
 const TESTIMONIALS = [
   {
-    name: 'Priya R.',
-    role: 'Registered Dietitian',
-    text: '"I recommend MealEase to clients who struggle with meal planning. The allergy support and family adaptation is better than anything else I\'ve seen."',
-    avatar: 'PR',
-    color: 'bg-emerald-100 text-emerald-700',
+    name: 'Sarah M.',
+    role: 'Mom of 3, Austin TX',
+    text: 'I used to spend 40 minutes deciding what to cook. Now I open MealEase, tap once, and dinner is handled. My husband thinks I became a chef.',
+    avatar: 'SM',
+    color: 'bg-violet-100 text-violet-700',
     stars: 5,
+    highlight: 'tap once, and dinner is handled',
   },
   {
     name: 'James K.',
     role: 'Software engineer, remote',
-    text: '"Zero-Cook Mode is genius. After a 10-hour day, it finds me the perfect takeout that still fits my macros. I\'ve saved so much on random delivery orders."',
+    text: 'Living solo, I defaulted to the same 5 takeout places. Now I actually cook and enjoy it. The budget mode saved me over $200 last month.',
     avatar: 'JK',
     color: 'bg-blue-100 text-blue-700',
-    stars: 4,
-  },
-  {
-    name: 'Sarah M.',
-    role: 'Mom of 3, Austin TX',
-    text: '"I used to spend 40 minutes deciding what to cook. Now I open MealEase, tap once, and dinner is handled. My husband thinks I became a chef."',
-    avatar: 'SM',
-    color: 'bg-violet-100 text-violet-700',
     stars: 5,
+    highlight: 'saved me over $200 last month',
   },
   {
-    name: 'Michelle T.',
-    role: 'Busy nurse, Chicago IL',
-    text: '"I work 12-hour shifts. MealEase plans my week while I sleep. I come home to a plan, a grocery list, and zero stress. Absolute game changer."',
-    avatar: 'MT',
-    color: 'bg-rose-100 text-rose-700',
-    stars: 4,
-  },
-  {
-    name: 'David L.',
-    role: 'Dad of 2, Seattle WA',
-    text: '"Snap & Cook saves us so much. We photograph the fridge on Sunday and get a whole week of meals from what we already have."',
-    avatar: 'DL',
-    color: 'bg-amber-100 text-amber-700',
+    name: 'Priya R.',
+    role: 'Registered Dietitian',
+    text: 'I recommend MealEase to clients who struggle with meal planning. The allergy support and family adaptation is better than anything else I\'ve seen.',
+    avatar: 'PR',
+    color: 'bg-emerald-100 text-emerald-700',
     stars: 5,
+    highlight: 'better than anything else I\'ve seen',
   },
   {
     name: 'Carlos G.',
     role: 'Single dad, Miami FL',
-    text: '"My daughter is allergic to dairy and nuts. MealEase factors that in automatically. I don\'t have to triple-check every recipe anymore."',
+    text: 'My daughter is allergic to dairy and nuts. MealEase factors that in automatically. I don\'t have to triple-check every recipe anymore.',
     avatar: 'CG',
     color: 'bg-teal-100 text-teal-700',
     stars: 5,
+    highlight: 'factors that in automatically',
   },
+  {
+    name: 'Michelle T.',
+    role: 'Busy nurse, Chicago IL',
+    text: 'I work 12-hour shifts. MealEase plans my week while I sleep. I come home to a plan, a grocery list, and zero stress. Absolute game changer.',
+    avatar: 'MT',
+    color: 'bg-rose-100 text-rose-700',
+    stars: 5,
+    highlight: 'plans my week while I sleep',
+  },
+  {
+    name: 'David L.',
+    role: 'Dad of 2, Seattle WA',
+    text: 'Snap & Cook saves us so much. We photograph the fridge on Sunday and get a whole week of meals from what we already have. Zero waste.',
+    avatar: 'DL',
+    color: 'bg-amber-100 text-amber-700',
+    stars: 5,
+    highlight: 'meals from what we already have',
+  },
+]
+
+const TRUST_STATS = [
+  { value: '3,200+', label: 'Active households' },
+  { value: '47,000+', label: 'Meals decided' },
+  { value: '4.9/5', label: 'Average rating' },
+  { value: '$150+', label: 'Saved monthly on takeout' },
 ]
 
 const container = {
@@ -74,15 +87,31 @@ export function LandingTestimonials() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
           <p className="text-sm font-semibold uppercase tracking-wider text-primary mb-3">Loved by families</p>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground mb-4">
+          <h2 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-bold tracking-tight text-foreground mb-4 leading-tight">
             Real families, real relief.
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Join thousands of households who stopped stressing about dinner.
           </p>
+        </motion.div>
+
+        {/* Trust stats bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.4 }}
+          className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-14"
+        >
+          {TRUST_STATS.map((stat) => (
+            <div key={stat.label} className="rounded-2xl border border-border/60 bg-[#fafbfa] p-4 text-center">
+              <p className="text-2xl sm:text-3xl font-bold text-foreground">{stat.value}</p>
+              <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
+            </div>
+          ))}
         </motion.div>
 
         {/* Testimonial cards */}
@@ -97,8 +126,11 @@ export function LandingTestimonials() {
             <motion.div
               key={t.name}
               variants={item}
-              className="rounded-2xl border border-border/60 bg-white p-6 hover:shadow-md transition-shadow"
+              className="group rounded-2xl border border-border/60 bg-white p-6 hover:shadow-lg hover:shadow-black/[0.04] transition-all duration-300"
             >
+              {/* Quote icon */}
+              <Quote className="h-5 w-5 text-primary/20 mb-3" />
+
               {/* Stars */}
               <div className="flex gap-0.5 mb-4">
                 {[...Array(5)].map((_, i) => (
@@ -106,11 +138,22 @@ export function LandingTestimonials() {
                 ))}
               </div>
 
-              {/* Quote */}
-              <p className="text-sm text-foreground/80 leading-relaxed mb-6">{t.text}</p>
+              {/* Quote with highlight */}
+              <p className="text-sm text-foreground/80 leading-relaxed mb-6">
+                &ldquo;{t.text.split(t.highlight).map((part, i, arr) => (
+                  <span key={i}>
+                    {part}
+                    {i < arr.length - 1 && (
+                      <span className="font-semibold text-foreground bg-emerald-50 px-0.5 rounded">
+                        {t.highlight}
+                      </span>
+                    )}
+                  </span>
+                ))}&rdquo;
+              </p>
 
               {/* Author */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 pt-4 border-t border-border/40">
                 <div className={`h-10 w-10 rounded-full ${t.color} flex items-center justify-center text-sm font-bold`}>
                   {t.avatar}
                 </div>

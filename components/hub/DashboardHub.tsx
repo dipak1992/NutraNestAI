@@ -9,6 +9,7 @@ import { useUpgradeTrigger } from '@/lib/pillars/use-upgrade-trigger'
 import { useHouseholdConfig } from '@/lib/hooks/use-household-config'
 import { PILLAR_CARDS, TONIGHT_CHIPS, hasAccess } from '@/lib/pillars/config'
 import { StreakBadge } from '@/components/habit/StreakBadge'
+import { KidsSection } from '@/components/hub/KidsSection'
 import { cn } from '@/lib/utils'
 import type { PillarCard } from '@/lib/pillars/config'
 
@@ -206,6 +207,9 @@ export function DashboardHub({ displayName }: Props) {
             />
           ))}
         </div>
+
+        {/* ── For the Kids Section ── */}
+        <KidsSection />
 
         {/* ── Contextual Upgrade Banner ── */}
         <div className="mt-6">

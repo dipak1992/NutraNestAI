@@ -426,10 +426,11 @@ export default function HouseholdPillarPage() {
               {features.kidsTools && (
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   {[
-                    { emoji: '🍱', label: 'Lunchbox', href: '/kids-tool?mode=lunchbox' },
-                    { emoji: '🍎', label: 'Snacks', href: '/kids-tool?mode=snack' },
-                    { emoji: '🧁', label: 'Bake', href: '/kids-tool?mode=bake' },
+                    { emoji: '🍎', label: 'Snack for Kids', href: '/kids-tool?mode=snack' },
                     { emoji: '🍽', label: 'Picky Eater', href: '/kids-tool?mode=picky' },
+                    { emoji: '🍱', label: 'Lunchbox', href: '/kids-tool?mode=lunchbox' },
+                    { emoji: '🧁', label: 'Bake', href: '/kids-tool?mode=bake' },
+                    { emoji: '⚡', label: 'Food in 5 Min', href: '/kids-tool?mode=fast' },
                   ].map(tool => (
                     <Link
                       key={tool.label}
@@ -454,6 +455,7 @@ export default function HouseholdPillarPage() {
                 ? 'Automatically balances competing preferences across family members'
                 : 'Smart balancing ensures everyone gets meals they enjoy each week'
             }
+            href={features.conflictBalancing ? '/dashboard/conflict-balancing' : undefined}
             locked={!features.conflictBalancing}
             onClick={
               !features.conflictBalancing
@@ -477,6 +479,7 @@ export default function HouseholdPillarPage() {
                 ? 'Share meal plans and grocery lists with your household'
                 : 'Collaborate on meal planning with your partner or family'
             }
+            href={features.sharedPlanning ? '/dashboard/shared-planning' : undefined}
             locked={!features.sharedPlanning}
             onClick={
               !features.sharedPlanning
@@ -500,6 +503,7 @@ export default function HouseholdPillarPage() {
                 ? 'Plan meals for dinner parties and hosting guests'
                 : 'Unlock smart hosting tools for dinner parties and gatherings'
             }
+            href={features.guestHostingPlanner ? '/dashboard/guest-hosting' : undefined}
             locked={!features.guestHostingPlanner}
             onClick={
               !features.guestHostingPlanner

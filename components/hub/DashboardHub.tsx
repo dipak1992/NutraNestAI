@@ -1,25 +1,165 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { AnimatePresence } from 'framer-motion'
-import posthog from 'posthog-js'
-import { useOnboardingStore, useLightOnboardingStore } from '@/lib/store'
+import { useMemo } from 'react'
+import Link from 'next/link'
+import { motion } from 'framer-motion'
+import { ChevronRight, Crown, Sparkles } from 'lucide-react'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
+import { useUpgradeTrigger } from '@/lib/pillars/use-upgrade-trigger'
 import { useHouseholdConfig } from '@/lib/hooks/use-household-config'
-import { useDashboardMessage } from '@/lib/hooks/use-dashboard-message'
-import { showRewardToast } from '@/lib/reward-toast'
-import { householdFromMembers, fallbackHousehold } from '@/lib/decide/client'
+import { PILLAR_CARDS, TONIGHT_CHIPS, hasAccess } from '@/lib/pillars/config'
 import { StreakBadge } from '@/components/habit/StreakBadge'
-import { SupportLine } from './SupportLine'
-import { PantryCapture } from './PantryCapture'
-import { HeroSection } from './HeroSection'
-import { TonightRecommendation } from './TonightRecommendation'
-import { SmartToolsRow } from './SmartToolsRow'
-import { WeekendModeCard } from './WeekendModeCard'
-import { ProgressCard } from './ProgressCard'
-import { ShareFooter } from './ShareFooter'
-import type { FamilyHouseholdSummary } from '@/lib/family/types'
+import { cn } from '@/lib/utils'
+import type { PillarCard } from '@/lib/pillars/config'
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function getGreeting(): string {
+  const h = new Date().getHours()
+  if (h < 12) return 'Good morning'
+  if (h < 17) return 'Good afternoon'
+  return 'Good evening'
+}
+
+// ── Pillar Card Component ─────────────────────────────────────────────────────
+
+function PillarCardUI({
+  card,
+  index,
+  isPro,
+  isFamily,
+  userTier,
+}: {
+  card: PillarCard
+  index: number
+  isPro: boolean
+  isFamily: boolean
+  userTier: 'free' | 'pro' | 'family'
+}) {
+  const showPremiumCta = card.premiumCta && hasAccess(userTier, card.premiumCta.requiredTier)
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.08 * index, duration: 0.3 }}
+      whileTap={{ scale: 0.98 }}
+    >
+      <Link
+        href={card.href}
+        className={cn(
+          'block rounded-2xl border p-5 transition-all hover:shadow-lg',
+          `bg-gradient-to-br ${card.gradient}`,
+          card.borderColor,
+          card.hoverBorder,
+        )}
+      >
+        <div className="flex items-start gap-4">
+          <span className="text-3xl flex-shrink-0 mt-0.5">{card.emoji}</span>
+          <div className="flex-1 min-w-0">
+            <h3 className="text-[15px] font-bold text-foreground leading-tight">
+              {card.title}
+            </h3>
+            <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+              {card.subtitle}
+            </p>
+
+            {/* Tonight chips — only on Tonight card */}
+            {card.id === 'tonight' && (
+              <div className="flex flex-wrap gap-1.5 mt-3">
+                {TONIGHT_CHIPS.map((chip) => {
+                  const locked = !hasAccess(userTier, chip.requiredTier)
+                  return (
+                    <span
+                      key={chip.id}
+                      className={cn(
+                        'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors',
+                        locked
+                          ? 'bg-gray-100 text-gray-400 border border-gray-200/60'
+                          : 'bg-white/80 text-foreground border border-border/60 hover:bg-white',
+                      )}
+                    >
+                      {chip.emoji} {chip.label}
+                      {locked && <Crown className="h-2.5 w-2.5 ml-0.5 text-amber-400" />}
+                    </span>
+                  )
+                })}
+              </div>
+            )}
+
+            {/* Plan card — Build Plan CTA + premium Autopilot CTA */}
+            {card.id === 'plan' && (
+              <div className="flex items-center gap-2 mt-3">
+                <span className="inline-flex items-center gap-1 rounded-lg bg-white/80 border border-border/60 px-3 py-1.5 text-xs font-semibold text-foreground">
+                  Build Plan
+                </span>
+                {card.premiumCta && (
+                  <span
+                    className={cn(
+                      'inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold',
+                      showPremiumCta
+                        ? 'bg-primary/10 text-primary border border-primary/20'
+                        : 'bg-gray-100 text-gray-400 border border-gray-200/60',
+                    )}
+                  >
+                    <Sparkles className="h-3 w-3" />
+                    {card.premiumCta.label}
+                    {!showPremiumCta && <Crown className="h-2.5 w-2.5 ml-0.5 text-amber-400" />}
+                  </span>
+                )}
+              </div>
+            )}
+
+            {/* Cook card — Snap & Cook badge */}
+            {card.id === 'cook' && (
+              <div className="flex items-center gap-2 mt-3">
+                <span className="inline-flex items-center gap-1 rounded-lg bg-white/80 border border-border/60 px-3 py-1.5 text-xs font-semibold text-foreground">
+                  📸 Snap & Cook
+                </span>
+              </div>
+            )}
+          </div>
+          <ChevronRight className="h-4 w-4 text-muted-foreground/40 flex-shrink-0 mt-1" />
+        </div>
+      </Link>
+    </motion.div>
+  )
+}
+
+// ── Contextual Upgrade Banner ─────────────────────────────────────────────────
+
+function UpgradeBanner() {
+  const trigger = useUpgradeTrigger()
+
+  if (!trigger) return null
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.5, duration: 0.3 }}
+    >
+      <Link
+        href={`/pricing?intent=${trigger.targetTier}&trigger=${trigger.id}`}
+        className="block rounded-2xl border border-amber-200/60 bg-gradient-to-r from-amber-50 to-orange-50/80 p-4 hover:shadow-md transition-all"
+      >
+        <div className="flex items-start gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-100 flex-shrink-0">
+            <Sparkles className="h-4 w-4 text-amber-600" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-amber-900">{trigger.message}</p>
+            <p className="text-xs font-medium text-amber-700 mt-1.5 flex items-center gap-1">
+              {trigger.cta} <ChevronRight className="h-3 w-3" />
+            </p>
+          </div>
+        </div>
+      </Link>
+    </motion.div>
+  )
+}
+
+// ── Main Dashboard Hub ────────────────────────────────────────────────────────
 
 interface Props {
   displayName: string
@@ -27,155 +167,62 @@ interface Props {
 
 export function DashboardHub({ displayName }: Props) {
   const firstName = displayName
-  const router = useRouter()
-
-  const [refreshKey, setRefreshKey] = useState(0)
-  const [tonightVisible, setTonightVisible] = useState(false)
-  const tonightRef = useRef<HTMLDivElement>(null)
-
-  const [snapCookOpen, setSnapCookOpen] = useState(false)
-
-  const {
-    state: { members },
-  } = useOnboardingStore()
-  const light = useLightOnboardingStore()
-  const { status: paywallStatus } = usePaywallStatus()
+  const { status } = usePaywallStatus()
   const householdConfig = useHouseholdConfig()
-  const { supportLine, timeBlock } = useDashboardMessage()
-  const [familySummary, setFamilySummary] = useState<FamilyHouseholdSummary | null>(null)
-
-  const getHousehold = useCallback(
-    () =>
-      members?.length
-        ? householdFromMembers(members)
-        : fallbackHousehold(
-            light.householdType,
-            light.hasKids,
-            light.kidsAgeGroup,
-          ),
-    [members, light.householdType, light.hasKids, light.kidsAgeGroup],
-  )
-
-  const handleQuickDecide = useCallback(() => {
-    posthog.capture('hub_tile_tapped', { tile: 'quick' })
-    showRewardToast('mealGenerated')
-    setTonightVisible(true)
-    setRefreshKey((k) => k + 1)
-    setTimeout(() => {
-      tonightRef.current?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-      })
-    }, 100)
-  }, [])
-
-  useEffect(() => {
-    if (!paywallStatus.isFamily) return
-
-    fetch('/api/family/members', { cache: 'no-store' })
-      .then(async (res) => {
-        if (!res.ok) return null
-        return res.json()
-      })
-      .then((data) => {
-        if (data?.summary) {
-          setFamilySummary(data.summary as FamilyHouseholdSummary)
-          posthog.capture('retention_by_household_size', {
-            household_size: data.summary.totalMembers,
-          })
-        }
-      })
-      .catch(() => null)
-  }, [paywallStatus.isFamily])
+  const greeting = useMemo(() => getGreeting(), [])
 
   return (
-    <>
-      <div
-        className="min-h-screen"
-        style={{
-          background:
-            'linear-gradient(180deg, #fef7f0 0%, #f0fdf4 12%, #ffffff 40%, #ffffff 100%)',
-        }}
-      >
-        <div className="mx-auto max-w-lg px-5 pb-16 pt-6">
-          {/* Streak badge — top-right */}
-          <div className="mb-4 flex justify-end">
+    <div
+      className="min-h-screen"
+      style={{
+        background:
+          'linear-gradient(180deg, #fef7f0 0%, #f0fdf4 12%, #ffffff 40%, #ffffff 100%)',
+      }}
+    >
+      <div className="mx-auto max-w-lg px-5 pb-16 pt-6">
+        {/* ── Header ── */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-sm text-muted-foreground">
+              {greeting}, {firstName}
+            </p>
             <StreakBadge />
           </div>
-
-          <HeroSection
-            firstName={firstName}
-            onQuickDecide={handleQuickDecide}
-            onSnapCook={() => {
-              showRewardToast('snapCook')
-              setSnapCookOpen(true)
-            }}
-            householdConfig={householdConfig}
-            familyHeadline={paywallStatus.isFamily ? familySummary?.headline : null}
-            familyBullets={paywallStatus.isFamily ? familySummary?.bullets : undefined}
-          />
-
-          {!light.completedAt && (
-            <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50/80 p-4 flex items-start gap-3">
-              <span className="text-lg flex-shrink-0">🌿</span>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-amber-900">Personalise your meals</p>
-                <p className="text-xs text-amber-700/80 mt-0.5">Takes 30 seconds — tells AI exactly what your household loves.</p>
-              </div>
-              <button
-                onClick={() => router.push('/onboarding')}
-                className="flex-shrink-0 text-xs font-semibold text-amber-800 bg-amber-200 hover:bg-amber-300 rounded-lg px-3 py-1.5 transition-colors"
-              >
-                Set up →
-              </button>
-            </div>
-          )}
-
-          <WeekendModeCard
-            weekendTitle={householdConfig.weekendTitle}
-            weekendSubtitle={householdConfig.weekendSubtitle}
-          />
-
-          <div ref={tonightRef}>
-            {tonightVisible && <TonightRecommendation refreshKey={refreshKey} />}
-          </div>
-
-          <SmartToolsRow
-            householdConfig={householdConfig}
-            canSeeKidsTools={paywallStatus.isFamily}
-          />
-
-          {/* Lower support line: keep header minimal while preserving subtle guidance */}
-          {supportLine && timeBlock ? (
-            <div className="mt-4 rounded-2xl border border-border/50 bg-white/70 px-4 py-3">
-              <SupportLine line={supportLine} timeBlock={timeBlock} />
-            </div>
-          ) : null}
-
-          {/* Snap & Cook — PantryCapture overlay */}
-          <AnimatePresence>
-            {snapCookOpen && (
-              <div className="fixed inset-0 z-50 bg-white overflow-y-auto">
-                <PantryCapture
-                  onConfirm={(items) => {
-                    setSnapCookOpen(false)
-                    if (items.length > 0) {
-                      const q = encodeURIComponent(items.join(','))
-                      router.push(`/tonight?ingredients=${q}`)
-                    }
-                  }}
-                  onCancel={() => setSnapCookOpen(false)}
-                />
-              </div>
-            )}
-          </AnimatePresence>
-
-          <ProgressCard />
-
-          <ShareFooter />
+          <h1 className="text-2xl font-bold text-foreground tracking-tight leading-tight">
+            What&apos;s for dinner tonight?
+          </h1>
         </div>
-      </div>
 
-    </>
+        {/* ── 4 Pillar Cards ── */}
+        <div className="flex flex-col gap-3">
+          {PILLAR_CARDS.map((card, i) => (
+            <PillarCardUI
+              key={card.id}
+              card={card}
+              index={i}
+              isPro={status.isPro}
+              isFamily={status.isFamily}
+              userTier={status.tier}
+            />
+          ))}
+        </div>
+
+        {/* ── Contextual Upgrade Banner ── */}
+        <div className="mt-6">
+          <UpgradeBanner />
+        </div>
+
+        {/* ── Subtle intelligence indicator ── */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6, duration: 0.4 }}
+          className="mt-8 flex items-center justify-center gap-2 text-xs text-muted-foreground/60"
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span>Intelligence layer active — learning your preferences</span>
+        </motion.div>
+      </div>
+    </div>
   )
 }

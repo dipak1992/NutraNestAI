@@ -6,20 +6,19 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  LayoutDashboard,
+  Home,
+  Moon,
   Calendar,
-  ShoppingCart,
-  Package,
-  BarChart3,
+  ChefHat,
+  Users,
   Settings,
   Menu,
   X,
   LogOut,
   User,
-  Users,
-  Bookmark,
   Crown,
   Gift,
+  BarChart3,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -37,12 +36,17 @@ import { useUIStore } from '@/lib/store'
 import { MealEaseLogo } from '@/components/ui/MealEaseLogo'
 
 const navLinks = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/planner', label: 'Meal Planner', icon: Calendar },
-  { href: '/grocery-list', label: 'Grocery List', icon: ShoppingCart },
-  { href: '/pantry', label: 'Pantry', icon: Package },
-  { href: '/saved', label: 'Saved', icon: Bookmark },
+  { href: '/dashboard',           label: 'Home',      icon: Home },
+  { href: '/dashboard/tonight',   label: 'Tonight',   icon: Moon },
+  { href: '/planner',             label: 'Plan',      icon: Calendar },
+  { href: '/dashboard/cook',      label: 'Cook',      icon: ChefHat },
+  { href: '/dashboard/household', label: 'Household', icon: Users },
 ]
+
+function isNavActive(pathname: string | null, href: string) {
+  if (href === '/dashboard') return pathname === '/dashboard'
+  return pathname?.startsWith(href)
+}
 
 export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: string; subscriptionTier?: SubscriptionTier }) {
   const pathname = usePathname()
@@ -73,7 +77,7 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
           <MealEaseLogo size="md" />
         </Link>
 
-        {/* Desktop nav */}
+        {/* Desktop nav — 4 pillars + Home */}
         <nav className="hidden md:flex items-center gap-1">
           {navLinks.map(({ href, label, icon: Icon }) => (
             <Link
@@ -81,7 +85,7 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
               href={href}
               className={cn(
                 'flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-                pathname?.startsWith(href)
+                isNavActive(pathname, href)
                   ? 'bg-primary/10 text-primary'
                   : 'text-muted-foreground hover:bg-muted hover:text-foreground'
               )}
@@ -90,20 +94,6 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
               {label}
             </Link>
           ))}
-          {isFamily ? (
-            <Link
-              href="/family"
-              className={cn(
-                'flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-                pathname?.startsWith('/family')
-                  ? 'bg-primary/10 text-primary'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-              )}
-            >
-              <Users className="h-4 w-4" />
-              Family Settings
-            </Link>
-          ) : null}
         </nav>
 
         {/* Right side */}
@@ -158,12 +148,6 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
                   Upgrade to Pro
                 </DropdownMenuItem>
               )}
-              {isFamily && (
-                <DropdownMenuItem render={<Link href="/family" />}>
-                  <Users className="h-4 w-4" />
-                  Family Settings
-                </DropdownMenuItem>
-              )}
               <DropdownMenuItem render={<Link href="/referral" />}>
                 <Gift className="h-4 w-4" />
                 Refer Friends
@@ -210,7 +194,7 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
                   onClick={() => useUIStore.getState().setSidebarOpen(false)}
                   className={cn(
                     'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
-                    pathname?.startsWith(href)
+                    isNavActive(pathname, href)
                       ? 'bg-primary/10 text-primary'
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   )}
@@ -227,16 +211,6 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
                 <Settings className="h-4 w-4" />
                 Settings
               </Link>
-              {isFamily && (
-                <Link
-                  href="/family"
-                  onClick={() => useUIStore.getState().setSidebarOpen(false)}
-                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                >
-                  <Users className="h-4 w-4" />
-                  Family Settings
-                </Link>
-              )}
               {!isPaid && (
                 <Link
                   href="/pricing?intent=pro"

@@ -30,6 +30,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 import { PRICING_TIERS, PRO_ANNUAL_SAVINGS, FAMILY_ANNUAL_SAVINGS } from '@/lib/paywall/config'
 import { cn } from '@/lib/utils'
+import { AboutSnippet } from '@/components/about/AboutSnippet'
 
 /* ─────────────────────── DATA ─────────────────────── */
 
@@ -81,36 +82,36 @@ const COMPARISON_FEATURES = [
 
 const FAQ = [
   {
-    q: 'Is MealEase free?',
-    a: 'Yes. Free users get Tonight Dinner, 3 meal ideas daily, and simple grocery lists. Perfect to try MealEase risk-free.',
+    q: 'Is this just another recipe app?',
+    a: 'Not even close. Recipe apps give you a database and leave you to scroll. MealEase is a decision engine — it knows your household, your energy level, your fridge, and your kids\' quirks, then tells you exactly what to make tonight. No browsing. No decision fatigue. Just dinner, handled.',
   },
   {
-    q: 'What do I get with Pro?',
-    a: 'Unlimited meal ideas, full Weekly Planner, saved preferences, budget modes, and faster planning tools. Great for individuals and couples.',
+    q: 'How does Household Memory work?',
+    a: 'Every time you cook, save, skip, or swap a meal, MealEase quietly learns. It tracks which cuisines your family gravitates toward, what your picky eater actually ate, and which nights you tend to reach for something fast. Over weeks, your suggestions get sharper — like a sous chef who\'s been with your family for years.',
   },
   {
-    q: 'What do I get with Family Plus?',
-    a: 'Everything in Pro plus Pantry Mode, Kids Mode, Lunchbox Planner, shared grocery lists, and family profiles. Best for households with multiple members.',
+    q: 'What is Weekly Autopilot?',
+    a: 'One tap, seven nights planned. Autopilot builds a full week of dinners tailored to your household — balancing variety, nutrition, prep time, and what you already have on hand. It generates a smart grocery list alongside it. You review, tweak if you want, and you\'re done. Sunday planning in under 60 seconds.',
   },
   {
-    q: 'Can I cancel anytime?',
-    a: 'Yes, cancel anytime from your account settings. Your plan stays active until the end of the current billing period. No questions asked.',
+    q: 'Can it help picky eaters?',
+    a: 'This is one of the things we built MealEase to solve. The Picky Eater tool suggests meals with high acceptance likelihood based on your child\'s profile — textures they tolerate, flavors they\'ve accepted before, and gentle ways to introduce new foods. It even scores each suggestion so you know what to expect before you start cooking.',
   },
   {
-    q: 'Do you offer yearly plans?',
-    a: `Yes. Yearly plans save you money — Pro saves ${PRO_ANNUAL_SAVINGS}% and Family Plus saves ${FAMILY_ANNUAL_SAVINGS}% compared to monthly billing.`,
+    q: 'Does it work for couples and families?',
+    a: 'Beautifully. Solo users get a streamlined experience. Couples get shared planning and date-night modes. Families get individual profiles for up to six members, conflict balancing when preferences clash, kids tools, lunchbox planning, and shared grocery lists. MealEase adapts to however your household is shaped.',
   },
   {
-    q: 'Can I switch plans later?',
-    a: 'Yes, upgrade or downgrade anytime. Changes take effect at your next billing cycle.',
+    q: 'Can it help save money on groceries?',
+    a: 'Yes — and most users notice it within the first two weeks. Budget Mode filters meals by cost. Pantry Mode builds dinners from what you already have, reducing waste. Weekly Autopilot minimizes impulse buys by giving you a precise shopping list before you walk into the store. Less food thrown away, fewer last-minute takeout orders.',
   },
   {
-    q: 'Do you support allergies and preferences?',
-    a: 'Yes. MealEase supports dietary filters and personalized household preferences at every tier.',
+    q: 'What makes MealEase different from ChatGPT meal plans?',
+    a: 'ChatGPT gives you a generic list and forgets you exist five minutes later. MealEase remembers your household — allergies, preferences, what your toddler refused last Tuesday. It integrates with your pantry, builds grocery lists, tracks your streaks, and gets smarter every week. It\'s the difference between asking a stranger for advice and having a system that actually knows your family.',
   },
   {
-    q: 'Is there a free trial?',
-    a: 'Free users can try everything without signing up. Upgrade anytime — all paid plans include a 7-day free trial.',
+    q: 'Is there a free version?',
+    a: 'Yes. The free plan gives you Tonight Dinner, up to three meal ideas daily, and basic grocery lists — enough to experience how MealEase thinks. When you\'re ready for Weekly Autopilot, Household Memory, or Kids Tools, upgrade anytime. All paid plans include a 7-day free trial, and you can cancel with one click.',
   },
 ]
 
@@ -637,6 +638,13 @@ export function PricingContent() {
               </div>
             </motion.div>
           )}
+        </div>
+      </section>
+
+      {/* ═══════════════════ ABOUT SNIPPET ═══════════════════ */}
+      <section className="py-8">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+          <AboutSnippet />
         </div>
       </section>
 

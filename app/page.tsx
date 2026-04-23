@@ -37,42 +37,58 @@ const faqJsonLd = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: 'What is MealEase?',
+      name: 'Is MealEase just another recipe app?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'MealEase is an AI-powered meal planning assistant that helps busy families decide what to cook each night based on their dietary needs, preferences, and schedule.',
+        text: 'No. MealEase is a meal decision engine that knows your household, energy level, and preferences. It tells you exactly what to make tonight — no scrolling, no decision fatigue.',
       },
     },
     {
       '@type': 'Question',
-      name: 'How does MealEase work?',
+      name: 'How does Household Memory work?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Tell MealEase about your household — ages, allergies, and preferences — and it generates a personalized weekly meal plan with recipes, grocery lists, and step-by-step instructions.',
+        text: 'Every time you cook, save, or skip a meal, MealEase learns your family\'s preferences. Over time, suggestions get sharper — like a sous chef who knows your household inside out.',
       },
     },
     {
       '@type': 'Question',
-      name: 'Is MealEase free to use?',
+      name: 'What is Weekly Autopilot?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'MealEase offers a free tier that lets you generate up to 5 meals per week. Paid plans unlock unlimited meals, advanced dietary filters, and more.',
+        text: 'One tap, seven nights planned. Autopilot builds a full week of dinners tailored to your household with a smart grocery list. Sunday planning in under 60 seconds.',
       },
     },
     {
       '@type': 'Question',
-      name: 'Does MealEase handle food allergies?',
+      name: 'Can MealEase help picky eaters?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Yes. You can specify allergies and intolerances for each household member and MealEase will exclude those ingredients from every suggested meal.',
+        text: 'Yes. The Picky Eater tool suggests meals with high acceptance likelihood based on your child\'s texture tolerances, accepted flavors, and gentle ways to introduce new foods.',
       },
     },
     {
       '@type': 'Question',
-      name: 'Can MealEase plan meals for toddlers and babies?',
+      name: 'Does MealEase work for couples and families?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Absolutely. MealEase includes age-appropriate safety rules and portion guidance so the whole family — including little ones — can eat together.',
+        text: 'Beautifully. Solo users get a streamlined experience. Couples get shared planning. Families get individual profiles for up to six members, conflict balancing, kids tools, and shared grocery lists.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What makes MealEase different from ChatGPT meal plans?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'ChatGPT gives a generic list and forgets you. MealEase remembers your household — allergies, preferences, what your toddler refused last Tuesday — and gets smarter every week.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Is there a free version of MealEase?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes. The free plan includes Tonight Dinner, up to three meal ideas daily, and basic grocery lists. All paid plans include a 7-day free trial.',
       },
     },
   ],

@@ -1,7 +1,5 @@
 import type { BlogPost } from './blog'
-
-const U = (id: string) =>
-  `https://images.unsplash.com/photo-${id}?w=1600&q=80&auto=format&fit=crop`
+import { UNSPLASH } from './unsplash'
 
 const AU = { name: 'MealEase Editorial', role: 'Family nutrition team' }
 
@@ -20,7 +18,7 @@ export const BLOG_POSTS_BATCH2: BlogPost[] = [
     publishedAt: '2026-04-17',
     updatedAt: '2026-04-17',
     readingTime: '6 min read',
-    heroImage: U('1547592180-85f173990554'),
+    heroImage: UNSPLASH('ground,beef,skillet,dinner'),
     heroImageAlt: 'Family eating a relaxed weeknight dinner with no stress',
     heroImagePrompt: 'Realistic photo of a calm family dinner at a kitchen table, simple food, warm evening light',
     internalLinks: [
@@ -101,7 +99,7 @@ export const BLOG_POSTS_BATCH2: BlogPost[] = [
     publishedAt: '2026-04-17',
     updatedAt: '2026-04-17',
     readingTime: '5 min read',
-    heroImage: U('1466637574434-a3b13e194a4e'),
+    heroImage: UNSPLASH('pasta,simple,ingredients,kitchen'),
     heroImageAlt: 'Simple dinner template written on a whiteboard in a kitchen',
     heroImagePrompt: 'Realistic photo of a simple weekly dinner template written on a kitchen whiteboard, warm light, organized home kitchen',
     internalLinks: [
@@ -176,7 +174,7 @@ export const BLOG_POSTS_BATCH2: BlogPost[] = [
     publishedAt: '2026-04-17',
     updatedAt: '2026-04-17',
     readingTime: '5 min read',
-    heroImage: U('1584438784894-089d6a62b8fa'),
+    heroImage: UNSPLASH('tired,parent,kitchen,dinner'),
     heroImageAlt: 'Tired parent staring into an open fridge at the end of the day',
     heroImagePrompt: 'Realistic photo of a tired adult staring into an open fridge in the evening, dim kitchen light, exhausted expression',
     internalLinks: [
@@ -244,7 +242,7 @@ export const BLOG_POSTS_BATCH2: BlogPost[] = [
     publishedAt: '2026-04-17',
     updatedAt: '2026-04-17',
     readingTime: '6 min read',
-    heroImage: U('1584568694497-b9e4e8e9e8e8'),
+    heroImage: UNSPLASH('open,fridge,ingredients'),
     heroImageAlt: 'Well-stocked pantry with pasta, canned goods, and dry staples',
     heroImagePrompt: 'Realistic photo of an organized pantry shelf with pasta, canned tomatoes, beans, rice, and olive oil, warm kitchen light',
     internalLinks: [
@@ -329,7 +327,7 @@ export const BLOG_POSTS_BATCH2: BlogPost[] = [
     publishedAt: '2026-04-17',
     updatedAt: '2026-04-17',
     readingTime: '6 min read',
-    heroImage: U('1512621776951-a57ef244f5a4'),
+    heroImage: UNSPLASH('quick,pasta,family,dinner'),
     heroImageAlt: 'Delicious pasta dish that looks expensive but costs very little',
     heroImagePrompt: 'Realistic photo of a beautiful pasta dish with fresh herbs, looks restaurant-quality, warm kitchen light',
     internalLinks: [
@@ -413,7 +411,7 @@ export const BLOG_POSTS_BATCH2: BlogPost[] = [
     publishedAt: '2026-04-17',
     updatedAt: '2026-04-17',
     readingTime: '6 min read',
-    heroImage: U('1547592166-ceef9901c8e8'),
+    heroImage: UNSPLASH('one,pan,dinner,stove'),
     heroImageAlt: 'Kids happily eating dinner at the family table on a school night',
     heroImagePrompt: 'Realistic photo of children happily eating dinner at a family table, school night, warm kitchen light, relaxed atmosphere',
     internalLinks: [
@@ -487,7 +485,7 @@ export const BLOG_POSTS_BATCH2: BlogPost[] = [
     publishedAt: '2026-04-18',
     updatedAt: '2026-04-18',
     readingTime: '7 min read',
-    heroImage: U('1490645935967-10de6ba17061'),
+    heroImage: UNSPLASH('sheet,pan,sausage,potatoes'),
     heroImageAlt: 'Weekly meal plan written on a notepad next to a stocked fridge',
     heroImagePrompt: 'Realistic photo of a simple weekly meal plan written on a notepad next to a stocked fridge, warm kitchen light, home setting',
     internalLinks: [
@@ -548,7 +546,7 @@ export const BLOG_POSTS_BATCH2: BlogPost[] = [
     publishedAt: '2026-04-18',
     updatedAt: '2026-04-18',
     readingTime: '6 min read',
-    heroImage: U('1547592180-85f173990554'),
+    heroImage: UNSPLASH('family,dinner,table,weeknight'),
     heroImageAlt: 'Family calendar with weekly dinner plan written in for each night',
     heroImagePrompt: 'Realistic photo of a family kitchen calendar with dinner plans written for each weeknight, organized home, warm light',
     internalLinks: [
@@ -616,7 +614,7 @@ export const BLOG_POSTS_BATCH2: BlogPost[] = [
     publishedAt: '2026-04-18',
     updatedAt: '2026-04-18',
     readingTime: '7 min read',
-    heroImage: U('1540189549519-f2d9e7e4e8e8'),
+    heroImage: UNSPLASH('baby,led,weaning,vegetables'),
     heroImageAlt: 'Child eating colorful vegetables at the dinner table with a smile',
     heroImagePrompt: 'Realistic photo of a young child eating colorful vegetables at a family dinner table, happy expression, warm kitchen light',
     internalLinks: [
@@ -691,7 +689,7 @@ export const BLOG_POSTS_BATCH2: BlogPost[] = [
     publishedAt: '2026-04-18',
     updatedAt: '2026-04-18',
     readingTime: '6 min read',
-    heroImage: U('1555939594-58d7cb561b1c'),
+    heroImage: UNSPLASH('toddler,crying,dinner,kitchen'),
     heroImageAlt: 'Toddler eating a colorful meal at the family dinner table',
     heroImagePrompt: 'Realistic photo of a toddler happily eating a colorful meal at the family dinner table, warm kitchen light, family setting',
     internalLinks: [
@@ -761,7 +759,7 @@ export const BLOG_POSTS_BATCH2: BlogPost[] = [
     publishedAt: '2026-04-18',
     updatedAt: '2026-04-18',
     readingTime: '6 min read',
-    heroImage: U('1466637574434-a3b13e194a4e'),
+    heroImage: UNSPLASH('kitchen,phone,dinner,decision'),
     heroImageAlt: 'Quick and easy pasta dinner ready in under 30 minutes',
     heroImagePrompt: 'Realistic photo of a quick pasta dinner on a kitchen counter, weeknight setting, warm light, looks delicious and fast',
     internalLinks: [
@@ -836,7 +834,7 @@ export const BLOG_POSTS_BATCH2: BlogPost[] = [
     publishedAt: '2026-04-18',
     updatedAt: '2026-04-18',
     readingTime: '5 min read',
-    heroImage: U('1512621776951-a57ef244f5a4'),
+    heroImage: UNSPLASH('sheet,pan,chicken,vegetables'),
     heroImageAlt: 'Quick dinner being prepared on a stovetop in under 30 minutes',
     heroImagePrompt: 'Realistic photo of a quick dinner being cooked on a stovetop, weeknight kitchen, warm light, fast and simple',
     internalLinks: [
@@ -914,7 +912,7 @@ export const BLOG_POSTS_BATCH2: BlogPost[] = [
     publishedAt: '2026-04-18',
     updatedAt: '2026-04-18',
     readingTime: '6 min read',
-    heroImage: U('1546069901-ba9599a7e63c'),
+    heroImage: UNSPLASH('charcuterie,board,snack,dinner'),
     heroImageAlt: 'Colorful and appealing kids lunchbox with a variety of foods',
     heroImagePrompt: 'Realistic photo of a colorful and appealing kids lunchbox with sandwiches, fruit, and snacks, bright natural light',
     internalLinks: [

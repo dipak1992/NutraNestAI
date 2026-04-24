@@ -65,7 +65,8 @@ const COMPARISON_FEATURES = [
   { feature: 'Unlimited regenerations', free: false, pro: true, family: true },
   { feature: 'Weekly Planner', free: '3-day preview', pro: 'Full 7 days', family: 'Full 7 days' },
   { feature: 'Save preferences', free: false, pro: true, family: true },
-  { feature: 'Household memory', free: false, pro: '1 household', family: 'Up to 6 members' },
+  { feature: 'Member profiles', free: '1 profile', pro: '2 profiles', family: 'Up to 6 profiles' },
+  { feature: 'Household memory', free: false, pro: '1 household', family: 'Full household' },
   { feature: 'Snap & Cook scans', free: '3/week', pro: 'Unlimited', family: 'Unlimited' },
   { feature: 'Smart Menu Scan', free: false, pro: true, family: true },
   { feature: 'Food Check (calorie snap)', free: false, pro: true, family: true },
@@ -337,7 +338,7 @@ export function PricingContent() {
               </div>
 
               <ul className="mb-8 flex-1 space-y-3.5">
-                {['Tonight suggestions', 'Basic Snap & Cook', '3 meal ideas per day', 'Simple grocery list', 'Basic dietary filters'].map((f) => (
+                {['Tonight suggestions', 'Basic Snap & Cook', '3 meal ideas per day', 'Simple grocery list', '1 member profile', 'Basic dietary filters'].map((f) => (
                   <li key={f} className="flex items-start gap-3 text-sm">
                     <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-500" />
                     <span>{f}</span>
@@ -405,6 +406,7 @@ export function PricingContent() {
 
               <ul className="mb-8 flex-1 space-y-3.5">
                 {[
+                  '2 member profiles',
                   'Household Memory',
                   'Weekly Autopilot Lite',
                   'Smart Menu Scan ✨',

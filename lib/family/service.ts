@@ -1,5 +1,31 @@
 import { normalizeTier } from '@/lib/paywall/config'
+import type { SubscriptionTier } from '@/types'
 import type { FamilyEngineOverrides, FamilyHouseholdSummary, FamilyMemberRecord } from '@/lib/family/types'
+
+// ── Tier-based member limits ──────────────────────────────────────────────
+// Free: 1 profile (yourself), Pro: 2 profiles, Family Plus: 6 profiles
+const TIER_MEMBER_LIMITS: Record<SubscriptionTier, number> = {
+  free: 1,
+  pro: 2,
+  family: 6,
+}
+
+export function getMaxMembersForTier(tier: SubscriptionTier): number {
+  return TIER_MEMBER_LIMITS[tier] ?? 1
+}
+
+export function getTierUpgradeMessage(tier: SubscriptionTier): string | null {
+  switch (tier) {
+    case 'free':
+      return 'Upgrade to Pro for 2 profiles, or Family Plus for up to 6.'
+    case 'pro':
+      return 'Upgrade to Family Plus to add up to 6 family members.'
+    case 'family':
+      return null
+    default:
+      return 'Upgrade to add more profiles.'
+  }
+}
 
 type SupabaseLike = {
   from: (table: string) => {

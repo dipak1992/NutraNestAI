@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { buildFamilyEngineOverrides, ensureHousehold, getFamilyMembers, getUserTier, summarizeHousehold } from '@/lib/family/service'
-
-const MAX_FAMILY_MEMBERS = 6
+import {
+  buildFamilyEngineOverrides,
+  ensureHousehold,
+  getFamilyMembers,
+  getMaxMembersForTier,
+  getTierUpgradeMessage,
+  getUserTier,
+  summarizeHousehold,
+} from '@/lib/family/service'
 
 function toStringArray(value: unknown): string[] {
   if (!Array.isArray(value)) return []
@@ -15,16 +21,18 @@ export async function GET() {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const tier = await getUserTier(supabase as any, user.id)
+  const maxMembers = getMaxMembersForTier(tier)
   const household = await ensureHousehold(supabase as any, user.id)
   const members = await getFamilyMembers(supabase as any, user.id)
   const summary = summarizeHousehold(members)
 
   return NextResponse.json({
     tier,
-    maxMembers: MAX_FAMILY_MEMBERS,
+    maxMembers,
     household,
     members,
     summary,
+    upgradeMessage: getTierUpgradeMessage(tier),
     engineOverrides: buildFamilyEngineOverrides(members),
   })
 }
@@ -35,17 +43,18 @@ export async function POST(req: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const tier = await getUserTier(supabase as any, user.id)
-  if (tier !== 'family') {
-    return NextResponse.json(
-      { error: 'Unlock Family Plus to personalize meals for every family member.' },
-      { status: 403 },
-    )
-  }
+  const maxMembers = getMaxMembersForTier(tier)
 
   const household = await ensureHousehold(supabase as any, user.id)
   const existing = await getFamilyMembers(supabase as any, user.id)
-  if (existing.length >= MAX_FAMILY_MEMBERS) {
-    return NextResponse.json({ error: `Family Plus supports up to ${MAX_FAMILY_MEMBERS} members.` }, { status: 400 })
+
+  if (existing.length >= maxMembers) {
+    const upgradeMsg = getTierUpgradeMessage(tier)
+    const limitMsg = `You've reached your ${maxMembers}-profile limit.`
+    return NextResponse.json(
+      { error: upgradeMsg ? `${limitMsg} ${upgradeMsg}` : limitMsg },
+      { status: 403 },
+    )
   }
 
   const body = await req.json().catch(() => null)
@@ -61,7 +70,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid role' }, { status: 400 })
   }
 
-  const payload = {
+  // Pro tier gets simplified profiles (name + role + allergies + dietary only)
+  // Family Plus gets full rich profiles
+  const isFullProfile = tier === 'family'
+
+  const payload: Record<string, unknown> = {
     household_id: household.id,
     user_id: user.id,
     member_name: firstName,
@@ -71,23 +84,30 @@ export async function POST(req: NextRequest) {
     age_range: typeof (body as any).age_range === 'string' ? (body as any).age_range : null,
     dietary_type: typeof (body as any).dietary_type === 'string' ? (body as any).dietary_type : null,
     allergies_json: toStringArray((body as any).allergies_json),
-    foods_loved_json: toStringArray((body as any).foods_loved_json),
-    foods_disliked_json: toStringArray((body as any).foods_disliked_json),
-    protein_preferences_json: toStringArray((body as any).protein_preferences_json),
-    cuisine_likes_json: toStringArray((body as any).cuisine_likes_json),
-    spice_tolerance: typeof (body as any).spice_tolerance === 'string' ? (body as any).spice_tolerance : null,
-    picky_eater_level: Number.isFinite((body as any).picky_eater_level) ? Number((body as any).picky_eater_level) : 0,
-    portion_size: typeof (body as any).portion_size === 'string' ? (body as any).portion_size : null,
-    school_lunch_needed: Boolean((body as any).school_lunch_needed),
-    snack_frequency: typeof (body as any).snack_frequency === 'string' ? (body as any).snack_frequency : null,
-    texture_sensitivity: typeof (body as any).texture_sensitivity === 'string' ? (body as any).texture_sensitivity : null,
-    foods_accepted_json: toStringArray((body as any).foods_accepted_json),
-    foods_rejected_json: toStringArray((body as any).foods_rejected_json),
-    allergy_notes: typeof (body as any).allergy_notes === 'string' ? (body as any).allergy_notes : null,
-    notes: typeof (body as any).notes === 'string' ? (body as any).notes : null,
-    is_primary_shopper: Boolean((body as any).is_primary_shopper),
-    is_primary_cook: Boolean((body as any).is_primary_cook),
     display_order: Number.isFinite((body as any).display_order) ? Number((body as any).display_order) : existing.length,
+  }
+
+  // Full profile fields — only for Family Plus
+  if (isFullProfile) {
+    Object.assign(payload, {
+      foods_loved_json: toStringArray((body as any).foods_loved_json),
+      foods_disliked_json: toStringArray((body as any).foods_disliked_json),
+      protein_preferences_json: toStringArray((body as any).protein_preferences_json),
+      cuisine_likes_json: toStringArray((body as any).cuisine_likes_json),
+      spice_tolerance: typeof (body as any).spice_tolerance === 'string' ? (body as any).spice_tolerance : null,
+      picky_eater_level: Number.isFinite((body as any).picky_eater_level) ? Number((body as any).picky_eater_level) : 0,
+      portion_size: typeof (body as any).portion_size === 'string' ? (body as any).portion_size : null,
+      school_lunch_needed: Boolean((body as any).school_lunch_needed),
+      snack_frequency: typeof (body as any).snack_frequency === 'string' ? (body as any).snack_frequency : null,
+      texture_sensitivity: typeof (body as any).texture_sensitivity === 'string' ? (body as any).texture_sensitivity : null,
+      foods_accepted_json: toStringArray((body as any).foods_accepted_json),
+      foods_rejected_json: toStringArray((body as any).foods_rejected_json),
+      allergy_notes: typeof (body as any).allergy_notes === 'string' ? (body as any).allergy_notes : null,
+      notes: typeof (body as any).notes === 'string' ? (body as any).notes : null,
+      is_primary_shopper: Boolean((body as any).is_primary_shopper),
+      is_primary_cook: Boolean((body as any).is_primary_cook),
+      weight_goal: typeof (body as any).weight_goal === 'string' ? (body as any).weight_goal : null,
+    })
   }
 
   const { data, error } = await supabase

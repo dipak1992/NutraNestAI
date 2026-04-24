@@ -1,4 +1,7 @@
 export type FamilyMemberRole = 'adult' | 'teen' | 'child' | 'toddler' | 'baby'
+export type InviteStatus = 'none' | 'pending' | 'accepted' | 'revoked'
+export type InviteRole = 'viewer' | 'editor'
+export type WeightGoal = 'lose' | 'maintain' | 'gain' | 'build_muscle'
 
 export interface FamilyMemberRecord {
   id: string
@@ -28,6 +31,13 @@ export interface FamilyMemberRecord {
   is_primary_shopper: boolean
   is_primary_cook: boolean
   display_order: number
+  // Future shared-login columns (migration 021)
+  invited_email: string | null
+  invited_user_id: string | null
+  invite_status: InviteStatus
+  invite_role: InviteRole
+  // Personal nutrition goal
+  weight_goal: WeightGoal | null
   created_at: string
   updated_at: string
 }

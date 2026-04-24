@@ -40,6 +40,7 @@ export const FREE_KIDS_RECIPE_LIMIT = 3   // Free users: 3 kid recipe variations
 // ── Pro tier unlocks ─────────────────────────────────────────────────────
 
 export const PRO_UNLOCKS = [
+  '2 member profiles',
   'Unlimited meal generations',
   'Full 7-day weekly planner',
   'Save preferences',

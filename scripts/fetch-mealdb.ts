@@ -6,6 +6,8 @@
  * No API key needed. Filters to dinner-relevant categories only.
  */
 
+export {}
+
 // Exclude only Breakfast and Dessert — everything else is dinner-compatible
 const EXCLUDED_CATEGORIES = new Set(['Breakfast', 'Dessert'])
 

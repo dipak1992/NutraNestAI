@@ -4,6 +4,7 @@ import { StickyMobileCta } from '@/components/landing/StickyMobileCta'
 import { LandingHero } from '@/components/landing/LandingHero'
 import { LandingOutcomes } from '@/components/landing/LandingOutcomes'
 import { LandingProductProof } from '@/components/landing/LandingProductProof'
+import { LandingEatingOut } from '@/components/landing/LandingEatingOut'
 import { LandingEmotionalStory } from '@/components/landing/LandingEmotionalStory'
 import { LandingTestimonials } from '@/components/landing/LandingTestimonials'
 import { LandingFinalCTA } from '@/components/landing/LandingFinalCTA'
@@ -91,6 +92,38 @@ const faqJsonLd = {
         text: 'Yes. The free plan includes Tonight Dinner, up to three meal ideas daily, and basic grocery lists. All paid plans include a 7-day free trial.',
       },
     },
+    {
+      '@type': 'Question',
+      name: 'Can MealEase help me order healthier at restaurants?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes. Smart Menu Scan lets you photograph any restaurant menu and choose a goal — lose weight, high protein, budget-friendly, or more. AI highlights exactly what to order based on your personal nutrition profile.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How does the calorie estimation feature work?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Food Check uses AI vision to analyze a photo of any plate or snack. It estimates calorie ranges, protein levels, gives a goal-fit verdict (healthy, balanced, or indulgent), and suggests smarter swaps when relevant.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Does Smart Menu Scan work with fast food menus?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes. Smart Menu Scan works with any printed or digital menu — sit-down restaurants, fast food chains, takeout menus, and even handwritten specials. Just snap a photo and pick your goal.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What is the difference between personal preferences and household settings?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Household settings power family meal planning — allergies, ages, and shared preferences. Personal preferences are just for you — your weight goal, protein focus, and individual dietary needs. Smart Menu Scan and Food Check use your personal profile so recommendations are tailored to your body and goals.',
+      },
+    },
   ],
 }
 
@@ -107,6 +140,7 @@ export default function LandingPage() {
         <LandingHero />
         <LandingOutcomes />
         <LandingProductProof />
+        <LandingEatingOut />
         <LandingEmotionalStory />
         <LandingTestimonials />
         <LandingFinalCTA />

@@ -44,6 +44,8 @@ export const PRO_UNLOCKS = [
   'Full 7-day weekly planner',
   'Save preferences',
   'Household memory (1 household)',
+  'Smart Menu Scan — order smarter at restaurants',
+  'Food Check — snap any food, see calories & fit',
   'Budget meal mode',
   'Healthy mode',
   'Meal history',
@@ -56,6 +58,7 @@ export const PRO_UNLOCKS = [
 export const FAMILY_PLUS_UNLOCKS = [
   'Up to 6 family members',
   'Kids Mode with picky eater settings',
+  'Smart Menu Scan & Food Check',
   'Lunchbox Planner',
   'Pantry Mode (turn leftovers into dinner)',
   'Shared grocery lists',

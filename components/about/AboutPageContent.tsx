@@ -44,8 +44,10 @@ const features = [
   { icon: '📅', title: 'Weekly meal plans', sub: 'Full 7-day plans in one tap' },
   { icon: '🧠', title: "I Don't Want to Think", sub: 'Dinner decided in under 5 seconds' },
   { icon: '📸', title: 'Snap & Cook', sub: 'Your fridge → a real meal tonight' },
+  { icon: '🍽️', title: 'Smart Menu Scan', sub: 'Scan any restaurant menu, order smarter' },
+  { icon: '🔥', title: 'Food Check', sub: 'Snap any food — see calories & goal fit' },
   { icon: '🛒', title: 'Smart grocery list', sub: 'Built automatically, ready to share' },
-  { icon: '🍽️', title: 'Zero-Cook Mode', sub: "For the nights you just can't" },
+  { icon: '🌙', title: 'Zero-Cook Mode', sub: "For the nights you just can't" },
 ]
 
 export function AboutPageContent() {
@@ -291,6 +293,17 @@ export function AboutPageContent() {
             quietly learns your family&apos;s preferences over time — your favorite cuisines, what your kids
             will actually eat, what you usually have on hand — and gets smarter every single week.
           </motion.p>
+
+          <motion.p variants={fadeUp} className="text-[16px] leading-8 text-muted-foreground">
+            But we realized the struggle doesn&apos;t stop at your kitchen door. Eating out brings its own
+            overwhelm — scanning a 40-item menu while trying to stay on track, wondering if that lunch was
+            actually as healthy as it looked. So we built{' '}
+            <em className="text-foreground font-medium">Smart Menu Scan</em> — photograph any restaurant
+            menu, pick a goal, and get AI-powered recommendations in seconds. And{' '}
+            <em className="text-foreground font-medium">Food Check</em> — snap any plate or snack and
+            instantly see calorie estimates, protein levels, and whether it fits your goals. MealEase now
+            helps you make smarter choices everywhere you eat, not just at home.
+          </motion.p>
         </motion.div>
       </section>
 
@@ -303,7 +316,7 @@ export function AboutPageContent() {
           whileInView="visible"
           viewport={{ once: true, margin: '-60px' }}
           variants={stagger}
-          className="grid grid-cols-2 sm:grid-cols-3 gap-3"
+          className="grid grid-cols-2 sm:grid-cols-4 gap-3"
         >
           {features.map((item) => (
             <motion.div

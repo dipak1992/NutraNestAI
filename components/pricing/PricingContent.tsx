@@ -67,6 +67,9 @@ const COMPARISON_FEATURES = [
   { feature: 'Save preferences', free: false, pro: true, family: true },
   { feature: 'Household memory', free: false, pro: '1 household', family: 'Up to 6 members' },
   { feature: 'Snap & Cook scans', free: '3/week', pro: 'Unlimited', family: 'Unlimited' },
+  { feature: 'Smart Menu Scan', free: false, pro: true, family: true },
+  { feature: 'Food Check (calorie snap)', free: false, pro: true, family: true },
+  { feature: 'Personal nutrition profile', free: false, pro: true, family: true },
   { feature: 'Budget meal mode', free: false, pro: true, family: true },
   { feature: 'Healthy mode', free: false, pro: true, family: true },
   { feature: 'Meal history', free: false, pro: true, family: true },
@@ -112,6 +115,22 @@ const FAQ = [
   {
     q: 'Is there a free version?',
     a: 'Yes. The free plan gives you Tonight Dinner, up to three meal ideas daily, and basic grocery lists — enough to experience how MealEase thinks. When you\'re ready for Weekly Autopilot, Household Memory, or Kids Tools, upgrade anytime. All paid plans include a 7-day free trial, and you can cancel with one click.',
+  },
+  {
+    q: 'Can MealEase help me order healthier at restaurants?',
+    a: 'Yes. Smart Menu Scan lets you photograph any restaurant menu and choose a goal — lose weight, high protein, budget-friendly, or more. AI highlights exactly what to order based on your personal nutrition profile. It works with sit-down restaurants, fast food chains, takeout menus, and even handwritten specials.',
+  },
+  {
+    q: 'How does the calorie estimation feature work?',
+    a: 'Food Check uses AI vision to analyze a photo of any plate or snack. It estimates calorie ranges with a confidence level, shows protein levels, gives a goal-fit verdict (healthy, balanced, or indulgent), and suggests smarter swaps when relevant. It\'s like having a nutritionist in your pocket.',
+  },
+  {
+    q: 'Does Smart Menu Scan work with fast food menus?',
+    a: 'Absolutely. Smart Menu Scan works with any printed or digital menu — sit-down restaurants, fast food drive-throughs, takeout menus, and even handwritten specials. Just snap a photo and pick your goal. It adapts to whatever you\'re looking at.',
+  },
+  {
+    q: 'What\'s the difference between personal preferences and household settings?',
+    a: 'Household settings power family meal planning — allergies, ages, and shared preferences for everyone at the table. Personal preferences are just for you — your weight goal, protein focus, and individual dietary needs. Smart Menu Scan and Food Check use your personal profile so recommendations are tailored to your body and goals, not the whole family.',
   },
 ]
 
@@ -388,6 +407,8 @@ export function PricingContent() {
                 {[
                   'Household Memory',
                   'Weekly Autopilot Lite',
+                  'Smart Menu Scan ✨',
+                  'Food Check (calorie snap) ✨',
                   'Budget Mode',
                   'Dinner Date Night',
                   'Pantry Mode',
@@ -479,6 +500,7 @@ export function PricingContent() {
                   'Up to 6 family members',
                   'Full Household Memory',
                   'Full Weekly Autopilot',
+                  'Smart Menu Scan & Food Check ✨',
                   'Kids tools & picky eater mode',
                   'Hosting Guests Tonight',
                   'Shared planning & grocery lists',

@@ -33,12 +33,21 @@ import type { SubscriptionTier } from '@/types'
 
 type CookMode = 'snap' | 'menu-scan' | 'food-check' | 'pantry' | 'leftover'
 
+/** Features launched after this date show a NEW badge for 14 days */
+const FEATURE_LAUNCH_DATE = new Date('2026-04-24T00:00:00Z')
+const NEW_BADGE_DURATION_MS = 14 * 24 * 60 * 60 * 1000 // 14 days
+
+function isNewFeature(): boolean {
+  return Date.now() - FEATURE_LAUNCH_DATE.getTime() < NEW_BADGE_DURATION_MS
+}
+
 interface CookChip {
   id: CookMode
   label: string
   emoji: string
   description: string
   requiredTier: SubscriptionTier
+  isNew?: boolean
 }
 
 const COOK_CHIPS: CookChip[] = [
@@ -55,6 +64,7 @@ const COOK_CHIPS: CookChip[] = [
     emoji: '🍽️',
     description: 'Scan any restaurant menu — order smarter',
     requiredTier: 'pro',
+    isNew: true,
   },
   {
     id: 'food-check',
@@ -62,6 +72,7 @@ const COOK_CHIPS: CookChip[] = [
     emoji: '📸',
     description: 'Snap any food — see if it fits your goals',
     requiredTier: 'pro',
+    isNew: true,
   },
   {
     id: 'pantry',
@@ -295,25 +306,31 @@ export default function CookPillarPage() {
         {/* Mode chips */}
         <div className="flex flex-wrap gap-2 mb-6">
           {COOK_CHIPS.map((chip) => {
-            const locked = !hasAccess(status.tier, chip.requiredTier)
-            const isActive = activeChip === chip.id
-            return (
-              <motion.button
-                key={chip.id}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => handleChipSelect(chip.id)}
-                className={cn(
-                  'inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all border',
-                  isActive ? 'bg-emerald-600 text-white border-emerald-600 shadow-md'
-                    : locked ? 'bg-gray-50 text-gray-400 border-gray-200/60'
-                    : 'bg-white text-foreground border-border/60 hover:border-emerald-400/40 hover:shadow-sm',
-                )}
-              >
-                {chip.emoji} {chip.label}
-                {locked && <Crown className="h-3 w-3 text-amber-400" />}
-              </motion.button>
-            )
-          })}
+              const locked = !hasAccess(status.tier, chip.requiredTier)
+              const isActive = activeChip === chip.id
+              const showNew = chip.isNew && isNewFeature()
+              return (
+                <motion.button
+                  key={chip.id}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleChipSelect(chip.id)}
+                  className={cn(
+                    'relative inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all border',
+                    isActive ? 'bg-emerald-600 text-white border-emerald-600 shadow-md'
+                      : locked ? 'bg-gray-50 text-gray-400 border-gray-200/60'
+                      : 'bg-white text-foreground border-border/60 hover:border-emerald-400/40 hover:shadow-sm',
+                  )}
+                >
+                  {showNew && (
+                    <span className="absolute -top-2 -right-1 inline-flex items-center rounded-full bg-gradient-to-r from-violet-600 to-purple-600 px-1.5 py-0.5 text-[9px] font-bold text-white leading-none shadow-sm">
+                      NEW
+                    </span>
+                  )}
+                  {chip.emoji} {chip.label}
+                  {locked && <Crown className="h-3 w-3 text-amber-400" />}
+                </motion.button>
+              )
+            })}
         </div>
 
         {/* Content */}

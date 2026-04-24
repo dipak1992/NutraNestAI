@@ -1,6 +1,88 @@
 import { BLOG_POSTS_BATCH2 } from './blog-posts-batch2'
 import { UNSPLASH } from './unsplash'
 
+// ─── CATEGORY SYSTEM ─────────────────────────────────────────────────────────
+
+/**
+ * Canonical blog categories — maps existing category strings to SEO slugs.
+ * New articles should use one of these values for the `category` field.
+ */
+export const BLOG_CATEGORIES = [
+  {
+    slug: 'tonight-dinner',
+    label: 'Tonight Dinner',
+    description: 'Quick dinner ideas and what to cook tonight — fast, practical, and family-tested.',
+    // Maps to existing category values in blog data
+    matches: ['Quick Meals', 'Daily Problem'],
+    emoji: '🍽️',
+  },
+  {
+    slug: 'family-planning',
+    label: 'Family Planning',
+    description: 'Weekly meal plans, household dinner systems, and strategies for feeding the whole family.',
+    matches: ['Decision Fatigue', 'Family Dinners'],
+    emoji: '📅',
+  },
+  {
+    slug: 'kids-parents',
+    label: 'Kids & Parents',
+    description: 'Lunchbox ideas, picky eater strategies, toddler meals, and baby-safe dinners.',
+    matches: ['Family & Kids'],
+    emoji: '👨‍👩‍👧',
+  },
+  {
+    slug: 'budget-meals',
+    label: 'Budget Meals',
+    description: 'Cheap family dinners, pantry cooking, and meal plans that stretch every dollar.',
+    matches: ['Budget Cooking'],
+    emoji: '💰',
+  },
+  {
+    slug: 'pantry-ingredients',
+    label: 'Pantry & Ingredients',
+    description: 'Use what you have — ingredient-led recipes and zero-waste cooking strategies.',
+    matches: ['Pantry Cooking'],
+    emoji: '🥫',
+  },
+  {
+    slug: 'smart-food-tools',
+    label: 'Smart Food Tools',
+    description: 'Smart Menu Scan, Food Check, and AI-powered tools for smarter eating decisions.',
+    matches: ['Smart Tools', 'Food Check', 'Menu Scan'],
+    emoji: '🔍',
+  },
+  {
+    slug: 'weekend-mode',
+    label: 'Weekend Mode',
+    description: 'Date night dinners, movie night meals, and weekend food ideas for every household.',
+    matches: ['Weekend Mode', 'Weekend'],
+    emoji: '🎬',
+  },
+] as const
+
+export type BlogCategorySlug = (typeof BLOG_CATEGORIES)[number]['slug']
+
+/** Returns the canonical category config for a given post category string */
+export function getCategoryConfig(categoryStr: string) {
+  return BLOG_CATEGORIES.find((c) =>
+    c.matches.some((m) => m.toLowerCase() === categoryStr.toLowerCase())
+  ) ?? null
+}
+
+/** Returns the SEO slug for a given post category string */
+export function getCategorySlug(categoryStr: string): BlogCategorySlug | null {
+  return getCategoryConfig(categoryStr)?.slug ?? null
+}
+
+/** Returns all posts for a given category slug */
+export function getPostsByCategory(slug: BlogCategorySlug) {
+  const config = BLOG_CATEGORIES.find((c) => c.slug === slug)
+  if (!config) return []
+  return getAllBlogPosts().filter((p) =>
+    config.matches.some((m) => m.toLowerCase() === p.category.toLowerCase())
+  )
+}
+
 export interface BlogSection {
   heading: string
   paragraphs: string[]

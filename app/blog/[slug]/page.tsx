@@ -3,7 +3,13 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Badge } from '@/components/ui/badge'
-import { getAllBlogPosts, getBlogPostBySlug, getRelatedPosts } from '@/lib/content/blog'
+import { BlogImage } from '@/components/content/BlogImage'
+import {
+  getAllBlogPosts,
+  getBlogPostBySlug,
+  getRelatedPosts,
+  getCategoryConfig,
+} from '@/lib/content/blog'
 import { absoluteUrl } from '@/lib/seo'
 
 type Props = {
@@ -111,7 +117,22 @@ export default async function BlogPostPage({ params }: Props) {
       <article>
         <header className="mb-10">
           <div className="flex flex-wrap items-center gap-2 mb-4">
-            <Badge variant="secondary">{post.category}</Badge>
+            {/* Category badge — links to category page */}
+            {(() => {
+              const catConfig = getCategoryConfig(post.category)
+              return catConfig ? (
+                <Link href={`/blog/category/${catConfig.slug}`}>
+                  <Badge
+                    variant="secondary"
+                    className="hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer"
+                  >
+                    {catConfig.emoji} {catConfig.label}
+                  </Badge>
+                </Link>
+              ) : (
+                <Badge variant="secondary">{post.category}</Badge>
+              )
+            })()}
             <span className="text-sm text-muted-foreground">
               {new Date(post.publishedAt).toLocaleDateString('en-US', {
                 month: 'long',
@@ -131,15 +152,11 @@ export default async function BlogPostPage({ params }: Props) {
             ))}
           </div>
           {post.heroImage && (
-            <figure className="mt-8 overflow-hidden rounded-2xl border border-border/60 bg-muted">
-              <Image
+            <figure className="mt-8 overflow-hidden rounded-2xl border border-border/60">
+              <BlogImage
                 src={post.heroImage}
                 alt={post.heroImageAlt}
-                width={1600}
-                height={900}
-                className="w-full h-auto object-cover aspect-[16/9]"
                 priority
-                sizes="(max-width: 768px) 100vw, 768px"
               />
             </figure>
           )}
@@ -198,31 +215,38 @@ export default async function BlogPostPage({ params }: Props) {
           <section className="mt-12">
             <h2 className="text-xl font-semibold mb-4">Related articles</h2>
             <div className="grid gap-4 sm:grid-cols-2">
-              {related.map((r) => (
-                <Link
-                  key={r.slug}
-                  href={`/blog/${r.slug}`}
-                  className="group rounded-2xl border border-border/60 bg-card overflow-hidden hover:border-primary/60 transition-colors"
-                >
-                  {r.heroImage && (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img
-                      src={r.heroImage}
-                      alt={r.heroImageAlt}
-                      className="w-full aspect-[16/9] object-cover"
-                      loading="lazy"
-                    />
-                  )}
-                  <div className="p-4">
-                    <Badge variant="secondary" className="mb-2">
-                      {r.category}
-                    </Badge>
-                    <h3 className="font-semibold leading-snug group-hover:text-primary">
-                      {r.title}
-                    </h3>
-                  </div>
-                </Link>
-              ))}
+              {related.map((r) => {
+                const relCatConfig = getCategoryConfig(r.category)
+                return (
+                  <Link
+                    key={r.slug}
+                    href={`/blog/${r.slug}`}
+                    className="group rounded-2xl border border-border/60 bg-card overflow-hidden hover:border-primary/60 transition-colors"
+                  >
+                    {r.heroImage && (
+                      <BlogImage
+                        src={r.heroImage}
+                        alt={r.heroImageAlt}
+                        priority={false}
+                      />
+                    )}
+                    <div className="p-4">
+                      {relCatConfig ? (
+                        <Badge variant="secondary" className="mb-2">
+                          {relCatConfig.emoji} {relCatConfig.label}
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary" className="mb-2">
+                          {r.category}
+                        </Badge>
+                      )}
+                      <h3 className="font-semibold leading-snug group-hover:text-primary">
+                        {r.title}
+                      </h3>
+                    </div>
+                  </Link>
+                )
+              })}
             </div>
           </section>
         )}

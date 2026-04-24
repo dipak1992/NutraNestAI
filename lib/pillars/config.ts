@@ -2,10 +2,10 @@
  * 4-Pillar Product Architecture Configuration
  *
  * The entire MealEase experience is organized into 4 visible pillars:
- *   1. Tonight   – Fast meal ideas for your real situation
- *   2. Plan      – Weekly planning that saves time
- *   3. Cook      – Use what you already have
- *   4. Household – Preferences, family profiles, memory
+ *   1. Tonight        – Fast meal ideas for your real situation
+ *   2. Plan           – Weekly planning that saves time
+ *   3. Scan & Decide  – Smart food decisions at home or eating out
+ *   4. Household      – Preferences, family profiles, memory
  *
  * Everything else is either:
  *   - A mode inside a pillar
@@ -105,11 +105,11 @@ export const PILLAR_CARDS: PillarCard[] = [
   },
   {
     id: 'cook',
-    emoji: '👨‍🍳',
-    title: 'Cook',
-    subtitle: 'Use what you already have',
+    emoji: '📸',
+    title: 'Scan & Decide',
+    subtitle: 'Smart food decisions at home or eating out',
     href: '/dashboard/cook',
-    gradient: 'from-emerald-50 to-green-50/80',
+    gradient: 'from-emerald-50 to-teal-50/80',
     borderColor: 'border-emerald-200/60',
     hoverBorder: 'hover:border-emerald-300',
   },

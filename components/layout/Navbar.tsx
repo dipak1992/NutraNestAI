@@ -9,7 +9,7 @@ import {
   Home,
   Moon,
   Calendar,
-  ChefHat,
+  Camera,
   Users,
   Settings,
   Menu,
@@ -39,7 +39,7 @@ const navLinks = [
   { href: '/dashboard',           label: 'Home',      icon: Home },
   { href: '/dashboard/tonight',   label: 'Tonight',   icon: Moon },
   { href: '/planner',             label: 'Plan',      icon: Calendar },
-  { href: '/dashboard/cook',      label: 'Cook',      icon: ChefHat },
+  { href: '/dashboard/cook',      label: 'Scan',      icon: Camera },
   { href: '/dashboard/household', label: 'Household', icon: Users },
 ]
 

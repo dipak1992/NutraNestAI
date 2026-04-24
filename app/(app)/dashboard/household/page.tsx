@@ -142,7 +142,7 @@ function IntelligenceSummary() {
       <div className="mt-3 rounded-lg bg-violet-50/50 border border-violet-200/40 p-3">
         <p className="text-xs text-muted-foreground">
           <Brain className="h-3 w-3 inline mr-1" />
-          No preferences learned yet. Use Tonight or Cook to start teaching MealEase what you like.
+          No preferences learned yet. Use Tonight or Scan &amp; Decide to start teaching MealEase what you like.
         </p>
       </div>
     )

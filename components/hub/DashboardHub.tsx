@@ -13,6 +13,13 @@ import { KidsSection } from '@/components/hub/KidsSection'
 import { cn } from '@/lib/utils'
 import type { PillarCard } from '@/lib/pillars/config'
 
+// ── NEW badge logic (14-day window from launch) ───────────────────────────────
+const SCAN_FEATURE_LAUNCH = new Date('2026-04-24T00:00:00Z')
+const NEW_BADGE_MS = 14 * 24 * 60 * 60 * 1000
+function isScanFeatureNew(): boolean {
+  return Date.now() - SCAN_FEATURE_LAUNCH.getTime() < NEW_BADGE_MS
+}
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function getGreeting(): string {
@@ -111,12 +118,41 @@ function PillarCardUI({
               </div>
             )}
 
-            {/* Cook card — Snap & Cook badge */}
+            {/* Scan & Decide card — 3 sub-features */}
             {card.id === 'cook' && (
-              <div className="flex items-center gap-2 mt-3">
-                <span className="inline-flex items-center gap-1 rounded-lg bg-white/80 border border-border/60 px-3 py-1.5 text-xs font-semibold text-foreground">
-                  📸 Snap & Cook
-                </span>
+              <div className="mt-3 space-y-1.5">
+                {/* Snap & Cook */}
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/80 border border-border/60 px-3 py-1.5 text-xs font-semibold text-foreground">
+                    📸 Snap &amp; Cook
+                  </span>
+                </div>
+                {/* Smart Menu Scan — NEW */}
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/80 border border-border/60 px-3 py-1.5 text-xs font-semibold text-foreground">
+                    🍽️ Smart Menu Scan
+                  </span>
+                  {isScanFeatureNew() && (
+                    <span className="inline-flex items-center rounded-full bg-gradient-to-r from-violet-600 to-purple-600 px-2 py-0.5 text-[9px] font-bold text-white leading-none shadow-sm">
+                      NEW
+                    </span>
+                  )}
+                </div>
+                {/* Food Check — NEW */}
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/80 border border-border/60 px-3 py-1.5 text-xs font-semibold text-foreground">
+                    📊 Food Check
+                  </span>
+                  {isScanFeatureNew() && (
+                    <span className="inline-flex items-center rounded-full bg-gradient-to-r from-violet-600 to-purple-600 px-2 py-0.5 text-[9px] font-bold text-white leading-none shadow-sm">
+                      NEW
+                    </span>
+                  )}
+                </div>
+                {/* Subtext */}
+                <p className="text-[10px] text-muted-foreground/70 pt-0.5">
+                  Use what you have · Order smarter · Check food instantly
+                </p>
               </div>
             )}
           </div>

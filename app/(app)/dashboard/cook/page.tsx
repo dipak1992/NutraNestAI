@@ -299,8 +299,8 @@ export default function CookPillarPage() {
           <button onClick={() => router.push('/dashboard')} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4">
             <ArrowLeft className="h-4 w-4" /> Back
           </button>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">👨‍🍳 Cook</h1>
-          <p className="text-sm text-muted-foreground mt-1">Use what you already have</p>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">📸 Scan &amp; Decide</h1>
+          <p className="text-sm text-muted-foreground mt-1">Smart food decisions at home or eating out</p>
         </div>
 
         {/* Mode chips */}
@@ -338,8 +338,8 @@ export default function CookPillarPage() {
           {/* No mode selected */}
           {!activeChip && (
             <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16">
-              <p className="text-4xl mb-3">👨‍🍳</p>
-              <p className="text-sm text-muted-foreground mb-4">Choose a mode above to start cooking with what you have</p>
+              <p className="text-4xl mb-3">📸</p>
+              <p className="text-sm text-muted-foreground mb-4">Choose a mode above — scan menus, check food, or cook from what you have</p>
               <Button size="sm" onClick={() => handleChipSelect('snap')} className="gap-1.5 bg-emerald-600 hover:bg-emerald-700">
                 <Camera className="h-3.5 w-3.5" /> Snap &amp; Cook
               </Button>
@@ -504,8 +504,8 @@ export default function CookPillarPage() {
       <PaywallDialog
         open={paywallOpen}
         onOpenChange={setPaywallOpen}
-        title="Unlock Cook Pro Tools"
-        description="Upgrade to access Smart Menu Scan, Food Check, Pantry Meals, and Smart Leftovers — plus unlimited Snap & Cook scans."
+        title="Unlock Scan & Decide Pro Tools"
+        description="Upgrade to scan restaurant menus, check food calories, use pantry meals, and smart leftovers — plus unlimited Snap & Cook scans."
         isAuthenticated={status.isAuthenticated}
         redirectPath="/dashboard/cook"
       />

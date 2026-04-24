@@ -2,14 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Moon, Calendar, ChefHat, Users } from 'lucide-react'
+import { Home, Moon, Calendar, Camera, Users } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const TABS = [
   { href: '/dashboard',           label: 'Home',      icon: Home },
   { href: '/dashboard/tonight',   label: 'Tonight',   icon: Moon },
   { href: '/planner',             label: 'Plan',      icon: Calendar },
-  { href: '/dashboard/cook',      label: 'Cook',      icon: ChefHat },
+  { href: '/dashboard/cook',      label: 'Scan',      icon: Camera },
   { href: '/dashboard/household', label: 'Household', icon: Users },
 ]
 

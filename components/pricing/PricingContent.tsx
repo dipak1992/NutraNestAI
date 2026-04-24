@@ -65,7 +65,7 @@ const COMPARISON_FEATURES = [
   { feature: 'Unlimited regenerations', free: false, pro: true, family: true },
   { feature: 'Weekly Planner', free: '3-day preview', pro: 'Full 7 days', family: 'Full 7 days' },
   { feature: 'Save preferences', free: false, pro: true, family: true },
-  { feature: 'Member profiles', free: '1 profile', pro: '2 profiles', family: 'Up to 6 profiles' },
+  { feature: 'Member profiles †', free: '1 profile', pro: '2 profiles', family: 'Up to 6 profiles' },
   { feature: 'Household memory', free: false, pro: '1 household', family: 'Full household' },
   { feature: 'Snap & Cook scans', free: '3/week', pro: 'Unlimited', family: 'Unlimited' },
   { feature: 'Smart Menu Scan', free: false, pro: true, family: true },
@@ -75,6 +75,7 @@ const COMPARISON_FEATURES = [
   { feature: 'Healthy mode', free: false, pro: true, family: true },
   { feature: 'Meal history', free: false, pro: true, family: true },
   { feature: 'Faster AI responses', free: false, pro: true, family: true },
+  { feature: '🎬 Weekend Mode ‡', free: false, pro: true, family: true },
   { feature: 'Pantry Mode', free: false, pro: false, family: true },
   { feature: 'Kids Mode', free: false, pro: false, family: true },
   { feature: 'Lunchbox Planner', free: false, pro: false, family: true },
@@ -90,6 +91,34 @@ const FAQ = [
     a: 'Not even close. Recipe apps give you a database and leave you to scroll. MealEase is a decision engine — it knows your household, your energy level, your fridge, and your kids\' quirks, then tells you exactly what to make tonight. No browsing. No decision fatigue. Just dinner, handled.',
   },
   {
+    q: 'What is a household profile?',
+    a: 'A household profile stores preferences, allergies, age groups, and food goals for one person in your household. Profiles are not separate logins — they are preference records that help MealEase personalize every meal for each person at your table. Free plan includes 1 profile. Pro includes 2. Family Plus supports up to 6.',
+  },
+  {
+    q: 'Are profiles separate logins? Can my spouse use MealEase too?',
+    a: 'Not yet — profiles are preference records, not separate accounts. One account manages all profiles. Your spouse\'s preferences, allergies, and food goals are stored in their profile and used to personalize every meal. Shared login support is on our roadmap for a future update.',
+  },
+  {
+    q: 'How many family members can I add?',
+    a: 'Free plan: 1 personal profile. Pro plan: up to 2 profiles (great for couples). Family Plus: up to 6 household member profiles with full preferences, allergy tracking, picky eater settings, and kids tools.',
+  },
+  {
+    q: 'Why upgrade to Family Plus?',
+    a: 'Family Plus is for households where everyone\'s preferences matter. You get up to 6 member profiles with full detail — allergies, age groups, picky eater levels, cuisine preferences, and portion sizes. MealEase then balances all of that automatically when planning meals. Plus you get kids tools, lunchbox planning, shared grocery lists, and Weekend Mode family experiences.',
+  },
+  {
+    q: 'Can I share grocery lists or meal plans?',
+    a: 'Yes. Family Plus includes shared grocery lists and shared meal planning — so everyone in the household stays on the same page. Pro users get personal grocery lists. Shared login support for multiple accounts is coming in a future update.',
+  },
+  {
+    q: 'What is Weekend Mode?',
+    a: 'Weekend Mode is a special experience that activates automatically every Friday through Sunday. It surfaces curated dinner + movie ideas tailored to your household type — date nights for couples, family nights for families, or solo chill evenings for individuals. No setup needed. It just appears.',
+  },
+  {
+    q: 'When does Weekend Mode appear?',
+    a: 'Weekend Mode appears automatically from Friday at 11 AM through Sunday at 11:59 PM as a featured card above your dashboard. It disappears on Monday morning. Available on Pro and Family Plus plans.',
+  },
+  {
     q: 'How does Household Memory work?',
     a: 'Every time you cook, save, skip, or swap a meal, MealEase quietly learns. It tracks which cuisines your family gravitates toward, what your picky eater actually ate, and which nights you tend to reach for something fast. Over weeks, your suggestions get sharper — like a sous chef who\'s been with your family for years.',
   },
@@ -100,10 +129,6 @@ const FAQ = [
   {
     q: 'Can it help picky eaters?',
     a: 'This is one of the things we built MealEase to solve. The Picky Eater tool suggests meals with high acceptance likelihood based on your child\'s profile — textures they tolerate, flavors they\'ve accepted before, and gentle ways to introduce new foods. It even scores each suggestion so you know what to expect before you start cooking.',
-  },
-  {
-    q: 'Does it work for couples and families?',
-    a: 'Beautifully. Solo users get a streamlined experience. Couples get shared planning and date-night modes. Families get individual profiles for up to six members, conflict balancing when preferences clash, kids tools, lunchbox planning, and shared grocery lists. MealEase adapts to however your household is shaped.',
   },
   {
     q: 'Can it help save money on groceries?',
@@ -124,10 +149,6 @@ const FAQ = [
   {
     q: 'How does the calorie estimation feature work?',
     a: 'Food Check uses AI vision to analyze a photo of any plate or snack. It estimates calorie ranges with a confidence level, shows protein levels, gives a goal-fit verdict (healthy, balanced, or indulgent), and suggests smarter swaps when relevant. It\'s like having a nutritionist in your pocket.',
-  },
-  {
-    q: 'Does Smart Menu Scan work with fast food menus?',
-    a: 'Absolutely. Smart Menu Scan works with any printed or digital menu — sit-down restaurants, fast food drive-throughs, takeout menus, and even handwritten specials. Just snap a photo and pick your goal. It adapts to whatever you\'re looking at.',
   },
   {
     q: 'What\'s the difference between personal preferences and household settings?',
@@ -411,6 +432,7 @@ export function PricingContent() {
                   'Weekly Autopilot Lite',
                   'Smart Menu Scan ✨',
                   'Food Check (calorie snap) ✨',
+                  '🎬 Weekend Mode',
                   'Budget Mode',
                   'Dinner Date Night',
                   'Pantry Mode',
@@ -499,10 +521,11 @@ export function PricingContent() {
               <ul className="mb-8 flex-1 space-y-3.5">
                 <li className="text-sm font-semibold text-amber-700 mb-1">Everything in Pro, plus:</li>
                 {[
-                  'Up to 6 family members',
+                  'Up to 6 household member profiles',
                   'Full Household Memory',
                   'Full Weekly Autopilot',
                   'Smart Menu Scan & Food Check ✨',
+                  '🎬 Weekend Mode — family experiences',
                   'Kids tools & picky eater mode',
                   'Hosting Guests Tonight',
                   'Shared planning & grocery lists',
@@ -659,6 +682,13 @@ export function PricingContent() {
                   </div>
                   <p className="text-xs text-muted-foreground text-center py-2 sm:hidden">Swipe to see all plans &rarr;</p>
                 </div>
+              </div>
+              {/* Footnotes */}
+              <div className="px-5 py-3 border-t border-border/40 bg-muted/20">
+                <p className="text-[11px] text-muted-foreground leading-relaxed">
+                  <span className="font-semibold">†</span> Profiles store preferences, allergies, age groups, and food goals — not separate logins.
+                  {' '}<span className="font-semibold">‡</span> Weekend Mode appears automatically Friday 11 AM through Sunday 11:59 PM.
+                </p>
               </div>
             </motion.div>
           )}

@@ -21,6 +21,23 @@ function isScanFeatureNew(): boolean {
   return Date.now() - SCAN_FEATURE_LAUNCH.getTime() < NEW_BADGE_MS
 }
 
+// ── Weekend window helpers ────────────────────────────────────────────────────
+function isWeekendWindow(): boolean {
+  const now = new Date()
+  const day = now.getDay()
+  const hour = now.getHours()
+  if (day === 5 && hour >= 11) return true
+  if (day === 6) return true
+  if (day === 0) return true
+  return false
+}
+
+function isWeekdayTeaserWindow(): boolean {
+  // Show Mon-Thu only (not during weekend window)
+  const day = new Date().getDay()
+  return day >= 1 && day <= 4
+}
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function getGreeting(): string {
@@ -197,6 +214,28 @@ function UpgradeBanner() {
   )
 }
 
+// ── Mon-Thu Weekend Teaser ────────────────────────────────────────────────────
+
+function WeekendTeaser() {
+  const show = useMemo(() => isWeekdayTeaserWindow(), [])
+  if (!show) return null
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.4, duration: 0.3 }}
+      className="mb-4"
+    >
+      <div className="flex items-center gap-2 rounded-xl border border-amber-200/50 bg-amber-50/60 px-3.5 py-2.5 text-xs text-amber-800">
+        <span className="text-base leading-none">🎬</span>
+        <span className="font-medium">Weekend Mode unlocks Friday</span>
+        <span className="text-amber-600/70">— dinner + movie ideas for your weekend.</span>
+      </div>
+    </motion.div>
+  )
+}
+
 // ── Main Dashboard Hub ────────────────────────────────────────────────────────
 
 interface Props {
@@ -233,6 +272,9 @@ export function DashboardHub({ displayName }: Props) {
 
         {/* ── Weekend Mode (Fri 11 AM → Sun 11:59 PM) ── */}
         <WeekendModeCard householdType={householdConfig.householdType} />
+
+        {/* ── Mon-Thu Weekend Teaser ── */}
+        <WeekendTeaser />
 
         {/* ── 4 Pillar Cards ── */}
         <div className="flex flex-col gap-3">

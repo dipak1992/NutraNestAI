@@ -181,9 +181,9 @@ export default function HouseholdPillarPage() {
   const light = useLightOnboardingStore()
   const features = useMemo(() => getFeatures(status.tier), [status.tier])
 
-  // Load family members if user has family tier
+  // Load household profiles for all authenticated tiers
   useEffect(() => {
-    if (!status.isFamily) return
+    if (!status.isAuthenticated) return
     setMembersLoading(true)
     fetch('/api/family/members', { cache: 'no-store' })
       .then(r => r.json())
@@ -192,7 +192,7 @@ export default function HouseholdPillarPage() {
       })
       .catch(() => {})
       .finally(() => setMembersLoading(false))
-  }, [status.isFamily])
+  }, [status.isAuthenticated])
 
   const handleLockedClick = useCallback((title: string, description: string) => {
     setPaywallMessage({ title, description })
@@ -334,30 +334,35 @@ export default function HouseholdPillarPage() {
             )}
           </SectionCard>
 
-          {/* 2. Family Members */}
+          {/* 2. Household Profiles */}
           <SectionCard
             index={1}
-            emoji="👨‍👩‍👧‍👦"
-            title="Family Members"
+            emoji="👤"
+            title="Household Profiles"
             subtitle={
-              features.multiMember
-                ? `Add up to 6 members with individual preferences and allergy tracking`
-                : 'Personalize meals for every family member with individual profiles'
+              status.isFamily
+                ? `Supports up to 6 household member profiles — preferences, allergies, kids tools, and more`
+                : status.isPro
+                  ? 'Add up to 2 profiles. Upgrade to Family Plus for up to 6 with full preferences.'
+                  : 'Add your personal profile. Upgrade to Pro for 2 profiles, or Family Plus for up to 6.'
             }
-            href={features.multiMember ? '/family' : undefined}
-            onClick={
-              !features.multiMember
-                ? () => handleLockedClick(
-                    'Unlock Family Profiles',
-                    'Family Plus lets you add up to 6 members with individual preferences, allergy tracking, and conflict balancing.'
-                  )
-                : undefined
+            href="/family"
+            badge={
+              status.isFamily
+                ? `${members.length} profiles`
+                : status.isPro
+                  ? 'Pro · 2 profiles'
+                  : 'Free · 1 profile'
             }
-            locked={!features.multiMember}
-            badge={features.multiMember ? `${members.length} members` : 'Family Plus'}
-            badgeColor={features.multiMember ? 'bg-violet-50 text-violet-700' : 'bg-amber-50 text-amber-700'}
+            badgeColor={
+              status.isFamily
+                ? 'bg-violet-50 text-violet-700'
+                : status.isPro
+                  ? 'bg-emerald-50 text-emerald-700'
+                  : 'bg-slate-50 text-slate-600'
+            }
           >
-            {features.multiMember && members.length === 0 && (
+            {members.length === 0 && (
               <div className="mt-2">
                 <Button
                   size="sm"
@@ -369,9 +374,15 @@ export default function HouseholdPillarPage() {
                     router.push('/family')
                   }}
                 >
-                  <Plus className="h-3 w-3" /> Add first member
+                  <Plus className="h-3 w-3" />
+                  {status.isFamily ? 'Add first member' : 'Add your profile'}
                 </Button>
               </div>
+            )}
+            {!status.isFamily && (
+              <p className="mt-1.5 text-[11px] text-muted-foreground/70">
+                Profiles store preferences, allergies, and food goals — not separate logins.
+              </p>
             )}
           </SectionCard>
 

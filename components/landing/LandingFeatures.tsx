@@ -35,8 +35,8 @@ const FEATURES = [
   },
   {
     icon: Users,
-    title: 'Household Mode',
-    description: 'One meal, every version. Cook once — each person gets their own adapted plate. Baby-safe, allergy-aware, diet-compatible.',
+    title: 'Household Profiles',
+    description: 'Everyone\'s preferences, one smarter dinner plan. Add member profiles with allergies, age groups, and food goals — MealEase adapts every meal automatically.',
     tag: 'For everyone',
     gradient: 'from-emerald-500 to-teal-600',
     iconBg: 'bg-emerald-100',
@@ -44,8 +44,8 @@ const FEATURES = [
   },
   {
     icon: Sun,
-    title: 'Weekend Mode',
-    description: 'Saturday brunch ideas, Sunday slow-cooks, and weekend entertaining picks. Because weekends deserve different energy.',
+    title: '🎬 Weekend Mode',
+    description: 'Every Friday through Sunday, MealEase unlocks curated dinner + movie ideas for date nights, family nights, or solo chill evenings. Activates automatically.',
     tag: 'Weekend vibes',
     gradient: 'from-yellow-500 to-amber-600',
     iconBg: 'bg-yellow-100',

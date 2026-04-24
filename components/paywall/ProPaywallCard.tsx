@@ -113,10 +113,10 @@ export function ProPaywallCard({
               <span className="text-xl">👨‍👩‍👧‍👦</span>
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-bold text-amber-900">
-                  Up to 6 family members
+                  Supports up to 6 household member profiles
                 </p>
                 <p className="text-[11px] text-amber-700/70 mt-0.5">
-                  Share meal planning with your whole household with dedicated kids and pantry modes.
+                  Everyone&apos;s preferences, one smarter dinner plan. Profiles store allergies, age groups, and food goals — not separate logins.
                 </p>
               </div>
             </div>

@@ -304,6 +304,16 @@ export function AboutPageContent() {
             instantly see calorie estimates, protein levels, and whether it fits your goals. MealEase now
             helps you make smarter choices everywhere you eat, not just at home.
           </motion.p>
+
+          <motion.p variants={fadeUp} className="text-[16px] leading-8 text-muted-foreground">
+            And because we&apos;re a family ourselves, we built MealEase to grow with yours. Whether you&apos;re
+            cooking for one, planning date nights as a couple, or feeding a household of six with wildly different
+            preferences — MealEase adapts. Add household profiles for each person, and every meal suggestion
+            accounts for everyone at the table. Weekends get their own experience too:{' '}
+            <em className="text-foreground font-medium">Weekend Mode</em> activates automatically every Friday
+            through Sunday, surfacing dinner + movie ideas tailored to your household — date nights, family nights,
+            or solo chill evenings. No setup. It just appears.
+          </motion.p>
         </motion.div>
       </section>
 

@@ -6,6 +6,7 @@ import { LandingOutcomes } from '@/components/landing/LandingOutcomes'
 import { LandingProductProof } from '@/components/landing/LandingProductProof'
 import { LandingEatingOut } from '@/components/landing/LandingEatingOut'
 import { LandingEmotionalStory } from '@/components/landing/LandingEmotionalStory'
+import { LandingHouseholdTiers } from '@/components/landing/LandingHouseholdTiers'
 import { LandingTestimonials } from '@/components/landing/LandingTestimonials'
 import { LandingFinalCTA } from '@/components/landing/LandingFinalCTA'
 import { Heart } from 'lucide-react'
@@ -124,6 +125,46 @@ const faqJsonLd = {
         text: 'Household settings power family meal planning — allergies, ages, and shared preferences. Personal preferences are just for you — your weight goal, protein focus, and individual dietary needs. Smart Menu Scan and Food Check use your personal profile so recommendations are tailored to your body and goals.',
       },
     },
+    {
+      '@type': 'Question',
+      name: 'What is a household profile?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'A household profile stores preferences, allergies, age groups, and food goals for one person in your household. Profiles are not separate logins — they are preference records that help MealEase personalize every meal for each person at your table.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Are household profiles separate logins?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No. Household profiles are preference records, not separate accounts. One account manages all profiles. Shared login support is on our roadmap.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How many household profiles can I add?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Free plan: 1 personal profile. Pro plan: up to 2 profiles (great for couples). Family Plus: up to 6 household member profiles with full preferences, allergy tracking, and kids tools.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What is Weekend Mode?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Weekend Mode is a special experience that activates automatically every Friday through Sunday. It surfaces curated dinner + movie ideas tailored to your household — date nights, family nights, or solo chill evenings. No setup needed.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'When does Weekend Mode appear?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Weekend Mode appears automatically from Friday at 11 AM through Sunday at 11:59 PM. It shows as a featured card above your dashboard and disappears on Monday morning.',
+      },
+    },
   ],
 }
 
@@ -142,6 +183,7 @@ export default function LandingPage() {
         <LandingProductProof />
         <LandingEatingOut />
         <LandingEmotionalStory />
+        <LandingHouseholdTiers />
         <LandingTestimonials />
         <LandingFinalCTA />
         <FriendlyDisclaimer />

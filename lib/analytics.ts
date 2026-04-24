@@ -45,6 +45,10 @@ export const Analytics = {
   KIDS_SAVE_CLICKED:      'kids_save_clicked',
   KIDS_SHARE_CLICKED:     'kids_share_clicked',
   KIDS_SWAP_CLICKED:      'kids_swap_clicked',
+  // Weekend Mode
+  WEEKEND_MODE_CARD_VIEWED:  'weekend_mode_card_viewed',
+  WEEKEND_MODE_BUTTON_CLICKED: 'weekend_mode_button_clicked',
+  WEEKEND_MODE_OPENED:     'weekend_mode_opened',
 } as const
 
 export type AnalyticsEvent = (typeof Analytics)[keyof typeof Analytics]

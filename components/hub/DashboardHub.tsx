@@ -9,6 +9,7 @@ import { useUpgradeTrigger } from '@/lib/pillars/use-upgrade-trigger'
 import { useHouseholdConfig } from '@/lib/hooks/use-household-config'
 import { PILLAR_CARDS, TONIGHT_CHIPS, hasAccess } from '@/lib/pillars/config'
 import { StreakBadge } from '@/components/habit/StreakBadge'
+import { WeekendModeCard } from '@/components/hub/WeekendModeCard'
 import { KidsSection } from '@/components/hub/KidsSection'
 import { cn } from '@/lib/utils'
 import type { PillarCard } from '@/lib/pillars/config'
@@ -229,6 +230,9 @@ export function DashboardHub({ displayName }: Props) {
             What&apos;s for dinner tonight?
           </h1>
         </div>
+
+        {/* ── Weekend Mode (Fri 11 AM → Sun 11:59 PM) ── */}
+        <WeekendModeCard householdType={householdConfig.householdType} />
 
         {/* ── 4 Pillar Cards ── */}
         <div className="flex flex-col gap-3">

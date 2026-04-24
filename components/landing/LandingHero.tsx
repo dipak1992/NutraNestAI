@@ -1,11 +1,18 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { ProductDemoModal } from '@/components/landing/ProductDemoModal'
+import { Analytics, trackEvent } from '@/lib/analytics'
+import {
+  getTodaysMeal,
+  getPickLabel,
+  getDayContext,
+  type DailyMeal,
+} from '@/lib/content/dailyMeal'
 import {
   ArrowRight,
   Play,
@@ -16,8 +23,214 @@ import {
   Clock,
 } from 'lucide-react'
 
+// ── Static fallback shown during SSR / before client mount ───────────────────
+// Matches the old hardcoded meal so there is zero layout shift on hydration.
+const SSR_FALLBACK: DailyMeal = {
+  name: 'Creamy Pesto Salmon Bowls',
+  time: '22 min',
+  tags: ['High Protein', 'Family Favorite'],
+  swapNote: 'Dairy-free sauce for mom, soft veggie sides for the kids.',
+  pantryNote: 'Uses rice, frozen peas, and garlic you already have.',
+  groceryItems: ['Salmon fillets', 'Basil pesto', 'Cucumber + avocado'],
+  category: 'family',
+  isWeekend: false,
+}
+
+// ── Meal card sub-component ───────────────────────────────────────────────────
+function MealCard({ meal, mounted }: { meal: DailyMeal; mounted: boolean }) {
+  const label = mounted ? getPickLabel(meal.category) : "Tonight's Smart Pick"
+  const context = mounted ? getDayContext(meal.category) : ''
+  const isWeekend = meal.isWeekend
+
+  return (
+    <div className="relative rounded-[22px] border border-white/10 bg-white/[0.06] p-4 backdrop-blur-sm">
+      {/* Tonight's plan header */}
+      <div
+        className={`mb-4 flex items-center justify-between rounded-2xl border px-4 py-3 cursor-pointer transition-colors hover:bg-white/[0.12] ${
+          isWeekend
+            ? 'border-amber-400/25 bg-white/[0.08]'
+            : 'border-emerald-400/20 bg-white/[0.08]'
+        }`}
+        onClick={() => {
+          if (mounted) {
+            trackEvent(Analytics.HERO_MEAL_SUGGESTION_CLICKED, {
+              meal_name: meal.name,
+              category: meal.category,
+              is_weekend: meal.isWeekend,
+            })
+          }
+        }}
+      >
+        <div className="flex-1 min-w-0 pr-3">
+          <p className={`text-xs font-semibold uppercase tracking-[0.16em] ${
+            isWeekend ? 'text-amber-400' : 'text-emerald-400'
+          }`}>
+            {label}
+          </p>
+
+          {/* Animate the meal name change */}
+          <AnimatePresence mode="wait">
+            <motion.p
+              key={meal.name}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              className="mt-1 text-lg font-semibold text-white leading-snug"
+            >
+              {meal.name}
+            </motion.p>
+          </AnimatePresence>
+
+          {/* Day context — only shown after mount */}
+          <AnimatePresence>
+            {mounted && context && (
+              <motion.p
+                key={context}
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3, delay: 0.1 }}
+                className="mt-1 text-xs text-white/45 leading-snug"
+              >
+                {context}
+              </motion.p>
+            )}
+          </AnimatePresence>
+        </div>
+
+        <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${
+          isWeekend ? 'bg-amber-400/15 text-amber-400' : 'bg-emerald-400/15 text-emerald-400'
+        }`}>
+          <Sparkles className="h-5 w-5" />
+        </div>
+      </div>
+
+      {/* Dashboard preview grid */}
+      <div className="grid gap-3 sm:grid-cols-[1.4fr_0.9fr]">
+        <div className={`rounded-2xl p-4 ${
+          isWeekend
+            ? 'bg-gradient-to-br from-amber-400/10 via-white/[0.04] to-rose-400/10'
+            : 'bg-gradient-to-br from-emerald-400/10 via-white/[0.04] to-amber-400/10'
+        }`}>
+          {/* Tags */}
+          <div className="mb-4 flex items-center gap-2 flex-wrap">
+            {meal.tags.map((tag) => (
+              <span
+                key={tag}
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium shadow-sm ${
+                  isWeekend
+                    ? 'bg-white/10 text-amber-300'
+                    : 'bg-white/10 text-emerald-300'
+                }`}
+              >
+                <span className={`h-1.5 w-1.5 rounded-full ${
+                  isWeekend ? 'bg-amber-400' : 'bg-emerald-400'
+                }`} />
+                {tag}
+              </span>
+            ))}
+          </div>
+
+          <div className="space-y-3">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`swap-${meal.name}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.4, delay: 0.05 }}
+                className="rounded-2xl bg-white/[0.07] backdrop-blur-sm p-3"
+              >
+                <p className="text-sm font-semibold text-white">Swap suggestions</p>
+                <p className="mt-1 text-sm text-white/60">{meal.swapNote}</p>
+              </motion.div>
+            </AnimatePresence>
+
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`pantry-${meal.name}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.4, delay: 0.1 }}
+                className="rounded-2xl bg-white/[0.07] backdrop-blur-sm p-3"
+              >
+                <p className="text-sm font-semibold text-white">Pantry matched</p>
+                <p className="mt-1 text-sm text-white/60">{meal.pantryNote}</p>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`time-${meal.name}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4 }}
+              className="rounded-2xl border border-white/10 bg-white/[0.06] p-4"
+            >
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/50 flex items-center gap-1.5">
+                <Clock className="h-3 w-3" />
+                Prep time
+              </p>
+              <p className="mt-2 text-3xl font-bold text-white">{meal.time}</p>
+            </motion.div>
+          </AnimatePresence>
+
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`grocery-${meal.name}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4, delay: 0.05 }}
+              className="rounded-2xl border border-white/10 bg-white/[0.06] p-4"
+            >
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/50">Smart grocery list</p>
+              <ul className="mt-3 space-y-2 text-sm text-white/80">
+                {meal.groceryItems.map((item) => (
+                  <li key={item} className="flex items-center gap-2">
+                    <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${
+                      isWeekend ? 'bg-amber-400' : 'bg-emerald-400'
+                    }`} />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Main hero component ───────────────────────────────────────────────────────
 export function LandingHero() {
   const [demoOpen, setDemoOpen] = useState(false)
+  const [meal, setMeal] = useState<DailyMeal>(SSR_FALLBACK)
+  const [mounted, setMounted] = useState(false)
+
+  // Client-only mount — avoids hydration mismatch entirely.
+  // SSR renders the fallback; after mount we swap to today's real meal.
+  useEffect(() => {
+    const todaysMeal = getTodaysMeal()
+    setMeal(todaysMeal)
+    setMounted(true)
+
+    // Track the viewed meal
+    trackEvent(Analytics.HERO_MEAL_SUGGESTION_VIEWED, {
+      meal_name: todaysMeal.name,
+      category: todaysMeal.category,
+      is_weekend: todaysMeal.isWeekend,
+    })
+  }, [])
+
+  const isWeekend = meal.isWeekend
 
   return (
     <section className="relative overflow-hidden min-h-[92vh] flex items-center">
@@ -34,7 +247,7 @@ export function LandingHero() {
           quality={85}
         />
 
-        {/* Mobile-optimized portrait image — hero-mobile.jpg, focal point upper-center for face/food prominence */}
+        {/* Mobile-optimized portrait image */}
         <Image
           src="/mobile/hero-mobile.jpg"
           alt=""
@@ -46,22 +259,18 @@ export function LandingHero() {
         />
 
         {/* Premium multi-layer overlay system */}
-        {/* Base darkening — slightly heavier on mobile for text legibility */}
         <div className="absolute inset-0 bg-black/40 md:bg-black/40" />
-        {/* Warm gradient from left for text readability — stronger bottom-up on mobile */}
         <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-slate-950/50 to-transparent" />
-        {/* Bottom fade — deeper on mobile so CTA text pops */}
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-slate-950/20 to-slate-950/20 md:from-slate-950/60 md:via-transparent md:to-slate-950/20" />
-        {/* Subtle warm tint */}
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-950/20 via-transparent to-amber-950/15" />
-        {/* Fine grain texture for premium feel */}
+        {/* Fine grain texture */}
         <div className="absolute inset-0 opacity-[0.03] [background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIiBmaWx0ZXI9InVybCgjYSkiIG9wYWNpdHk9IjAuMDUiLz48L3N2Zz4=')]" />
       </div>
 
       <div className="relative z-[1] mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 sm:py-28 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
-          {/* ── Left: Copy (light text on dark photo) ── */}
+          {/* ── Left: Copy ── */}
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
@@ -147,62 +356,27 @@ export function LandingHero() {
             className="w-full"
           >
             <div className="relative overflow-hidden rounded-[28px] border border-white/15 bg-white/[0.08] p-5 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.4),0_0_0_1px_rgba(255,255,255,0.06)] backdrop-blur-xl">
-              <div className="absolute inset-x-8 top-0 h-24 bg-gradient-to-b from-emerald-400/20 to-transparent blur-2xl" />
+              {/* Glow — shifts color on weekend */}
+              <div className={`absolute inset-x-8 top-0 h-24 blur-2xl ${
+                isWeekend
+                  ? 'bg-gradient-to-b from-amber-400/20 to-transparent'
+                  : 'bg-gradient-to-b from-emerald-400/20 to-transparent'
+              }`} />
 
-              <div className="relative rounded-[22px] border border-white/10 bg-white/[0.06] p-4 backdrop-blur-sm">
-                {/* Tonight's plan header */}
-                <div className="mb-4 flex items-center justify-between rounded-2xl border border-emerald-400/20 bg-white/[0.08] px-4 py-3">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-400">Tonight&apos;s plan</p>
-                    <p className="mt-1 text-lg font-semibold text-white">Creamy pesto salmon bowls</p>
-                  </div>
-                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-400/15 text-emerald-400">
-                    <Sparkles className="h-5 w-5" />
-                  </div>
-                </div>
-
-                {/* Dashboard preview grid */}
-                <div className="grid gap-3 sm:grid-cols-[1.4fr_0.9fr]">
-                  <div className="rounded-2xl bg-gradient-to-br from-emerald-400/10 via-white/[0.04] to-amber-400/10 p-4">
-                    <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-emerald-300 shadow-sm">
-                      <span className="h-2 w-2 rounded-full bg-emerald-400" />
-                      Personalized for 4 people
-                    </div>
-                    <div className="space-y-3">
-                      <div className="rounded-2xl bg-white/[0.07] backdrop-blur-sm p-3">
-                        <p className="text-sm font-semibold text-white">Swap suggestions</p>
-                        <p className="mt-1 text-sm text-white/60">Dairy-free sauce for mom, soft veggie sides for the kids.</p>
-                      </div>
-                      <div className="rounded-2xl bg-white/[0.07] backdrop-blur-sm p-3">
-                        <p className="text-sm font-semibold text-white">Pantry matched</p>
-                        <p className="mt-1 text-sm text-white/60">Uses rice, frozen peas, and garlic you already have.</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-4">
-                      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/50">Prep time</p>
-                      <p className="mt-2 text-3xl font-bold text-white">22 min</p>
-                    </div>
-                    <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-4">
-                      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/50">Smart grocery list</p>
-                      <ul className="mt-3 space-y-2 text-sm text-white/80">
-                        <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />Salmon fillets</li>
-                        <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />Basil pesto</li>
-                        <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />Cucumber + avocado</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
+              {/* suppressHydrationWarning on the meal card wrapper prevents React
+                  from warning about the SSR→client content swap */}
+              <div suppressHydrationWarning>
+                <MealCard meal={meal} mounted={mounted} />
               </div>
             </div>
 
             {/* Floating badge */}
             <div className="mt-4 flex justify-end">
               <div className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.07] px-3 py-1 backdrop-blur-md shadow-lg text-xs font-medium text-white/60">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                Watch the full walkthrough below
+                <span className={`h-1.5 w-1.5 rounded-full animate-pulse ${
+                  isWeekend ? 'bg-amber-400' : 'bg-emerald-400'
+                }`} />
+                {mounted && isWeekend ? 'Weekend Mode is active 🎬' : 'Watch the full walkthrough below'}
               </div>
             </div>
           </motion.div>

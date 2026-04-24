@@ -49,6 +49,9 @@ export const Analytics = {
   WEEKEND_MODE_CARD_VIEWED:  'weekend_mode_card_viewed',
   WEEKEND_MODE_BUTTON_CLICKED: 'weekend_mode_button_clicked',
   WEEKEND_MODE_OPENED:     'weekend_mode_opened',
+  // Landing hero daily meal
+  HERO_MEAL_SUGGESTION_VIEWED:  'hero_meal_suggestion_viewed',
+  HERO_MEAL_SUGGESTION_CLICKED: 'hero_meal_suggestion_clicked',
 } as const
 
 export type AnalyticsEvent = (typeof Analytics)[keyof typeof Analytics]

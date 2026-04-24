@@ -17,7 +17,10 @@ interface Props {
 }
 
 export function PantryMatchList({ matches, onCook, onSwap, onOrder }: Props) {
-  if (matches.length === 0) {
+  // Safe guard: ensure matches is always an array
+  const safeMatches = Array.isArray(matches) ? matches : []
+
+  if (safeMatches.length === 0) {
     return (
       <div className="rounded-2xl border border-border/60 bg-white p-6 text-center">
         <span className="text-3xl block mb-2">🥫</span>
@@ -32,16 +35,20 @@ export function PantryMatchList({ matches, onCook, onSwap, onOrder }: Props) {
   return (
     <div className="space-y-3">
       <AnimatePresence mode="popLayout">
-        {matches.slice(0, 3).map((m) => (
-          <MealCard
-            key={m.meal.id}
-            meal={m.meal}
-            pantryMatch={m.pantryPercent}
-            onCook={() => onCook(m.meal)}
-            onSwap={() => onSwap(m.meal)}
-            onOrder={() => onOrder(m.meal)}
-          />
-        ))}
+        {safeMatches.slice(0, 3).map((m) => {
+          // Guard against malformed match entries
+          if (!m?.meal?.id) return null
+          return (
+            <MealCard
+              key={m.meal.id}
+              meal={m.meal}
+              pantryMatch={typeof m.pantryPercent === 'number' ? m.pantryPercent : 0}
+              onCook={() => onCook(m.meal)}
+              onSwap={() => onSwap(m.meal)}
+              onOrder={() => onOrder(m.meal)}
+            />
+          )
+        })}
       </AnimatePresence>
     </div>
   )

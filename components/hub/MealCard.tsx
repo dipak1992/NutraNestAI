@@ -52,8 +52,23 @@ export function MealCard({ meal, pantryMatch, swapping, onCook, onSwap, onOrder 
   const [showSteps, setShowSteps] = useState(false)
   const router = useRouter()
 
-  const pantryItems = meal.ingredients?.filter((i) => i.fromPantry) ?? []
-  const toBuyItems = meal.ingredients?.filter((i) => !i.fromPantry) ?? []
+  // ── Safe null guards — prevent crash if meal data is incomplete ──
+  if (!meal || !meal.id) {
+    return (
+      <div className="rounded-3xl border border-amber-200 bg-amber-50 p-5 text-center">
+        <p className="text-sm font-semibold text-amber-800">Meal data unavailable</p>
+        <p className="text-xs text-amber-700 mt-1">Try scanning again or refreshing.</p>
+      </div>
+    )
+  }
+
+  const safeIngredients = Array.isArray(meal.ingredients) ? meal.ingredients : []
+  const safeSteps = Array.isArray(meal.steps) ? meal.steps : []
+  const safeDifficulty: 'easy' | 'moderate' | 'hard' = meal.difficulty ?? 'easy'
+  const safeMeta = meal.meta ?? { pantryUtilization: 0, matchedPantryItems: [], score: 0, simplifiedForEnergy: false, pickyEaterAdjusted: false, localityApplied: false, selectionReason: '' }
+
+  const pantryItems = safeIngredients.filter((i) => i?.fromPantry === true)
+  const toBuyItems = safeIngredients.filter((i) => i?.fromPantry !== true)
 
   function handleViewRecipe() {
     try {
@@ -72,17 +87,17 @@ export function MealCard({ meal, pantryMatch, swapping, onCook, onSwap, onOrder 
       className="rounded-3xl border border-border/60 bg-white overflow-hidden shadow-sm"
     >
       <div className="p-5">
-        <h3 className="text-base font-bold text-foreground leading-snug">{meal.title}</h3>
-        <p className="text-sm text-foreground/70 mt-1 line-clamp-2">{meal.tagline}</p>
+        <h3 className="text-base font-bold text-foreground leading-snug">{meal.title ?? 'Untitled Meal'}</h3>
+        <p className="text-sm text-foreground/70 mt-1 line-clamp-2">{meal.tagline ?? meal.description ?? ''}</p>
 
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <span className="inline-flex items-center gap-1 text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full px-2.5 py-0.5">
             <Clock className="h-3 w-3" />
-            {formatTime(meal.totalTime)}
+            {formatTime(meal.totalTime ?? 0)}
           </span>
           <span className="inline-flex items-center gap-1.5 text-xs font-semibold bg-muted text-foreground/80 rounded-full px-2.5 py-0.5">
-            <DifficultyDots difficulty={meal.difficulty} />
-            <span className="capitalize">{meal.difficulty}</span>
+            <DifficultyDots difficulty={safeDifficulty} />
+            <span className="capitalize">{safeDifficulty}</span>
           </span>
           {pantryMatch != null && pantryMatch > 0 && (
             <span className="inline-flex items-center gap-1 text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200 rounded-full px-2.5 py-0.5">
@@ -90,10 +105,10 @@ export function MealCard({ meal, pantryMatch, swapping, onCook, onSwap, onOrder 
               {pantryMatch}% pantry
             </span>
           )}
-          {!pantryMatch && meal.meta.pantryUtilization > 0 && (
+          {!pantryMatch && (safeMeta.pantryUtilization ?? 0) > 0 && (
             <span className="inline-flex items-center gap-1 text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200 rounded-full px-2.5 py-0.5">
               <Flame className="h-3 w-3" />
-              {Math.round(meal.meta.pantryUtilization * 100)}% pantry
+              {Math.round((safeMeta.pantryUtilization ?? 0) * 100)}% pantry
             </span>
           )}
           <div className="ml-auto flex items-center gap-1">
@@ -114,7 +129,7 @@ export function MealCard({ meal, pantryMatch, swapping, onCook, onSwap, onOrder 
       )}
 
       {/* Expandable: Ingredients */}
-      {meal.ingredients && meal.ingredients.length > 0 && (
+      {safeIngredients.length > 0 && (
         <div className="border-t border-border/40">
           <button
             onClick={() => setShowIngredients((v) => !v)}
@@ -139,7 +154,7 @@ export function MealCard({ meal, pantryMatch, swapping, onCook, onSwap, onOrder 
                       <div className="flex flex-wrap gap-1.5">
                         {toBuyItems.map((i, idx) => (
                           <span key={idx} className="text-xs bg-red-50 text-red-800 border border-red-200 rounded-full px-2 py-0.5">
-                            {i.quantity} {i.unit} {i.name}
+                            {[i.quantity, i.unit, i.name].filter(Boolean).join(' ')}
                           </span>
                         ))}
                       </div>
@@ -151,7 +166,7 @@ export function MealCard({ meal, pantryMatch, swapping, onCook, onSwap, onOrder 
                       <div className="flex flex-wrap gap-1.5">
                         {pantryItems.map((i, idx) => (
                           <span key={idx} className="text-xs bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full px-2 py-0.5">
-                            {i.quantity} {i.unit} {i.name}
+                            {[i.quantity, i.unit, i.name].filter(Boolean).join(' ')}
                           </span>
                         ))}
                       </div>
@@ -165,13 +180,13 @@ export function MealCard({ meal, pantryMatch, swapping, onCook, onSwap, onOrder 
       )}
 
       {/* Expandable: Cooking steps */}
-      {meal.steps && meal.steps.length > 0 && (
+      {safeSteps.length > 0 && (
         <div className="border-t border-border/40">
           <button
             onClick={() => setShowSteps((v) => !v)}
             className="w-full flex items-center justify-between px-5 py-2.5 text-sm font-medium hover:bg-muted/50 transition-colors"
           >
-            <span>📋 {meal.steps.length} cooking step{meal.steps.length !== 1 ? 's' : ''}</span>
+            <span>📋 {safeSteps.length} cooking step{safeSteps.length !== 1 ? 's' : ''}</span>
             {showSteps ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </button>
           <AnimatePresence>
@@ -184,9 +199,9 @@ export function MealCard({ meal, pantryMatch, swapping, onCook, onSwap, onOrder 
                 className="overflow-hidden"
               >
                 <ol className="px-5 pb-3 space-y-1.5 list-decimal list-inside">
-                  {meal.steps.map((step, idx) => (
+                  {safeSteps.map((step, idx) => (
                     <li key={idx} className="text-xs leading-relaxed text-muted-foreground">
-                      {step}
+                      {step ?? ''}
                     </li>
                   ))}
                 </ol>

@@ -51,15 +51,22 @@ export const POST = withErrorHandler('pantry/match', async (req: Request) => {
     maxCookTime: body.maxCookTime,
   }
 
-  const meals = matchPantryMeals(
+  const mealResults = matchPantryMeals(
     allPantryItems,
     request,
     body.learnedBoosts,
     Math.min(body.limit ?? 3, 3), // cap at 3 per golden rule
   )
 
+  // Normalize into { meal, pantryPercent } shape expected by the client
+  const matches = mealResults.map((meal) => ({
+    meal,
+    pantryPercent: Math.round((meal.meta?.pantryUtilization ?? 0) * 100),
+  }))
+
   return apiSuccess({
-    meals,
+    matches,
+    meals: mealResults, // keep legacy key for any other consumers
     pantryItemCount: allPantryItems.length,
   })
 })

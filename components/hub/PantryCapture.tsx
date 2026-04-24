@@ -2,7 +2,7 @@
 
 import { useCallback, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Camera, Pencil, X, Loader2, Plus, ArrowRight } from 'lucide-react'
+import { Camera, Pencil, X, Loader2, Plus, ArrowRight, RefreshCw } from 'lucide-react'
 import { PaywallDialog } from '@/components/paywall/PaywallDialog'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 
@@ -12,6 +12,14 @@ interface Props {
 }
 
 type Phase = 'choose' | 'scanning' | 'manual' | 'review'
+
+// ── Source-tagged ingredient for combined fridge+pantry flow ──
+interface TaggedIngredient {
+  name: string
+  source: 'fridge' | 'pantry' | 'manual'
+}
+
+// ── Image compression helper ──────────────────────────────────
 
 async function compressImageForVision(file: File): Promise<string> {
   const rawDataUrl = await new Promise<string>((resolve, reject) => {
@@ -44,21 +52,62 @@ async function compressImageForVision(file: File): Promise<string> {
   return canvas.toDataURL('image/jpeg', 0.82)
 }
 
+// ── Ingredient normalization ──────────────────────────────────
+// Deduplicates ingredients across fridge + pantry sources.
+// "tomato sauce" and "canned tomatoes" are kept separate (different items).
+// Exact duplicates (same name) are merged, keeping the first source.
+
+function normalizeAndDedup(tagged: TaggedIngredient[]): TaggedIngredient[] {
+  const seen = new Map<string, TaggedIngredient>()
+  for (const item of tagged) {
+    const key = item.name.toLowerCase().trim()
+    if (!key) continue
+    if (!seen.has(key)) {
+      seen.set(key, { ...item, name: key })
+    }
+    // If already seen, keep the first occurrence (preserves source)
+  }
+  return Array.from(seen.values())
+}
+
+// ── Validate ingredient list before confirming ────────────────
+
+function validateIngredients(items: TaggedIngredient[]): string | null {
+  const valid = items.filter(i => i.name.trim().length > 0)
+  if (valid.length === 0) return 'No ingredients found. Please add at least one item.'
+  if (valid.length > 80) return 'Too many ingredients. Please remove some before continuing.'
+  return null
+}
+
+// ── Main Component ────────────────────────────────────────────
+
 export function PantryCapture({ onConfirm, onCancel }: Props) {
   const [phase, setPhase] = useState<Phase>('choose')
-  const [items, setItems] = useState<string[]>([])
+  // Tagged ingredients track source (fridge / pantry / manual)
+  const [taggedItems, setTaggedItems] = useState<TaggedIngredient[]>([])
   const [manualInput, setManualInput] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [paywallOpen, setPaywallOpen] = useState(false)
+  // Track which scan source is active so we can label items correctly
+  const [pendingScanSource, setPendingScanSource] = useState<'fridge' | 'pantry'>('fridge')
+  const [scanningSource, setScanningSource] = useState<'fridge' | 'pantry' | null>(null)
+
   const fileRef = useRef<HTMLInputElement>(null)
   const { status, loading: paywallStatusLoading } = usePaywallStatus()
 
   // ── Camera / file pick ────────────────────────────────────
 
+  const triggerScan = useCallback((source: 'fridge' | 'pantry') => {
+    setPendingScanSource(source)
+    fileRef.current?.click()
+  }, [])
+
   const handleCapture = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
 
+    const source = pendingScanSource
+    setScanningSource(source)
     setPhase('scanning')
     setError(null)
 
@@ -77,45 +126,60 @@ export function PantryCapture({ onConfirm, onCancel }: Props) {
           setPaywallOpen(true)
           setError(body?.error ?? 'Free Snap & Cook quota reached. Upgrade for unlimited scans.')
           setPhase('choose')
+          setScanningSource(null)
           return
         }
         throw new Error(body?.error ?? 'Scan failed')
       }
 
       const data = await res.json()
-      const detected: string[] = data.data?.items ?? []
+      // Validate response shape
+      const rawDetected: unknown = data?.data?.items
+      const detected: string[] = Array.isArray(rawDetected)
+        ? rawDetected.filter((i): i is string => typeof i === 'string' && i.trim().length > 0)
+        : []
 
       if (detected.length === 0) {
         setError('No ingredients detected — try a clearer photo or add manually.')
-        setPhase('choose')
+        setPhase(taggedItems.length > 0 ? 'review' : 'choose')
+        setScanningSource(null)
         return
       }
 
-      setItems(prev => {
-        const set = new Set([...prev, ...detected])
-        return [...set]
+      // Merge new detections with existing items, tagging with source
+      setTaggedItems(prev => {
+        const newItems: TaggedIngredient[] = detected.map(name => ({
+          name: name.toLowerCase().trim(),
+          source,
+        }))
+        return normalizeAndDedup([...prev, ...newItems])
       })
       setPhase('review')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Scan failed')
-      setPhase('choose')
+      setError(err instanceof Error ? err.message : 'Scan failed. Please try again.')
+      setPhase(taggedItems.length > 0 ? 'review' : 'choose')
     } finally {
+      setScanningSource(null)
       // Reset file input so the same file can be re-selected
       if (fileRef.current) fileRef.current.value = ''
     }
-  }, [])
+  }, [pendingScanSource, taggedItems.length])
 
   // ── Manual add ────────────────────────────────────────────
 
   const addManualItem = useCallback(() => {
     const val = manualInput.trim().toLowerCase()
     if (!val) return
-    setItems(prev => (prev.includes(val) ? prev : [...prev, val]))
+    setTaggedItems(prev => {
+      const exists = prev.some(i => i.name === val)
+      if (exists) return prev
+      return [...prev, { name: val, source: 'manual' }]
+    })
     setManualInput('')
   }, [manualInput])
 
-  const removeItem = useCallback((item: string) => {
-    setItems(prev => prev.filter(i => i !== item))
+  const removeItem = useCallback((name: string) => {
+    setTaggedItems(prev => prev.filter(i => i.name !== name))
   }, [])
 
   const handleManualKeyDown = useCallback((e: React.KeyboardEvent) => {
@@ -128,9 +192,29 @@ export function PantryCapture({ onConfirm, onCancel }: Props) {
   // ── Confirm ───────────────────────────────────────────────
 
   const handleConfirm = useCallback(() => {
-    if (items.length === 0) return
-    onConfirm(items)
-  }, [items, onConfirm])
+    const validationError = validateIngredients(taggedItems)
+    if (validationError) {
+      setError(validationError)
+      return
+    }
+    // Pass only the names (strings) to the parent — normalized and deduped
+    const names = taggedItems.map(i => i.name).filter(Boolean)
+    onConfirm(names)
+  }, [taggedItems, onConfirm])
+
+  // ── Source badge color ────────────────────────────────────
+
+  const sourceBadge = (source: TaggedIngredient['source']) => {
+    if (source === 'fridge') return 'bg-blue-50 border-blue-200 text-blue-900'
+    if (source === 'pantry') return 'bg-amber-50 border-amber-200 text-amber-900'
+    return 'bg-emerald-50 border-emerald-200 text-emerald-900'
+  }
+
+  const sourceLabel = (source: TaggedIngredient['source']) => {
+    if (source === 'fridge') return '🧊'
+    if (source === 'pantry') return '🥫'
+    return '✏️'
+  }
 
   return (
     <>
@@ -152,7 +236,7 @@ export function PantryCapture({ onConfirm, onCancel }: Props) {
 
       <AnimatePresence mode="wait">
         {/* ── CHOOSE MODE ──────────────────────────────────── */}
-        {(phase === 'choose') && (
+        {phase === 'choose' && (
           <motion.div
             key="choose"
             initial={{ opacity: 0 }}
@@ -164,7 +248,7 @@ export function PantryCapture({ onConfirm, onCancel }: Props) {
                 🥫 What&apos;s in your kitchen?
               </h2>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Snap a photo or type items manually
+                Snap a photo of your fridge, pantry, or type items manually
               </p>
             </div>
 
@@ -175,23 +259,43 @@ export function PantryCapture({ onConfirm, onCancel }: Props) {
             )}
 
             <div className="flex flex-col gap-3">
+              {/* Fridge scan */}
               <button
-                onClick={() => fileRef.current?.click()}
-                className="flex items-center gap-4 w-full px-5 py-4 rounded-2xl border-2 border-primary/40 bg-primary/5 hover:bg-primary/10 hover:border-primary/60 hover:shadow-lg transition-all group text-left"
+                onClick={() => triggerScan('fridge')}
+                className="flex items-center gap-4 w-full px-5 py-4 rounded-2xl border-2 border-blue-300/60 bg-blue-50/60 hover:bg-blue-50 hover:border-blue-400/60 hover:shadow-lg transition-all group text-left"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 flex-shrink-0">
-                  <Camera className="h-6 w-6 text-primary" />
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 flex-shrink-0">
+                  <Camera className="h-6 w-6 text-blue-600" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold group-hover:text-primary transition-colors">
-                    Take a photo
+                  <p className="text-sm font-bold group-hover:text-blue-700 transition-colors">
+                    📸 Snap your fridge
                   </p>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    Snap your fridge or pantry shelf
+                    AI detects what&apos;s inside
                   </p>
                 </div>
               </button>
 
+              {/* Pantry scan */}
+              <button
+                onClick={() => triggerScan('pantry')}
+                className="flex items-center gap-4 w-full px-5 py-4 rounded-2xl border-2 border-amber-300/60 bg-amber-50/60 hover:bg-amber-50 hover:border-amber-400/60 hover:shadow-lg transition-all group text-left"
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100 flex-shrink-0">
+                  <Camera className="h-6 w-6 text-amber-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold group-hover:text-amber-700 transition-colors">
+                    🥫 Snap your pantry shelf
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Detect dry goods, cans, and staples
+                  </p>
+                </div>
+              </button>
+
+              {/* Manual entry */}
               <button
                 onClick={() => setPhase('manual')}
                 className="flex items-center gap-4 w-full px-5 py-4 rounded-2xl border border-border/60 bg-white hover:border-primary/40 hover:shadow-md transition-all group text-left"
@@ -201,7 +305,7 @@ export function PantryCapture({ onConfirm, onCancel }: Props) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold group-hover:text-primary transition-colors">
-                    Type ingredients
+                    ✏️ Type ingredients
                   </p>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     Add items one by one
@@ -210,13 +314,13 @@ export function PantryCapture({ onConfirm, onCancel }: Props) {
               </button>
             </div>
 
-            {/* Show "Continue with items" if we already have some from a previous scan */}
-            {items.length > 0 && (
+            {/* Continue with existing items */}
+            {taggedItems.length > 0 && (
               <button
                 onClick={() => setPhase('review')}
                 className="mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition-colors"
               >
-                Review {items.length} item{items.length !== 1 ? 's' : ''}
+                Review {taggedItems.length} item{taggedItems.length !== 1 ? 's' : ''}
                 <ArrowRight className="h-4 w-4" />
               </button>
             )}
@@ -240,7 +344,9 @@ export function PantryCapture({ onConfirm, onCancel }: Props) {
             className="flex flex-col items-center justify-center py-16"
           >
             <Loader2 className="h-10 w-10 text-primary animate-spin mb-4" />
-            <p className="text-sm font-semibold text-foreground">Scanning your photo…</p>
+            <p className="text-sm font-semibold text-foreground">
+              Scanning your {scanningSource === 'pantry' ? 'pantry' : 'fridge'}…
+            </p>
             <p className="text-xs text-muted-foreground mt-1">AI is identifying ingredients</p>
           </motion.div>
         )}
@@ -282,17 +388,18 @@ export function PantryCapture({ onConfirm, onCancel }: Props) {
             </div>
 
             {/* Item chips */}
-            {items.length > 0 && (
+            {taggedItems.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-4">
-                {items.map(item => (
+                {taggedItems.map(item => (
                   <span
-                    key={item}
-                    className="inline-flex items-center gap-1.5 pl-3 pr-1.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-sm text-emerald-900"
+                    key={item.name}
+                    className={`inline-flex items-center gap-1.5 pl-2 pr-1.5 py-1.5 rounded-full border text-sm ${sourceBadge(item.source)}`}
                   >
-                    {item}
+                    <span className="text-xs">{sourceLabel(item.source)}</span>
+                    {item.name}
                     <button
-                      onClick={() => removeItem(item)}
-                      className="flex h-5 w-5 items-center justify-center rounded-full hover:bg-emerald-200 transition-colors"
+                      onClick={() => removeItem(item.name)}
+                      className="flex h-5 w-5 items-center justify-center rounded-full hover:bg-black/10 transition-colors"
                     >
                       <X className="h-3 w-3" />
                     </button>
@@ -303,25 +410,25 @@ export function PantryCapture({ onConfirm, onCancel }: Props) {
 
             <div className="flex gap-2">
               <button
-                onClick={() => fileRef.current?.click()}
+                onClick={() => triggerScan('fridge')}
                 className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-border/60 text-sm text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all"
               >
                 <Camera className="h-4 w-4" />
-                Scan a photo too
+                Scan fridge too
               </button>
-              {items.length > 0 && (
+              {taggedItems.length > 0 && (
                 <button
                   onClick={() => setPhase('review')}
                   className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition-colors"
                 >
-                  Review ({items.length})
+                  Review ({taggedItems.length})
                   <ArrowRight className="h-4 w-4" />
                 </button>
               )}
             </div>
 
             <button
-              onClick={() => setPhase(items.length > 0 ? 'choose' : 'choose')}
+              onClick={() => setPhase('choose')}
               className="mt-3 w-full text-center text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
             >
               Back
@@ -337,61 +444,100 @@ export function PantryCapture({ onConfirm, onCancel }: Props) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <div className="mb-5">
+            <div className="mb-4">
               <h2 className="text-lg font-bold text-foreground leading-snug">
                 ✅ Confirm your items
               </h2>
               <p className="text-xs text-muted-foreground mt-0.5">
                 Remove anything that doesn&apos;t look right
               </p>
+
+              {/* Source legend */}
+              <div className="flex items-center gap-3 mt-2">
+                <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+                  <span className="inline-block w-2 h-2 rounded-full bg-blue-400" /> Fridge
+                </span>
+                <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+                  <span className="inline-block w-2 h-2 rounded-full bg-amber-400" /> Pantry
+                </span>
+                <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+                  <span className="inline-block w-2 h-2 rounded-full bg-emerald-400" /> Manual
+                </span>
+              </div>
             </div>
 
-            <div className="flex flex-wrap gap-2 mb-6">
-              {items.map(item => (
-                <motion.span
-                  key={item}
-                  layout
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  className="inline-flex items-center gap-1.5 pl-3 pr-1.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-sm text-emerald-900"
+            {error && (
+              <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                {error}
+              </div>
+            )}
+
+            {taggedItems.length === 0 ? (
+              <div className="rounded-xl border border-border/60 bg-muted/30 p-6 text-center mb-4">
+                <p className="text-sm text-muted-foreground">No ingredients yet.</p>
+                <button
+                  onClick={() => setPhase('choose')}
+                  className="mt-2 text-sm text-primary hover:underline"
                 >
-                  {item}
-                  <button
-                    onClick={() => removeItem(item)}
-                    className="flex h-5 w-5 items-center justify-center rounded-full hover:bg-emerald-200 transition-colors"
+                  Add some →
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-wrap gap-2 mb-5">
+                {taggedItems.map(item => (
+                  <motion.span
+                    key={item.name}
+                    layout
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    className={`inline-flex items-center gap-1.5 pl-2 pr-1.5 py-1.5 rounded-full border text-sm ${sourceBadge(item.source)}`}
                   >
-                    <X className="h-3 w-3" />
-                  </button>
-                </motion.span>
-              ))}
-            </div>
+                    <span className="text-xs">{sourceLabel(item.source)}</span>
+                    {item.name}
+                    <button
+                      onClick={() => removeItem(item.name)}
+                      className="flex h-5 w-5 items-center justify-center rounded-full hover:bg-black/10 transition-colors"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </motion.span>
+                ))}
+              </div>
+            )}
 
             {/* Action buttons */}
             <div className="flex flex-col gap-2">
               <button
                 onClick={handleConfirm}
-                disabled={items.length === 0}
+                disabled={taggedItems.length === 0}
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
-                Use these {items.length} item{items.length !== 1 ? 's' : ''}
+                Use these {taggedItems.length} item{taggedItems.length !== 1 ? 's' : ''}
                 <ArrowRight className="h-4 w-4" />
               </button>
 
               <div className="flex gap-2">
                 <button
-                  onClick={() => fileRef.current?.click()}
-                  className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-border/60 text-sm text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all"
+                  onClick={() => triggerScan('fridge')}
+                  className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-blue-200 bg-blue-50 text-sm text-blue-700 hover:bg-blue-100 transition-all"
                 >
                   <Camera className="h-4 w-4" />
-                  Add more
+                  + Fridge
+                </button>
+                <button
+                  onClick={() => triggerScan('pantry')}
+                  className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-amber-200 bg-amber-50 text-sm text-amber-700 hover:bg-amber-100 transition-all"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  + Pantry
                 </button>
                 <button
                   onClick={() => setPhase('manual')}
                   className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-border/60 text-sm text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all"
                 >
                   <Pencil className="h-4 w-4" />
-                  Type more
+                  + Type
                 </button>
               </div>
             </div>

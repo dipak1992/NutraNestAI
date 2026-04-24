@@ -1,3 +1,5 @@
+import { BLOG_POSTS_BATCH2 } from './blog-posts-batch2'
+
 export interface BlogSection {
   heading: string
   paragraphs: string[]
@@ -1597,23 +1599,25 @@ const BLOG_POSTS: BlogPost[] = [
   },
 ]
 
+const ALL_POSTS = [...BLOG_POSTS, ...BLOG_POSTS_BATCH2]
+
 export function getAllBlogPosts() {
-  return BLOG_POSTS.toSorted((a, b) =>
+  return ALL_POSTS.toSorted((a, b) =>
     new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
   )
 }
 
 export function getBlogPostBySlug(slug: string) {
-  return BLOG_POSTS.find((post) => post.slug === slug) ?? null
+  return ALL_POSTS.find((post) => post.slug === slug) ?? null
 }
 
 export function getRelatedPosts(slug: string, limit = 3) {
   const post = getBlogPostBySlug(slug)
   if (!post) return []
-  const sameCategory = BLOG_POSTS.filter(
+  const sameCategory = ALL_POSTS.filter(
     (p) => p.slug !== slug && p.category === post.category,
   )
-  const others = BLOG_POSTS.filter(
+  const others = ALL_POSTS.filter(
     (p) => p.slug !== slug && p.category !== post.category,
   )
   return [...sameCategory, ...others].slice(0, limit)

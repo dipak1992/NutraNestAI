@@ -39,6 +39,8 @@ export type PlanMode =
 export type CookMode =
   | 'snap'        // Snap & Cook (FREE basic)
   | 'pantry'      // Pantry meals (PRO)
+  | 'menu-scan'   // Smart Menu Scan (PRO)
+  | 'food-check'  // Food Check (PRO)
   | 'leftover'    // Leftover reuse (PRO)
 
 // ── Tonight chip config ───────────────────────────────────────────────────────
@@ -141,6 +143,8 @@ export interface TierFeatures {
   snapCookBasic: boolean
   pantryMeals: boolean
   smartLeftovers: boolean
+  smartMenuScan: boolean
+  foodCheck: boolean
 
   // Household
   oneProfile: boolean
@@ -164,6 +168,8 @@ export const TIER_FEATURES: Record<SubscriptionTier, TierFeatures> = {
     snapCookBasic: true,
     pantryMeals: false,
     smartLeftovers: false,
+    smartMenuScan: false,
+    foodCheck: false,
     oneProfile: true,
     householdMemory: false,
     multiMember: false,
@@ -183,6 +189,8 @@ export const TIER_FEATURES: Record<SubscriptionTier, TierFeatures> = {
     snapCookBasic: true,
     pantryMeals: true,
     smartLeftovers: true,
+    smartMenuScan: true,
+    foodCheck: true,
     oneProfile: true,
     householdMemory: true,
     multiMember: false,
@@ -202,6 +210,8 @@ export const TIER_FEATURES: Record<SubscriptionTier, TierFeatures> = {
     snapCookBasic: true,
     pantryMeals: true,
     smartLeftovers: true,
+    smartMenuScan: true,
+    foodCheck: true,
     oneProfile: true,
     householdMemory: true,
     multiMember: true,

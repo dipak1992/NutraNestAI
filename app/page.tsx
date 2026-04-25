@@ -1,3 +1,5 @@
+import { redirect } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
 import { Nav } from '@/components/landing/Nav'
 import { Hero } from '@/components/landing/Hero'
 import { HowItWorks } from '@/components/landing/HowItWorks'
@@ -22,7 +24,16 @@ export const metadata = {
   },
 }
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  // If user is already authenticated, send them to the dashboard
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) redirect('/dashboard')
+  } catch {
+    // Supabase unavailable — show landing page
+  }
+
   return (
     <>
       <script

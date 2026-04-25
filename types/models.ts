@@ -405,3 +405,226 @@ export interface PlanLimits {
   nutrition_info: boolean
 }
 
+
+// ============================================================
+// DOMAIN INTERFACES (camelCase)
+// Used for application logic, API responses, and UI state.
+// The snake_case types above map directly to Supabase DB rows.
+// These camelCase interfaces are the "app layer" representation.
+// ============================================================
+
+export interface User {
+  id: string
+  email: string
+  firstName: string
+  lastName: string | null
+  timezone: string
+  createdAt: Date
+  /** 'free' | 'pro' | 'family' */
+  plan: SubscriptionTier
+  trialEndsAt: Date | null
+  onboardingCompleted: boolean
+  hasSeenDashboardTour: boolean
+  /** For grocery pricing estimates */
+  zipCode: string | null
+}
+
+export interface HouseholdDomain {
+  id: string
+  name: string
+  ownerId: string
+  inviteCode: string | null
+  createdAt: Date
+  dietaryPreferences: DietaryPreference[]
+  cuisinePreferences: string[]
+  budgetWeekly: number | null
+  cookingSkillLevel: 'beginner' | 'comfortable' | 'confident'
+}
+
+export interface HouseholdMemberDomain {
+  id: string
+  householdId: string
+  /** null for non-user members (e.g. kids) */
+  userId: string | null
+  displayName: string
+  role: 'owner' | 'adult' | 'teen' | 'kid'
+  age: number | null
+  allergies: string[]
+  dislikes: string[]
+  joinedAt: Date
+}
+
+export interface RecipeDomain {
+  id: string
+  slug: string
+  name: string
+  description: string
+  image: string | null
+  prepTimeMinutes: number
+  cookTimeMinutes: number
+  totalTimeMinutes: number
+  servings: number
+  difficulty: 'easy' | 'medium' | 'hard'
+  cuisine: string | null
+  tags: string[]
+  dietaryTags: DietaryPreference[]
+  ingredients: IngredientDomain[]
+  steps: RecipeStepDomain[]
+  nutritionPerServing: NutritionInfoDomain | null
+  estimatedCostUSD: number | null
+  source: 'ai_generated' | 'curated' | 'user_saved'
+  isPublic: boolean
+  createdAt: Date
+  createdBy: string | null
+}
+
+export interface IngredientDomain {
+  id: string
+  name: string
+  normalizedName: string
+  quantity: number
+  unit: string
+  category: 'produce' | 'protein' | 'dairy' | 'pantry' | 'frozen' | 'spices' | 'other'
+  isOptional: boolean
+  estimatedCostUSD: number | null
+}
+
+export interface RecipeStepDomain {
+  stepNumber: number
+  instruction: string
+  durationMinutes: number | null
+  tip: string | null
+  imageUrl: string | null
+}
+
+export interface NutritionInfoDomain {
+  calories: number
+  proteinGrams: number
+  carbsGrams: number
+  fatGrams: number
+  fiberGrams: number
+  sugarGrams: number
+  sodiumMg: number
+}
+
+export interface WeekPlan {
+  id: string
+  householdId: string
+  /** Always a Monday */
+  weekStartDate: Date
+  days: DayPlanDomain[]
+  isAutopilotGenerated: boolean
+  totalEstimatedCostUSD: number | null
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface DayPlanDomain {
+  id: string
+  weekPlanId: string
+  date: Date
+  dayOfWeek: string
+  recipeId: string | null
+  status: 'planned' | 'cooked' | 'skipped' | 'empty'
+  cookedAt: Date | null
+  notes: string | null
+}
+
+export interface PantryItemDomain {
+  id: string
+  householdId: string
+  ingredientName: string
+  normalizedName: string
+  quantity: number
+  unit: string
+  category: string
+  addedAt: Date
+  expiresAt: Date | null
+  source: 'manual' | 'scan' | 'grocery_sync'
+}
+
+export interface ScanDomain {
+  id: string
+  userId: string
+  householdId: string
+  imageUrl: string
+  mode: 'auto' | 'fridge' | 'menu' | 'food'
+  detectedType: 'fridge' | 'menu' | 'food' | null
+  detectedItems: string[]
+  resultRecipeIds: string[]
+  processingTimeMs: number
+  createdAt: Date
+}
+
+export interface LeftoverDomain {
+  id: string
+  householdId: string
+  sourceRecipeId: string | null
+  cookedAt: Date
+  estimatedServingsRemaining: number
+  mainIngredients: string[]
+  status: 'active' | 'used' | 'expired' | 'discarded'
+  /** Typically 3–4 days after cookedAt */
+  expiresAt: Date
+  usedInRecipeId: string | null
+  usedAt: Date | null
+}
+
+export interface BudgetSettingsDomain {
+  id: string
+  householdId: string
+  weeklyBudgetUSD: number | null
+  /** Reject AI plans that exceed the budget */
+  isStrictMode: boolean
+  zipCode: string
+  preferredStore: 'instacart' | 'kroger' | 'walmart' | 'generic' | null
+  updatedAt: Date
+}
+
+export interface WeeklySpendDomain {
+  id: string
+  householdId: string
+  weekStartDate: Date
+  estimatedTotalUSD: number
+  actualTotalUSD: number | null
+  mealsCount: number
+  costPerMealUSD: number
+}
+
+export interface GroceryListDomain {
+  id: string
+  weekPlanId: string | null
+  items: GroceryItemDomain[]
+  generatedAt: Date
+  exportedAt: Date | null
+  exportDestination: 'instacart' | 'amazon_fresh' | 'email' | 'pdf' | null
+}
+
+export interface GroceryItemDomain {
+  id: string
+  ingredientName: string
+  quantity: number
+  unit: string
+  category: string
+  estimatedCostUSD: number
+  isChecked: boolean
+  /** Already have it in pantry */
+  isInPantry: boolean
+  addedManually: boolean
+}
+
+export interface ContextualNudgeDomain {
+  id: string
+  userId: string
+  type: NudgeType
+  priority: number
+  title: string
+  description: string
+  ctaLabel: string
+  ctaAction: string
+  dismissible: boolean
+  shownAt: Date | null
+  dismissedAt: Date | null
+  clickedAt: Date | null
+  expiresAt: Date | null
+}

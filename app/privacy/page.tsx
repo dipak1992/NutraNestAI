@@ -1,30 +1,15 @@
 import { buildMetadata } from '@/lib/seo'
 import { Nav } from '@/components/landing/Nav'
 import { Footer } from '@/components/landing/Footer'
-import { LegalShell, LegalSection } from '@/components/legal/LegalShell'
+import { LegalShell } from '@/components/legal/LegalShell'
+import Link from 'next/link'
 
-const lastUpdated = 'April 14, 2026'
-
-const TOC = [
-  { id: 'overview', title: 'Overview' },
-  { id: 'information-we-collect', title: 'Information We Collect' },
-  { id: 'authentication', title: 'Authentication' },
-  { id: 'how-we-use', title: 'How We Use Your Information' },
-  { id: 'cookies', title: 'Cookies and Tracking' },
-  { id: 'ai-content', title: 'AI-Generated Content' },
-  { id: 'third-party', title: 'Third-Party Services' },
-  { id: 'childrens-data', title: "Children's Data" },
-  { id: 'retention', title: 'Data Retention and Security' },
-  { id: 'your-rights', title: 'Your Rights and Choices' },
-  { id: 'international', title: 'International Transfers' },
-  { id: 'changes', title: 'Changes to This Policy' },
-  { id: 'contact', title: 'Contact Us' },
-]
+const UPDATED_AT = '2024-12-15'
 
 export const metadata = buildMetadata({
   title: 'Privacy Policy',
   description:
-    'Read how MealEase collects, uses, stores, and protects your data, including account details, family preferences, AI-generated meal content, and your privacy rights.',
+    'What we collect, how we use it, and your rights. In plain English.',
   path: '/privacy',
   keywords: ['MealEase privacy policy', 'family meal app privacy', 'MealEase data policy'],
 })
@@ -36,125 +21,253 @@ export default function PrivacyPage() {
       <main>
         <LegalShell
           title="Privacy Policy"
-          intro="This Privacy Policy explains how MealEase collects, uses, stores, and protects information when you use mealeaseai.com and related services."
-          lastUpdated={lastUpdated}
-          toc={TOC}
-        >
-          <LegalSection id="overview" title="Overview">
-            <p>
-              MealEase is an AI-powered meal planning assistant designed to help families decide what to cook, organize meals, and reduce day-to-day dinner stress. We work hard to keep your information private, secure, and used only in ways that support the service.
-            </p>
-          </LegalSection>
-
-          <LegalSection id="information-we-collect" title="Information We Collect">
-            <p>
-              We collect account information such as your name, email address, login details, and authentication identifiers when you create or access an account.
-            </p>
-            <p>
-              We also collect household and meal-planning preferences you choose to provide, including dietary preferences, allergies, pantry details, family composition, cooking goals, and meal feedback.
-            </p>
-            <p>
-              In addition, we collect usage data such as app interactions, page visits, device or browser information, approximate location based on IP address, and performance logs that help us understand how the product is working.
-            </p>
-          </LegalSection>
-
-          <LegalSection id="authentication" title="Authentication and Account Access">
-            <p>
-              MealEase supports sign-in through email-based authentication and third-party login providers such as Google. When you sign in with Google, we receive basic account details that are necessary to authenticate you and operate your account.
-            </p>
-            <p>
-              Authentication and account storage are managed through Supabase and related infrastructure providers acting on our behalf.
-            </p>
-          </LegalSection>
-
-          <LegalSection id="how-we-use" title="How We Use Your Information">
-            <p>We use collected information to provide, maintain, and improve MealEase, including to:</p>
-            <ul className="list-disc space-y-2 pl-5">
-              <li>create and secure your account</li>
-              <li>generate meal ideas, meal plans, grocery lists, and family-specific variations</li>
-              <li>personalize recommendations based on your preferences and feedback</li>
-              <li>process subscriptions, billing, and support requests</li>
-              <li>monitor performance, fix bugs, and prevent abuse or fraud</li>
-              <li>communicate product updates, service notices, and important legal or security messages</li>
-            </ul>
-          </LegalSection>
-
-          <LegalSection id="cookies" title="Cookies and Tracking">
-            <p>
-              We use cookies and similar technologies to keep you signed in, remember preferences, measure site performance, understand product usage, and improve the experience over time.
-            </p>
-            <p>
-              Some cookies are necessary for the service to function. Others may support analytics, experimentation, or fraud prevention. You can control cookies through your browser settings, but disabling certain cookies may affect how MealEase works.
-            </p>
-          </LegalSection>
-
-          <LegalSection id="ai-content" title="AI-Generated Content Handling">
-            <p>
-              MealEase uses AI systems to generate meal suggestions, meal plans, ingredient ideas, and related text. To produce relevant outputs, we may send limited request data such as household preferences, dietary restrictions, pantry details, and meal context to AI service providers.
-            </p>
-            <p>
-              We do not use AI-generated content as a substitute for medical advice. We may log prompts, outputs, errors, and feedback to improve quality, reliability, and safety.
-            </p>
-          </LegalSection>
-
-          <LegalSection id="third-party" title="Third-Party Services">
-            <p>
-              We rely on third-party providers to operate MealEase. These may include Supabase for authentication and database services, payment processors for subscription billing, analytics providers to understand app usage, hosting providers, and AI model providers that help generate content.
-            </p>
-            <p>
-              These providers only receive information necessary for their services and are expected to handle data according to their own privacy and security obligations.
-            </p>
-          </LegalSection>
-
-          <LegalSection id="childrens-data" title="Children's Data">
-            <p>
-              MealEase is intended for parents, guardians, and adult household planners. It is not designed for direct use by children.
-            </p>
-            <p>
-              Because the service may involve meal planning for babies or children, adults may choose to enter information about a child&apos;s age, dietary needs, allergies, or food preferences. We treat that information carefully and use it only to provide the requested meal-planning experience.
-            </p>
-            <p>
-              If you believe a child has provided personal information to MealEase directly without appropriate adult involvement, contact us at hello@mealeaseai.com and we will review and delete the information when appropriate.
-            </p>
-          </LegalSection>
-
-          <LegalSection id="retention" title="Data Retention and Security">
-            <p>
-              We retain personal information for as long as needed to provide the service, comply with legal obligations, resolve disputes, and enforce our agreements.
-            </p>
-            <p>
-              We use reasonable administrative, technical, and organizational safeguards to protect your data. No system is completely secure, so we cannot guarantee absolute security.
-            </p>
-          </LegalSection>
-
-          <LegalSection id="your-rights" title="Your Rights and Choices">
-            <p>Depending on where you live, you may have the right to request access to, correction of, export of, or deletion of your personal information.</p>
-            <p>
-              You may also ask us to restrict certain processing or object to certain uses of your data where applicable. We may need to verify your identity before fulfilling a request.
-            </p>
-            <p>
-              You can contact us at hello@mealeaseai.com to request access, correction, or deletion of your information.
-            </p>
-          </LegalSection>
-
-          <LegalSection id="international" title="International Transfers">
-            <p>
-              MealEase is based in the United States. If you use the service from another country, your information may be transferred to and processed in the United States or other countries where our providers operate.
-            </p>
-          </LegalSection>
-
-          <LegalSection id="changes" title="Changes to This Policy">
-            <p>
-              We may update this Privacy Policy from time to time. When we make material changes, we will update the date above and may provide additional notice inside the product or by email when appropriate.
-            </p>
-          </LegalSection>
-
-          <LegalSection id="contact" title="Contact Us">
-            <p>
-              If you have questions about this Privacy Policy, data practices, or your privacy rights, contact us at hello@mealeaseai.com.
-            </p>
-          </LegalSection>
-        </LegalShell>
+          intro="What we collect, how we use it, and your rights. In plain English."
+          updatedAt={UPDATED_AT}
+          sections={[
+            {
+              id: 'the-short-version',
+              title: 'The short version',
+              content: (
+                <>
+                  <p>
+                    <strong>Your data is yours.</strong> We collect what we need
+                    to give you meal suggestions, budget tracking, and leftover
+                    reminders. Nothing more.
+                  </p>
+                  <p>
+                    <strong>We never sell your data.</strong> Not your grocery
+                    habits, not your dietary preferences, not your kitchen photos
+                    — to anyone, ever.
+                  </p>
+                  <p>
+                    <strong>You can take it with you or delete it.</strong>{' '}
+                    Anytime. Settings → Your data.
+                  </p>
+                  <p>
+                    <strong>We use standard tools</strong> — Supabase for
+                    auth/database, Stripe for billing, OpenAI/Anthropic for AI
+                    features, PostHog for product analytics. More below.
+                  </p>
+                </>
+              ),
+            },
+            {
+              id: 'what-we-collect',
+              title: 'What we collect',
+              content: (
+                <>
+                  <p>
+                    <strong>Account info.</strong> Your email, first name, and
+                    (if you sign in with Google) your profile photo. Password is
+                    never stored in plain text.
+                  </p>
+                  <p>
+                    <strong>Household preferences.</strong> Size, dietary needs,
+                    dislikes, skill level, budget. You provide this during
+                    onboarding and in Settings.
+                  </p>
+                  <p>
+                    <strong>App activity.</strong> Meal plans you create, recipes
+                    you cook, leftovers you save, scans you perform. This is how
+                    we give you personalized suggestions.
+                  </p>
+                  <p>
+                    <strong>Camera photos.</strong> When you scan your fridge, a
+                    menu, or food, we temporarily process the image through our
+                    AI partners. We do not store the raw images after processing.
+                    We only store the extracted data (ingredients, menu items,
+                    nutrition).
+                  </p>
+                  <p>
+                    <strong>Payment info.</strong> Processed by Stripe. We never
+                    see your card number. We store only your Stripe customer ID.
+                  </p>
+                  <p>
+                    <strong>Analytics.</strong> Anonymized product usage via
+                    PostHog — which features get used, where people get stuck.
+                    Never tied to individual identity for marketing.
+                  </p>
+                </>
+              ),
+            },
+            {
+              id: 'how-we-use-it',
+              title: 'How we use it',
+              content: (
+                <>
+                  <p>
+                    <strong>To give you the product.</strong> Your preferences,
+                    pantry, leftovers, and budget feed directly into the
+                    suggestions and plans we generate. Without this data, the app
+                    can&apos;t personalize anything.
+                  </p>
+                  <p>
+                    <strong>To improve the product.</strong> Aggregated,
+                    anonymized usage helps us see which features matter. We never
+                    use individual data for research without explicit consent.
+                  </p>
+                  <p>
+                    <strong>To communicate with you.</strong> Account emails
+                    (password reset, receipts), product updates if you opt in,
+                    and responses when you contact us.
+                  </p>
+                  <p>
+                    <strong>To keep the service secure.</strong> Detect fraud,
+                    abuse, and security issues.
+                  </p>
+                  <p>
+                    That&apos;s it. We don&apos;t build advertising profiles, sell to data
+                    brokers, or share with third parties for their marketing.
+                  </p>
+                </>
+              ),
+            },
+            {
+              id: 'ai-and-third-parties',
+              title: 'AI and third-party services',
+              content: (
+                <>
+                  <p>
+                    To make MealEase work, we rely on a few trusted providers.
+                    Each handles a specific piece:
+                  </p>
+                  <ul className="list-disc pl-5 space-y-2">
+                    <li>
+                      <strong>Supabase</strong> — hosts your account, profile,
+                      and app data.
+                    </li>
+                    <li>
+                      <strong>OpenAI and Anthropic</strong> — process your scans
+                      and generate recipe suggestions. They do not retain your
+                      data for training under our contracts.
+                    </li>
+                    <li>
+                      <strong>Stripe</strong> — handles all payment processing.
+                    </li>
+                    <li>
+                      <strong>PostHog</strong> — anonymized product analytics.
+                    </li>
+                    <li>
+                      <strong>Resend</strong> — transactional email.
+                    </li>
+                    <li>
+                      <strong>Vercel</strong> — hosts the web app.
+                    </li>
+                  </ul>
+                  <p>
+                    Each provider has its own privacy policy. We only share the
+                    minimum necessary data with each one.
+                  </p>
+                </>
+              ),
+            },
+            {
+              id: 'your-rights',
+              title: 'Your rights',
+              content: (
+                <>
+                  <p>
+                    <strong>Access.</strong> Export everything we have on you as
+                    a JSON file. Settings → Your data → Export.
+                  </p>
+                  <p>
+                    <strong>Correction.</strong> Update your profile, preferences,
+                    and household info anytime in Settings.
+                  </p>
+                  <p>
+                    <strong>Deletion.</strong> Delete your account with one tap
+                    in Settings → Your data. Your data is kept for 30 days (in
+                    case you change your mind), then permanently removed.
+                  </p>
+                  <p>
+                    <strong>Opt out of marketing.</strong> We rarely email, but
+                    every email has an unsubscribe link. You can also toggle
+                    preferences in Settings → Notifications.
+                  </p>
+                  <p>
+                    <strong>Under GDPR/CCPA?</strong> You have additional rights
+                    including data portability, objection to processing, and
+                    filing a complaint with a supervisory authority. Email us to
+                    exercise any of these.
+                  </p>
+                </>
+              ),
+            },
+            {
+              id: 'children',
+              title: 'Children',
+              content: (
+                <p>
+                  MealEase is not directed at children under 13. We don&apos;t
+                  knowingly collect data from anyone under 13. If you&apos;re a
+                  parent and believe your child has signed up, email us and
+                  we&apos;ll delete the account.
+                </p>
+              ),
+            },
+            {
+              id: 'security',
+              title: 'Security',
+              content: (
+                <>
+                  <p>
+                    We use standard industry practices: encryption in transit
+                    (HTTPS everywhere), encryption at rest in our database, and
+                    access controls for the small team that can view account
+                    data.
+                  </p>
+                  <p>
+                    No system is 100% secure. If you suspect unauthorized access
+                    to your account, email{' '}
+                    <a
+                      href="mailto:hello@mealeaseai.com"
+                      className="text-[#D97757] hover:underline"
+                    >
+                      hello@mealeaseai.com
+                    </a>{' '}
+                    immediately.
+                  </p>
+                </>
+              ),
+            },
+            {
+              id: 'changes',
+              title: 'Changes to this policy',
+              content: (
+                <p>
+                  If we materially change how we handle your data, we&apos;ll email
+                  you before the change takes effect. Minor updates (fixing
+                  typos, clarifying language) will be reflected here with an
+                  updated &ldquo;last updated&rdquo; date.
+                </p>
+              ),
+            },
+            {
+              id: 'contact',
+              title: 'Contact us',
+              content: (
+                <>
+                  <p>
+                    Questions, concerns, or requests:{' '}
+                    <a
+                      href="mailto:hello@mealeaseai.com"
+                      className="text-[#D97757] hover:underline"
+                    >
+                      hello@mealeaseai.com
+                    </a>
+                  </p>
+                  <p>
+                    Or{' '}
+                    <Link href="/contact" className="text-[#D97757] hover:underline">
+                      use the contact form
+                    </Link>
+                    . Dipak and Suprabha read every message.
+                  </p>
+                </>
+              ),
+            },
+          ]}
+        />
       </main>
       <Footer />
     </>

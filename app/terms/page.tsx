@@ -1,142 +1,160 @@
-import { PublicSiteFooter } from '@/components/layout/PublicSiteFooter'
+import type { ReactNode } from 'react'
+import Link from 'next/link'
 import { PublicSiteHeader } from '@/components/layout/PublicSiteHeader'
-import { LegalDocument, LegalSection } from '@/components/layout/LegalDocument'
-import { buildMetadata } from '@/lib/seo'
+import { PublicSiteFooter } from '@/components/layout/PublicSiteFooter'
+import { LegalShell } from '@/components/legal/LegalShell'
 
-const lastUpdated = 'April 14, 2026'
+export const metadata = {
+  title: 'Terms of Service | MealEase',
+  description: 'The rules of the road for using MealEase. Readable, not legalese.',
+}
 
-export const metadata = buildMetadata({
-  title: 'Terms of Service',
-  description:
-    'Read the MealEase Terms of Service covering account use, subscriptions, billing, intellectual property, and important limitations including the medical advice disclaimer.',
-  path: '/terms',
-  keywords: ['MealEase terms', 'MealEase terms of service', 'meal planning app terms'],
-})
+const UPDATED_AT = '2024-12-15'
+
+type Section = { id: string; title: string; content: ReactNode }
+
+const SECTIONS: Section[] = [
+  {
+    id: 'agreement',
+    title: 'Agreement',
+    content: (
+      <div className="space-y-3">
+        <p>By creating a MealEase account or using the service, you agree to these terms. If you don&apos;t agree, please don&apos;t use MealEase.</p>
+        <p>&ldquo;MealEase,&rdquo; &ldquo;we,&rdquo; &ldquo;us&rdquo; means the MealEase service, operated by the founders. &ldquo;You&rdquo; means you, the person using the service.</p>
+      </div>
+    ),
+  },
+  {
+    id: 'your-account',
+    title: 'Your account',
+    content: (
+      <div className="space-y-3">
+        <p>You need an account to use most features. You must be at least 13 years old. You&apos;re responsible for your account — don&apos;t share your login, use a strong password (or Google sign-in), and tell us if you think your account&apos;s been compromised.</p>
+        <p>One account per person. No bots. No scraping. No trying to break things.</p>
+      </div>
+    ),
+  },
+  {
+    id: 'what-you-can-do',
+    title: 'What you can do',
+    content: (
+      <div className="space-y-3">
+        <p>Use MealEase for planning and cooking meals for yourself and your household. Share the app with friends. Take screenshots. Tell the world.</p>
+        <p>You own your data (meal history, preferences, notes). You give us a limited license to process it so we can give you the service.</p>
+      </div>
+    ),
+  },
+  {
+    id: 'what-you-cant-do',
+    title: "What you can't do",
+    content: (
+      <div className="space-y-3">
+        <p>A non-exhaustive list:</p>
+        <ul className="list-disc list-inside space-y-1">
+          <li>Use MealEase to harass anyone or post illegal content</li>
+          <li>Try to reverse-engineer, scrape, or copy the service to build a competitor</li>
+          <li>Abuse our AI features (e.g., spam our servers, attempt prompt injection)</li>
+          <li>Share your account with strangers</li>
+          <li>Resell MealEase as your own product</li>
+          <li>Use MealEase in ways that violate your local laws</li>
+        </ul>
+        <p>We may suspend or terminate accounts that do any of the above. We&apos;ll always try to be fair, and we&apos;ll tell you what went wrong.</p>
+      </div>
+    ),
+  },
+  {
+    id: 'plans-and-billing',
+    title: 'Plans and billing',
+    content: (
+      <div className="space-y-3">
+        <p><strong className="font-semibold text-foreground">Free plan.</strong> Free forever, with limits as described on the <Link href="/pricing" className="text-[#D97757] hover:underline">pricing page</Link>.</p>
+        <p><strong className="font-semibold text-foreground">Plus and Family.</strong> Paid monthly via Stripe. Your plan renews automatically until you cancel. Prices may change, but we&apos;ll email you 30 days before any price increase affects you.</p>
+        <p><strong className="font-semibold text-foreground">Cancellation.</strong> Cancel anytime from Settings → Billing. Your plan stays active until the end of the billing period. No refunds for partial months, except as required by law.</p>
+        <p><strong className="font-semibold text-foreground">Refunds.</strong> Full refund within 14 days of your first paid charge, no questions asked. After that, contact us and we&apos;ll do the right thing.</p>
+        <p><strong className="font-semibold text-foreground">Taxes.</strong> Prices don&apos;t include sales tax or VAT. Stripe handles the math if your region requires it.</p>
+      </div>
+    ),
+  },
+  {
+    id: 'ai-and-accuracy',
+    title: 'AI-generated content and accuracy',
+    content: (
+      <div className="space-y-3">
+        <p>MealEase uses AI to identify ingredients, generate recipes, estimate costs, and suggest plans. AI gets things wrong sometimes. Nutrition estimates, cost estimates, and recipe suggestions are estimates — not medical, dietary, or financial advice.</p>
+        <p>Always use common sense. If something smells off, it probably is. If an ingredient identification looks wrong, correct it. We can&apos;t guarantee every recipe suits every dietary need, so double-check if you have severe allergies.</p>
+        <p>We are not responsible for cooking injuries, food poisoning, or kitchen disasters. Please be careful.</p>
+      </div>
+    ),
+  },
+  {
+    id: 'service-availability',
+    title: 'Service availability',
+    content: (
+      <div className="space-y-3">
+        <p>We work hard to keep MealEase running, but we can&apos;t promise 100% uptime. Stuff breaks. We fix it. If the service is down for more than 24 hours and you&apos;re on a paid plan, email us and we&apos;ll credit you.</p>
+        <p>We may change or remove features over time. When we remove something people rely on, we&apos;ll give notice.</p>
+      </div>
+    ),
+  },
+  {
+    id: 'liability',
+    title: 'Limits of liability',
+    content: (
+      <div className="space-y-3">
+        <p>To the maximum extent permitted by law, MealEase is provided &ldquo;as is.&rdquo; We&apos;re not liable for indirect damages — lost income, ruined dinner parties, disappointed relatives, or similar.</p>
+        <p>Our total liability to you for any claim is limited to the amount you&apos;ve paid us in the 12 months before the claim, or $100 if you&apos;re on the Free plan.</p>
+        <p>Some jurisdictions don&apos;t allow these limits. If that&apos;s you, the limits apply to the extent the law allows.</p>
+      </div>
+    ),
+  },
+  {
+    id: 'termination',
+    title: 'Termination',
+    content: (
+      <div className="space-y-3">
+        <p>You can delete your account anytime in Settings → Your data.</p>
+        <p>We may suspend or terminate your account for violations of these terms. When we do, we&apos;ll tell you why and give you a chance to export your data.</p>
+      </div>
+    ),
+  },
+  {
+    id: 'changes',
+    title: 'Changes to these terms',
+    content: (
+      <p>We&apos;ll update these terms occasionally. For material changes, we&apos;ll email you at least 30 days before they take effect. Continued use after the effective date means you accept the new terms.</p>
+    ),
+  },
+  {
+    id: 'misc',
+    title: 'The legal catch-all',
+    content: (
+      <div className="space-y-3">
+        <p>These terms are governed by the laws of the State of Texas, United States, without regard to conflict-of-law principles. Disputes go to courts in Texas, unless we both agree otherwise.</p>
+        <p>If any part of these terms is found unenforceable, the rest stays in effect. If we don&apos;t enforce a term right away, it doesn&apos;t mean we&apos;ve waived it.</p>
+      </div>
+    ),
+  },
+  {
+    id: 'contact-terms',
+    title: 'Contact us',
+    content: (
+      <p>Questions about these terms? <a href="mailto:hello@mealeaseai.com" className="text-[#D97757] hover:underline">hello@mealeaseai.com</a></p>
+    ),
+  },
+]
 
 export default function TermsPage() {
   return (
     <>
       <PublicSiteHeader />
-      <LegalDocument
-        title="Terms of Service"
-        intro="These Terms of Service govern your use of MealEase, including mealeaseai.com and related websites, applications, and services."
-        lastUpdated={lastUpdated}
-      >
-        <LegalSection title="Acceptance of Terms">
-          <p>
-            By accessing or using MealEase, you agree to these Terms of Service. If you do not agree, do not use the service.
-          </p>
-          <p>
-            If you use MealEase on behalf of a household, company, or other entity, you represent that you have authority to bind that party to these terms.
-          </p>
-        </LegalSection>
-
-        <LegalSection title="Description of Service">
-          <p>
-            MealEase is an AI-powered meal planning assistant that helps users explore meal ideas, build meal plans, organize grocery lists, adapt meals for different household needs, and manage related food-planning workflows.
-          </p>
-          <p>
-            We may update, improve, limit, or discontinue parts of the service from time to time.
-          </p>
-        </LegalSection>
-
-        <LegalSection title="Accounts and User Responsibilities">
-          <p>
-            You are responsible for providing accurate information, keeping your login credentials secure, and using MealEase in a lawful and respectful way.
-          </p>
-          <p>You agree not to:</p>
-          <ul className="list-disc space-y-2 pl-5">
-            <li>use the service to violate laws or infringe the rights of others</li>
-            <li>attempt to access systems or data you are not authorized to access</li>
-            <li>interfere with the operation, integrity, or security of MealEase</li>
-            <li>copy, scrape, reverse engineer, or misuse the service beyond what is permitted by law</li>
-          </ul>
-        </LegalSection>
-
-        <LegalSection title="Important Health and Medical Disclaimer">
-          <p>
-            MealEase is for informational and planning purposes only. It is not medical advice, nutritional therapy, diagnosis, treatment, or a substitute for advice from a physician, pediatrician, registered dietitian, or other qualified healthcare professional.
-          </p>
-          <p>
-            You are responsible for reviewing ingredients, recipes, allergens, and meal suitability before serving food to yourself or anyone else. If you or a family member has allergies, medical conditions, special nutritional needs, or safety concerns, you should consult a qualified professional.
-          </p>
-        </LegalSection>
-
-        <LegalSection title="Subscriptions, Billing, and Trials">
-          <p>
-            Some parts of MealEase may require a paid subscription. Prices, plan details, trial offers, and included features may change over time.
-          </p>
-          <p>
-            If you start a paid plan, you authorize us and our payment processor to charge the applicable subscription fees, taxes, and any related charges using your chosen payment method.
-          </p>
-          <p>
-            Any trial or promotional access is offered at our discretion and may be modified or withdrawn at any time.
-          </p>
-        </LegalSection>
-
-        <LegalSection title="Cancellation Policy">
-          <p>
-            You may cancel your subscription at any time. Unless otherwise stated, cancellation stops future renewal charges but does not automatically create a refund for the current billing period.
-          </p>
-          <p>
-            Your access to paid features will usually continue until the end of the active billing period, after which your account may return to the free version of MealEase.
-          </p>
-        </LegalSection>
-
-        <LegalSection title="Refunds">
-          <p>
-            Except where required by law or expressly stated otherwise, payments are non-refundable. If you believe a charge was made in error, contact hello@mealeaseai.com.
-          </p>
-        </LegalSection>
-
-        <LegalSection title="Intellectual Property">
-          <p>
-            MealEase, including its branding, design, software, content, and service features, is owned by MealEase or its licensors and is protected by intellectual property laws.
-          </p>
-          <p>
-            Subject to these terms, we grant you a limited, non-exclusive, non-transferable, revocable right to use the service for personal or internal household purposes.
-          </p>
-        </LegalSection>
-
-        <LegalSection title="AI Output and Service Availability">
-          <p>
-            MealEase uses AI-generated outputs, which may occasionally be incomplete, inaccurate, or unsuitable for your circumstances. You should review all output carefully before relying on it.
-          </p>
-          <p>
-            We do not guarantee uninterrupted availability, perfect accuracy, or error-free operation.
-          </p>
-        </LegalSection>
-
-        <LegalSection title="Limitation of Liability">
-          <p>
-            To the fullest extent permitted by law, MealEase and its founders, affiliates, employees, and service providers will not be liable for indirect, incidental, special, consequential, exemplary, or punitive damages, or for any loss of data, profits, goodwill, or business opportunity arising from your use of the service.
-          </p>
-          <p>
-            To the fullest extent permitted by law, our total liability for any claim relating to MealEase will not exceed the amount you paid us in the twelve months before the claim arose, or one hundred U.S. dollars if you have not made any payments.
-          </p>
-        </LegalSection>
-
-        <LegalSection title="Termination">
-          <p>
-            We may suspend or terminate access to MealEase if you violate these terms, create risk for other users or the service, or if we decide to discontinue the service.
-          </p>
-          <p>
-            You may stop using MealEase at any time. Sections that reasonably should survive termination, including payment obligations, limitations of liability, and intellectual property protections, will continue to apply.
-          </p>
-        </LegalSection>
-
-        <LegalSection title="Changes to These Terms">
-          <p>
-            We may update these terms from time to time. When we do, we will post the updated version here and revise the date above. Continued use of MealEase after changes take effect means you accept the updated terms.
-          </p>
-        </LegalSection>
-
-        <LegalSection title="Contact and Support">
-          <p>
-            Questions about these terms, subscriptions, or billing can be sent to hello@mealeaseai.com.
-          </p>
-        </LegalSection>
-      </LegalDocument>
+      <main>
+        <LegalShell
+          title="Terms of Service"
+          intro="The rules of the road for using MealEase. We've tried to make this readable, not legalese."
+          updatedAt={UPDATED_AT}
+          sections={SECTIONS}
+        />
+      </main>
       <PublicSiteFooter />
     </>
   )

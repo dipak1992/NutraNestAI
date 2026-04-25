@@ -147,9 +147,6 @@ export interface TierFeatures {
   householdMemory: boolean
   multiMember: boolean
   kidsTools: boolean
-  guestHostingPlanner: boolean
-  conflictBalancing: boolean
-  sharedPlanning: boolean
 }
 
 export const TIER_FEATURES: Record<SubscriptionTier, TierFeatures> = {
@@ -168,9 +165,6 @@ export const TIER_FEATURES: Record<SubscriptionTier, TierFeatures> = {
     householdMemory: false,
     multiMember: false,
     kidsTools: false,
-    guestHostingPlanner: false,
-    conflictBalancing: false,
-    sharedPlanning: false,
   },
   pro: {
     tonightBasic: true,
@@ -187,9 +181,6 @@ export const TIER_FEATURES: Record<SubscriptionTier, TierFeatures> = {
     householdMemory: true,
     multiMember: false,
     kidsTools: false,
-    guestHostingPlanner: false,
-    conflictBalancing: false,
-    sharedPlanning: false,
   },
   family: {
     tonightBasic: true,
@@ -206,9 +197,6 @@ export const TIER_FEATURES: Record<SubscriptionTier, TierFeatures> = {
     householdMemory: true,
     multiMember: true,
     kidsTools: true,
-    guestHostingPlanner: true,
-    conflictBalancing: true,
-    sharedPlanning: true,
   },
 }
 

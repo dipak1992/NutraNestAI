@@ -1,30 +1,35 @@
-import { PublicSiteFooter } from '@/components/layout/PublicSiteFooter'
-import { PublicSiteHeader } from '@/components/layout/PublicSiteHeader'
-import { buildMetadata } from '@/lib/seo'
-import { AboutPageContent } from '@/components/about/AboutPageContent'
+import { Nav } from '@/components/landing/Nav'
+import { Footer } from '@/components/landing/Footer'
+import { AboutHero } from '@/components/about/AboutHero'
+import { FounderStory } from '@/components/about/FounderStory'
+import { WhyBuiltIt } from '@/components/about/WhyBuiltIt'
+import { Principles } from '@/components/about/Principles'
+import { AboutCTA } from '@/components/about/AboutCTA'
 
-export const metadata = buildMetadata({
-  title: 'About',
+export const metadata = {
+  title: "About | MealEase — Built by a family that got tired of 'what's for dinner?'",
   description:
-    "Meet the family behind MealEase — Dipak and Suprabha, two working parents who built a calmer way to decide what's for dinner, so your evenings belong to your family again.",
-  path: '/about',
-  keywords: [
-    'about MealEase',
-    'MealEase founders',
-    'family meal planning story',
-    'busy parents dinner solution',
-    'Dipak Suprabha founders',
-  ],
-})
+    'Meet the husband-and-wife team behind MealEase. A software engineer and a CPA with two tiny kids, building the meal planner they wished existed.',
+  openGraph: {
+    title: 'About MealEase',
+    description:
+      "Built by a family that got tired of the 5:30 PM fridge stare. Meet Dipak and Suprabha.",
+    images: ['/og-about.png'],
+  },
+}
 
 export default function AboutPage() {
   return (
     <>
-      <PublicSiteHeader />
-      <main className="min-h-screen bg-background">
-        <AboutPageContent />
+      <Nav />
+      <main id="main">
+        <AboutHero />
+        <FounderStory />
+        <WhyBuiltIt />
+        <Principles />
+        <AboutCTA />
       </main>
-      <PublicSiteFooter />
+      <Footer />
     </>
   )
 }

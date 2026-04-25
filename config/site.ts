@@ -4,7 +4,6 @@ export const site = {
   url: 'https://mealease.ai',
   nav: [
     { label: 'How it works', href: '#how-it-works' },
-    { label: 'About', href: '/about' },
     { label: 'Pricing', href: '/pricing' },
     { label: 'Log in', href: '/login' },
   ],

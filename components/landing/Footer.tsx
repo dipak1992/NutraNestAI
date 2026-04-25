@@ -75,7 +75,7 @@ export function Footer() {
 
         {/* Bottom bar */}
         <div className="border-t border-neutral-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-600">
-          <p>© {new Date().getFullYear()} MealEase, Inc. All rights reserved.</p>
+          <p suppressHydrationWarning>© {new Date().getFullYear()} MealEase, Inc. All rights reserved.</p>
           <p>Made with ♥ for households everywhere.</p>
         </div>
       </Container>

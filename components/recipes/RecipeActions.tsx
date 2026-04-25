@@ -2,15 +2,16 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChefHat, Share2, Bookmark, BookmarkCheck, Loader2 } from 'lucide-react'
-import type { Meal } from '@/types'
+import { ChefHat, Share2, Bookmark, BookmarkCheck, Loader2, PlayCircle } from 'lucide-react'
+import type { LoadedRecipe } from '@/app/recipes/[id]/loader'
 
 type Props = {
-  meal: Meal
+  recipe: LoadedRecipe
   recipeId: string
+  hasActiveSession?: boolean
 }
 
-export function RecipeActions({ meal, recipeId }: Props) {
+export function RecipeActions({ recipe, recipeId, hasActiveSession = false }: Props) {
   const router = useRouter()
   const [saved, setSaved] = useState(false)
   const [sharing, setSharing] = useState(false)
@@ -20,13 +21,12 @@ export function RecipeActions({ meal, recipeId }: Props) {
     try {
       if (navigator.share) {
         await navigator.share({
-          title: meal.title,
-          text: meal.description,
+          title: recipe.name,
+          text: recipe.description ?? undefined,
           url: window.location.href,
         })
       } else {
         await navigator.clipboard.writeText(window.location.href)
-        // Could show a toast here
       }
     } finally {
       setSharing(false)
@@ -41,8 +41,17 @@ export function RecipeActions({ meal, recipeId }: Props) {
         onClick={() => router.push(`/recipes/${recipeId}/cook`)}
         className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-[#D97757] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#c4694a] sm:flex-none"
       >
-        <ChefHat className="h-4 w-4" />
-        Start cooking
+        {hasActiveSession ? (
+          <>
+            <PlayCircle className="h-4 w-4" />
+            Resume cooking
+          </>
+        ) : (
+          <>
+            <ChefHat className="h-4 w-4" />
+            Start cooking
+          </>
+        )}
       </button>
 
       {/* Save */}

@@ -1,3 +1,6 @@
+import { redirect } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
+import { DashboardNav } from '@/components/dashboard/DashboardNav'
 import { loadRecipe } from './loader'
 import { RecipeHero } from '@/components/recipes/RecipeHero'
 import { IngredientList } from '@/components/recipes/IngredientList'
@@ -6,72 +9,86 @@ import { RecipeActions } from '@/components/recipes/RecipeActions'
 
 type Props = {
   params: Promise<{ id: string }>
+  searchParams: Promise<{ cooked?: string }>
 }
 
 export async function generateMetadata({ params }: Props) {
   const { id } = await params
-  const meal = await loadRecipe(id)
+  const recipe = await loadRecipe(id)
   return {
-    title: `${meal.title} — NutriNest AI`,
-    description: meal.description,
+    title: `${recipe.name} — NutriNest AI`,
+    description: recipe.description,
   }
 }
 
-export default async function RecipePage({ params }: Props) {
+export default async function RecipePage({ params, searchParams }: Props) {
   const { id } = await params
-  const meal = await loadRecipe(id)
+  const { cooked } = await searchParams
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
+  const recipe = await loadRecipe(id)
+
+  // Check if there's an active cook session
+  const { data: activeSession } = await supabase
+    .from('cook_sessions')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('recipe_id', id)
+    .eq('status', 'active')
+    .maybeSingle()
+
+  const hasActiveSession = !!activeSession
 
   return (
-    <main className="min-h-screen bg-[#0f0f0f] pb-16">
-      <div className="mx-auto max-w-2xl px-4 pt-4">
-        {/* Hero */}
-        <RecipeHero meal={meal} />
-
-        <div className="mt-6 space-y-5">
-          {/* Actions */}
-          <RecipeActions meal={meal} recipeId={id} />
-
-          {/* Instructions */}
-          <section className="rounded-3xl border border-white/10 bg-white/5 p-5">
-            <h2 className="mb-4 text-base font-semibold text-white">Instructions</h2>
-            <ol className="space-y-4">
-              {meal.base_instructions.map((step, i) => (
-                <li key={i} className="flex gap-3">
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#D97757]/20 text-xs font-bold text-[#D97757]">
-                    {i + 1}
-                  </span>
-                  <p className="text-sm leading-relaxed text-white/80">{step}</p>
-                </li>
-              ))}
-            </ol>
-          </section>
-
-          {/* Ingredients */}
-          <IngredientList ingredients={meal.base_ingredients} />
-
-          {/* Nutrition (if available via tags/notes) */}
-          {meal.tags.length > 0 && (
-            <NutritionCard
-              nutrition={{
-                calories: meal.tags.includes('high_protein') ? 450 : undefined,
-                protein: meal.tags.includes('high_protein') ? 35 : undefined,
-              }}
-            />
+    <>
+      <DashboardNav />
+      <main className="min-h-screen bg-[#0f0f0f] pb-16">
+        <div className="mx-auto max-w-2xl px-4 pt-4">
+          {/* "Just cooked" banner */}
+          {cooked === '1' && (
+            <div className="mb-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
+              🎉 Great job! Your cook session has been recorded.
+            </div>
           )}
 
-          {/* Safety notes */}
-          {meal.safety_notes.length > 0 && (
-            <section className="rounded-3xl border border-amber-500/20 bg-amber-500/5 p-5">
-              <h2 className="mb-3 text-sm font-semibold text-amber-400">⚠️ Safety notes</h2>
-              <ul className="space-y-1.5">
-                {meal.safety_notes.map((note, i) => (
-                  <li key={i} className="text-sm text-white/70">{note}</li>
+          {/* Hero */}
+          <RecipeHero recipe={recipe} />
+
+          <div className="mt-6 space-y-5">
+            {/* Actions */}
+            <RecipeActions recipe={recipe} recipeId={id} hasActiveSession={hasActiveSession} />
+
+            {/* Instructions */}
+            <section className="rounded-3xl border border-white/10 bg-white/5 p-5">
+              <h2 className="mb-4 text-base font-semibold text-white">Instructions</h2>
+              <ol className="space-y-4">
+                {recipe.steps.map((step) => (
+                  <li key={step.order} className="flex gap-3">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#D97757]/20 text-xs font-bold text-[#D97757]">
+                      {step.order}
+                    </span>
+                    <p className="text-sm leading-relaxed text-white/80">{step.instruction}</p>
+                  </li>
                 ))}
-              </ul>
+              </ol>
             </section>
-          )}
+
+            {/* Ingredients */}
+            <IngredientList
+              ingredients={recipe.ingredients}
+              defaultServings={recipe.servings}
+            />
+
+            {/* Nutrition */}
+            {recipe.nutrition && (
+              <NutritionCard nutrition={recipe.nutrition} />
+            )}
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </>
   )
 }

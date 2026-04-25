@@ -17,46 +17,29 @@ export async function POST(req: Request) {
       weeklyBudget: number | null
     }
 
-    // Map skill level → budget_level for the household table
-    const budgetLevel = body.weeklyBudget
-      ? body.weeklyBudget <= 75
-        ? 'low'
-        : body.weeklyBudget <= 150
-        ? 'medium'
-        : 'high'
-      : 'medium'
-
-    // Upsert household
-    const { error: householdError } = await supabase
-      .from('households')
+    // Upsert household_preferences
+    const { error: prefError } = await supabase
+      .from('household_preferences')
       .upsert(
         {
-          owner_id: user.id,
-          name: 'My Household',
-          adults_count: body.householdSize,
-          babies_count: 0,
-          toddlers_count: 0,
-          kids_count: 0,
-          budget_level: budgetLevel,
-          cooking_time_preference: body.skillLevel === 'beginner' ? 'quick' : 'any',
-          cuisine_preferences: [],
-          low_energy_mode: body.skillLevel === 'beginner',
-          one_pot_preference: body.skillLevel === 'beginner',
-          leftovers_preference: true,
-          pantry_staples: [],
-          preferred_proteins: [],
-          meals_per_day: 3,
+          user_id: user.id,
+          household_size: body.householdSize,
+          dietary_restrictions: body.dietary,
+          disliked_ingredients: body.dislikes,
+          skill_level: body.skillLevel,
+          weekly_budget: body.weeklyBudget,
+          updated_at: new Date().toISOString(),
         },
-        { onConflict: 'owner_id' }
+        { onConflict: 'user_id' }
       )
 
-    if (householdError) throw householdError
+    if (prefError) throw prefError
 
     // Mark onboarding complete on profile
     const { error: profileError } = await supabase
       .from('profiles')
       .update({
-        onboarding_completed: true,
+        has_completed_onboarding: true,
         updated_at: new Date().toISOString(),
       })
       .eq('id', user.id)

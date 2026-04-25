@@ -4,15 +4,12 @@ import { useState } from 'react'
 import { User, Loader2 } from 'lucide-react'
 
 type Props = {
-  profile: {
-    full_name: string | null
-    email: string
-    avatar_url: string | null
-  }
+  firstName: string
+  email: string
 }
 
-export function SectionProfile({ profile }: Props) {
-  const [name, setName] = useState(profile.full_name ?? '')
+export function SectionProfile({ firstName, email }: Props) {
+  const [name, setName] = useState(firstName)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
 
@@ -22,7 +19,7 @@ export function SectionProfile({ profile }: Props) {
       await fetch('/api/settings', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ full_name: name }),
+        body: JSON.stringify({ firstName: name }),
       })
       setSaved(true)
       setTimeout(() => setSaved(false), 2000)
@@ -39,32 +36,27 @@ export function SectionProfile({ profile }: Props) {
       </h2>
 
       <div className="space-y-4">
-        {/* Avatar placeholder */}
+        {/* Email (read-only) */}
         <div className="flex items-center gap-4">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#D97757]/20 text-2xl">
-            {profile.avatar_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={profile.avatar_url} alt="Avatar" className="h-full w-full rounded-full object-cover" />
-            ) : (
-              '👤'
-            )}
+            👤
           </div>
           <div>
-            <p className="text-sm font-medium text-white">{profile.email}</p>
-            <p className="text-xs text-white/40">Avatar managed via your auth provider</p>
+            <p className="text-sm font-medium text-white">{email}</p>
+            <p className="text-xs text-white/40">Email managed via your auth provider</p>
           </div>
         </div>
 
-        {/* Name field */}
+        {/* First name field */}
         <div>
           <label className="mb-1.5 block text-xs font-medium text-white/50">
-            Display name
+            First name
           </label>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Your name"
+            placeholder="Your first name"
             className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/30 outline-none focus:border-[#D97757]/60 focus:ring-1 focus:ring-[#D97757]/40"
           />
         </div>

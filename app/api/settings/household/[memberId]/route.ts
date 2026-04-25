@@ -12,20 +12,12 @@ export async function DELETE(_req: Request, { params }: Params) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    // Verify ownership
-    const { data: household } = await supabase
-      .from('households')
-      .select('id')
-      .eq('owner_id', user.id)
-      .single()
-
-    if (!household) return NextResponse.json({ error: 'No household found' }, { status: 404 })
-
+    // Delete only if this user is the household owner
     const { error } = await supabase
       .from('household_members')
       .delete()
       .eq('id', memberId)
-      .eq('household_id', household.id)
+      .eq('household_owner_id', user.id)
 
     if (error) throw error
 
@@ -47,19 +39,12 @@ export async function PATCH(req: Request, { params }: Params) {
 
     const body = await req.json() as Record<string, unknown>
 
-    const { data: household } = await supabase
-      .from('households')
-      .select('id')
-      .eq('owner_id', user.id)
-      .single()
-
-    if (!household) return NextResponse.json({ error: 'No household found' }, { status: 404 })
-
+    // Update only if this user is the household owner
     const { error } = await supabase
       .from('household_members')
       .update({ ...body, updated_at: new Date().toISOString() })
       .eq('id', memberId)
-      .eq('household_id', household.id)
+      .eq('household_owner_id', user.id)
 
     if (error) throw error
 

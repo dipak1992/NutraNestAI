@@ -8,15 +8,36 @@ import { PLANS, type PlanId } from '@/lib/stripe/plans'
 
 type Props = {
   currentPlan?: PlanId
+  isAuthenticated?: boolean
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function PricingTiers({ currentPlan = 'free' }: Props) {
+export function PricingTiers({ currentPlan = 'free', isAuthenticated = false }: Props) {
   const [loading, setLoading] = useState<PlanId | null>(null)
 
   async function handleSelect(planId: PlanId) {
-    if (planId === 'free' || planId === currentPlan) return
+    if (planId === currentPlan) return
+
+    // Unauthenticated → send to login
+    if (!isAuthenticated) {
+      window.location.href = '/login?next=/pricing'
+      return
+    }
+
+    // Downgrade to free → open billing portal
+    if (planId === 'free') {
+      setLoading('free')
+      try {
+        const res = await fetch('/api/stripe/portal', { method: 'POST' })
+        const data = await res.json() as { url?: string; error?: string }
+        if (data.url) window.location.href = data.url
+      } finally {
+        setLoading(null)
+      }
+      return
+    }
+
     setLoading(planId)
     try {
       const res = await fetch('/api/stripe/checkout', {
@@ -38,6 +59,18 @@ export function PricingTiers({ currentPlan = 'free' }: Props) {
       {plans.map((plan) => {
         const isCurrent = plan.id === currentPlan
         const isLoading = loading === plan.id
+
+        // Label logic
+        let label: string
+        if (isCurrent) {
+          label = 'Current plan'
+        } else if (!isAuthenticated) {
+          label = plan.id === 'free' ? 'Get started free' : `Upgrade to ${plan.name}`
+        } else if (plan.id === 'free') {
+          label = 'Downgrade to Free'
+        } else {
+          label = `Upgrade to ${plan.name}`
+        }
 
         return (
           <div
@@ -85,21 +118,19 @@ export function PricingTiers({ currentPlan = 'free' }: Props) {
             {/* CTA */}
             <button
               type="button"
-              disabled={isCurrent || isLoading || plan.id === 'free'}
+              disabled={isCurrent || isLoading}
               onClick={() => handleSelect(plan.id)}
               className={[
                 'flex w-full items-center justify-center gap-2 rounded-2xl py-3 text-sm font-semibold transition',
                 isCurrent
                   ? 'cursor-default border border-white/20 bg-transparent text-white/40'
-                  : plan.id === 'free'
-                  ? 'cursor-default border border-white/10 bg-transparent text-white/30'
                   : plan.highlighted
                   ? 'bg-[#D97757] text-white hover:bg-[#c4694a]'
                   : 'border border-white/20 bg-white/10 text-white hover:bg-white/20',
               ].join(' ')}
             >
               {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
-              {isCurrent ? 'Current plan' : plan.id === 'free' ? 'Free forever' : `Upgrade to ${plan.name}`}
+              {label}
             </button>
           </div>
         )

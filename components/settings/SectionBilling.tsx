@@ -7,11 +7,18 @@ import { PLANS } from '@/lib/stripe/plans'
 
 type Props = {
   currentPlan: PlanId
+  planStatus: string | null
   renewsAt: string | null
   stripeCustomerId: string | null
+  hasStripeCustomer: boolean
 }
 
-export function SectionBilling({ currentPlan, renewsAt, stripeCustomerId }: Props) {
+export function SectionBilling({
+  currentPlan,
+  planStatus,
+  renewsAt,
+  hasStripeCustomer,
+}: Props) {
   const [loading, setLoading] = useState(false)
   const plan = PLANS[currentPlan]
 
@@ -25,6 +32,14 @@ export function SectionBilling({ currentPlan, renewsAt, stripeCustomerId }: Prop
       setLoading(false)
     }
   }
+
+  const statusLabel = planStatus === 'past_due'
+    ? '⚠️ Past due'
+    : planStatus === 'canceled'
+    ? 'Canceled'
+    : planStatus === 'paused'
+    ? 'Paused'
+    : null
 
   return (
     <section className="rounded-3xl border border-white/10 bg-white/5 p-6">
@@ -40,6 +55,9 @@ export function SectionBilling({ currentPlan, renewsAt, stripeCustomerId }: Prop
             <p className="text-xs text-white/40">Current plan</p>
             <p className="mt-0.5 text-lg font-bold text-white">{plan.name}</p>
             <p className="text-sm text-white/50">{plan.tagline}</p>
+            {statusLabel && (
+              <p className="mt-1 text-xs text-amber-400">{statusLabel}</p>
+            )}
           </div>
           <div className="text-right">
             <p className="text-xl font-bold text-white">
@@ -67,7 +85,7 @@ export function SectionBilling({ currentPlan, renewsAt, stripeCustomerId }: Prop
           >
             Upgrade plan
           </a>
-        ) : stripeCustomerId ? (
+        ) : hasStripeCustomer ? (
           <button
             type="button"
             onClick={openPortal}

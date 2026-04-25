@@ -21,7 +21,7 @@ const STEP_COMPONENTS = {
 
 // ─── Client ───────────────────────────────────────────────────────────────────
 
-export default function OnboardingClient() {
+export function OnboardingClient() {
   const step         = useOnboardingStore((s) => s.step)
   const householdSize = useOnboardingStore((s) => s.data.householdSize)
   const skillLevel   = useOnboardingStore((s) => s.data.skillLevel)

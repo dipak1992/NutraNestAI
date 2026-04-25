@@ -1,16 +1,18 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import {
-  ChevronLeft, ChevronRight, X, Timer, Play, Pause, RotateCcw, CheckCircle2,
+  ChevronLeft, ChevronRight, X, Timer, Play, Pause, RotateCcw, CheckCircle2, Check,
 } from 'lucide-react'
-import type { Meal } from '@/types'
+import type { LoadedRecipe } from '@/app/recipes/[id]/loader'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
+type Recipe = LoadedRecipe
+
 type Props = {
-  meal: Meal
+  recipe: Recipe
   recipeId: string
 }
 
@@ -22,7 +24,14 @@ function useTimer(initialSeconds: number) {
 
   useEffect(() => {
     if (!running) return
-    if (seconds <= 0) { setRunning(false); return }
+    if (seconds <= 0) {
+      setRunning(false)
+      // Vibrate on completion
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        navigator.vibrate([200, 100, 200])
+      }
+      return
+    }
     const id = setInterval(() => setSeconds((s) => s - 1), 1000)
     return () => clearInterval(id)
   }, [running, seconds])
@@ -38,8 +47,8 @@ function useTimer(initialSeconds: number) {
 
 // ─── Step timer ───────────────────────────────────────────────────────────────
 
-function StepTimer({ minutes }: { minutes: number }) {
-  const timer = useTimer(minutes * 60)
+function StepTimer({ seconds: initialSeconds }: { seconds: number }) {
+  const timer = useTimer(initialSeconds)
   return (
     <div className="mt-4 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
       <Timer className={['h-4 w-4', timer.done ? 'text-emerald-400' : 'text-[#D97757]'].join(' ')} />
@@ -68,25 +77,103 @@ function StepTimer({ minutes }: { minutes: number }) {
   )
 }
 
-// ─── Extract timer minutes from instruction text ──────────────────────────────
+// ─── Ingredient check step ────────────────────────────────────────────────────
 
-function extractMinutes(text: string): number | null {
-  const match = text.match(/(\d+)\s*(?:min(?:ute)?s?|minutes?)/i)
-  return match ? parseInt(match[1], 10) : null
+function IngredientCheckStep({ ingredients }: { ingredients: Recipe['ingredients'] }) {
+  const [checked, setChecked] = useState<Set<number>>(new Set())
+
+  function toggle(i: number) {
+    setChecked((prev) => {
+      const next = new Set(prev)
+      if (next.has(i)) next.delete(i)
+      else next.add(i)
+      return next
+    })
+  }
+
+  return (
+    <div className="mx-auto w-full max-w-lg">
+      <div className="mb-6 flex items-center gap-2">
+        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#D97757] text-sm font-bold text-white">
+          ✓
+        </div>
+        <p className="text-sm text-white/50">Check your ingredients</p>
+      </div>
+      <h2 className="mb-4 text-xl font-medium text-white">
+        Gather everything before you start
+      </h2>
+      <ul className="space-y-2">
+        {ingredients.map((ing, i) => (
+          <li key={i}>
+            <button
+              type="button"
+              onClick={() => toggle(i)}
+              className={[
+                'flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-left transition',
+                checked.has(i)
+                  ? 'border-emerald-500/30 bg-emerald-500/10 text-white/60 line-through'
+                  : 'border-white/10 bg-white/5 text-white/80 hover:bg-white/10',
+              ].join(' ')}
+            >
+              <span className="text-sm">{ing.name}</span>
+              <span className="flex items-center gap-2 text-sm text-white/50">
+                {ing.quantity} {ing.unit}
+                {checked.has(i) && <Check className="h-4 w-4 text-emerald-400" />}
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
 }
 
 // ─── CookMode ─────────────────────────────────────────────────────────────────
 
-export function CookMode({ meal, recipeId }: Props) {
+export function CookMode({ recipe, recipeId }: Props) {
   const router = useRouter()
-  const steps = meal.base_instructions
-  const [current, setCurrent] = useState(0)
+  // -1 = ingredient check step, 0..n-1 = cooking steps
+  const [current, setCurrent] = useState(-1)
   const [completed, setCompleted] = useState<Set<number>>(new Set())
+  const wakeLockRef = useRef<WakeLockSentinel | null>(null)
 
-  const isFirst = current === 0
+  const steps = recipe.steps
+  const isIngredientStep = current === -1
+  const isFirst = current === -1
   const isLast  = current === steps.length - 1
-  const step    = steps[current] ?? ''
-  const timerMins = extractMinutes(step)
+  const step    = steps[current] ?? null
+
+  // ── Wake lock ──────────────────────────────────────────────────────────────
+  useEffect(() => {
+    async function acquireWakeLock() {
+      if ('wakeLock' in navigator) {
+        try {
+          wakeLockRef.current = await navigator.wakeLock.request('screen')
+        } catch {
+          // Wake lock not available — non-critical
+        }
+      }
+    }
+    acquireWakeLock()
+    return () => {
+      wakeLockRef.current?.release().catch(() => {})
+    }
+  }, [])
+
+  // ── Keyboard navigation ────────────────────────────────────────────────────
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        if (!isLast) setCurrent((c) => Math.min(steps.length - 1, c + 1))
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        if (!isFirst) setCurrent((c) => Math.max(-1, c - 1))
+      } else if (e.key === 'Escape') {
+        router.back()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [isFirst, isLast, steps.length, router])
 
   function markDone(idx: number) {
     setCompleted((prev) => {
@@ -105,6 +192,10 @@ export function CookMode({ meal, recipeId }: Props) {
     router.push(`/recipes/${recipeId}?cooked=1`)
   }
 
+  // Total steps including ingredient check
+  const totalDisplaySteps = steps.length + 1
+  const currentDisplayStep = current + 2 // ingredient check = step 1
+
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-[#0f0f0f]">
       {/* Header */}
@@ -119,10 +210,10 @@ export function CookMode({ meal, recipeId }: Props) {
         </button>
         <div className="text-center">
           <p className="text-xs text-white/40">Cook Mode</p>
-          <p className="text-sm font-semibold text-white">{meal.title}</p>
+          <p className="text-sm font-semibold text-white">{recipe.name}</p>
         </div>
         <span className="text-sm text-white/40">
-          {current + 1} / {steps.length}
+          {currentDisplayStep} / {totalDisplaySteps}
         </span>
       </div>
 
@@ -130,42 +221,46 @@ export function CookMode({ meal, recipeId }: Props) {
       <div className="h-1 bg-white/10">
         <div
           className="h-full bg-[#D97757] transition-all"
-          style={{ width: `${((current + 1) / steps.length) * 100}%` }}
+          style={{ width: `${(currentDisplayStep / totalDisplaySteps) * 100}%` }}
         />
       </div>
 
       {/* Step content */}
       <div className="flex flex-1 flex-col overflow-y-auto px-5 py-8">
-        <div className="mx-auto w-full max-w-lg">
-          {/* Step number */}
-          <div className="mb-4 flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#D97757] text-sm font-bold text-white">
-              {current + 1}
+        {isIngredientStep ? (
+          <IngredientCheckStep ingredients={recipe.ingredients} />
+        ) : step ? (
+          <div className="mx-auto w-full max-w-lg">
+            {/* Step number */}
+            <div className="mb-4 flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#D97757] text-sm font-bold text-white">
+                {step.order}
+              </div>
+              {completed.has(current) && (
+                <CheckCircle2 className="h-5 w-5 text-emerald-400" />
+              )}
             </div>
-            {completed.has(current) && (
-              <CheckCircle2 className="h-5 w-5 text-emerald-400" />
+
+            {/* Instruction */}
+            <p className="text-xl font-medium leading-relaxed text-white">{step.instruction}</p>
+
+            {/* Timer if step has one */}
+            {step.timerSeconds && step.timerSeconds > 0 && (
+              <StepTimer seconds={step.timerSeconds} />
+            )}
+
+            {/* Mark done */}
+            {!completed.has(current) && (
+              <button
+                type="button"
+                onClick={() => markDone(current)}
+                className="mt-6 rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/60 transition hover:bg-white/10"
+              >
+                ✓ Mark as done
+              </button>
             )}
           </div>
-
-          {/* Instruction */}
-          <p className="text-xl font-medium leading-relaxed text-white">{step}</p>
-
-          {/* Timer if step mentions time */}
-          {timerMins && timerMins > 0 && timerMins <= 120 && (
-            <StepTimer minutes={timerMins} />
-          )}
-
-          {/* Mark done */}
-          {!completed.has(current) && (
-            <button
-              type="button"
-              onClick={() => markDone(current)}
-              className="mt-6 rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/60 transition hover:bg-white/10"
-            >
-              ✓ Mark as done
-            </button>
-          )}
-        </div>
+        ) : null}
       </div>
 
       {/* Navigation */}
@@ -173,7 +268,7 @@ export function CookMode({ meal, recipeId }: Props) {
         <div className="mx-auto flex max-w-lg gap-3">
           <button
             type="button"
-            onClick={() => setCurrent((c) => Math.max(0, c - 1))}
+            onClick={() => setCurrent((c) => Math.max(-1, c - 1))}
             disabled={isFirst}
             className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 py-3 text-sm font-medium text-white/70 transition hover:bg-white/10 disabled:opacity-30"
           >
@@ -196,7 +291,7 @@ export function CookMode({ meal, recipeId }: Props) {
               onClick={() => setCurrent((c) => Math.min(steps.length - 1, c + 1))}
               className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-[#D97757] py-3 text-sm font-semibold text-white transition hover:bg-[#c4694a]"
             >
-              Next
+              {isIngredientStep ? "Let's cook!" : 'Next'}
               <ChevronRight className="h-4 w-4" />
             </button>
           )}

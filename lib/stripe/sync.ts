@@ -1,4 +1,4 @@
-import { getStripe } from '@/lib/stripe'
+import { stripe } from '@/lib/stripe/client'
 import type { PlanId } from './plans'
 
 /**
@@ -10,7 +10,6 @@ export async function syncSubscriptionToProfile(
   supabase: any,
   subscriptionId: string,
 ) {
-  const stripe = getStripe()
   // Cast through unknown to handle Stripe v22 Response<Subscription> wrapper
   const sub = (await stripe.subscriptions.retrieve(subscriptionId)) as unknown as {
     id: string
@@ -54,7 +53,6 @@ export async function clearSubscription(
   supabase: any,
   subscriptionId: string,
 ) {
-  const stripe = getStripe()
   const sub = await stripe.subscriptions.retrieve(subscriptionId)
   const userId = sub.metadata?.supabase_user_id
   if (!userId) return

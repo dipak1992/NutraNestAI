@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { headers } from 'next/headers'
-import { getStripe } from '@/lib/stripe'
+import { stripe } from '@/lib/stripe/client'
 import { createClient } from '@/lib/supabase/server'
 import { syncSubscriptionToProfile, clearSubscription } from '@/lib/stripe/sync'
 
@@ -24,7 +24,6 @@ export async function POST(req: Request) {
   let event: { type: string; data: { object: unknown } }
 
   try {
-    const stripe = await getStripe()
     event = stripe.webhooks.constructEvent(body, sig, webhookSecret) as unknown as typeof event
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Webhook error'

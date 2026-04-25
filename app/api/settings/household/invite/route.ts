@@ -12,29 +12,22 @@ export async function POST(req: Request) {
     const { email } = await req.json() as { email: string }
     if (!email) return NextResponse.json({ error: 'Email required' }, { status: 400 })
 
-    // Get household
-    const { data: household } = await supabase
-      .from('households')
-      .select('id')
-      .eq('owner_id', user.id)
-      .single()
-
-    if (!household) return NextResponse.json({ error: 'No household found' }, { status: 404 })
-
-    // Insert invite record (table: household_invites)
-    const { error } = await supabase
-      .from('household_invites')
+    // Insert into household_members
+    const { data: member, error } = await supabase
+      .from('household_members')
       .insert({
-        household_id: household.id,
-        invited_by: user.id,
-        email,
+        household_owner_id: user.id,
+        invited_email: email,
+        role: 'member',
         status: 'pending',
         created_at: new Date().toISOString(),
       })
+      .select('id, invited_email, role, status, created_at')
+      .single()
 
     if (error) throw error
 
-    return NextResponse.json({ ok: true })
+    return NextResponse.json({ ok: true, member })
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error'
     return NextResponse.json({ error: message }, { status: 500 })

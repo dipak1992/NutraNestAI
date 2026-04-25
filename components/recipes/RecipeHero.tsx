@@ -1,22 +1,28 @@
 import Image from 'next/image'
-import { Clock, Users, DollarSign } from 'lucide-react'
-import type { Meal } from '@/types'
+import { Clock, Users, DollarSign, ChefHat } from 'lucide-react'
+import type { LoadedRecipe } from '@/app/recipes/[id]/loader'
 
 type Props = {
-  meal: Meal
+  recipe: LoadedRecipe
 }
 
-export function RecipeHero({ meal }: Props) {
-  const totalTime = meal.prep_time + meal.cook_time
+export function RecipeHero({ recipe }: Props) {
+  const totalTime = recipe.prepTimeMin + recipe.cookTimeMin
+
+  const difficultyColor = {
+    easy: 'text-emerald-400',
+    medium: 'text-amber-400',
+    hard: 'text-red-400',
+  }[recipe.difficulty]
 
   return (
     <div className="relative">
       {/* Hero image */}
       <div className="relative h-64 w-full overflow-hidden rounded-3xl sm:h-80">
-        {meal.image_url ? (
+        {recipe.image ? (
           <Image
-            src={meal.image_url}
-            alt={meal.title}
+            src={recipe.image}
+            alt={recipe.name}
             fill
             className="object-cover"
             priority
@@ -33,9 +39,9 @@ export function RecipeHero({ meal }: Props) {
       {/* Content overlay */}
       <div className="absolute bottom-0 left-0 right-0 p-5">
         {/* Tags */}
-        {meal.tags.length > 0 && (
+        {recipe.tags.length > 0 && (
           <div className="mb-2 flex flex-wrap gap-1.5">
-            {meal.tags.slice(0, 4).map((tag) => (
+            {recipe.tags.slice(0, 4).map((tag) => (
               <span
                 key={tag}
                 className="rounded-full bg-white/10 px-2.5 py-0.5 text-xs font-medium text-white/80 backdrop-blur-sm"
@@ -46,8 +52,10 @@ export function RecipeHero({ meal }: Props) {
           </div>
         )}
 
-        <h1 className="text-2xl font-bold text-white sm:text-3xl">{meal.title}</h1>
-        <p className="mt-1 text-sm text-white/70">{meal.description}</p>
+        <h1 className="text-2xl font-bold text-white sm:text-3xl">{recipe.name}</h1>
+        {recipe.description && (
+          <p className="mt-1 text-sm text-white/70">{recipe.description}</p>
+        )}
 
         {/* Stats row */}
         <div className="mt-3 flex flex-wrap gap-4">
@@ -57,14 +65,18 @@ export function RecipeHero({ meal }: Props) {
           </div>
           <div className="flex items-center gap-1.5 text-sm text-white/60">
             <Users className="h-4 w-4 text-[#D97757]" />
-            <span>Serves family</span>
+            <span>Serves {recipe.servings}</span>
           </div>
-          {meal.estimated_cost > 0 && (
+          {recipe.costTotal > 0 && (
             <div className="flex items-center gap-1.5 text-sm text-white/60">
               <DollarSign className="h-4 w-4 text-[#B8935A]" />
-              <span>${meal.estimated_cost.toFixed(2)}</span>
+              <span>${recipe.costTotal.toFixed(2)}</span>
             </div>
           )}
+          <div className={['flex items-center gap-1.5 text-sm', difficultyColor].join(' ')}>
+            <ChefHat className="h-4 w-4" />
+            <span className="capitalize">{recipe.difficulty}</span>
+          </div>
         </div>
       </div>
     </div>

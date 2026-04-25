@@ -1,12 +1,20 @@
-import { ShoppingCart } from 'lucide-react'
-import type { Ingredient } from '@/types'
+'use client'
+
+import { useState } from 'react'
+import { ShoppingCart, Minus, Plus } from 'lucide-react'
+import type { LoadedRecipe } from '@/app/recipes/[id]/loader'
+
+type Ingredient = LoadedRecipe['ingredients'][number]
 
 type Props = {
   ingredients: Ingredient[]
-  servings?: number
+  defaultServings?: number
 }
 
-export function IngredientList({ ingredients, servings = 4 }: Props) {
+export function IngredientList({ ingredients, defaultServings = 4 }: Props) {
+  const [servings, setServings] = useState(defaultServings)
+  const scale = servings / defaultServings
+
   return (
     <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
       <div className="mb-4 flex items-center justify-between">
@@ -14,29 +22,51 @@ export function IngredientList({ ingredients, servings = 4 }: Props) {
           <ShoppingCart className="h-4 w-4 text-[#D97757]" />
           Ingredients
         </h2>
-        <span className="text-xs text-white/40">Serves {servings}</span>
+        {/* Servings scaler */}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setServings((s) => Math.max(1, s - 1))}
+            disabled={servings <= 1}
+            className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 disabled:opacity-30"
+            aria-label="Decrease servings"
+          >
+            <Minus className="h-3.5 w-3.5" />
+          </button>
+          <span className="min-w-[4rem] text-center text-xs text-white/60">
+            {servings} serving{servings !== 1 ? 's' : ''}
+          </span>
+          <button
+            type="button"
+            onClick={() => setServings((s) => Math.min(20, s + 1))}
+            disabled={servings >= 20}
+            className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 disabled:opacity-30"
+            aria-label="Increase servings"
+          >
+            <Plus className="h-3.5 w-3.5" />
+          </button>
+        </div>
       </div>
 
       <ul className="space-y-2.5">
-        {ingredients.map((ing, i) => (
-          <li key={i} className="flex items-start justify-between gap-3">
-            <div className="flex items-start gap-2">
-              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#D97757]" />
-              <span className="text-sm text-white/80">{ing.name}</span>
-            </div>
-            <span className="shrink-0 text-sm text-white/50">
-              {ing.quantity} {ing.unit}
-            </span>
-          </li>
-        ))}
+        {ingredients.map((ing, i) => {
+          const scaledQty = ing.quantity * scale
+          const displayQty = Number.isInteger(scaledQty)
+            ? scaledQty.toString()
+            : scaledQty.toFixed(1)
+          return (
+            <li key={i} className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-2">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#D97757]" />
+                <span className="text-sm text-white/80">{ing.name}</span>
+              </div>
+              <span className="shrink-0 text-sm text-white/50">
+                {displayQty} {ing.unit}
+              </span>
+            </li>
+          )
+        })}
       </ul>
-
-      {/* Category groups if available */}
-      {ingredients.some((i) => i.category) && (
-        <p className="mt-3 text-xs text-white/30">
-          Grouped by category in your grocery list.
-        </p>
-      )}
     </div>
   )
 }

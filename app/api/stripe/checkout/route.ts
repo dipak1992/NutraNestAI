@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { getStripe } from '@/lib/stripe'
+import { stripe } from '@/lib/stripe/client'
 import { PLANS, type PlanId } from '@/lib/stripe/plans'
 
 // ─── POST /api/stripe/checkout ────────────────────────────────────────────────
@@ -16,8 +16,6 @@ export async function POST(req: Request) {
     if (!plan?.stripePriceId) {
       return NextResponse.json({ error: 'Invalid plan' }, { status: 400 })
     }
-
-    const stripe = await getStripe()
 
     // Get or create Stripe customer
     const { data: profile } = await supabase

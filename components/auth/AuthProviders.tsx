@@ -14,8 +14,11 @@ export function AuthProviders({ next = '/dashboard' }: Props) {
   async function signInWithGoogle() {
     setLoading(true)
     const supabase = createClient()
+    // Prefer the explicit NEXT_PUBLIC_SITE_URL so the redirectTo always
+    // matches the Supabase allowlist entry, even on preview deployments.
     const origin =
-      typeof window !== 'undefined' ? window.location.origin : ''
+      process.env.NEXT_PUBLIC_SITE_URL ||
+      (typeof window !== 'undefined' ? window.location.origin : '')
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',

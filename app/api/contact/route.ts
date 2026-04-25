@@ -1,39 +1,90 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
-import { sendSupportConfirmationEmail } from '@/lib/email/triggers'
-import { alertAdminContactForm } from '@/lib/email/triggers'
+import { NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
+import type { ContactPayload, ContactTopic } from '@/lib/contact/types'
 
-const schema = z.object({
-  name: z.string().min(1).max(100),
-  email: z.string().email(),
-  message: z.string().min(10).max(2000),
-})
+export const runtime = 'nodejs'
 
-export async function POST(request: NextRequest) {
-  let body: unknown
-  try {
-    body = await request.json()
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
-  }
+const VALID_TOPICS: ContactTopic[] = [
+  'general',
+  'support',
+  'billing',
+  'partnership',
+  'press',
+  'feedback',
+]
 
-  const parsed = schema.safeParse(body)
-  if (!parsed.success) {
+// Simple in-memory rate limit (per instance). For production, swap to Upstash or similar.
+const hits = new Map<string, number[]>()
+const WINDOW_MS = 60 * 60 * 1000 // 1 hour
+const MAX_PER_WINDOW = 5
+
+function rateLimited(key: string) {
+  const now = Date.now()
+  const existing = (hits.get(key) ?? []).filter((t) => now - t < WINDOW_MS)
+  if (existing.length >= MAX_PER_WINDOW) return true
+  existing.push(now)
+  hits.set(key, existing)
+  return false
+}
+
+export async function POST(req: Request) {
+  const ip =
+    req.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
+    req.headers.get('x-real-ip') ??
+    'unknown'
+
+  if (rateLimited(ip)) {
     return NextResponse.json(
-      { error: 'Invalid input', details: parsed.error.flatten() },
-      { status: 422 },
+      { error: 'Too many messages. Please try again later.' },
+      { status: 429 }
     )
   }
 
-  const { name, email, message } = parsed.data
+  const body = (await req.json().catch(() => ({}))) as Partial<ContactPayload>
+  const { name, email, topic, message } = body
 
-  // Fire both in parallel — neither should block the response
-  const [userResult, adminResult] = await Promise.allSettled([
-    sendSupportConfirmationEmail({ to: email, firstName: name }),
-    alertAdminContactForm({ senderEmail: email, senderName: name, message }),
-  ])
+  // Validation
+  if (!name || name.trim().length < 1) {
+    return NextResponse.json({ error: 'Name is required' }, { status: 400 })
+  }
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return NextResponse.json({ error: 'Valid email required' }, { status: 400 })
+  }
+  if (!topic || !VALID_TOPICS.includes(topic as ContactTopic)) {
+    return NextResponse.json({ error: 'Invalid topic' }, { status: 400 })
+  }
+  if (!message || message.trim().length < 10 || message.length > 2000) {
+    return NextResponse.json(
+      { error: 'Message must be 10–2000 characters' },
+      { status: 400 }
+    )
+  }
 
-  const userOk = userResult.status === 'fulfilled' && userResult.value.success
+  // Store to Supabase
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  return NextResponse.json({ ok: true, confirmed: userOk })
+  const { error } = await supabase.from('contact_messages').insert({
+    user_id: user?.id ?? null,
+    name: name.trim(),
+    email: email.trim().toLowerCase(),
+    topic,
+    message: message.trim(),
+    ip,
+    user_agent: req.headers.get('user-agent') ?? null,
+  })
+
+  if (error) {
+    console.error('[contact] insert failed:', error)
+    return NextResponse.json(
+      { error: "Couldn't save. Please email hello@mealeaseai.com instead." },
+      { status: 500 }
+    )
+  }
+
+  // TODO: send email notification to founders via Resend / Postmark / SES
+
+  return NextResponse.json({ ok: true })
 }

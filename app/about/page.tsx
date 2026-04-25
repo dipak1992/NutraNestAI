@@ -1,5 +1,5 @@
-import { Nav } from '@/components/landing/Nav'
-import { Footer } from '@/components/landing/Footer'
+import { PublicSiteHeader } from '@/components/layout/PublicSiteHeader'
+import { PublicSiteFooter } from '@/components/layout/PublicSiteFooter'
 import { AboutHero } from '@/components/about/AboutHero'
 import { FounderStory } from '@/components/about/FounderStory'
 import { WhyBuiltIt } from '@/components/about/WhyBuiltIt'
@@ -21,7 +21,7 @@ export const metadata = {
 export default function AboutPage() {
   return (
     <>
-      <Nav />
+      <PublicSiteHeader />
       <main id="main">
         <AboutHero />
         <FounderStory />
@@ -29,7 +29,7 @@ export default function AboutPage() {
         <Principles />
         <AboutCTA />
       </main>
-      <Footer />
+      <PublicSiteFooter />
     </>
   )
 }

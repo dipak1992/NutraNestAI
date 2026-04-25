@@ -1,3 +1,5 @@
+'use client'
+
 import Image from 'next/image'
 
 const SHORT_BIO = `Dipak and Suprabha are the husband-and-wife co-founders of MealEase. Dipak is a software engineer and entrepreneur. Suprabha is a CPA. They live in the US with their two young children (ages 3½ and 1), and built MealEase after getting tired of their own 5:47 PM fridge-stare moment.`

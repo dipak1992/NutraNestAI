@@ -79,7 +79,7 @@ create index if not exists profiles_last_active_at_idx on profiles(last_active_a
 
 create table if not exists households (
   id                        uuid primary key default gen_random_uuid(),
-  owner_id                  uuid not null references profiles(id) on delete cascade,
+  owner_user_id             uuid not null references profiles(id) on delete cascade,
   name                      text not null default 'My Household',
   invite_code               text unique,
   adults_count              int not null default 1,
@@ -106,7 +106,7 @@ create table if not exists households (
   deleted_at                timestamptz
 );
 
-create index if not exists households_owner_id_idx on households(owner_id);
+create index if not exists households_owner_user_id_idx on households(owner_user_id);
 create index if not exists households_invite_code_idx on households(invite_code) where invite_code is not null;
 
 -- ============================================================

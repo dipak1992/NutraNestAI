@@ -116,7 +116,7 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
             </Button>
           )}
           <DropdownMenu>
-            <DropdownMenuTrigger render={<Button variant="ghost" size="icon" className="rounded-full" />}>
+            <DropdownMenuTrigger className="rounded-full p-0 border-0 bg-transparent hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 outline-none">
               <Avatar className="h-8 w-8">
                 <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
                   {initials}
@@ -132,12 +132,12 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
                   <DropdownMenuSeparator />
                 </>
               )}
-              <DropdownMenuItem render={<Link href="/settings" />}>
+              <DropdownMenuItem onClick={() => router.push('/settings')}>
                 <User className="h-4 w-4" />
                 Profile &amp; Settings
               </DropdownMenuItem>
               {!isPaid && (
-                <DropdownMenuItem render={<Link href="/pricing?intent=pro" />}>
+                <DropdownMenuItem onClick={() => router.push('/pricing?intent=pro')}>
                   <Crown className="h-4 w-4" />
                   Upgrade to Pro
                 </DropdownMenuItem>

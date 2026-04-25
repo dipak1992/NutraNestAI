@@ -44,10 +44,6 @@ export const Analytics = {
   KIDS_SAVE_CLICKED:      'kids_save_clicked',
   KIDS_SHARE_CLICKED:     'kids_share_clicked',
   KIDS_SWAP_CLICKED:      'kids_swap_clicked',
-  // Weekend Mode
-  WEEKEND_MODE_CARD_VIEWED:  'weekend_mode_card_viewed',
-  WEEKEND_MODE_BUTTON_CLICKED: 'weekend_mode_button_clicked',
-  WEEKEND_MODE_OPENED:     'weekend_mode_opened',
   // Landing hero daily meal
   HERO_MEAL_SUGGESTION_VIEWED:  'hero_meal_suggestion_viewed',
   HERO_MEAL_SUGGESTION_CLICKED: 'hero_meal_suggestion_clicked',

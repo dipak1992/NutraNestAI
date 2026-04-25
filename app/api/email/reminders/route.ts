@@ -3,13 +3,12 @@ import { createSupabaseServiceClient } from '@/lib/supabase/service'
 import {
   sendDinnerReminderEmail,
   sendWeeklyReminderEmail,
-  sendWeekendReminderEmail,
   sendAdminWeeklySummary,
   sendTrialEndingSoonEmail,
   sendReactivationEmail,
   sendChurnWinbackEmail,
 } from '@/lib/email/triggers'
-import { isDinnerReminderDue, isWeeklyReminderDue, isWeekendReminderDue } from '@/lib/email/scheduler'
+import { isDinnerReminderDue, isWeeklyReminderDue } from '@/lib/email/scheduler'
 
 /**
  * Cron endpoint — called by Vercel Cron or any scheduler.
@@ -17,8 +16,7 @@ import { isDinnerReminderDue, isWeeklyReminderDue, isWeekendReminderDue } from '
  * Schedule (vercel.json):
  *   Dinner:        "0 * * * *"    (hourly — timezone-aware per user via isDinnerReminderDue)
  *   Weekly:        "0 0 * * *"    (daily midnight UTC — timezone-aware per user)
- *   Weekend:       "0 17 * * 5"   (Friday 5 PM UTC)
- *   Admin summary: "0 10 * * 1"   (Monday 10 AM UTC)
+ *  *   Admin summary: "0 10 * * 1"   (Monday 10 AM UTC)
  *
  * Protected by CRON_SECRET env var.
  */
@@ -37,7 +35,6 @@ export async function GET(request: NextRequest) {
 
   if (type === 'dinner') return handleDinnerReminders(supabase)
   if (type === 'weekly') return handleWeeklyReminders(supabase)
-  if (type === 'weekend') return handleWeekendReminders(supabase)
   if (type === 'admin-summary') return handleAdminSummary(supabase)
   if (type === 'trial-ending') return handleTrialEndingReminders(supabase)
   if (type === 'reactivation') return handleReactivationEmails(supabase)
@@ -175,46 +172,6 @@ async function handleWeeklyReminders(supabase: SupabaseClient) {
   return NextResponse.json({ ok: true, sent, skipped })
 }
 
-// ─── Weekend reminders ───────────────────────────────────────────────────────
-
-async function handleWeekendReminders(supabase: SupabaseClient) {
-  const { data: users, error } = await supabase
-    .from('reminder_schedules')
-    .select('user_id, weekly_enabled, timezone, last_weekend_sent_at')
-    .eq('weekly_enabled', true)
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
-  }
-
-  const profileMap = await batchFetchProfiles(supabase, (users ?? []).map(u => u.user_id), true)
-
-  let sent = 0
-  let skipped = 0
-
-  for (const row of (users ?? [])) {
-    if (!isWeekendReminderDue(row)) { skipped++; continue }
-
-    const profile = profileMap[row.user_id]
-    if (!profile?.email || !profile.is_pro) { skipped++; continue }
-
-    const result = await sendWeekendReminderEmail({
-      to: profile.email,
-      firstName: profile.first_name ?? undefined,
-      userId: row.user_id,
-    })
-
-    if (result.success) {
-      await supabase
-        .from('reminder_schedules')
-        .update({ last_weekend_sent_at: new Date().toISOString() })
-        .eq('user_id', row.user_id)
-      sent++
-    }
-  }
-
-  return NextResponse.json({ ok: true, sent, skipped })
-}
 
 // ─── Admin weekly summary ────────────────────────────────────────────────────
 

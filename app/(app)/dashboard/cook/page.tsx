@@ -25,13 +25,11 @@ import { PantryCapture } from '@/components/hub/PantryCapture'
 import { PantryMatchList } from '@/components/hub/PantryMatchList'
 import { MealCard } from '@/components/hub/MealCard'
 import { SnapCookErrorBoundary } from '@/components/hub/SnapCookErrorBoundary'
-import { SmartMenuScan } from '@/components/cook/SmartMenuScan'
-import { FoodCheck } from '@/components/cook/FoodCheck'
 import { cn } from '@/lib/utils'
 import type { SmartMealResult } from '@/lib/engine/types'
 import type { SubscriptionTier } from '@/types'
 
-type CookMode = 'snap' | 'menu-scan' | 'food-check' | 'pantry' | 'leftover'
+type CookMode = 'snap' | 'pantry' | 'leftover'
 
 /** Features launched after this date show a NEW badge for 14 days */
 const FEATURE_LAUNCH_DATE = new Date('2026-04-24T00:00:00Z')
@@ -57,22 +55,6 @@ const COOK_CHIPS: CookChip[] = [
     emoji: '📸',
     description: 'Take a photo of your fridge — get meals instantly',
     requiredTier: 'free',
-  },
-  {
-    id: 'menu-scan',
-    label: 'Smart Menu Scan',
-    emoji: '🍽️',
-    description: 'Scan any restaurant menu — order smarter',
-    requiredTier: 'pro',
-    isNew: true,
-  },
-  {
-    id: 'food-check',
-    label: 'Food Check',
-    emoji: '📸',
-    description: 'Snap any food — see if it fits your goals',
-    requiredTier: 'pro',
-    isNew: true,
   },
   {
     id: 'pantry',
@@ -346,19 +328,6 @@ export default function CookPillarPage() {
             </motion.div>
           )}
 
-          {/* Smart Menu Scan */}
-          {activeChip === 'menu-scan' && (
-            <motion.div key="menu-scan" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}>
-              <SmartMenuScan onBack={() => setActiveChip(null)} />
-            </motion.div>
-          )}
-
-          {/* Food Check */}
-          {activeChip === 'food-check' && (
-            <motion.div key="food-check" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}>
-              <FoodCheck onBack={() => setActiveChip(null)} />
-            </motion.div>
-          )}
 
           {/* Snap & Cook: Capture Phase */}
           {activeChip === 'snap' && pantryPhase === 'capture' && (

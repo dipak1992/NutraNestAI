@@ -10,8 +10,23 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { rateLimit, rateLimitKeyFromRequest } from '@/lib/rate-limit'
 import { apiError, apiRateLimited } from '@/lib/api-response'
-import type { PersonalPreferences } from '@/types/cook-tools'
-import { DEFAULT_PERSONAL_PREFS } from '@/types/cook-tools'
+// Inline type (was in types/cook-tools.ts, now removed)
+interface PersonalPreferences {
+  user_id: string
+  weight_goal: 'lose' | 'maintain' | 'gain'
+  protein_focus: boolean
+  is_vegetarian: boolean
+  allergies: string[]
+  avoid_foods: string[]
+}
+
+const DEFAULT_PERSONAL_PREFS: Omit<PersonalPreferences, 'user_id'> = {
+  weight_goal: 'maintain',
+  protein_focus: false,
+  is_vegetarian: false,
+  allergies: [],
+  avoid_foods: [],
+}
 
 export async function GET(req: NextRequest) {
   const rl = await rateLimit({ key: rateLimitKeyFromRequest(req), limit: 60, windowMs: 60_000 })

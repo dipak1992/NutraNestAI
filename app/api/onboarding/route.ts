@@ -31,7 +31,7 @@ export async function POST(req: Request) {
       .from('households')
       .upsert(
         {
-          owner_user_id: user.id,
+          owner_id: user.id,
           name: 'My Household',
           adults_count: body.householdSize,
           babies_count: 0,
@@ -47,7 +47,7 @@ export async function POST(req: Request) {
           preferred_proteins: [],
           meals_per_day: 3,
         },
-        { onConflict: 'owner_user_id' }
+        { onConflict: 'owner_id' }
       )
 
     if (householdError) throw householdError

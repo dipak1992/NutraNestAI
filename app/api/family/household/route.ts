@@ -25,7 +25,7 @@ export async function PATCH(req: NextRequest) {
     .from('households')
     .update({ name })
     .eq('id', household.id)
-    .eq('owner_user_id', user.id)
+    .eq('owner_id', user.id)
     .select('*')
     .single()
 

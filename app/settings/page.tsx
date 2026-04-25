@@ -22,7 +22,7 @@ export default async function SettingsPage() {
   const { data: household } = await supabase
     .from('households')
     .select('adults_count, kids_count, toddlers_count, babies_count, budget_level')
-    .eq('owner_user_id', user.id)
+    .eq('owner_id', user.id)
     .single()
 
   return (

@@ -43,7 +43,7 @@ export async function PATCH(req: Request) {
       const { error } = await supabase
         .from('households')
         .update({ ...body.household, updated_at: new Date().toISOString() })
-        .eq('owner_user_id', user.id)
+        .eq('owner_id', user.id)
       if (error) throw error
     }
 

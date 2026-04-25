@@ -55,7 +55,7 @@ export interface Profile {
 
 export interface Household {
   id: string;
-  owner_user_id: string;
+  owner_id: string;
   name: string;
   adults_count: number;
   babies_count: number;

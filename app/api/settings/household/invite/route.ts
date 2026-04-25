@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     const { data: household } = await supabase
       .from('households')
       .select('id')
-      .eq('owner_user_id', user.id)
+      .eq('owner_id', user.id)
       .single()
 
     if (!household) return NextResponse.json({ error: 'No household found' }, { status: 404 })

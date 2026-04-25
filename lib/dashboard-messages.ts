@@ -110,9 +110,7 @@ const contextLines: Record<TimeBlock, string[]> = {
 export const rewardMessages = {
   mealGenerated: 'Nice. One more decision done.',
   snapCook: 'Smart move.',
-  lunchbox: 'Morning stress reduced.',
   weekPlanned: 'Whole week handled.',
-  zeroCook: 'Dinner coming. You can relax.',
   mealCooked: 'Another win.',
 } as const
 

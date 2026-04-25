@@ -4,7 +4,6 @@ import { useState, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import posthog from 'posthog-js'
 import { toast } from 'sonner'
 import { motion } from 'framer-motion'
 import {
@@ -75,10 +74,7 @@ const COMPARISON_FEATURES = [
   { feature: 'Healthy mode', free: false, pro: true, family: true },
   { feature: 'Meal history', free: false, pro: true, family: true },
   { feature: 'Faster AI responses', free: false, pro: true, family: true },
-  { feature: '🎬 Weekend Mode ‡', free: false, pro: true, family: true },
   { feature: 'Pantry Mode', free: false, pro: false, family: true },
-  { feature: 'Kids Mode', free: false, pro: false, family: true },
-  { feature: 'Lunchbox Planner', free: false, pro: false, family: true },
   { feature: 'Shared grocery lists', free: false, pro: false, family: true },
   { feature: 'Family dashboard', free: false, pro: false, family: true },
   { feature: 'Multi-profile balancing', free: false, pro: false, family: true },
@@ -100,23 +96,15 @@ const FAQ = [
   },
   {
     q: 'How many family members can I add?',
-    a: 'Free plan: 1 personal profile. Pro plan: up to 2 profiles (great for couples). Family Plus: up to 6 household member profiles with full preferences, allergy tracking, picky eater settings, and kids tools.',
+    a: 'Free plan: 1 personal profile. Pro plan: up to 2 profiles (great for couples). Family Plus: up to 6 household member profiles with full preferences, allergy tracking, and cuisine preferences.',
   },
   {
     q: 'Why upgrade to Family Plus?',
-    a: 'Family Plus is for households where everyone\'s preferences matter. You get up to 6 member profiles with full detail — allergies, age groups, picky eater levels, cuisine preferences, and portion sizes. MealEase then balances all of that automatically when planning meals. Plus you get kids tools, lunchbox planning, shared grocery lists, and Weekend Mode family experiences.',
+    a: 'Family Plus is for households where everyone\'s preferences matter. You get up to 6 member profiles with full detail — allergies, age groups, cuisine preferences, and portion sizes. MealEase then balances all of that automatically when planning meals. Plus you get shared grocery lists, a family dashboard, and multi-profile meal balancing.',
   },
   {
     q: 'Can I share grocery lists or meal plans?',
     a: 'Yes. Family Plus includes shared grocery lists and shared meal planning — so everyone in the household stays on the same page. Pro users get personal grocery lists. Shared login support for multiple accounts is coming in a future update.',
-  },
-  {
-    q: 'What is Weekend Mode?',
-    a: 'Weekend Mode is a special experience that activates automatically every Friday through Sunday. It surfaces curated dinner + movie ideas tailored to your household type — date nights for couples, family nights for families, or solo chill evenings for individuals. No setup needed. It just appears.',
-  },
-  {
-    q: 'When does Weekend Mode appear?',
-    a: 'Weekend Mode appears automatically from Friday at 11 AM through Sunday at 11:59 PM as a featured card above your dashboard. It disappears on Monday morning. Available on Pro and Family Plus plans.',
   },
   {
     q: 'How does Household Memory work?',
@@ -136,11 +124,11 @@ const FAQ = [
   },
   {
     q: 'What makes MealEase different from ChatGPT meal plans?',
-    a: 'ChatGPT gives you a generic list and forgets you exist five minutes later. MealEase remembers your household — allergies, preferences, what your toddler refused last Tuesday. It integrates with your pantry, builds grocery lists, tracks your streaks, and gets smarter every week. It\'s the difference between asking a stranger for advice and having a system that actually knows your family.',
+    a: 'ChatGPT gives you a generic list and forgets you exist five minutes later. MealEase remembers your household — allergies, preferences, what your toddler refused last Tuesday. It integrates with your pantry, builds grocery lists, and gets smarter every week. It\'s the difference between asking a stranger for advice and having a system that actually knows your family.',
   },
   {
     q: 'Is there a free version?',
-    a: 'Yes. The free plan gives you Tonight Dinner, up to three meal ideas daily, and basic grocery lists — enough to experience how MealEase thinks. When you\'re ready for Weekly Autopilot, Household Memory, or Kids Tools, upgrade anytime. All paid plans include a 7-day free trial, and you can cancel with one click.',
+    a: 'Yes. The free plan gives you Tonight Dinner, up to three meal ideas daily, and basic grocery lists — enough to experience how MealEase thinks. When you\'re ready for Weekly Autopilot or Household Memory, upgrade anytime. All paid plans include a 7-day free trial, and you can cancel with one click.',
   },
   {
     q: 'Can MealEase help me order healthier at restaurants?',
@@ -177,26 +165,8 @@ export function PricingContent() {
   const familyMonthly = PRICING_TIERS.family.monthlyPrice
   const familyAnnual = PRICING_TIERS.family.yearlyPrice
 
-  const trackDeliveryDrivenConversion = useCallback((targetPlan: string) => {
-    try {
-      const raw = localStorage.getItem('mealease_delivery_last_used_at')
-      if (!raw) return
-      const usedAt = new Date(raw).getTime()
-      if (Number.isNaN(usedAt)) return
-      const withinAttributionWindow = Date.now() - usedAt <= 1000 * 60 * 60 * 24 * 7
-      if (!withinAttributionWindow) return
-      posthog.capture('conversion_to_paid_after_use', {
-        target_plan: targetPlan,
-        source_feature: 'zero_cook_delivery',
-        used_at: raw,
-      })
-    } catch {
-      // non-fatal
-    }
-  }, [])
 
   const handleStartTrial = useCallback(async () => {
-    trackDeliveryDrivenConversion('pro_trial')
     if (!status.isAuthenticated) {
       router.push('/signup?plan=pro&trial=1')
       return
@@ -223,10 +193,9 @@ export function PricingContent() {
     } finally {
       setIsStartingTrial(false)
     }
-  }, [status, router, trackDeliveryDrivenConversion])
+  }, [status, router])
 
   const handleCheckout = useCallback(async (plan: 'pro_monthly' | 'pro_yearly' | 'family_monthly' | 'family_yearly') => {
-    trackDeliveryDrivenConversion(plan)
     if (!status.isAuthenticated) {
       router.push(`/signup?plan=${plan}`)
       return
@@ -252,7 +221,7 @@ export function PricingContent() {
     } catch {
       toast.error('Something went wrong. Try again.')
     }
-  }, [status, router, handleStartTrial, trackDeliveryDrivenConversion])
+  }, [status, router, handleStartTrial])
 
   return (
     <div className="relative">
@@ -432,7 +401,6 @@ export function PricingContent() {
                   'Weekly Autopilot Lite',
                   'Smart Menu Scan ✨',
                   'Food Check (calorie snap) ✨',
-                  '🎬 Weekend Mode',
                   'Budget Mode',
                   'Dinner Date Night',
                   'Pantry Mode',
@@ -525,13 +493,10 @@ export function PricingContent() {
                   'Full Household Memory',
                   'Full Weekly Autopilot',
                   'Smart Menu Scan & Food Check ✨',
-                  '🎬 Weekend Mode — family experiences',
-                  'Kids tools & picky eater mode',
                   'Hosting Guests Tonight',
                   'Shared planning & grocery lists',
                   'Family dashboard',
                   'Multi-profile balancing',
-                  'Lunchbox Planner',
                   'Priority support',
                 ].map((f) => (
                   <li key={f} className="flex items-start gap-3 text-sm">
@@ -687,7 +652,6 @@ export function PricingContent() {
               <div className="px-5 py-3 border-t border-border/40 bg-muted/20">
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
                   <span className="font-semibold">†</span> Profiles store preferences, allergies, age groups, and food goals — not separate logins.
-                  {' '}<span className="font-semibold">‡</span> Weekend Mode appears automatically Friday 11 AM through Sunday 11:59 PM.
                 </p>
               </div>
             </motion.div>

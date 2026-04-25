@@ -9,9 +9,7 @@ import { MagicLinkEmail } from './templates/magic-link'
 import { ProConfirmationEmail } from './templates/pro-confirmation'
 import { PaymentReceiptEmail } from './templates/payment-receipt'
 import { WeeklyReminderEmail } from './templates/weekly-reminder'
-import { WeekendReminderEmail } from './templates/weekend-reminder'
 import { DinnerReminderEmail } from './templates/dinner-reminder'
-import { ReferralRewardEmail } from './templates/referral-reward'
 import { SupportConfirmationEmail } from './templates/support-confirmation'
 import { TrialStartedEmail } from './templates/trial-started'
 import { TrialEndingSoonEmail } from './templates/trial-ending-soon'
@@ -23,7 +21,6 @@ import {
   AdminNewUserEmail,
   AdminNewProEmail,
   AdminFailedPaymentEmail,
-  AdminReferralEmail,
   AdminContactFormEmail,
   AdminWeeklySummaryEmail,
 } from './templates/admin'
@@ -109,33 +106,6 @@ export async function sendWeeklyReminderEmail(params: {
   })
 }
 
-export async function sendWeekendReminderEmail(params: {
-  to: string
-  firstName?: string
-  mealTitle?: string
-  entertainmentTitle?: string
-  userId?: string
-}) {
-  const week = getWeekKey()
-  const unsubscribeUrl = params.userId
-    ? `${SITE_URL}/api/unsubscribe?token=${generateUnsubscribeToken(params.userId)}`
-    : undefined
-  return sendEmail({
-    to: params.to,
-    subject: '🎬 Your weekend plan is ready — dinner + a movie',
-    react: createElement(WeekendReminderEmail, {
-      firstName: params.firstName,
-      mealTitle: params.mealTitle,
-      entertainmentTitle: params.entertainmentTitle,
-      unsubscribeUrl,
-    }),
-    idempotencyKey: `weekend:${params.to}:${week}`,
-    headers: unsubscribeUrl
-      ? { 'List-Unsubscribe': `<${unsubscribeUrl}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' }
-      : undefined,
-  })
-}
-
 export async function sendDinnerReminderEmail(params: {
   to: string
   firstName?: string
@@ -162,20 +132,6 @@ export async function sendDinnerReminderEmail(params: {
     headers: unsubscribeUrl
       ? { 'List-Unsubscribe': `<${unsubscribeUrl}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' }
       : undefined,
-  })
-}
-
-export async function sendReferralRewardEmail(params: {
-  to: string
-  firstName?: string
-  referrerName?: string
-  rewardDescription?: string
-}) {
-  return sendEmail({
-    to: params.to,
-    subject: 'Your referral reward has arrived 🎁',
-    react: createElement(ReferralRewardEmail, params),
-    idempotencyKey: `referral-reward:${params.to}:${params.referrerName ?? ''}`,
   })
 }
 
@@ -233,19 +189,6 @@ export async function alertAdminFailedPayment(params: {
     to: EMAIL_ALERTS,
     subject: `[MealEase] ⚠️ Failed payment — ${params.userEmail}`,
     react: createElement(AdminFailedPaymentEmail, params),
-    skipLog: true,
-  })
-}
-
-export async function alertAdminReferral(params: {
-  referrerEmail: string
-  referrerId: string
-  newUserEmail: string
-}) {
-  return sendEmail({
-    to: EMAIL_ALERTS,
-    subject: `[MealEase] Referral conversion — ${params.referrerEmail}`,
-    react: createElement(AdminReferralEmail, params),
     skipLog: true,
   })
 }

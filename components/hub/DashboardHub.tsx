@@ -6,10 +6,7 @@ import { motion } from 'framer-motion'
 import { ChevronRight, Crown, Sparkles } from 'lucide-react'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 import { useUpgradeTrigger } from '@/lib/pillars/use-upgrade-trigger'
-import { useHouseholdConfig } from '@/lib/hooks/use-household-config'
 import { PILLAR_CARDS, TONIGHT_CHIPS, hasAccess } from '@/lib/pillars/config'
-import { StreakBadge } from '@/components/habit/StreakBadge'
-import { WeekendModeCard } from '@/components/hub/WeekendModeCard'
 import { KidsSection } from '@/components/hub/KidsSection'
 import { cn } from '@/lib/utils'
 import type { PillarCard } from '@/lib/pillars/config'
@@ -19,23 +16,6 @@ const SCAN_FEATURE_LAUNCH = new Date('2026-04-24T00:00:00Z')
 const NEW_BADGE_MS = 14 * 24 * 60 * 60 * 1000
 function isScanFeatureNew(): boolean {
   return Date.now() - SCAN_FEATURE_LAUNCH.getTime() < NEW_BADGE_MS
-}
-
-// ── Weekend window helpers ────────────────────────────────────────────────────
-function isWeekendWindow(): boolean {
-  const now = new Date()
-  const day = now.getDay()
-  const hour = now.getHours()
-  if (day === 5 && hour >= 11) return true
-  if (day === 6) return true
-  if (day === 0) return true
-  return false
-}
-
-function isWeekdayTeaserWindow(): boolean {
-  // Show Mon-Thu only (not during weekend window)
-  const day = new Date().getDay()
-  return day >= 1 && day <= 4
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -214,28 +194,6 @@ function UpgradeBanner() {
   )
 }
 
-// ── Mon-Thu Weekend Teaser ────────────────────────────────────────────────────
-
-function WeekendTeaser() {
-  const show = useMemo(() => isWeekdayTeaserWindow(), [])
-  if (!show) return null
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.4, duration: 0.3 }}
-      className="mb-4"
-    >
-      <div className="flex items-center gap-2 rounded-xl border border-amber-200/50 bg-amber-50/60 px-3.5 py-2.5 text-xs text-amber-800">
-        <span className="text-base leading-none">🎬</span>
-        <span className="font-medium">Weekend Mode unlocks Friday</span>
-        <span className="text-amber-600/70">— dinner + movie ideas for your weekend.</span>
-      </div>
-    </motion.div>
-  )
-}
-
 // ── Main Dashboard Hub ────────────────────────────────────────────────────────
 
 interface Props {
@@ -245,7 +203,6 @@ interface Props {
 export function DashboardHub({ displayName }: Props) {
   const firstName = displayName
   const { status } = usePaywallStatus()
-  const householdConfig = useHouseholdConfig()
   const greeting = useMemo(() => getGreeting(), [])
 
   return (
@@ -259,22 +216,13 @@ export function DashboardHub({ displayName }: Props) {
       <div className="mx-auto max-w-lg px-5 pb-16 pt-6">
         {/* ── Header ── */}
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm text-muted-foreground">
-              {greeting}, {firstName}
-            </p>
-            <StreakBadge />
-          </div>
+          <p className="text-sm text-muted-foreground mb-2">
+            {greeting}, {firstName}
+          </p>
           <h1 className="text-2xl font-bold text-foreground tracking-tight leading-tight">
             What&apos;s for dinner tonight?
           </h1>
         </div>
-
-        {/* ── Weekend Mode (Fri 11 AM → Sun 11:59 PM) ── */}
-        <WeekendModeCard householdType={householdConfig.householdType} />
-
-        {/* ── Mon-Thu Weekend Teaser ── */}
-        <WeekendTeaser />
 
         {/* ── 4 Pillar Cards ── */}
         <div className="flex flex-col gap-3">

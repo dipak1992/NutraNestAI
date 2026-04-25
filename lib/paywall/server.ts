@@ -10,8 +10,6 @@ import {
   isFamilyTier,
   normalizeTier,
 } from '@/lib/paywall/config'
-import { REFERRAL_MAX_BONUS_DAYS } from '@/lib/referral/config'
-
 export interface PaywallStatus {
   isAuthenticated: boolean
   tier: SubscriptionTier
@@ -88,10 +86,9 @@ export async function getPaywallStatus(): Promise<PaywallStatus> {
   const isTempPro = !!tempProUntil && new Date(tempProUntil) > new Date()
   const isPro = isProTier(tier) || isTempPro
   const isFamily = isFamilyTier(tier)
-  const clampedBonusDays = Math.min(bonusDays, REFERRAL_MAX_BONUS_DAYS)
   const effectivePlanPreviewDays = isPro
     ? 7
-    : Math.min(FREE_PLAN_PREVIEW_DAYS + clampedBonusDays, 7)
+    : Math.min(FREE_PLAN_PREVIEW_DAYS + bonusDays, 7)
 
   return {
     isAuthenticated: true,
@@ -104,7 +101,7 @@ export async function getPaywallStatus(): Promise<PaywallStatus> {
     freeTonightSwipeLimit: FREE_TONIGHT_SWIPE_LIMIT,
     freeKidsRecipeLimit: FREE_KIDS_RECIPE_LIMIT,
     freeDailyGenerations: FREE_DAILY_GENERATIONS,
-    bonusDays: clampedBonusDays,
+    bonusDays,
     tempProUntil,
   }
 }

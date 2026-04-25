@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
-import { Loader2, Check, Gift, Eye, EyeOff } from 'lucide-react'
+import { Loader2, Check, Eye, EyeOff } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import posthog from 'posthog-js'
 
@@ -67,18 +67,8 @@ export default function SignupPage() {
   const watchedPassword = watch('password', '')
   const pwStrength = getPasswordStrength(watchedPassword ?? '')
 
-  // Read referral code from URL at submit time to avoid useSearchParams Suspense
-  function getRefCode(): string | null {
-    try {
-      return new URLSearchParams(window.location.search).get('ref')
-    } catch {
-      return null
-    }
-  }
-
   async function onSubmit(values: FormValues) {
     setLoading(true)
-    const refCode = getRefCode()
     const supabase = createClient()
     const { data: signUpData, error } = await supabase.auth.signUp({
       email: values.email,
@@ -94,16 +84,7 @@ export default function SignupPage() {
     if (signUpData.user) {
       posthog.identify(signUpData.user.id, { email: signUpData.user.email })
     }
-    posthog.capture('user_signed_up', { method: 'email', has_referral: !!refCode })
-
-    // Apply referral code if present — fire-and-forget (non-blocking)
-    if (refCode) {
-      fetch('/api/referral/apply', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: refCode }),
-      }).catch(() => { /* silent – referral is best-effort */ })
-    }
+    posthog.capture('user_signed_up', { method: 'email' })
 
     toast.success('Account created! Redirecting to setup…')
     router.push('/onboarding')
@@ -133,18 +114,8 @@ export default function SignupPage() {
     }
   }
 
-  const refCode = typeof window !== 'undefined'
-    ? new URLSearchParams(window.location.search).get('ref')
-    : null
-
   return (
     <div className="glass-card rounded-2xl border border-border/60 p-8 shadow-xl">
-      {refCode && (
-        <div className="mb-5 flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800">
-          <Gift className="h-4 w-4 flex-shrink-0" />
-          <span>You were invited by a friend — you&apos;ll unlock bonus days for them!</span>
-        </div>
-      )}
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Create your account</h1>
         <p className="text-sm text-muted-foreground mt-1">Start free, then upgrade to Pro when you want the full planner</p>

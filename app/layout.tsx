@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Fraunces } from 'next/font/google'
 import './globals.css'
 import { Providers } from '@/components/providers'
 import { Toaster } from '@/components/ui/sonner'
@@ -9,6 +9,13 @@ import { getSiteUrl } from '@/lib/seo'
 const inter = Inter({
   variable: '--font-inter',
   subsets: ['latin'],
+})
+
+const fraunces = Fraunces({
+  variable: '--font-serif',
+  subsets: ['latin'],
+  display: 'swap',
+  axes: ['opsz'],
 })
 
 export const metadata: Metadata = {
@@ -64,7 +71,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} h-full antialiased`}
+      className={`${inter.variable} ${fraunces.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <script

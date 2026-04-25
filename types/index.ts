@@ -55,7 +55,7 @@ export interface Profile {
 
 export interface Household {
   id: string;
-  owner_id: string;
+  owner_user_id: string;
   name: string;
   adults_count: number;
   babies_count: number;
@@ -533,35 +533,57 @@ export interface ShareableCard {
 }
 
 // ============================================================
-// Weekend Mode (PRO)
+// Dietary Preferences — 5-pillar aligned
 // ============================================================
 
-export interface EntertainmentPrefs {
-  language: string;
-  genre: string[];
-  watchStyle: 'solo' | 'couple' | 'family';
-}
+export type DietaryPreference =
+  | 'vegetarian'
+  | 'vegan'
+  | 'pescatarian'
+  | 'gluten_free'
+  | 'dairy_free'
+  | 'nut_free'
+  | 'keto'
+  | 'paleo'
+  | 'mediterranean'
+  | 'high_protein'
+  | 'low_sodium'
+  | 'low_carb'
+  | 'halal'
+  | 'kosher'
+  | 'kid_friendly';
 
-export interface EntertainmentResult {
-  title: string;
-  type: 'movie' | 'series';
-  year: number;
-  rating: string;
-  imdbScore: number;
-  whereToWatch: string[];
-  reason: string;
-  posterEmoji: string;
-}
+// ============================================================
+// Scan mode — Pillar 2: Snap & Cook
+// ============================================================
 
-export interface WeekendModeResult {
-  meal: {
-    title: string;
-    description: string;
-    prepTime: number;
-    cookTime: number;
-    tags: string[];
-    ingredients: string[];
-    instructions: string[];
-  };
-  entertainment: EntertainmentResult;
-}
+export type ScanMode = 'auto' | 'fridge' | 'pantry' | 'receipt';
+export type ScanDetectedType = 'fridge' | 'pantry' | 'receipt' | 'unknown';
+
+// ============================================================
+// Leftover status — Pillar 4: Leftovers AI
+// ============================================================
+
+export type LeftoverStatus = 'active' | 'used' | 'expired' | 'discarded';
+
+// ============================================================
+// Budget price tier — Pillar 5: Budget Intelligence
+// ============================================================
+
+export type PriceTier = 'budget' | 'mid' | 'premium';
+export type PreferredStore = 'instacart' | 'kroger' | 'walmart' | 'whole_foods' | 'generic';
+
+// ============================================================
+// Nudge types — cross-pillar contextual prompts
+// ============================================================
+
+export type NudgeType =
+  | 'upgrade'
+  | 'onboarding'
+  | 'feature_education'
+  | 'household_invite'
+  | 'budget_alert'
+  | 'leftover_reminder'
+  | 'pantry_expiry'
+  | 'plan_missing'
+  | 'streak_encouragement';

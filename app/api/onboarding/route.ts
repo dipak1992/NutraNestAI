@@ -1,83 +1,71 @@
-/**
- * POST /api/onboarding
- *
- * Saves lightweight onboarding preferences to Supabase.
- * This is fire-and-forget — the client never waits on this response.
- *
- * Required Supabase migration (run once in the SQL editor):
- * ─────────────────────────────────────────────────────────
- * create table if not exists onboarding_preferences (
- *   id                   uuid primary key default gen_random_uuid(),
- *   user_id              uuid references auth.users(id) on delete cascade unique,
- *   household_type       text,
- *   has_kids             boolean,
- *   picky_eater          boolean default false,
- *   cuisines             text[]  default '{}',
- *   disliked_foods       text[]  default '{}',
- *   cooking_time_minutes int     default 30,
- *   low_energy           boolean default false,
- *   country              text,
- *   store_preference     text,
- *   created_at           timestamptz default now(),
- *   updated_at           timestamptz default now()
- * );
- *
- * alter table onboarding_preferences enable row level security;
- *
- * create policy "Users manage own preferences"
- *   on onboarding_preferences
- *   for all using (auth.uid() = user_id)
- *   with check (auth.uid() = user_id);
- * ─────────────────────────────────────────────────────────
- */
-
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
-export async function POST(req: NextRequest) {
-  try {
-    const body = await req.json()
+// ─── POST /api/onboarding ─────────────────────────────────────────────────────
 
+export async function POST(req: Request) {
+  try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    // Guest users: preferences live in localStorage — that's fine
-    if (!user) {
-      return NextResponse.json({ ok: true, note: 'guest' })
+    const body = await req.json() as {
+      householdSize: number
+      dietary: string[]
+      dislikes: string[]
+      skillLevel: 'beginner' | 'intermediate' | 'advanced'
+      weeklyBudget: number | null
     }
 
-    const payload = {
-      user_id:              user.id,
-      household_type:       body.household_type       ?? null,
-      has_kids:             body.has_kids             ?? null,
-      picky_eater:          body.picky_eater          ?? false,
-      cuisines:             Array.isArray(body.cuisines)       ? body.cuisines       : [],
-      disliked_foods:       Array.isArray(body.disliked_foods) ? body.disliked_foods : [],
-      cooking_time_minutes: typeof body.cooking_time_minutes === 'number' ? body.cooking_time_minutes : 30,
-      low_energy:           body.low_energy           ?? false,
-      country:              body.country              ?? null,
-      store_preference:     body.store_preference     ?? null,
-      updated_at:           new Date().toISOString(),
-    }
+    // Map skill level → budget_level for the household table
+    const budgetLevel = body.weeklyBudget
+      ? body.weeklyBudget <= 75
+        ? 'low'
+        : body.weeklyBudget <= 150
+        ? 'medium'
+        : 'high'
+      : 'medium'
 
-    const { error: prefError } = await supabase
-      .from('onboarding_preferences')
-      .upsert(payload, { onConflict: 'user_id' })
+    // Upsert household
+    const { error: householdError } = await supabase
+      .from('households')
+      .upsert(
+        {
+          owner_user_id: user.id,
+          name: 'My Household',
+          adults_count: body.householdSize,
+          babies_count: 0,
+          toddlers_count: 0,
+          kids_count: 0,
+          budget_level: budgetLevel,
+          cooking_time_preference: body.skillLevel === 'beginner' ? 'quick' : 'any',
+          cuisine_preferences: [],
+          low_energy_mode: body.skillLevel === 'beginner',
+          one_pot_preference: body.skillLevel === 'beginner',
+          leftovers_preference: true,
+          pantry_staples: [],
+          preferred_proteins: [],
+          meals_per_day: 3,
+        },
+        { onConflict: 'owner_user_id' }
+      )
 
-    if (prefError) {
-      // Table may not exist yet — non-fatal, just log
-      console.warn('[onboarding] preferences save skipped:', prefError.message)
-    }
+    if (householdError) throw householdError
 
-    // Best-effort: mark profile as onboarding complete
-    await supabase
+    // Mark onboarding complete on profile
+    const { error: profileError } = await supabase
       .from('profiles')
-      .update({ onboarding_completed: true, updated_at: new Date().toISOString() })
+      .update({
+        onboarding_completed: true,
+        updated_at: new Date().toISOString(),
+      })
       .eq('id', user.id)
 
+    if (profileError) throw profileError
+
     return NextResponse.json({ ok: true })
-  } catch (err) {
-    console.error('[onboarding] route error:', err)
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 })
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

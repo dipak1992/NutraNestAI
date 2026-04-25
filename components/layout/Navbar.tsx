@@ -17,8 +17,6 @@ import {
   LogOut,
   User,
   Crown,
-  Gift,
-  BarChart3,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -138,20 +136,12 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
                 <User className="h-4 w-4" />
                 Profile &amp; Settings
               </DropdownMenuItem>
-              <DropdownMenuItem render={<Link href="/insights" />}>
-                <BarChart3 className="h-4 w-4" />
-                Insights
-              </DropdownMenuItem>
               {!isPaid && (
                 <DropdownMenuItem render={<Link href="/pricing?intent=pro" />}>
                   <Crown className="h-4 w-4" />
                   Upgrade to Pro
                 </DropdownMenuItem>
               )}
-              <DropdownMenuItem render={<Link href="/referral" />}>
-                <Gift className="h-4 w-4" />
-                Refer Friends
-              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={handleSignOut}

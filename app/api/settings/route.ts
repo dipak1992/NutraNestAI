@@ -1,74 +1,74 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { createSupabaseServiceClient } from '@/lib/supabase/service'
 
-export async function PATCH(req: NextRequest) {
+// ─── PATCH /api/settings ──────────────────────────────────────────────────────
+
+export async function PATCH(req: Request) {
   try {
-    const body = await req.json()
-
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const body = await req.json() as {
+      full_name?: string
+      dietary?: string[]
+      dislikes?: string[]
+      notifications?: Record<string, boolean>
+      household?: {
+        adults_count?: number
+        kids_count?: number
+        toddlers_count?: number
+        babies_count?: number
+        budget_level?: string
+      }
     }
 
-    const promises: PromiseLike<unknown>[] = []
+    // Update profile fields
+    const profileUpdate: Record<string, unknown> = { updated_at: new Date().toISOString() }
+    if (body.full_name !== undefined) profileUpdate.full_name = body.full_name
+    if (body.dietary !== undefined)   profileUpdate.dietary_preferences = body.dietary
+    if (body.dislikes !== undefined)  profileUpdate.disliked_foods = body.dislikes
+    if (body.notifications !== undefined) profileUpdate.notification_prefs = body.notifications
 
-    // Persist household name to user metadata
-    if (typeof body.householdName === 'string') {
-      promises.push(
-        supabase.auth.updateUser({ data: { household_name: body.householdName } })
-      )
+    if (Object.keys(profileUpdate).length > 1) {
+      const { error } = await supabase
+        .from('profiles')
+        .update(profileUpdate)
+        .eq('id', user.id)
+      if (error) throw error
     }
 
-    // Persist preferences to onboarding_preferences table
-    const prefPayload: Record<string, unknown> = { user_id: user.id, updated_at: new Date().toISOString() }
-    if (Array.isArray(body.cuisines)) prefPayload.cuisines = body.cuisines
-    if (typeof body.cookingTimeMinutes === 'number') prefPayload.cooking_time_minutes = body.cookingTimeMinutes
-    if (body.entertainmentPrefs !== undefined && typeof body.entertainmentPrefs === 'object' && body.entertainmentPrefs !== null) {
-      prefPayload.entertainment_prefs = body.entertainmentPrefs
+    // Update household fields
+    if (body.household) {
+      const { error } = await supabase
+        .from('households')
+        .update({ ...body.household, updated_at: new Date().toISOString() })
+        .eq('owner_user_id', user.id)
+      if (error) throw error
     }
-
-    if (Object.keys(prefPayload).length > 2) {
-      promises.push(
-        supabase
-          .from('onboarding_preferences')
-          .upsert(prefPayload, { onConflict: 'user_id' })
-          .then()
-      )
-    }
-
-    // Sync cuisines to user_dietary_preferences so the AI engine can read them
-    if (Array.isArray(body.cuisines)) {
-      promises.push(
-        supabase
-          .from('user_dietary_preferences')
-          .update({ cuisine_love: body.cuisines, updated_at: new Date().toISOString() })
-          .eq('user_id', user.id)
-          .then()
-      )
-    }
-
-    await Promise.all(promises)
 
     return NextResponse.json({ ok: true })
-  } catch {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
 
+// ─── DELETE /api/settings ─────────────────────────────────────────────────────
+
 export async function DELETE() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const admin = createSupabaseServiceClient()
+    // Delete user data (cascades via RLS/FK in Supabase)
+    const { error } = await supabase.auth.admin.deleteUser(user.id)
+    if (error) throw error
 
-  // All user data tables have ON DELETE CASCADE on user_id FK,
-  // so deleting the auth user removes everything automatically.
-  const { error } = await admin.auth.admin.deleteUser(user.id)
-  if (error) return NextResponse.json({ error: 'Failed to delete account' }, { status: 500 })
-
-  return NextResponse.json({ ok: true })
+    return NextResponse.json({ ok: true })
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    return NextResponse.json({ error: message }, { status: 500 })
+  }
 }

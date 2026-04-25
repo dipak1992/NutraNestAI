@@ -352,7 +352,7 @@ export function WeeklyPlannerV2() {
           </p>
           {!paywallLoading && !status.isPro && (
             <p className="mt-1 text-xs text-amber-700">
-              Free includes instant previews, {status.freeTonightSwipeLimit} Tonight swipes, and {status.effectivePlanPreviewDays} planned dinners{status.bonusDays > 0 ? ` (+${status.bonusDays} referral bonus)` : ''}.
+              Free includes instant previews, {status.freeTonightSwipeLimit} Tonight swipes, and {status.effectivePlanPreviewDays} planned dinners.
             </p>
           )}
         </div>

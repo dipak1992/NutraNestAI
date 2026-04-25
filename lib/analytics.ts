@@ -16,7 +16,6 @@ export const Analytics = {
   PAYWALL_VIEW:           'paywall_view',
   SUBSCRIPTION_STARTED:   'subscription_started',
   SUBSCRIPTION_SUCCESS:   'subscription_success',
-  REFERRAL_SHARED:        'referral_shared',
   EMAIL_CAPTURED:         'email_captured',
   ONBOARDING_STARTED:     'onboarding_started',
   ONBOARDING_COMPLETED:   'onboarding_completed',

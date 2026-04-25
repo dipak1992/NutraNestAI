@@ -435,98 +435,13 @@ export default function HouseholdPillarPage() {
               badgeColor={features.kidsTools ? 'bg-pink-50 text-pink-700' : 'bg-amber-50 text-amber-700'}
             >
               {features.kidsTools && (
-                <div className="mt-2 flex flex-wrap gap-1.5">
-                  {[
-                    { emoji: '🍎', label: 'Snack for Kids', href: '/kids-tool?mode=snack' },
-                    { emoji: '🍽', label: 'Picky Eater', href: '/kids-tool?mode=picky' },
-                    { emoji: '🍱', label: 'Lunchbox', href: '/kids-tool?mode=lunchbox' },
-                    { emoji: '🧁', label: 'Bake', href: '/kids-tool?mode=bake' },
-                    { emoji: '⚡', label: 'Food in 5 Min', href: '/kids-tool?mode=fast' },
-                  ].map(tool => (
-                    <Link
-                      key={tool.label}
-                      href={tool.href}
-                      className="inline-flex items-center gap-1 rounded-full bg-pink-50 border border-pink-200/60 px-2.5 py-1 text-[11px] font-medium text-pink-800 hover:bg-pink-100 transition-colors"
-                    >
-                      {tool.emoji} {tool.label}
-                    </Link>
-                  ))}
-                </div>
+                <p className="mt-1.5 text-[11px] text-muted-foreground/70">
+                  Kid-friendly meal tools coming in the next update.
+                </p>
               )}
             </SectionCard>
           )}
 
-          {/* 5. Conflict Balancing */}
-          <SectionCard
-            index={4}
-            emoji="⚖️"
-            title="Conflict Balancing"
-            subtitle={
-              features.conflictBalancing
-                ? 'Automatically balances competing preferences across family members'
-                : 'Smart balancing ensures everyone gets meals they enjoy each week'
-            }
-            href={features.conflictBalancing ? '/dashboard/conflict-balancing' : undefined}
-            locked={!features.conflictBalancing}
-            onClick={
-              !features.conflictBalancing
-                ? () => handleLockedClick(
-                    'Unlock Conflict Balancing',
-                    'Family Plus automatically balances competing preferences — if one person loves spicy and another doesn\'t, MealEase finds the sweet spot.'
-                  )
-                : undefined
-            }
-            badge={features.conflictBalancing ? 'Active' : 'Family Plus'}
-            badgeColor={features.conflictBalancing ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}
-          />
-
-          {/* 6. Shared Planning */}
-          <SectionCard
-            index={5}
-            emoji="📋"
-            title="Shared Planning"
-            subtitle={
-              features.sharedPlanning
-                ? 'Share meal plans and grocery lists with your household'
-                : 'Collaborate on meal planning with your partner or family'
-            }
-            href={features.sharedPlanning ? '/dashboard/shared-planning' : undefined}
-            locked={!features.sharedPlanning}
-            onClick={
-              !features.sharedPlanning
-                ? () => handleLockedClick(
-                    'Unlock Shared Planning',
-                    'Family Plus lets you share meal plans and grocery lists with your household — everyone stays on the same page.'
-                  )
-                : undefined
-            }
-            badge={features.sharedPlanning ? 'Active' : 'Family Plus'}
-            badgeColor={features.sharedPlanning ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}
-          />
-
-          {/* 7. Guest Hosting */}
-          <SectionCard
-            index={6}
-            emoji="🍽️"
-            title="Guest Hosting Planner"
-            subtitle={
-              features.guestHostingPlanner
-                ? 'Plan meals for dinner parties and hosting guests'
-                : 'Unlock smart hosting tools for dinner parties and gatherings'
-            }
-            href={features.guestHostingPlanner ? '/dashboard/guest-hosting' : undefined}
-            locked={!features.guestHostingPlanner}
-            onClick={
-              !features.guestHostingPlanner
-                ? () => handleLockedClick(
-                    'Unlock Guest Hosting',
-                    'Family Plus includes a guest hosting planner — set guest count, dietary needs, and get a complete menu with shopping list.'
-                  )
-                : undefined
-            }
-            badge={features.guestHostingPlanner ? 'Unlocked' : 'Family Plus'}
-            badgeColor={features.guestHostingPlanner ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}
-          />
         </div>
 
         {/* Upgrade prompt for free users */}

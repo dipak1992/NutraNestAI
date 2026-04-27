@@ -6,21 +6,20 @@ type Row = {
   feature: string
   free: boolean | string
   plus: boolean | string
-  family: boolean | string
 }
 
 const ROWS: Row[] = [
-  { feature: 'Tonight suggestions',        free: true,          plus: true,          family: true },
-  { feature: 'Fridge scans',               free: '3 / week',    plus: 'Unlimited',   family: 'Unlimited' },
-  { feature: 'Menu scans',                 free: '3 / month',   plus: 'Unlimited',   family: 'Unlimited' },
-  { feature: 'Leftovers AI',               free: 'Limited',     plus: 'Unlimited',   family: 'Unlimited' },
-  { feature: 'Weekly Autopilot',           free: false,         plus: true,          family: true },
-  { feature: 'Budget Intelligence',        free: false,         plus: true,          family: true },
-  { feature: 'Grocery list export',        free: false,         plus: true,          family: true },
-  { feature: 'Household members',          free: '1',           plus: '2',           family: 'Up to 6' },
-  { feature: 'Shared meal plans',          free: false,         plus: false,         family: true },
-  { feature: 'Kid-friendly suggestions',   free: false,         plus: false,         family: true },
-  { feature: 'Priority support',           free: false,         plus: false,         family: true },
+  { feature: 'Tonight suggestions',        free: true,          plus: true },
+  { feature: 'Fridge scans',               free: '3 / week',    plus: 'Unlimited' },
+  { feature: 'Menu scans',                 free: '3 / month',   plus: 'Unlimited' },
+  { feature: 'Leftovers AI',               free: 'Limited',     plus: 'Unlimited' },
+  { feature: 'Weekly Autopilot',           free: false,         plus: true },
+  { feature: 'Budget Intelligence',        free: false,         plus: true },
+  { feature: 'Grocery list export',        free: false,         plus: true },
+  { feature: 'Household members',          free: '1',           plus: 'Up to 6' },
+  { feature: 'Shared meal plans',          free: false,         plus: true },
+  { feature: 'Kid-friendly suggestions',   free: false,         plus: true },
+  { feature: 'Priority support',           free: false,         plus: false },
 ]
 
 // ─── Cell ─────────────────────────────────────────────────────────────────────
@@ -41,13 +40,13 @@ function Cell({ value }: { value: boolean | string }) {
 export function PricingCompare() {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[480px] border-collapse text-sm">
+      <table className="w-full min-w-[320px] border-collapse text-sm">
         <thead>
           <tr className="border-b border-white/10">
             <th className="py-3 pr-4 text-left text-xs font-medium uppercase tracking-wider text-white/40">
               Feature
             </th>
-            {(['Free', 'Plus', 'Family'] as const).map((name) => (
+            {(['Free', 'Plus'] as const).map((name) => (
               <th
                 key={name}
                 className={[
@@ -75,9 +74,6 @@ export function PricingCompare() {
               </td>
               <td className="px-4 py-3 text-center">
                 <Cell value={row.plus} />
-              </td>
-              <td className="px-4 py-3 text-center">
-                <Cell value={row.family} />
               </td>
             </tr>
           ))}

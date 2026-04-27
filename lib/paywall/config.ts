@@ -20,8 +20,8 @@ export const PRICING_TIERS = {
   },
   family: {
     name: 'Family Plus',
-    monthlyPrice: 12.99,
-    yearlyPrice: 99,
+    monthlyPrice: 14.99,
+    yearlyPrice: 119,
     monthlyPriceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_FAMILY_MONTHLY,
     yearlyPriceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_FAMILY_YEARLY,
   },
@@ -54,30 +54,18 @@ export const PRO_UNLOCKS = [
   'Faster AI responses',
 ] as const
 
-// ── Family Plus tier unlocks (everything in Pro + these) ────────────────
-
-export const FAMILY_PLUS_UNLOCKS = [
-  'Up to 6 family members',
-  'Kids Mode with picky eater settings',
-  'Smart Menu Scan & Food Check',
-  'Lunchbox Planner',
-  'Pantry Mode (turn leftovers into dinner)',
-  'Shared grocery lists',
-  'Family dashboard',
-  'Multi-profile meal balancing',
-  'Smart family weekly planning',
-  'Household autopilot',
-] as const
+// ── Kept for backward compat (same as PRO_UNLOCKS now) ──────────────────
+export const FAMILY_PLUS_UNLOCKS = PRO_UNLOCKS
 
 // ── Savings calculations ──────────────────────────────────────────────────
 
 export const PRO_ANNUAL_SAVINGS = Math.round((1 - PRICING_TIERS.pro.yearlyPrice / (PRICING_TIERS.pro.monthlyPrice * 12)) * 100) // 38%
-export const FAMILY_ANNUAL_SAVINGS = Math.round((1 - PRICING_TIERS.family.yearlyPrice / (PRICING_TIERS.family.monthlyPrice * 12)) * 100) // 36%
+export const FAMILY_ANNUAL_SAVINGS = PRO_ANNUAL_SAVINGS // alias kept for compat
 
 // ── Tier normalization & checks ───────────────────────────────────────────
 
 export function normalizeTier(tier: string | null | undefined): SubscriptionTier {
-  if (tier === 'pro' || tier === 'family') return tier as SubscriptionTier
+  if (tier === 'pro' || tier === 'family') return tier
   return 'free'
 }
 
@@ -86,7 +74,6 @@ export function isProTier(tier: SubscriptionTier | string | null | undefined): b
   return normalized === 'pro' || normalized === 'family'
 }
 
-export function isFamilyTier(tier: SubscriptionTier | string | null | undefined): boolean {
-  const normalized = typeof tier === 'string' ? normalizeTier(tier) : 'free'
-  return normalized === 'family'
+export function isFamilyTier(_tier: SubscriptionTier | string | null | undefined): boolean {
+  return _tier === 'family'
 }

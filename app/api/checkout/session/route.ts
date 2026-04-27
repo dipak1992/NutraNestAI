@@ -1,6 +1,6 @@
 // ============================================================
 // API: POST /api/checkout/session
-// Creates a Stripe Checkout Session for MealEaseAI Pro or Family Plus.
+// Creates a Stripe Checkout Session for MealEaseAI Pro.
 // Uses direct Stripe REST API (no SDK dependency).
 // ============================================================
 
@@ -9,27 +9,21 @@ import { createClient } from '@/lib/supabase/server'
 import { serverEnv } from '@/lib/env'
 import { getSiteUrl } from '@/lib/seo'
 
-type Plan = 'pro_monthly' | 'pro_yearly' | 'family_monthly' | 'family_yearly'
+type Plan = 'pro_monthly' | 'pro_yearly'
 
 const PRICE_IDS: Record<Plan, string | undefined> = {
-  pro_monthly:      serverEnv.stripePricingTierPro.monthly,
-  pro_yearly:       serverEnv.stripePricingTierPro.yearly,
-  family_monthly:   serverEnv.stripePricingTierFamily.monthly,
-  family_yearly:    serverEnv.stripePricingTierFamily.yearly,
+  pro_monthly: serverEnv.stripePricingTierPro.monthly,
+  pro_yearly:  serverEnv.stripePricingTierPro.yearly,
 }
 
 const PLAN_DISPLAY_NAMES: Record<Plan, string> = {
-  pro_monthly:    'Pro',
-  pro_yearly:     'Pro',
-  family_monthly: 'Family Plus',
-  family_yearly:  'Family Plus',
+  pro_monthly: 'Pro',
+  pro_yearly:  'Pro',
 }
 
-const PLAN_TIERS: Record<Plan, 'pro' | 'family'> = {
-  pro_monthly:    'pro',
-  pro_yearly:     'pro',
-  family_monthly: 'family',
-  family_yearly:  'family',
+const PLAN_TIERS: Record<Plan, 'pro'> = {
+  pro_monthly: 'pro',
+  pro_yearly:  'pro',
 }
 
 export async function POST(req: Request) {
@@ -47,7 +41,7 @@ export async function POST(req: Request) {
     }
 
     const { plan } = (await req.json()) as { plan: Plan }
-    if (!['pro_monthly', 'pro_yearly', 'family_monthly', 'family_yearly'].includes(plan)) {
+    if (!['pro_monthly', 'pro_yearly'].includes(plan)) {
       return NextResponse.json({ error: 'Invalid plan' }, { status: 400 })
     }
 

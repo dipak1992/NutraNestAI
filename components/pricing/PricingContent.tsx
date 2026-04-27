@@ -17,7 +17,6 @@ import {
   ArrowRight,
   Zap,
   X,
-  Gift,
   CreditCard,
   Clock,
   ShieldCheck,
@@ -27,7 +26,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
-import { PRICING_TIERS, PRO_ANNUAL_SAVINGS, FAMILY_ANNUAL_SAVINGS } from '@/lib/paywall/config'
+import { PRICING_TIERS, PRO_ANNUAL_SAVINGS } from '@/lib/paywall/config'
 import { cn } from '@/lib/utils'
 import { AboutSnippet } from '@/components/about/AboutSnippet'
 
@@ -35,7 +34,7 @@ import { AboutSnippet } from '@/components/about/AboutSnippet'
 
 const TESTIMONIALS = [
   {
-    quote: 'I recommend MealEase to clients who struggle with meal planning. The allergy support and family adaptation is better than anything else I\'ve seen.',
+    quote: 'I recommend MealEase to clients who struggle with meal planning. The allergy support and personalization is better than anything else I\'ve seen.',
     name: 'Priya R.',
     role: 'Registered Dietitian',
     avatar: 'PR',
@@ -58,27 +57,24 @@ const TESTIMONIALS = [
 ]
 
 const COMPARISON_FEATURES = [
-  { feature: 'Tonight Dinner', free: true, pro: true, family: true },
-  { feature: 'Daily meal generations', free: '3 per day', pro: 'Unlimited', family: 'Unlimited' },
-  { feature: 'Simple grocery list', free: true, pro: true, family: true },
-  { feature: 'Unlimited regenerations', free: false, pro: true, family: true },
-  { feature: 'Weekly Planner', free: '3-day preview', pro: 'Full 7 days', family: 'Full 7 days' },
-  { feature: 'Save preferences', free: false, pro: true, family: true },
-  { feature: 'Member profiles †', free: '1 profile', pro: '2 profiles', family: 'Up to 6 profiles' },
-  { feature: 'Household memory', free: false, pro: '1 household', family: 'Full household' },
-  { feature: 'Snap & Cook scans', free: '3/week', pro: 'Unlimited', family: 'Unlimited' },
-  { feature: 'Smart Menu Scan', free: false, pro: true, family: true },
-  { feature: 'Food Check (calorie snap)', free: false, pro: true, family: true },
-  { feature: 'Personal nutrition profile', free: false, pro: true, family: true },
-  { feature: 'Budget meal mode', free: false, pro: true, family: true },
-  { feature: 'Healthy mode', free: false, pro: true, family: true },
-  { feature: 'Meal history', free: false, pro: true, family: true },
-  { feature: 'Faster AI responses', free: false, pro: true, family: true },
-  { feature: 'Pantry Mode', free: false, pro: false, family: true },
-  { feature: 'Shared grocery lists', free: false, pro: false, family: true },
-  { feature: 'Family dashboard', free: false, pro: false, family: true },
-  { feature: 'Multi-profile balancing', free: false, pro: false, family: true },
-  { feature: 'Priority support', free: false, pro: false, family: true },
+  { feature: 'Tonight Dinner', free: true, pro: true },
+  { feature: 'Daily meal generations', free: '3 per day', pro: 'Unlimited' },
+  { feature: 'Simple grocery list', free: true, pro: true },
+  { feature: 'Unlimited regenerations', free: false, pro: true },
+  { feature: 'Weekly Planner', free: '3-day preview', pro: 'Full 7 days' },
+  { feature: 'Save preferences', free: false, pro: true },
+  { feature: 'Member profiles †', free: '1 profile', pro: 'Up to 6 profiles' },
+  { feature: 'Household memory', free: false, pro: true },
+  { feature: 'Snap & Cook scans', free: '3/week', pro: 'Unlimited' },
+  { feature: 'Smart Menu Scan', free: false, pro: true },
+  { feature: 'Food Check (calorie snap)', free: false, pro: true },
+  { feature: 'Personal nutrition profile', free: false, pro: true },
+  { feature: 'Budget meal mode', free: false, pro: true },
+  { feature: 'Healthy mode', free: false, pro: true },
+  { feature: 'Meal history', free: false, pro: true },
+  { feature: 'Faster AI responses', free: false, pro: true },
+  { feature: 'Pantry Mode', free: false, pro: true },
+  { feature: 'Shared grocery lists', free: false, pro: true },
 ]
 
 const FAQ = [
@@ -88,27 +84,23 @@ const FAQ = [
   },
   {
     q: 'What is a household profile?',
-    a: 'A household profile stores preferences, allergies, age groups, and food goals for one person in your household. Profiles are not separate logins — they are preference records that help MealEase personalize every meal for each person at your table. Free plan includes 1 profile. Pro includes 2. Family Plus supports up to 6.',
+    a: 'A household profile stores preferences, allergies, age groups, and food goals for one person in your household. Profiles are not separate logins — they are preference records that help MealEase personalize every meal for each person at your table. Free plan includes 1 profile. Pro includes up to 6.',
   },
   {
     q: 'Are profiles separate logins? Can my spouse use MealEase too?',
     a: 'Not yet — profiles are preference records, not separate accounts. One account manages all profiles. Your spouse\'s preferences, allergies, and food goals are stored in their profile and used to personalize every meal. Shared login support is on our roadmap for a future update.',
   },
   {
-    q: 'How many family members can I add?',
-    a: 'Free plan: 1 personal profile. Pro plan: up to 2 profiles (great for couples). Family Plus: up to 6 household member profiles with full preferences, allergy tracking, and cuisine preferences.',
-  },
-  {
-    q: 'Why upgrade to Family Plus?',
-    a: 'Family Plus is for households where everyone\'s preferences matter. You get up to 6 member profiles with full detail — allergies, age groups, cuisine preferences, and portion sizes. MealEase then balances all of that automatically when planning meals. Plus you get shared grocery lists, a family dashboard, and multi-profile meal balancing.',
+    q: 'How many household members can I add?',
+    a: 'Free plan: 1 personal profile. Pro plan: up to 6 household member profiles with full preferences, allergy tracking, and cuisine preferences.',
   },
   {
     q: 'Can I share grocery lists or meal plans?',
-    a: 'Yes. Family Plus includes shared grocery lists and shared meal planning — so everyone in the household stays on the same page. Pro users get personal grocery lists. Shared login support for multiple accounts is coming in a future update.',
+    a: 'Yes. Pro includes shared grocery lists and shared meal planning — so everyone in the household stays on the same page.',
   },
   {
     q: 'How does Household Memory work?',
-    a: 'Every time you cook, save, skip, or swap a meal, MealEase quietly learns. It tracks which cuisines your family gravitates toward, what your picky eater actually ate, and which nights you tend to reach for something fast. Over weeks, your suggestions get sharper — like a sous chef who\'s been with your family for years.',
+    a: 'Every time you cook, save, skip, or swap a meal, MealEase quietly learns. It tracks which cuisines your household gravitates toward, what your picky eater actually ate, and which nights you tend to reach for something fast. Over weeks, your suggestions get sharper — like a sous chef who\'s been with your family for years.',
   },
   {
     q: 'What is Weekly Autopilot?',
@@ -128,7 +120,7 @@ const FAQ = [
   },
   {
     q: 'Is there a free version?',
-    a: 'Yes. The free plan gives you Tonight Dinner, up to three meal ideas daily, and basic grocery lists — enough to experience how MealEase thinks. When you\'re ready for Weekly Autopilot or Household Memory, upgrade anytime. All paid plans include a 7-day free trial, and you can cancel with one click.',
+    a: 'Yes. The free plan gives you Tonight Dinner, up to three meal ideas daily, and basic grocery lists — enough to experience how MealEase thinks. When you\'re ready for Weekly Autopilot or Household Memory, upgrade anytime. Pro includes a 7-day free trial, and you can cancel with one click.',
   },
   {
     q: 'Can MealEase help me order healthier at restaurants?',
@@ -140,7 +132,7 @@ const FAQ = [
   },
   {
     q: 'What\'s the difference between personal preferences and household settings?',
-    a: 'Household settings power family meal planning — allergies, ages, and shared preferences for everyone at the table. Personal preferences are just for you — your weight goal, protein focus, and individual dietary needs. Smart Menu Scan and Food Check use your personal profile so recommendations are tailored to your body and goals, not the whole family.',
+    a: 'Household settings power meal planning — allergies, ages, and shared preferences for everyone at the table. Personal preferences are just for you — your weight goal, protein focus, and individual dietary needs. Smart Menu Scan and Food Check use your personal profile so recommendations are tailored to your body and goals.',
   },
 ]
 
@@ -162,9 +154,6 @@ export function PricingContent() {
 
   const proMonthly = PRICING_TIERS.pro.monthlyPrice
   const proAnnual = PRICING_TIERS.pro.yearlyPrice
-  const familyMonthly = PRICING_TIERS.family.monthlyPrice
-  const familyAnnual = PRICING_TIERS.family.yearlyPrice
-
 
   const handleStartTrial = useCallback(async () => {
     if (!status.isAuthenticated) {
@@ -172,7 +161,7 @@ export function PricingContent() {
       return
     }
     if (status.isPro) {
-      toast.info('You already have Pro or Family Plus!')
+      toast.info('You already have Pro!')
       return
     }
     setIsStartingTrial(true)
@@ -195,7 +184,7 @@ export function PricingContent() {
     }
   }, [status, router])
 
-  const handleCheckout = useCallback(async (plan: 'pro_monthly' | 'pro_yearly' | 'family_monthly' | 'family_yearly') => {
+  const handleCheckout = useCallback(async (plan: 'pro_monthly' | 'pro_yearly') => {
     if (!status.isAuthenticated) {
       router.push(`/signup?plan=${plan}`)
       return
@@ -253,7 +242,7 @@ export function PricingContent() {
             </h1>
 
             <p className="mx-auto max-w-2xl text-lg text-muted-foreground leading-relaxed mb-8">
-              Whether you&apos;re cooking for one or feeding a family of six, MealEase scales to your life. Start free, upgrade when you&apos;re ready.
+              Whether you&apos;re cooking for one or feeding a household of six, MealEase scales to your life. Start free, upgrade when you&apos;re ready.
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-5 text-sm text-muted-foreground">
@@ -290,7 +279,7 @@ export function PricingContent() {
             >
               Annual
               <Badge className="border-0 bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5">
-                SAVE {FAMILY_ANNUAL_SAVINGS}%
+                SAVE {PRO_ANNUAL_SAVINGS}%
               </Badge>
             </button>
           </div>
@@ -299,12 +288,12 @@ export function PricingContent() {
 
       {/* ═══════════════════ PRICING CARDS ═══════════════════ */}
       <section className="relative z-[1] pb-16 pt-6">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:gap-5 items-start"
+            className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:gap-8 items-start"
           >
             {/* ── FREE ── */}
             <div className="relative flex flex-col rounded-[28px] border border-border/60 bg-white p-8 hover:shadow-lg transition-shadow duration-300">
@@ -347,7 +336,7 @@ export function PricingContent() {
               </Button>
             </div>
 
-            {/* ── PRO (Best Value) ── */}
+            {/* ── PRO ── */}
             <div className="relative flex flex-col rounded-[28px] border-2 border-primary/40 bg-white p-8 shadow-[0_20px_60px_-12px_rgba(16,185,129,0.15),0_0_0_1px_rgba(16,185,129,0.08)] md:scale-[1.04] md:-translate-y-4">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-primary px-5 py-1.5 text-xs font-bold text-white tracking-wide shadow-lg shadow-primary/25">
@@ -363,7 +352,7 @@ export function PricingContent() {
                   </div>
                   <div>
                     <h2 className="text-xl font-bold">Pro</h2>
-                    <p className="text-xs text-muted-foreground">For individuals &amp; couples</p>
+                    <p className="text-xs text-muted-foreground">For individuals, couples &amp; households</p>
                   </div>
                 </div>
                 <p className="text-sm font-medium text-foreground/80 mb-6 leading-relaxed italic">
@@ -396,14 +385,15 @@ export function PricingContent() {
 
               <ul className="mb-8 flex-1 space-y-3.5">
                 {[
-                  '2 member profiles',
+                  'Up to 6 member profiles',
                   'Household Memory',
-                  'Weekly Autopilot Lite',
+                  'Weekly Autopilot',
                   'Smart Menu Scan ✨',
                   'Food Check (calorie snap) ✨',
                   'Budget Mode',
                   'Dinner Date Night',
                   'Pantry Mode',
+                  'Shared grocery lists',
                   'Saved preferences',
                   'Unlimited meal generations',
                   'Full 7-day Weekly Planner',
@@ -423,11 +413,11 @@ export function PricingContent() {
                     <Button
                       size="lg"
                       className="w-full h-13 rounded-2xl text-[15px] font-semibold bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/25 hover:scale-[1.01] transition-all gap-2"
-                      onClick={handleStartTrial}
-                      disabled={isStartingTrial || paywallLoading}
+                      onClick={() => isAnnual ? handleCheckout('pro_yearly') : handleCheckout('pro_monthly')}
+                      disabled={paywallLoading}
                     >
-                      {isStartingTrial ? 'Starting trial…' : 'Start 7-Day Free Trial'}
-                      {!isStartingTrial && <ArrowRight className="h-4 w-4" />}
+                      Start 7-Day Free Trial
+                      <ArrowRight className="h-4 w-4" />
                     </Button>
                     <p className="text-center text-xs text-muted-foreground flex items-center justify-center gap-1.5">
                       <Clock className="h-3 w-3" />
@@ -436,94 +426,6 @@ export function PricingContent() {
                   </>
                 ) : (
                   <Button disabled size="lg" className="w-full h-13 rounded-2xl">✓ You have Pro</Button>
-                )}
-              </div>
-            </div>
-
-            {/* ── FAMILY PLUS ── */}
-            <div className="relative flex flex-col rounded-[28px] border-2 border-amber-300/60 bg-gradient-to-br from-white via-amber-50/20 to-orange-50/30 p-8 shadow-lg shadow-amber-200/20 hover:shadow-xl transition-shadow duration-300">
-              <div className="absolute -top-4 right-8">
-                <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-1.5 text-xs font-bold text-white tracking-wide shadow-md shadow-amber-500/20">
-                  ⭐ MOST POPULAR
-                </span>
-              </div>
-
-              <div className="mb-8">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-md shadow-amber-600/20">
-                    <Gift className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold">Family Plus</h2>
-                    <p className="text-xs text-muted-foreground">For the whole household</p>
-                  </div>
-                </div>
-                <p className="text-sm font-medium text-foreground/80 mb-6 leading-relaxed italic">
-                  &ldquo;A meal system for the whole household.&rdquo;
-                </p>
-                <div>
-                  {isAnnual ? (
-                    <>
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-5xl font-bold tracking-tight">${(familyAnnual / 12).toFixed(2)}</span>
-                        <span className="text-sm text-muted-foreground">/mo</span>
-                        <span className="text-sm text-muted-foreground line-through ml-1">${familyMonthly}</span>
-                      </div>
-                      <div className="mt-2 flex items-center gap-2">
-                        <Badge className="bg-amber-100 text-amber-800 border-0 text-[11px] font-bold">Save {FAMILY_ANNUAL_SAVINGS}%</Badge>
-                        <span className="text-xs text-muted-foreground">${familyAnnual}/yr billed annually</span>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="flex items-baseline">
-                        <span className="text-5xl font-bold tracking-tight">${familyMonthly}</span>
-                        <span className="ml-2 text-sm text-muted-foreground">/month</span>
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-2">Billed monthly</p>
-                    </>
-                  )}
-                </div>
-              </div>
-
-              <ul className="mb-8 flex-1 space-y-3.5">
-                <li className="text-sm font-semibold text-amber-700 mb-1">Everything in Pro, plus:</li>
-                {[
-                  'Up to 6 household member profiles',
-                  'Full Household Memory',
-                  'Full Weekly Autopilot',
-                  'Smart Menu Scan & Food Check ✨',
-                  'Hosting Guests Tonight',
-                  'Shared planning & grocery lists',
-                  'Family dashboard',
-                  'Multi-profile balancing',
-                  'Priority support',
-                ].map((f) => (
-                  <li key={f} className="flex items-start gap-3 text-sm">
-                    <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600" />
-                    <span className="font-medium">{f}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <div className="space-y-3">
-                {status.tier !== 'family' ? (
-                  <>
-                    <Button
-                      size="lg"
-                      className="w-full h-13 rounded-2xl text-[15px] font-semibold bg-gradient-to-r from-amber-500 to-orange-600 border-0 text-white hover:opacity-90 shadow-lg shadow-amber-500/20 hover:shadow-xl hover:shadow-amber-500/25 hover:scale-[1.01] transition-all gap-2"
-                      onClick={() => isAnnual ? handleCheckout('family_yearly') : handleCheckout('family_monthly')}
-                    >
-                      Start Family Plus
-                      <ArrowRight className="h-4 w-4" />
-                    </Button>
-                    <p className="text-center text-xs text-muted-foreground flex items-center justify-center gap-1.5">
-                      <ShieldCheck className="h-3 w-3" />
-                      Cancel anytime · No commitment
-                    </p>
-                  </>
-                ) : (
-                  <Button disabled size="lg" className="w-full h-13 rounded-2xl">✓ You have Family Plus</Button>
                 )}
               </div>
             </div>
@@ -537,7 +439,7 @@ export function PricingContent() {
                 className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-5 py-2.5 text-sm font-semibold text-emerald-800 hover:bg-emerald-100 transition-colors"
               >
                 <Sparkles className="h-4 w-4" />
-                Switch to annual and save up to {PRO_ANNUAL_SAVINGS}%
+                Switch to annual and save {PRO_ANNUAL_SAVINGS}%
                 <ArrowRight className="h-3.5 w-3.5" />
               </button>
             </motion.div>
@@ -555,7 +457,7 @@ export function PricingContent() {
             <div>
               <p className="font-bold text-base mb-1">Risk-free guarantee</p>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Every paid plan includes a 7-day free trial. Cancel anytime with one click — no questions asked. Your plan stays active until the end of the current billing period.
+                Pro includes a 7-day free trial. Cancel anytime with one click — no questions asked. Your plan stays active until the end of the current billing period.
               </p>
             </div>
           </div>
@@ -601,7 +503,7 @@ export function PricingContent() {
 
       {/* ═══════════════════ COMPARISON TABLE ═══════════════════ */}
       <section className="py-16">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold tracking-tight mb-2">Compare every feature</h2>
             <p className="text-sm text-muted-foreground">Everything you need, nothing you don&apos;t</p>
@@ -623,24 +525,20 @@ export function PricingContent() {
             >
               <div className="rounded-2xl border border-border/60 overflow-hidden bg-white">
                 <div className="overflow-x-auto">
-                  <div className="min-w-[600px]">
-                    <div className="grid grid-cols-4 bg-muted/50 text-sm font-semibold sticky top-0">
+                  <div className="min-w-[400px]">
+                    <div className="grid grid-cols-3 bg-muted/50 text-sm font-semibold sticky top-0">
                       <div className="px-5 py-3.5">Feature</div>
                       <div className="px-5 py-3.5 text-center">Free</div>
                       <div className="px-5 py-3.5 text-center text-primary">Pro</div>
-                      <div className="px-5 py-3.5 text-center text-amber-600 font-bold">Family Plus</div>
                     </div>
-                    {COMPARISON_FEATURES.map(({ feature, free, pro, family }, i) => (
-                      <div key={feature} className={`grid grid-cols-4 text-sm ${i % 2 === 0 ? 'bg-background' : 'bg-muted/20'}`}>
+                    {COMPARISON_FEATURES.map(({ feature, free, pro }, i) => (
+                      <div key={feature} className={`grid grid-cols-3 text-sm ${i % 2 === 0 ? 'bg-background' : 'bg-muted/20'}`}>
                         <div className="px-5 py-3.5 font-medium">{feature}</div>
                         <div className="px-5 py-3.5 text-center text-muted-foreground">
                           {typeof free === 'boolean' ? (free ? <Check className="mx-auto h-4 w-4 text-emerald-600" /> : <span className="text-muted-foreground/40">&mdash;</span>) : free}
                         </div>
                         <div className="px-5 py-3.5 text-center font-medium">
                           {typeof pro === 'boolean' ? (pro ? <Check className="mx-auto h-4 w-4 text-emerald-600" /> : <span className="text-muted-foreground/40">&mdash;</span>) : pro}
-                        </div>
-                        <div className="px-5 py-3.5 text-center font-medium text-amber-700">
-                          {typeof family === 'boolean' ? (family ? <Check className="mx-auto h-4 w-4 text-amber-600" /> : <span className="text-muted-foreground/40">&mdash;</span>) : family}
                         </div>
                       </div>
                     ))}

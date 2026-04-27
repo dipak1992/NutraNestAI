@@ -5,7 +5,7 @@
 
 import posthog from 'posthog-js'
 
-export type SubscriptionPlan = 'free' | 'pro_monthly' | 'pro_yearly' | 'family_monthly' | 'family_yearly'
+export type SubscriptionPlan = 'free' | 'pro_monthly' | 'pro_yearly'
 
 // ─── Pricing Page Events ────────────────────────────────────────────────────
 
@@ -31,7 +31,7 @@ export function trackStartFreeClick() {
   })
 }
 
-export function trackUpgradeClick(plan: 'pro' | 'family') {
+export function trackUpgradeClick(plan: 'pro') {
   posthog.capture('pricing_cta_upgrade', {
     plan,
     action: 'click',
@@ -77,7 +77,7 @@ export function trackCheckoutAbandoned(plan: SubscriptionPlan, reason?: string) 
 
 // ─── Trial Flow ─────────────────────────────────────────────────────────────
 
-export function trackTrialStarted(plan: 'pro' | 'family' = 'pro') {
+export function trackTrialStarted(plan: 'pro' = 'pro') {
   posthog.capture('trial_started', {
     plan,
     trial_days: 7,
@@ -93,7 +93,7 @@ export function trackTrialConvertedToPaid(plan: SubscriptionPlan, trialDays: num
   })
 }
 
-export function trackTrialExpiredNoConversion(plan: 'pro' | 'family') {
+export function trackTrialExpiredNoConversion(plan: 'pro') {
   posthog.capture('trial_expired_no_conversion', {
     plan,
     timestamp: new Date().toISOString(),
@@ -102,7 +102,7 @@ export function trackTrialExpiredNoConversion(plan: 'pro' | 'family') {
 
 // ─── Paywall Conversions ────────────────────────────────────────────────────
 
-export function trackPaywallShown(feature: string, tier: 'pro' | 'family') {
+export function trackPaywallShown(feature: string, tier: 'pro') {
   posthog.capture('paywall_shown', {
     feature,
     required_tier: tier,
@@ -132,7 +132,7 @@ export function trackComparisonTableView() {
   })
 }
 
-export function trackPlanCompared(planA: 'free' | 'pro' | 'family', planB: 'free' | 'pro' | 'family') {
+export function trackPlanCompared(planA: 'free' | 'pro', planB: 'free' | 'pro') {
   posthog.capture('plan_compared', {
     plan_a: planA,
     plan_b: planB,

@@ -22,9 +22,8 @@ type Props = {
 // ─── Member limits per plan ───────────────────────────────────────────────────
 
 const MEMBER_LIMITS: Record<PlanId, number> = {
-  free:   1,
-  plus:   3,
-  family: 6,
+  free: 1,
+  plus: 6,
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────

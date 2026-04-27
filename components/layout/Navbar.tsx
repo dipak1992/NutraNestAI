@@ -52,8 +52,7 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
   const { sidebarOpen, toggleSidebar } = useUIStore()
   const [signingOut, setSigningOut] = useState(false)
   const isPro = subscriptionTier === 'pro'
-  const isFamily = subscriptionTier === 'family'
-  const isPaid = isPro || isFamily
+  const isPaid = isPro
 
   async function handleSignOut() {
     setSigningOut(true)
@@ -102,8 +101,6 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
               'inline-flex capitalize',
               isPro
                 ? 'border-amber-300 bg-amber-50 text-amber-800'
-                : isFamily
-                  ? 'border-emerald-300 bg-emerald-50 text-emerald-800'
                 : 'border-primary/20 bg-primary/5 text-primary',
             )}
           >

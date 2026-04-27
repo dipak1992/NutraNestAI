@@ -51,7 +51,7 @@ export function NewDashboardClient({ initial }: { initial: DashboardPayload }) {
 
   return (
     <>
-      <main
+      <div
         id="main"
         className="max-w-[1400px] mx-auto px-4 md:px-8 py-6 md:py-10 pb-28 md:pb-16 space-y-6 md:space-y-8"
       >
@@ -74,7 +74,7 @@ export function NewDashboardClient({ initial }: { initial: DashboardPayload }) {
         <WeekPlanStrip />
 
         <QuickActions />
-      </main>
+      </div>
 
       <BudgetSetupModal />
       <BudgetDrawer />

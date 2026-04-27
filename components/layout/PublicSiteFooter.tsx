@@ -6,6 +6,7 @@ const exploreLinks = [
   { href: '/terms', label: 'Terms' },
   { href: '/about', label: 'About' },
   { href: '/blog', label: 'Blog' },
+  { href: '/press', label: 'Press' },
   { href: '/meals', label: 'Meal Ideas' },
 ]
 

@@ -28,13 +28,14 @@ export function MealEaseLogo({
   invertText = false,
 }: MealEaseLogoProps) {
   const uid = useId()
-  const gradId  = `me-bg-${uid}`
-  const clipId  = `me-clip-${uid}`
+  const bgId = `me-bg-${uid}`
+  const leafId = `me-leaf-${uid}`
+  const bowlId = `me-bowl-${uid}`
+  const clipId = `me-clip-${uid}`
   const { icon, text, gap } = sizeMap[size]
 
   return (
     <span className={cn('inline-flex items-center font-bold select-none', gap, className)}>
-      {/* ── Icon mark ───────────────────────────────────────────────── */}
       <svg
         width={icon}
         height={icon}
@@ -45,115 +46,109 @@ export function MealEaseLogo({
         style={{ flexShrink: 0 }}
       >
         <defs>
-          {/* Green gradient background */}
-          <linearGradient id={gradId} x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#66BB6A" />
-            <stop offset="100%" stopColor="#2E7D32" />
+          <linearGradient id={bgId} x1="4" y1="2" x2="36" y2="38" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#064E3B" />
+            <stop offset="58%" stopColor="#063F32" />
+            <stop offset="100%" stopColor="#022C22" />
           </linearGradient>
-          {/* Clip to rounded rect */}
+          <linearGradient id={leafId} x1="16" y1="15" x2="25" y2="29" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#34D399" />
+            <stop offset="100%" stopColor="#10B981" />
+          </linearGradient>
+          <linearGradient id={bowlId} x1="7" y1="22" x2="34" y2="34" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#FDF8EA" />
+            <stop offset="100%" stopColor="#FFFFFF" />
+          </linearGradient>
           <clipPath id={clipId}>
-            <rect width="40" height="40" rx="9.5" />
+            <rect x="1.5" y="1.5" width="37" height="37" rx="9" />
           </clipPath>
         </defs>
 
-        {/* Background */}
-        <rect width="40" height="40" rx="9.5" fill={`url(#${gradId})`} />
+        <rect x="1.5" y="1.5" width="37" height="37" rx="9" fill={`url(#${bgId})`} />
 
         <g clipPath={`url(#${clipId})`}>
-          {/* ── House outline (home = family) — subtle above bowl ── */}
           <path
-            d="M 13 19 L 20 11.5 L 27 19"
-            stroke="white"
-            strokeWidth="1.7"
+            d="M-5 14C2 8 8 8 14 10c4 1 7 1 11-3 4-3 8-4 14-2"
+            stroke="#2DD4BF"
+            strokeWidth="1.4"
             strokeLinecap="round"
-            strokeLinejoin="round"
-            opacity="0.55"
-            fill="none"
+            opacity="0.18"
           />
-
-          {/* ── Bowl rim ── */}
-          <line
-            x1="7" y1="20.5" x2="33" y2="20.5"
-            stroke="white"
-            strokeWidth="2.6"
+          <path
+            d="M-4 25c5-5 11-6 17-3 6 3 9 2 14-3 5-4 11-3 17 1"
+            stroke="#2DD4BF"
+            strokeWidth="1.2"
             strokeLinecap="round"
+            opacity="0.16"
+          />
+          <path
+            d="M0 36c5-6 12-7 20-3 7 3 12 2 20-4"
+            stroke="#2DD4BF"
+            strokeWidth="1.2"
+            strokeLinecap="round"
+            opacity="0.14"
           />
 
-          {/* ── Bowl body (white filled) ── */}
           <path
-            d="M 8.5 20.5 Q 8.5 36.5 20 36.5 Q 31.5 36.5 31.5 20.5 Z"
-            fill="white"
-          />
-
-          {/* ── Spoon (dark green) ── */}
-          {/* Spoon head — oval */}
-          <ellipse cx="14" cy="26.5" rx="2.9" ry="2.3" fill="#2E7D32" />
-          {/* Spoon handle */}
-          <path
-            d="M 16.5 28 L 22.5 32.5"
-            stroke="#2E7D32"
-            strokeWidth="2.1"
+            d="M8 22.5c3.8 6.1 20.2 6.1 24 0"
+            stroke={`url(#${bowlId})`}
+            strokeWidth="4.2"
             strokeLinecap="round"
           />
-
-          {/* ── Leaf (fresh greens) ── */}
           <path
-            d="M 22.5 28.5 Q 26 24.5 29 28 Q 26 31.5 22.5 28.5 Z"
-            fill="#81C784"
+            d="M6.6 25.8c5.2 8.2 21.6 8.2 26.8 0"
+            stroke="#10B981"
+            strokeWidth="4.2"
+            strokeLinecap="round"
           />
-          {/* Leaf vein */}
           <path
-            d="M 22.5 28.5 Q 25.5 28 29 28"
-            stroke="#4CAF50"
+            d="M10.1 30.1c5.1 4.4 14.9 4.4 19.8 0"
+            stroke="#34D399"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+          />
+
+          <path
+            d="M19.3 25.5c-2.6-6.2 1.5-11 5.6-11.7 2.8 4.4 2.6 10.4-3.6 13.5"
+            fill={`url(#${leafId})`}
+          />
+          <path
+            d="M21.1 26.5c-.7-3.8.5-7 3.8-10.4"
+            stroke="#064E3B"
             strokeWidth="0.8"
             strokeLinecap="round"
-            fill="none"
             opacity="0.7"
           />
 
-          {/* ── Carrot / veggie pop (orange accent) ── */}
-          <circle cx="26" cy="24" r="2.3" fill="#FF7043" />
-          {/* Carrot top leaves */}
           <path
-            d="M 25 22 Q 26 20.5 27 22"
-            stroke="#66BB6A"
-            strokeWidth="1.1"
-            strokeLinecap="round"
-            fill="none"
+            d="M14.4 16.2c2.1 1.4 3 3.1 3.7 5-2.5-.7-4.2-1.8-5.2-3.7-.4-.8.7-1.8 1.5-1.3Z"
+            fill="#F59E0B"
           />
-
-          {/* ── Sparkle top-right ── */}
           <path
-            d="M 34.5 7 L 34.5 11.5 M 32.2 9.2 L 36.8 9.2"
-            stroke="white"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            opacity="0.85"
+            d="M20 13.2c1.2 2.3 1.1 4.3 0 6.6-1.1-2.3-1.2-4.3 0-6.6Z"
+            fill="#F59E0B"
           />
-          {/* Sparkle cross top-left (smaller) */}
           <path
-            d="M 5.5 8 L 5.5 11.5 M 3.8 9.8 L 7.2 9.8"
-            stroke="white"
-            strokeWidth="1.1"
-            strokeLinecap="round"
-            opacity="0.5"
+            d="M25.6 16.2c-2.1 1.4-3 3.1-3.7 5 2.5-.7 4.2-1.8 5.2-3.7.4-.8-.7-1.8-1.5-1.3Z"
+            fill="#F59E0B"
           />
         </g>
+
+        <rect x="1.5" y="1.5" width="37" height="37" rx="9" stroke="white" strokeOpacity="0.14" />
       </svg>
 
-      {/* ── Wordmark ─────────────────────────────────────────────────── */}
       {showText && (
-        <span className={cn('tracking-tight leading-none', text)}>
+        <span className={cn('leading-none', text)}>
           <span style={{ color: invertText ? 'white' : '#1F2937' }}>Meal</span>
-          <span style={{ color: invertText ? '#A5D6A7' : '#4CAF50' }}>Ease</span>
+          <span style={{ color: invertText ? '#34D399' : '#059669' }}>Ease</span>
 
           {showBadge && (
             <sup
-              className="ml-0.5 inline-flex items-center rounded px-[3px] py-px text-[8px] font-bold tracking-tight leading-none border align-super"
+              className="ml-0.5 inline-flex items-center rounded px-[3px] py-px text-[8px] font-bold leading-none border align-super"
               style={{
-                background: 'rgba(76,175,80,0.1)',
-                color: '#2E7D32',
-                borderColor: 'rgba(76,175,80,0.25)',
+                background: 'rgba(16,185,129,0.1)',
+                color: invertText ? '#A7F3D0' : '#047857',
+                borderColor: 'rgba(16,185,129,0.25)',
               }}
             >
               AI

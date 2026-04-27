@@ -1,5 +1,6 @@
 import type { NextConfig } from 'next'
 import { withSentryConfig } from '@sentry/nextjs'
+import createMDX from '@next/mdx'
 
 const securityHeaders = [
   { key: 'X-Frame-Options', value: 'DENY' },
@@ -16,7 +17,15 @@ const securityHeaders = [
   // CSP is now handled dynamically by middleware.ts with per-request nonce
 ]
 
+const withMDX = createMDX({
+  options: {
+    remarkPlugins: [],
+    rehypePlugins: [],
+  },
+})
+
 const nextConfig: NextConfig = {
+  pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
   images: {
     remotePatterns: [
       {
@@ -66,11 +75,13 @@ const nextConfig: NextConfig = {
 }
 
 // Only wrap with Sentry when all required vars are present (skips source map upload otherwise)
+const configWithMDX = withMDX(nextConfig)
+
 export default process.env.SENTRY_AUTH_TOKEN && process.env.SENTRY_ORG && process.env.SENTRY_PROJECT
-  ? withSentryConfig(nextConfig, {
+  ? withSentryConfig(configWithMDX, {
       org: process.env.SENTRY_ORG,
       project: process.env.SENTRY_PROJECT,
       silent: !process.env.CI,
       authToken: process.env.SENTRY_AUTH_TOKEN,
     })
-  : nextConfig
+  : configWithMDX

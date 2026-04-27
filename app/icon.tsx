@@ -3,10 +3,6 @@ import { ImageResponse } from 'next/og'
 export const size = { width: 32, height: 32 }
 export const contentType = 'image/png'
 
-/**
- * MealEase favicon (32×32)
- * Generated at build time by Next.js App Router
- */
 export default function Icon() {
   return new ImageResponse(
     (
@@ -15,7 +11,7 @@ export default function Icon() {
           width: 32,
           height: 32,
           borderRadius: 7,
-          background: 'linear-gradient(135deg, #66BB6A 0%, #2E7D32 100%)',
+          background: 'linear-gradient(135deg, #064E3B 0%, #022C22 100%)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -23,121 +19,14 @@ export default function Icon() {
           overflow: 'hidden',
         }}
       >
-        {/* House roof — left slope */}
-        <div
-          style={{
-            position: 'absolute',
-            top: 6,
-            left: 8,
-            width: 9,
-            height: 2,
-            background: 'white',
-            borderRadius: 1,
-            opacity: 0.55,
-            transformOrigin: 'right center',
-            transform: 'rotate(-38deg)',
-          }}
-        />
-        {/* House roof — right slope */}
-        <div
-          style={{
-            position: 'absolute',
-            top: 6,
-            right: 8,
-            width: 9,
-            height: 2,
-            background: 'white',
-            borderRadius: 1,
-            opacity: 0.55,
-            transformOrigin: 'left center',
-            transform: 'rotate(38deg)',
-          }}
-        />
-
-        {/* Bowl rim */}
-        <div
-          style={{
-            position: 'absolute',
-            top: 14,
-            left: 5,
-            right: 5,
-            height: 2,
-            background: 'white',
-            borderRadius: 1,
-          }}
-        />
-
-        {/* Bowl body */}
-        <div
-          style={{
-            position: 'absolute',
-            top: 15,
-            left: 6,
-            right: 6,
-            bottom: 3,
-            background: 'white',
-            borderRadius: '0 0 9px 9px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 2,
-          }}
-        >
-          {/* Spoon oval */}
-          <div
-            style={{
-              width: 5,
-              height: 4,
-              background: '#2E7D32',
-              borderRadius: '50%',
-            }}
-          />
-          {/* Orange dot */}
-          <div
-            style={{
-              width: 4,
-              height: 4,
-              background: '#FF7043',
-              borderRadius: '50%',
-            }}
-          />
-          {/* Leaf dot */}
-          <div
-            style={{
-              width: 3,
-              height: 3,
-              background: '#81C784',
-              borderRadius: '50%',
-            }}
-          />
-        </div>
-
-        {/* Sparkle — horizontal */}
-        <div
-          style={{
-            position: 'absolute',
-            top: 8,
-            right: 4,
-            width: 5,
-            height: 1.5,
-            background: 'white',
-            borderRadius: 1,
-            opacity: 0.8,
-          }}
-        />
-        {/* Sparkle — vertical */}
-        <div
-          style={{
-            position: 'absolute',
-            top: 5,
-            right: 6,
-            width: 1.5,
-            height: 5,
-            background: 'white',
-            borderRadius: 1,
-            opacity: 0.8,
-          }}
-        />
+        <div style={{ position: 'absolute', top: 5, left: -3, width: 26, height: 11, border: '1.5px solid rgba(45,212,191,0.16)', borderRadius: '50%' }} />
+        <div style={{ position: 'absolute', bottom: -2, right: -5, width: 28, height: 14, border: '1.5px solid rgba(45,212,191,0.14)', borderRadius: '50%' }} />
+        <div style={{ position: 'absolute', top: 18, left: 6, width: 20, height: 10, borderBottom: '3px solid #FDF8EA', borderRadius: '0 0 18px 18px' }} />
+        <div style={{ position: 'absolute', top: 21, left: 5, width: 22, height: 10, borderBottom: '3px solid #10B981', borderRadius: '0 0 18px 18px' }} />
+        <div style={{ position: 'absolute', top: 12, left: 15, width: 7, height: 11, background: '#10B981', borderRadius: '7px 7px 1px 7px', transform: 'rotate(26deg)' }} />
+        <div style={{ position: 'absolute', top: 8, left: 10, width: 4, height: 8, background: '#F59E0B', borderRadius: '99px', transform: 'rotate(-36deg)' }} />
+        <div style={{ position: 'absolute', top: 6, left: 15, width: 4, height: 9, background: '#F59E0B', borderRadius: '99px' }} />
+        <div style={{ position: 'absolute', top: 8, right: 9, width: 4, height: 8, background: '#F59E0B', borderRadius: '99px', transform: 'rotate(36deg)' }} />
       </div>
     ),
     { ...size },

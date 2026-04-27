@@ -53,7 +53,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   viewportFit: 'cover',
-  themeColor: '#16a34a',
+  themeColor: '#064E3B',
 }
 
 export default function RootLayout({
@@ -75,7 +75,7 @@ export default function RootLayout({
               '@type': 'Organization',
               name: 'MealEase',
               url: getSiteUrl(),
-              logo: `${getSiteUrl()}/icons/icon-192.png`,
+              logo: `${getSiteUrl()}/icons/logo-generated.png`,
               description:
                 'MealEase helps you decide what to cook with simple, smart meal plans for your whole family.',
               sameAs: [],

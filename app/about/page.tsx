@@ -1,10 +1,6 @@
 import { PublicSiteHeader } from '@/components/layout/PublicSiteHeader'
 import { PublicSiteFooter } from '@/components/layout/PublicSiteFooter'
-import { AboutHero } from '@/components/about/AboutHero'
-import { FounderStory } from '@/components/about/FounderStory'
-import { WhyBuiltIt } from '@/components/about/WhyBuiltIt'
-import { Principles } from '@/components/about/Principles'
-import { AboutCTA } from '@/components/about/AboutCTA'
+import { AboutPageContent } from '@/components/about/AboutPageContent'
 
 export const metadata = {
   title: "About | MealEase — Built by a family that got tired of 'what's for dinner?'",
@@ -23,11 +19,7 @@ export default function AboutPage() {
     <>
       <PublicSiteHeader />
       <main id="main">
-        <AboutHero />
-        <FounderStory />
-        <WhyBuiltIt />
-        <Principles />
-        <AboutCTA />
+        <AboutPageContent />
       </main>
       <PublicSiteFooter />
     </>

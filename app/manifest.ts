@@ -15,7 +15,7 @@ export default function manifest(): MetadataRoute.Manifest {
     lang: 'en-US',
     dir: 'ltr',
     background_color: '#ffffff',
-    theme_color: '#16a34a',
+    theme_color: '#064E3B',
     categories: ['food', 'lifestyle', 'productivity'],
     shortcuts: [
       {

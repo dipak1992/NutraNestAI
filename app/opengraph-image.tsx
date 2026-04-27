@@ -46,22 +46,22 @@ export default function OGImage() {
             zIndex: 2,
           }}
         >
-          {/* Bowl icon */}
-          <div style={{ width: 72, height: 72, borderRadius: 16, background: 'linear-gradient(135deg, #66BB6A 0%, #2E7D32 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 28, position: 'relative', overflow: 'hidden' }}>
-            <div style={{ position: 'absolute', top: 28, left: 10, right: 10, height: 4, background: 'white', borderRadius: 2 }} />
-            <div style={{ position: 'absolute', top: 31, left: 11, right: 11, bottom: 6, background: 'white', borderRadius: '0 0 22px 22px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
-              <div style={{ width: 11, height: 9, background: '#2E7D32', borderRadius: '50%' }} />
-              <div style={{ width: 9, height: 9, background: '#FF7043', borderRadius: '50%' }} />
-              <div style={{ width: 7, height: 7, background: '#81C784', borderRadius: '50%' }} />
-            </div>
-            <div style={{ position: 'absolute', top: 12, left: 14, width: 18, height: 3, background: 'white', borderRadius: 2, opacity: 0.55, transformOrigin: 'right center', transform: 'rotate(-38deg)' }} />
-            <div style={{ position: 'absolute', top: 12, right: 14, width: 18, height: 3, background: 'white', borderRadius: 2, opacity: 0.55, transformOrigin: 'left center', transform: 'rotate(38deg)' }} />
+          {/* Topographic nest icon */}
+          <div style={{ width: 72, height: 72, borderRadius: 16, background: 'linear-gradient(135deg, #064E3B 0%, #022C22 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 28, position: 'relative', overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', top: 6, left: -6, width: 58, height: 24, border: '3px solid rgba(45,212,191,0.16)', borderRadius: '50%' }} />
+            <div style={{ position: 'absolute', bottom: -2, right: -10, width: 60, height: 28, border: '3px solid rgba(45,212,191,0.14)', borderRadius: '50%' }} />
+            <div style={{ position: 'absolute', top: 39, left: 14, width: 44, height: 17, borderBottom: '7px solid #FDF8EA', borderRadius: '0 0 36px 36px' }} />
+            <div style={{ position: 'absolute', top: 46, left: 11, width: 50, height: 17, borderBottom: '7px solid #10B981', borderRadius: '0 0 40px 40px' }} />
+            <div style={{ position: 'absolute', top: 27, left: 33, width: 15, height: 25, background: '#10B981', borderRadius: '15px 15px 2px 15px', transform: 'rotate(26deg)' }} />
+            <div style={{ position: 'absolute', top: 18, left: 23, width: 8, height: 18, background: '#F59E0B', borderRadius: 99, transform: 'rotate(-38deg)' }} />
+            <div style={{ position: 'absolute', top: 14, left: 34, width: 8, height: 20, background: '#F59E0B', borderRadius: 99 }} />
+            <div style={{ position: 'absolute', top: 18, right: 23, width: 8, height: 18, background: '#F59E0B', borderRadius: 99, transform: 'rotate(38deg)' }} />
           </div>
 
           {/* Wordmark */}
           <div style={{ display: 'flex', fontSize: 72, fontWeight: 700, letterSpacing: '-2px', lineHeight: 1, marginBottom: 20 }}>
             <span style={{ color: 'white' }}>Meal</span>
-            <span style={{ color: '#66BB6A' }}>Ease</span>
+            <span style={{ color: '#34D399' }}>Ease</span>
           </div>
 
           {/* Tagline line 1 */}
@@ -80,15 +80,15 @@ export default function OGImage() {
                 key={label}
                 style={{
                   display: 'flex',
-                  background: 'rgba(76,175,80,0.18)',
-                  border: '1px solid rgba(76,175,80,0.35)',
+                  background: 'rgba(16,185,129,0.18)',
+                  border: '1px solid rgba(16,185,129,0.35)',
                   borderRadius: 100,
                   paddingTop: 8,
                   paddingBottom: 8,
                   paddingLeft: 16,
                   paddingRight: 16,
                   fontSize: 15,
-                  color: '#A5D6A7',
+                  color: '#A7F3D0',
                   fontWeight: 500,
                 }}
               >

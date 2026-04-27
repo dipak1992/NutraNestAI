@@ -10,7 +10,7 @@ export const site = {
     { label: 'Log in', href: '/login' },
   ],
   brand: {
-    primary: '#D97757',
-    accent: '#B8935A',
+    primary: '#064E3B',
+    accent: '#F59E0B',
   },
 }

@@ -5,7 +5,7 @@ type Props = {
 }
 
 /**
- * Lightweight FadeIn wrapper — no animation library needed.
+ * Lightweight FadeIn wrapper - no animation library needed.
  * On this branch we just render children directly; animation can be added later.
  * The `delay` prop is accepted but ignored (was used by framer-motion on main).
  */

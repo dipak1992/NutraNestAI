@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
 import { useOnboardingStore } from '@/stores/onboardingStore'
 import { STEPS } from '@/lib/onboarding/steps'
 import { cn } from '@/lib/utils'
+import { MealEaseLogo } from '@/components/ui/MealEaseLogo'
 
 type Props = {
   children: React.ReactNode
@@ -60,9 +61,7 @@ export function OnboardingShell({
             <ArrowLeft className="w-4 h-4" />
           </button>
 
-          <span className="font-serif font-bold text-sm text-neutral-900 dark:text-neutral-100">
-            MealEase
-          </span>
+          <MealEaseLogo size="sm" />
 
           {skippable ? (
             <button

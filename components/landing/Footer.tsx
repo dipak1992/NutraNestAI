@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Container } from './shared/Container'
+import { MealEaseLogo } from '@/components/ui/MealEaseLogo'
 
 const links = {
   Product: [
@@ -39,13 +40,9 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-10 mb-14">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <Link
-              href="/"
-              className="font-serif text-xl font-bold text-white hover:text-[#D97757] transition-colors"
-              aria-label="MealEase home"
-            >
-              MealEase
-            </Link>
+            <Link href="/" aria-label="MealEase home" className="inline-flex items-center">
+                <MealEaseLogo size="md" invertText showBadge />
+              </Link>
             <p className="mt-3 text-sm leading-relaxed">
               AI-powered meal planning for real households.
             </p>

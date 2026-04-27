@@ -6,6 +6,7 @@ import { Menu, X } from 'lucide-react'
 import { Container } from './shared/Container'
 import { Button } from './shared/Button'
 import { site } from '@/config/site'
+import { MealEaseLogo } from '@/components/ui/MealEaseLogo'
 
 export function Nav() {
   const [open, setOpen] = useState(false)
@@ -18,11 +19,8 @@ export function Nav() {
           aria-label="Main navigation"
         >
           {/* Logo */}
-          <Link
-            href="/"
-            className="font-serif text-xl font-bold text-neutral-900 dark:text-neutral-50"
-          >
-            MealEase
+          <Link href="/" aria-label="MealEase home" className="flex items-center">
+            <MealEaseLogo size="md" showBadge />
           </Link>
 
           {/* Desktop nav */}

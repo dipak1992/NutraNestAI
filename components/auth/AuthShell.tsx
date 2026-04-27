@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
+import { MealEaseLogo } from '@/components/ui/MealEaseLogo'
 
 type Props = {
   title: string
@@ -23,11 +24,8 @@ export function AuthShell({
         <div className="flex flex-col justify-center px-6 py-12 lg:px-12 xl:px-20">
           <div className="mx-auto w-full max-w-sm">
             {/* Logo */}
-            <Link
-              href="/"
-              className="font-serif text-xl font-bold text-neutral-900 dark:text-neutral-50 mb-8 block"
-            >
-              MealEase
+            <Link href="/" aria-label="MealEase home" className="inline-flex items-center mb-8">
+              <MealEaseLogo size="md" showBadge />
             </Link>
 
             <div className="mb-8">

@@ -11,9 +11,12 @@ type Props = {
 }
 
 export function GreetingHeader({ firstName, budget }: Props) {
-  const [g, setG] = useState(() => getGreeting())
+  // Initialize to null to avoid SSR/client time mismatch (React #185)
+  const [g, setG] = useState<ReturnType<typeof getGreeting> | null>(null)
 
   useEffect(() => {
+    // Set greeting on client only after mount
+    setG(getGreeting())
     const t = setInterval(() => setG(getGreeting()), 60_000)
     return () => clearInterval(t)
   }, [])
@@ -24,11 +27,11 @@ export function GreetingHeader({ firstName, budget }: Props) {
   return (
     <header className="mb-6 md:mb-8">
       <h1 className="font-serif text-3xl md:text-4xl font-bold text-neutral-900 dark:text-neutral-50 tracking-tight">
-        {g.greeting}, {firstName}{' '}
+        {g ? g.greeting : 'Hello'}, {firstName}{' '}
         <span aria-hidden>👋</span>
       </h1>
-      <p className="mt-2 text-sm md:text-base text-neutral-600 dark:text-neutral-400">
-        It&rsquo;s {g.timeString} — {g.contextMessage}
+      <p suppressHydrationWarning className="mt-2 text-sm md:text-base text-neutral-600 dark:text-neutral-400">
+        {g ? <>It&rsquo;s {g.timeString} — {g.contextMessage}</> : null}
         {hasBudget && colors && (
           <>
             <span className="mx-2 text-neutral-300 dark:text-neutral-700">|</span>

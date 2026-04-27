@@ -89,6 +89,8 @@ export function DashboardClient({ userName }: Props) {
   const [input, setInput] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const [streak, setStreak] = useState<{ current_streak: number; longest_streak: number } | null>(null)
+  // Computed client-side only to avoid SSR/hydration mismatch
+  const [isWeekend, setIsWeekend] = useState(false)
 
   const firstName = userName.includes('@') ? userName.split('@')[0] : userName
   const activeMode = SITUATIONS.find(s => s.id === mode)
@@ -100,6 +102,13 @@ export function DashboardClient({ userName }: Props) {
         if (data?.current_streak >= 1) setStreak(data)
       })
       .catch(() => null)
+  }, [])
+
+  useEffect(() => {
+    const d = new Date()
+    const day = d.getDay()
+    const hour = d.getHours()
+    setIsWeekend(day === 0 || day === 6 || (day === 5 && hour >= 17))
   }, [])
 
   // ── Stores ──────────────────────────────────────────────────────────────────
@@ -200,12 +209,12 @@ export function DashboardClient({ userName }: Props) {
               {/* Greeting + Title */}
               <div className="mb-7">
                 <div className="flex items-center justify-between mb-1">
-                  <p className="text-sm text-muted-foreground">
+                  <p suppressHydrationWarning className="text-sm text-muted-foreground">
                     {getGreeting()}, {firstName}
                   </p>
                   <StreakBadge />
                 </div>
-                <h1 className="text-2xl font-bold text-foreground leading-tight tracking-tight">
+                <h1 suppressHydrationWarning className="text-2xl font-bold text-foreground leading-tight tracking-tight">
                   {getH1()}
                 </h1>
                 <p className="text-sm text-muted-foreground mt-1.5">
@@ -369,13 +378,7 @@ export function DashboardClient({ userName }: Props) {
               )}
 
               {/* Weekend Mode banner — PRO only, Fri 5pm+ / Sat / Sun */}
-              {(() => {
-                const d = new Date()
-                const day = d.getDay()
-                const hour = d.getHours()
-                const isWeekend =
-                  day === 0 || day === 6 || (day === 5 && hour >= 17)
-                return isWeekend && paywallStatus.isPro ? (
+              {isWeekend && paywallStatus.isPro ? (
                   <Link
                     href="/weekend"
                     className="mt-4 flex items-center gap-3 rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50 px-4 py-3 hover:shadow-md transition-all"
@@ -388,8 +391,7 @@ export function DashboardClient({ userName }: Props) {
                       </p>
                     </div>
                   </Link>
-                ) : null
-              })()}
+              ) : null}
 
               {/* Value Accumulator — free users only */}
               {!paywallStatus.isPro && totalInteractions > 0 && (

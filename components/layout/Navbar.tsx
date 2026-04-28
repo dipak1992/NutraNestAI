@@ -69,23 +69,26 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
 
         {/* Right side — tier badge + upgrade + account */}
         <div className="flex items-center gap-2">
-          <Badge
-            variant="outline"
-            className={cn(
-              'inline-flex capitalize',
-              isPro
-                ? 'border-amber-300 bg-amber-50 text-amber-800'
-                : 'border-primary/20 bg-primary/5 text-primary',
-            )}
-          >
-            {isPaid ? <Crown className="mr-1.5 h-3 w-3" /> : null}
-            {subscriptionTier}
-          </Badge>
-
-          {!isPaid && (
-            <Button asChild size="sm" className="hidden sm:inline-flex">
-              <Link href="/pricing?intent=pro">Upgrade to Plus</Link>
-            </Button>
+          {isPaid ? (
+            <Badge
+              variant="outline"
+              className="inline-flex border-amber-300 bg-amber-50 text-amber-800"
+            >
+              <Crown className="mr-1.5 h-3 w-3" />
+              Plus Member
+            </Badge>
+          ) : (
+            <>
+              <Badge
+                variant="outline"
+                className="inline-flex border-primary/20 bg-primary/5 text-primary"
+              >
+                Free
+              </Badge>
+              <Button asChild size="sm" className="hidden sm:inline-flex">
+                <Link href="/pricing?intent=pro">Upgrade to Plus</Link>
+              </Button>
+            </>
           )}
 
           {/* Account menu */}

@@ -4,22 +4,23 @@ import { MealEaseLogo } from '@/components/ui/MealEaseLogo'
 
 const links = {
   Product: [
-    { label: 'Tonight Suggestions', href: '#pillars' },
-    { label: 'Snap & Cook', href: '#pillars' },
-    { label: 'Weekly Autopilot', href: '#pillars' },
-    { label: 'Leftovers AI', href: '#pillars' },
-    { label: 'Budget Intelligence', href: '#pillars' },
+    { label: 'Tonight Suggestions', href: '/features/tonight-suggestions' },
+    { label: 'Snap & Cook', href: '/features/snap-and-cook' },
+    { label: 'Weekly Autopilot', href: '/features/weekly-autopilot' },
+    { label: 'Leftovers AI', href: '/features/leftovers-ai' },
+    { label: 'Budget Intelligence', href: '/features/budget-intelligence' },
   ],
   Company: [
     { label: 'About', href: '/about' },
     { label: 'Blog', href: '/blog' },
     { label: 'Press', href: '/press' },
+    { label: 'Changelog', href: '/changelog' },
   ],
-  Support: [
+  Resources: [
+    { label: 'Pricing', href: '/pricing' },
+    { label: 'FAQ', href: '/faq' },
     { label: 'Help Center', href: '/help' },
     { label: 'Contact', href: '/contact' },
-    { label: 'Status', href: '/status' },
-    { label: 'FAQ', href: '#faq' },
   ],
   Legal: [
     { label: 'Privacy Policy', href: '/privacy' },

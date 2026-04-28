@@ -93,7 +93,7 @@ export function UpgradeModal({
       }
 
       if (!res.ok) {
-        toast.error(data.error || 'Could not start checkout')
+        toast.error(data.error || 'Could not start checkout. Please try again.')
         return
       }
 

@@ -67,14 +67,15 @@ export async function POST(req: Request) {
     body.set('line_items[0][quantity]', '1')
     body.set('success_url', `${site}/dashboard?welcome=${plan}&session_id={CHECKOUT_SESSION_ID}`)
     body.set('cancel_url', `${site}/upgrade?cancelled=1`)
-    body.set('customer_email', user.email ?? '')
     body.set('client_reference_id', user.id)
-    body.set('allow_promotion_codes', 'true')
-    body.set('automatic_tax[enabled]', 'true')
     // Metadata for webhook to extract tier (backup if price ID lookup fails)
     body.set('subscription_data[metadata][user_id]', user.id)
     body.set('subscription_data[metadata][plan]', plan)
     body.set('subscription_data[metadata][tier]', tier)
+    // Pass email only if available (avoids conflict if customer already exists)
+    if (user.email) {
+      body.set('customer_email', user.email)
+    }
 
     const res = await fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',
@@ -86,10 +87,16 @@ export async function POST(req: Request) {
     })
 
     if (!res.ok) {
-      const err = await res.text()
-      console.error('[checkout/session] Stripe error:', err)
+      let stripeError = 'Unknown Stripe error'
+      try {
+        const errJson = await res.json() as { error?: { message?: string } }
+        stripeError = errJson?.error?.message ?? stripeError
+      } catch {
+        stripeError = await res.text().catch(() => stripeError)
+      }
+      console.error('[checkout/session] Stripe error:', stripeError)
       return NextResponse.json(
-        { error: 'Could not start checkout. Please try again.' },
+        { error: stripeError || 'Could not start checkout. Please try again.' },
         { status: 502 },
       )
     }

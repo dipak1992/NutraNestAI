@@ -1,16 +1,17 @@
 /**
- * 4-Pillar Product Architecture Configuration
+ * 5-Pillar Product Architecture Configuration
  *
- * The entire MealEase experience is organized into 4 visible pillars:
- *   1. Tonight        – Fast meal ideas for your real situation
- *   2. Plan           – Weekly planning that saves time
- *   3. Scan & Decide  – Smart food decisions at home or eating out
- *   4. Household      – Preferences, family profiles, memory
+ * The entire MealEase experience is organized into 5 pillars:
+ *   1. Tonight Suggestions  – "What's for dinner?" — fast meal ideas for your real situation
+ *   2. Snap & Cook          – "What's in my fridge?" — cook from what you have
+ *   3. Weekly Autopilot     – "What's this week?" — 7 dinners, one tap
+ *   4. Leftovers AI         – "What do I do with leftovers?" — track & transform leftovers
+ *   5. Budget Intelligence  – "What will it cost me?" — weekly spend tracking
  *
  * Everything else is either:
  *   - A mode inside a pillar
  *   - An invisible intelligence layer
- *   - A secondary tool
+ *   - A secondary tool (Household, Profiles, Memory)
  */
 
 import type { SubscriptionTier } from '@/types'
@@ -104,8 +105,8 @@ export const PILLAR_CARDS: PillarCard[] = [
   {
     id: 'cook',
     emoji: '📸',
-    title: 'Scan & Decide',
-    subtitle: 'Smart food decisions at home or eating out',
+    title: 'Snap & Cook',
+    subtitle: 'Cook from what you have — fridge, pantry, or leftovers',
     href: '/dashboard/cook',
     gradient: 'from-emerald-50 to-teal-50/80',
     borderColor: 'border-emerald-200/60',

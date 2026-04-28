@@ -281,8 +281,8 @@ export default function CookPillarPage() {
           <button onClick={() => router.push('/dashboard')} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4">
             <ArrowLeft className="h-4 w-4" /> Back
           </button>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">📸 Scan &amp; Decide</h1>
-          <p className="text-sm text-muted-foreground mt-1">Smart food decisions at home or eating out</p>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">📸 Snap &amp; Cook</h1>
+          <p className="text-sm text-muted-foreground mt-1">Cook from what you have — fridge, pantry, or leftovers</p>
         </div>
 
         {/* Mode chips */}
@@ -473,8 +473,8 @@ export default function CookPillarPage() {
       <PaywallDialog
         open={paywallOpen}
         onOpenChange={setPaywallOpen}
-        title="Unlock Scan & Decide Pro Tools"
-        description="Upgrade to scan restaurant menus, check food calories, use pantry meals, and smart leftovers — plus unlimited Snap & Cook scans."
+        title="Unlock Snap & Cook Pro Tools"
+        description="Upgrade to access Pantry Meals and Smart Leftovers — plus unlimited Snap & Cook scans."
         isAuthenticated={status.isAuthenticated}
         redirectPath="/dashboard/cook"
       />

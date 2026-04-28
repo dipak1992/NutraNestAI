@@ -21,8 +21,8 @@ const WEIGHT_GOALS = ['lose', 'maintain', 'gain', 'build_muscle'] as const
 
 const TIER_LABELS: Record<TierName, string> = {
   free: 'Free',
-  pro: 'Pro',
-  family: 'Family Plus',
+  pro: 'Plus',
+  family: 'Plus',
 }
 
 const TIER_BADGE_STYLES: Record<TierName, string> = {

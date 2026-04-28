@@ -24,7 +24,7 @@ export default function GroceryListPage() {
           </div>
           <p className="text-lg font-bold text-foreground">Your personalized grocery list lives here</p>
           <p className="text-sm text-muted-foreground mt-1 max-w-sm">
-            Generate your weekly meal plan, then upgrade to Pro to unlock your auto-built grocery list with quantities and pantry deductions.
+            Generate your weekly meal plan, then upgrade to Plus to unlock your auto-built grocery list with quantities and pantry deductions.
           </p>
         </div>
 

@@ -18,7 +18,7 @@ const links = {
   Support: [
     { label: 'Help Center', href: '/help' },
     { label: 'Contact', href: '/contact' },
-    { label: 'Status', href: 'https://status.mealeaseai.com' },
+    { label: 'Status', href: '/status' },
     { label: 'FAQ', href: '#faq' },
   ],
   Legal: [

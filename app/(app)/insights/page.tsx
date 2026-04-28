@@ -38,7 +38,7 @@ export default async function InsightsPage() {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <ProPaywallCard
-          title="Insights unlock when you upgrade to Pro"
+          title="Insights unlock when you upgrade to Plus"
           description="Track cuisine trends, cook-time patterns, and household personalization once you move beyond the free preview."
           isAuthenticated={status.isAuthenticated}
           redirectPath="/insights"

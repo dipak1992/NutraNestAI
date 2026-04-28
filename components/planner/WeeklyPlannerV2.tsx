@@ -178,7 +178,7 @@ export function WeeklyPlannerV2() {
         setShowPlannerLock(true)
         setPaywallOpen(true)
         toast.success('3-day preview ready!', {
-          description: 'Upgrade to Pro to unlock the full week and grocery list.',
+          description: 'Upgrade to Plus to unlock the full week and grocery list.',
         })
       } else {
         setShowPlannerLock(false)

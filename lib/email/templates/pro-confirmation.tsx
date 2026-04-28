@@ -10,7 +10,7 @@ interface Props {
   planName?: string
 }
 
-export function ProConfirmationEmail({ firstName, planName = 'Pro' }: Props) {
+export function ProConfirmationEmail({ firstName, planName = 'Plus' }: Props) {
   const name = firstName ?? 'there'
   return (
     <Html>

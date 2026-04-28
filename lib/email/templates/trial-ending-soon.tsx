@@ -32,7 +32,7 @@ export function TrialEndingSoonEmail({ firstName, daysLeft = 3, trialEndDate, up
             </Heading>
 
             <Text style={styles.p}>
-              Hi {name}, your MealEase Pro trial
+              Hi {name}, your MealEase Plus trial
               {trialEndDate ? ` ends on ${trialEndDate}` : ` ends in ${daysLeft} day${daysLeft !== 1 ? 's' : ''}`}.
               After that, your account moves to the free plan and your current meal
               plans and grocery lists will stay — but you won&apos;t be able to generate new ones.
@@ -43,7 +43,7 @@ export function TrialEndingSoonEmail({ firstName, daysLeft = 3, trialEndDate, up
             </Text>
 
             <Link href={ctaUrl} style={styles.button}>
-              Upgrade to Pro →
+              Upgrade to Plus →
             </Link>
 
             <Hr style={styles.divider} />

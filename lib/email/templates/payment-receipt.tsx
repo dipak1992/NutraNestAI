@@ -18,7 +18,7 @@ export function PaymentReceiptEmail({
   amount,
   date,
   invoiceId,
-  planName = 'Pro',
+  planName = 'Plus',
 }: Props) {
   const name = firstName ?? 'there'
   return (

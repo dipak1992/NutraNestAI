@@ -416,7 +416,7 @@ export function DashboardClient({ userName }: Props) {
                     href="/pricing?intent=pro"
                     className="mt-3 flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition-colors"
                   >
-                    Upgrade to Pro
+                    Upgrade to Plus
                     <ChevronRight className="h-4 w-4" />
                   </Link>
                 </div>

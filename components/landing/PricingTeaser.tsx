@@ -18,8 +18,8 @@ const plans = [
     highlight: false,
   },
   {
-    name: 'Pro',
-    price: '$9',
+    name: 'Plus',
+    price: '$9.99',
     period: '/month',
     description: 'Everything you need to stop the dinner spiral.',
     features: [

@@ -46,7 +46,7 @@ export function AdminNewUserEmail({ userEmail, userId, signupAt, referralCode }:
 export function AdminNewProEmail({
   userEmail,
   userId,
-  planName = 'Pro',
+  planName = 'Plus',
   amount,
 }: {
   userEmail: string

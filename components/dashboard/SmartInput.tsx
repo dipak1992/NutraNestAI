@@ -208,7 +208,7 @@ export function SmartInput({ mode, placeholder, onSubmit, allowPhoto = true, onP
           }}
           disabled={analyzing}
           className="absolute right-3 top-3 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40"
-          title={allowPhoto ? 'Upload a photo' : 'Pro feature — upgrade to use photo analysis'}
+          title={allowPhoto ? 'Upload a photo' : 'Plus feature — upgrade to use photo analysis'}
         >
           {analyzing ? (
             <Loader2 className="h-5 w-5 animate-spin" />
@@ -240,7 +240,7 @@ export function SmartInput({ mode, placeholder, onSubmit, allowPhoto = true, onP
           }}
         >
           <ImageIcon className="h-4 w-4" />
-          {allowPhoto ? 'Or drop / tap to upload a photo' : '📸 Photo analysis — Pro feature'}
+          {allowPhoto ? 'Or drop / tap to upload a photo' : '📸 Photo analysis — Plus feature'}
         </div>
       )}
 

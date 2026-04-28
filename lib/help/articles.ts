@@ -177,14 +177,14 @@ We recognize the 500+ most common ingredients with about 94% accuracy. You can a
     description: 'How many scans you get per week and month.',
     updatedAt: '2024-12-15',
     body: `**Free plan:**
-- 3 fridge scans per week
-- 3 menu scans per month
-- Unlimited food nutrition checks
+- 3 Snap & Cook scans per week (fridge, menu, food)
 
-**Plus and Family plans:**
-- Unlimited everything
+**Plus plan:**
+- Unlimited Snap & Cook scans
+- Unlimited Leftovers AI suggestions
+- Budget Intelligence tracking
 
-Counters reset Monday at midnight your local time (weekly) and the 1st of the month (monthly). If you hit a limit, we'll tell you clearly — no surprises, no silent failures.`,
+Counters reset Monday at midnight your local time. If you hit a limit, we'll tell you clearly — no surprises, no silent failures.`,
     relatedSlugs: ['how-to-scan-fridge'],
   },
   {

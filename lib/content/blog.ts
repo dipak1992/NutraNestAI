@@ -47,16 +47,9 @@ export const BLOG_CATEGORIES = [
   {
     slug: 'smart-food-tools',
     label: 'Smart Food Tools',
-    description: 'Smart Menu Scan, Food Check, and AI-powered tools for smarter eating decisions.',
-    matches: ['Smart Tools', 'Food Check', 'Menu Scan'],
+    description: 'Snap & Cook, Leftovers AI, Budget Intelligence, and AI-powered tools for smarter eating decisions.',
+    matches: ['Smart Tools', 'Food Check', 'Menu Scan', 'Snap & Cook'],
     emoji: '🔍',
-  },
-  {
-    slug: 'weekend-mode',
-    label: 'Weekend Mode',
-    description: 'Date night dinners, movie night meals, and weekend food ideas for every household.',
-    matches: ['Weekend Mode', 'Weekend'],
-    emoji: '🎬',
   },
 ] as const
 

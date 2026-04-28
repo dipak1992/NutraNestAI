@@ -114,7 +114,7 @@ export async function getDashboardPayload(
     if (a.id === 'leftovers')
       status = leftovers.length > 0 ? `${leftovers.length} item${leftovers.length === 1 ? '' : 's'}` : undefined
     if (a.id === 'scan' && plan === 'free')
-      status = `${limits.scansLimit - limits.scansUsed} left`
+      status = `${limits.scansLimit - limits.scansUsed} scans left`
     return { ...a, status }
   })
 

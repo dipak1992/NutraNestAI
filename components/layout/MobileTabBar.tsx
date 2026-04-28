@@ -2,15 +2,18 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Moon, Calendar, Camera, Users } from 'lucide-react'
+import { Home, Utensils, Camera, Refrigerator, Wallet } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
+// 5 Pillars — mobile bottom tab bar
+// Home + 4 pillars (Tonight, Snap & Cook, Leftovers, Budget)
+// Weekly Autopilot accessible via Home → Plan my week CTA
 const TABS = [
-  { href: '/dashboard',           label: 'Home',      icon: Home },
-  { href: '/dashboard/tonight',   label: 'Tonight',   icon: Moon },
-  { href: '/planner',             label: 'Plan',      icon: Calendar },
-  { href: '/dashboard/cook',      label: 'Scan',      icon: Camera },
-  { href: '/dashboard/household', label: 'Household', icon: Users },
+  { href: '/dashboard',         label: 'Home',      icon: Home },
+  { href: '/dashboard/tonight', label: 'Tonight',   icon: Utensils },
+  { href: '/dashboard/cook',    label: 'Snap',      icon: Camera },
+  { href: '/leftovers',         label: 'Leftovers', icon: Refrigerator },
+  { href: '/budget',            label: 'Budget',    icon: Wallet },
 ]
 
 export function MobileTabBar() {

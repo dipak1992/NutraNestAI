@@ -12,52 +12,50 @@ import { cn } from '@/lib/utils'
 
 const FREE_FEATURES = [
   'Tonight Suggestions (3/day)',
-  'Snap & Cook (3 scans/week)',
+  'Snap & Cook — fridge scan (3/week)',
   'Basic grocery list',
   '1 member profile',
   'Basic dietary filters',
 ]
 
 const PLUS_FEATURES = [
-  'Unlimited meal generations',
-  'Unlimited Snap & Cook',
-  'Full 7-day Weekly Planner',
-  'Weekly Autopilot',
-  'Smart Menu Scan ✨',
-  'Food Check — calorie snap ✨',
-  'Budget meal mode',
-  'Healthy mode',
-  'Up to 2 member profiles',
-  'Household memory',
-  'Saved preferences',
-  'Meal history',
+  'Everything in Free',
+  'Unlimited Tonight Suggestions',
+  'Unlimited Snap & Cook scans',
+  'Weekly Autopilot — 7 dinners, one tap',
+  'Leftovers AI — track & use leftovers',
+  'Budget Intelligence — weekly spend tracking',
+  'Smart grocery list export',
+  'Up to 6 household members',
+  'Household memory & preferences',
+  'Meal history & saved favorites',
   'Faster AI responses',
 ]
 
 const FAQ = [
   {
     q: 'Is there a free version?',
-    a: 'Yes. The free plan gives you Tonight Suggestions, up to 3 meal ideas daily, and a basic grocery list — enough to experience how MealEase thinks. When you\'re ready for Weekly Autopilot or Household Memory, upgrade anytime. Plus includes a 7-day free trial.',
+    a: 'Yes. The free plan gives you Tonight Suggestions, up to 3 Snap & Cook scans per week, and a basic grocery list — enough to experience how MealEase thinks. When you\'re ready for Weekly Autopilot, Leftovers AI, or Budget Intelligence, upgrade anytime.',
   },
   {
     q: 'What is a household profile?',
-    a: 'A profile stores preferences, allergies, age groups, and food goals for one person. Profiles are not separate logins — they help MealEase personalize every meal for each person at your table. Free plan includes 1 profile. Plus includes up to 2.',
+    a: 'A profile stores preferences, allergies, age groups, and food goals for one person. Profiles are not separate logins — they help MealEase personalize every meal for each person at your table. Free plan includes 1 profile. Plus includes up to 6.',
   },
   {
     q: 'What is Weekly Autopilot?',
     a: 'One tap, seven nights planned. Autopilot builds a full week of dinners tailored to your household — balancing variety, nutrition, prep time, and what you already have on hand. It generates a smart grocery list alongside it.',
   },
   {
-    q: 'How does Household Memory work?',
-    a: 'Every time you cook, save, skip, or swap a meal, MealEase quietly learns. It tracks which cuisines your household gravitates toward and which nights you tend to reach for something fast. Over weeks, your suggestions get sharper.',
+    q: 'What is Leftovers AI?',
+    a: 'After you cook, MealEase asks if you have leftovers. Say yes and we track them — what they are, when they expire, and how many servings remain. We\'ll remind you before they go bad and suggest recipes that use them up.',
+  },
+  {
+    q: 'What is Budget Intelligence?',
+    a: 'Set a weekly food budget and we\'ll estimate recipe costs, track your spending, warn you before you go over, and suggest cheaper meal swaps when needed. Includes weekly history and category breakdown.',
   },
   {
     q: 'Can I cancel anytime?',
     a: 'Yes — cancel with one click from your account settings. No questions asked. Your plan stays active until the end of the current billing period.',
-  },
-  {
-    q: 'What is Smart Menu Scan?',
-    a: 'Photograph any restaurant menu and choose a goal — lose weight, high protein, budget-friendly, or more. AI highlights exactly what to order based on your personal nutrition profile.',
   },
 ]
 

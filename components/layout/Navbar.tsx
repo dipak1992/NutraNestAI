@@ -7,10 +7,11 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Home,
-  Moon,
-  Calendar,
+  Utensils,
   Camera,
-  Users,
+  CalendarDays,
+  Refrigerator,
+  Wallet,
   Settings,
   Menu,
   X,
@@ -27,12 +28,14 @@ import { createClient } from '@/lib/supabase/client'
 import { useUIStore } from '@/lib/store'
 import { MealEaseLogo } from '@/components/ui/MealEaseLogo'
 
+// 5 Pillars navigation
 const navLinks = [
-  { href: '/dashboard',           label: 'Home',      icon: Home },
-  { href: '/dashboard/tonight',   label: 'Tonight',   icon: Moon },
-  { href: '/planner',             label: 'Plan',      icon: Calendar },
-  { href: '/dashboard/cook',      label: 'Scan',      icon: Camera },
-  { href: '/dashboard/household', label: 'Household', icon: Users },
+  { href: '/dashboard',         label: 'Home',      icon: Home },
+  { href: '/dashboard/tonight', label: 'Tonight',   icon: Utensils },
+  { href: '/dashboard/cook',    label: 'Snap & Cook', icon: Camera },
+  { href: '/planner',           label: 'Autopilot', icon: CalendarDays },
+  { href: '/leftovers',         label: 'Leftovers', icon: Refrigerator },
+  { href: '/budget',            label: 'Budget',    icon: Wallet },
 ]
 
 function isNavActive(pathname: string | null, href: string) {
@@ -92,7 +95,7 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
           <MealEaseLogo size="md" />
         </Link>
 
-        {/* Desktop nav — 4 pillars + Home */}
+        {/* Desktop nav — 5 pillars + Home */}
         <nav className="hidden md:flex items-center gap-1">
           {navLinks.map(({ href, label, icon: Icon }) => (
             <Link

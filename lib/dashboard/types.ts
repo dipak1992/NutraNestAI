@@ -86,7 +86,7 @@ export type Nudge = {
 }
 
 export type QuickAction = {
-  id: 'scan' | 'grocery' | 'leftovers' | 'budget'
+  id: 'scan' | 'autopilot' | 'leftovers' | 'budget' | 'grocery'
   label: string
   icon: string
   href: string

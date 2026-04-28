@@ -3,24 +3,24 @@ import type { QuickAction, Plan } from '@/lib/dashboard/types'
 export const quickActionsConfig: QuickAction[] = [
   {
     id: 'scan',
-    label: 'Scan fridge',
+    label: 'Snap & Cook',
     icon: '📸',
-    href: '/pantry',
+    href: '/dashboard/cook',
     requiredPlan: 'free',
   },
   {
-    id: 'grocery',
-    label: 'Grocery list',
-    icon: '🛒',
-    href: '/grocery-list',
+    id: 'autopilot',
+    label: 'Autopilot',
+    icon: '📅',
+    href: '/planner',
     requiredPlan: 'plus',
   },
   {
     id: 'leftovers',
-    label: 'Leftovers',
+    label: 'Leftovers AI',
     icon: '🍱',
     href: '/leftovers',
-    requiredPlan: 'plus',
+    requiredPlan: 'free',
   },
   {
     id: 'budget',

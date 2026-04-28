@@ -89,8 +89,6 @@ export function DashboardClient({ userName }: Props) {
   const [input, setInput] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const [streak, setStreak] = useState<{ current_streak: number; longest_streak: number } | null>(null)
-  // Computed client-side only to avoid SSR/hydration mismatch
-  const [isWeekend, setIsWeekend] = useState(false)
 
   const firstName = userName.includes('@') ? userName.split('@')[0] : userName
   const activeMode = SITUATIONS.find(s => s.id === mode)
@@ -102,13 +100,6 @@ export function DashboardClient({ userName }: Props) {
         if (data?.current_streak >= 1) setStreak(data)
       })
       .catch(() => null)
-  }, [])
-
-  useEffect(() => {
-    const d = new Date()
-    const day = d.getDay()
-    const hour = d.getHours()
-    setIsWeekend(day === 0 || day === 6 || (day === 5 && hour >= 17))
   }, [])
 
   // ── Stores ──────────────────────────────────────────────────────────────────
@@ -376,22 +367,6 @@ export function DashboardClient({ userName }: Props) {
                   </div>
                 </div>
               )}
-
-              {/* Weekend Mode banner — PRO only, Fri 5pm+ / Sat / Sun */}
-              {isWeekend && paywallStatus.isPro ? (
-                  <Link
-                    href="/weekend"
-                    className="mt-4 flex items-center gap-3 rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50 px-4 py-3 hover:shadow-md transition-all"
-                  >
-                    <span className="text-2xl flex-shrink-0">🎬</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-amber-900">Weekend Mode</p>
-                      <p className="text-xs text-amber-700/80 mt-0.5">
-                        Dinner + movie picked for tonight →
-                      </p>
-                    </div>
-                  </Link>
-              ) : null}
 
               {/* Value Accumulator — free users only */}
               {!paywallStatus.isPro && totalInteractions > 0 && (

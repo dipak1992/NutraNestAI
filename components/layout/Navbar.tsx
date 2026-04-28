@@ -3,7 +3,7 @@
 import type { SubscriptionTier } from '@/types'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Home,
@@ -23,6 +23,13 @@ import {
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { createClient } from '@/lib/supabase/client'
 import { useUIStore } from '@/lib/store'
@@ -46,35 +53,9 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
   const router = useRouter()
   const { sidebarOpen, toggleSidebar } = useUIStore()
   const [signingOut, setSigningOut] = useState(false)
-  const [accountMenuOpen, setAccountMenuOpen] = useState(false)
-  const accountMenuRef = useRef<HTMLDivElement | null>(null)
   const isPro = subscriptionTier === 'pro'
   const isFamily = subscriptionTier === 'family'
   const isPaid = isPro || isFamily
-
-  useEffect(() => {
-    if (!accountMenuOpen) return
-
-    function handlePointerDown(event: PointerEvent) {
-      if (!accountMenuRef.current?.contains(event.target as Node)) {
-        setAccountMenuOpen(false)
-      }
-    }
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
-        setAccountMenuOpen(false)
-      }
-    }
-
-    document.addEventListener('pointerdown', handlePointerDown)
-    document.addEventListener('keydown', handleKeyDown)
-
-    return () => {
-      document.removeEventListener('pointerdown', handlePointerDown)
-      document.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [accountMenuOpen])
 
   async function handleSignOut() {
     setSigningOut(true)
@@ -136,69 +117,52 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
               <Link href="/pricing?intent=pro">Upgrade to Pro</Link>
             </Button>
           )}
-          <div ref={accountMenuRef} className="relative">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="rounded-full"
-              aria-label="Account menu"
-              aria-haspopup="menu"
-              aria-expanded={accountMenuOpen}
-              onClick={() => setAccountMenuOpen((open) => !open)}
-            >
+          <DropdownMenu>
+            <DropdownMenuTrigger render={<Button variant="ghost" size="icon" className="rounded-full" />}>
               <Avatar className="h-8 w-8">
                 <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
                   {initials}
                 </AvatarFallback>
               </Avatar>
-            </Button>
-
-            {accountMenuOpen && (
-              <div
-                role="menu"
-                aria-label="Account menu"
-                className="absolute right-0 top-full z-50 mt-2 w-48 rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10"
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              {userEmail && (
+                <>
+                  <div className="px-2 py-1.5 text-xs text-muted-foreground truncate">
+                    {userEmail}
+                  </div>
+                  <DropdownMenuSeparator />
+                </>
+              )}
+              <DropdownMenuItem render={<Link href="/settings" />}>
+                <User className="h-4 w-4" />
+                Profile &amp; Settings
+              </DropdownMenuItem>
+              <DropdownMenuItem render={<Link href="/insights" />}>
+                <BarChart3 className="h-4 w-4" />
+                Insights
+              </DropdownMenuItem>
+              {!isPaid && (
+                <DropdownMenuItem render={<Link href="/pricing?intent=pro" />}>
+                  <Crown className="h-4 w-4" />
+                  Upgrade to Pro
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem render={<Link href="/referral" />}>
+                <Gift className="h-4 w-4" />
+                Refer Friends
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={handleSignOut}
+                disabled={signingOut}
+                className="text-destructive focus:text-destructive flex items-center gap-2"
               >
-                {userEmail && (
-                  <>
-                    <div className="truncate px-2 py-1.5 text-xs text-muted-foreground">
-                      {userEmail}
-                    </div>
-                    <div className="-mx-1 my-1 h-px bg-border" />
-                  </>
-                )}
-                <AccountMenuLink href="/settings" onSelect={() => setAccountMenuOpen(false)}>
-                  <User className="h-4 w-4" />
-                  Profile &amp; Settings
-                </AccountMenuLink>
-                <AccountMenuLink href="/insights" onSelect={() => setAccountMenuOpen(false)}>
-                  <BarChart3 className="h-4 w-4" />
-                  Insights
-                </AccountMenuLink>
-                {!isPaid && (
-                  <AccountMenuLink href="/pricing?intent=pro" onSelect={() => setAccountMenuOpen(false)}>
-                    <Crown className="h-4 w-4" />
-                    Upgrade to Pro
-                  </AccountMenuLink>
-                )}
-                <AccountMenuLink href="/referral" onSelect={() => setAccountMenuOpen(false)}>
-                  <Gift className="h-4 w-4" />
-                  Refer Friends
-                </AccountMenuLink>
-                <div className="-mx-1 my-1 h-px bg-border" />
-                <button
-                  type="button"
-                  role="menuitem"
-                  onClick={handleSignOut}
-                  disabled={signingOut}
-                  className="relative flex w-full items-center gap-1.5 rounded-md px-1.5 py-1 text-left text-sm text-destructive outline-hidden select-none hover:bg-destructive/10 focus:bg-destructive/10 disabled:pointer-events-none disabled:opacity-50"
-                >
-                  <LogOut className="h-4 w-4" />
-                  {signingOut ? 'Signing out…' : 'Sign out'}
-                </button>
-              </div>
-            )}
-          </div>
+                <LogOut className="h-4 w-4" />
+                {signingOut ? 'Signing out…' : 'Sign out'}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* Mobile menu toggle */}
           <Button
@@ -262,26 +226,5 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
         )}
       </AnimatePresence>
     </header>
-  )
-}
-
-function AccountMenuLink({
-  href,
-  onSelect,
-  children,
-}: {
-  href: string
-  onSelect: () => void
-  children: React.ReactNode
-}) {
-  return (
-    <Link
-      href={href}
-      role="menuitem"
-      onClick={onSelect}
-      className="relative flex items-center gap-1.5 rounded-md px-1.5 py-1 text-sm outline-hidden select-none hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground [&_svg]:shrink-0"
-    >
-      {children}
-    </Link>
   )
 }

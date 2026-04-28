@@ -56,7 +56,7 @@ export function LeftoversCard({ state }: Props) {
               Your {urgentToday.name.toLowerCase()} expires tonight —{' '}
             </span>
             <Link
-              href={`/leftovers/${urgentToday.id}/use`}
+              href="/leftovers"
               className="underline underline-offset-2 font-medium"
             >
               see 3 quick meals →
@@ -126,7 +126,7 @@ function LeftoverItem({ item }: { item: Leftover }) {
   return (
     <li>
       <Link
-        href={`/leftovers/${item.id}/use`}
+        href="/leftovers"
         className={cn(
           'group flex items-center gap-3 p-2.5 -mx-2.5 rounded-2xl transition-colors',
           'hover:bg-neutral-50 dark:hover:bg-neutral-800/60'

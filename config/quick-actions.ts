@@ -9,17 +9,17 @@ export const quickActionsConfig: QuickAction[] = [
     requiredPlan: 'free',
   },
   {
-    id: 'autopilot',
-    label: 'Autopilot',
-    icon: '📅',
-    href: '/planner',
-    requiredPlan: 'plus',
-  },
-  {
     id: 'leftovers',
     label: 'Leftovers AI',
     icon: '🍱',
     href: '/leftovers',
+    requiredPlan: 'free',
+  },
+  {
+    id: 'grocery',
+    label: 'Grocery List',
+    icon: '🛒',
+    href: '/grocery-list',
     requiredPlan: 'free',
   },
   {

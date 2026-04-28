@@ -12,7 +12,6 @@ import { LeftoversCard } from '@/components/dashboard/LeftoversCard'
 import { WeekPlanStrip } from '@/components/dashboard/WeekPlanStrip'
 import { QuickActions } from '@/components/dashboard/QuickActions'
 import { ContextualNudge } from '@/components/dashboard/ContextualNudge'
-import { FloatingScanButton } from '@/components/dashboard/FloatingScanButton'
 import type { DashboardPayload } from '@/lib/dashboard/types'
 
 const REFRESH_INTERVAL_MS = 60_000 // 60 seconds
@@ -116,7 +115,6 @@ export function NewDashboardClient({ initial }: { initial: DashboardPayload }) {
 
       <BudgetSetupModal />
       <BudgetDrawer />
-      <FloatingScanButton />
     </>
   )
 }

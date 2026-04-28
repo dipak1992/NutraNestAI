@@ -3,8 +3,8 @@ import { BlogCard } from '@/components/blog/BlogCard'
 import { NewsletterBlock } from '@/components/blog/NewsletterBlock'
 import { getAllPosts } from '@/lib/blog/mdx'
 import { CATEGORY_LABELS, type BlogCategory } from '@/lib/blog/types'
-import { PublicSiteHeader } from '@/components/layout/PublicSiteHeader'
-import { PublicSiteFooter } from '@/components/layout/PublicSiteFooter'
+import { Nav } from '@/components/landing/Nav'
+import { Footer } from '@/components/landing/Footer'
 
 export const metadata = {
   title: 'Blog | MealEase — Cooking, budgeting, and family meal ideas',
@@ -18,7 +18,7 @@ export default function BlogIndexPage() {
 
   return (
     <>
-      <PublicSiteHeader />
+      <Nav />
       <main id="main">
         <section className="relative pt-16 pb-10 md:pt-24 md:pb-14">
           <div
@@ -102,7 +102,7 @@ export default function BlogIndexPage() {
           </>
         )}
       </main>
-      <PublicSiteFooter />
+      <Footer />
     </>
   )
 }

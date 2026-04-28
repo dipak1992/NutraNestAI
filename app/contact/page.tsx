@@ -1,5 +1,5 @@
-import { PublicSiteHeader } from '@/components/layout/PublicSiteHeader'
-import { PublicSiteFooter } from '@/components/layout/PublicSiteFooter'
+import { Nav } from '@/components/landing/Nav'
+import { Footer } from '@/components/landing/Footer'
 import { ContactClient } from './contact-client'
 
 export const metadata = {
@@ -11,7 +11,7 @@ export const metadata = {
 export default function ContactPage() {
   return (
     <>
-      <PublicSiteHeader />
+      <Nav />
       <main id="main">
         <section className="relative pt-16 pb-12 md:pt-24 md:pb-16">
           <div
@@ -41,7 +41,7 @@ export default function ContactPage() {
           </div>
         </section>
       </main>
-      <PublicSiteFooter />
+      <Footer />
     </>
   )
 }

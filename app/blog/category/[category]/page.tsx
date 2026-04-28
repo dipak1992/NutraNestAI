@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
-import { PublicSiteHeader } from '@/components/layout/PublicSiteHeader'
-import { PublicSiteFooter } from '@/components/layout/PublicSiteFooter'
+import { Nav } from '@/components/landing/Nav'
+import { Footer } from '@/components/landing/Footer'
 import { BlogCard } from '@/components/blog/BlogCard'
 import { getPostsByCategory } from '@/lib/blog/mdx'
 import { CATEGORY_LABELS, type BlogCategory } from '@/lib/blog/types'
@@ -39,7 +39,7 @@ export default async function CategoryPage({
 
   return (
     <>
-      <PublicSiteHeader />
+      <Nav />
       <main id="main">
         <section className="relative pt-16 pb-10 md:pt-24 md:pb-14">
           <div
@@ -82,7 +82,7 @@ export default async function CategoryPage({
           </div>
         </section>
       </main>
-      <PublicSiteFooter />
+      <Footer />
     </>
   )
 }

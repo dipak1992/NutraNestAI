@@ -1,5 +1,5 @@
-import { PublicSiteHeader } from '@/components/layout/PublicSiteHeader'
-import { PublicSiteFooter } from '@/components/layout/PublicSiteFooter'
+import { Nav } from '@/components/landing/Nav'
+import { Footer } from '@/components/landing/Footer'
 import { PressHero } from '@/components/press/PressHero'
 import { FactSheet } from '@/components/press/FactSheet'
 import { FoundersBios } from '@/components/press/FoundersBios'
@@ -20,7 +20,7 @@ export const metadata = {
 export default function PressPage() {
   return (
     <>
-      <PublicSiteHeader />
+      <Nav />
       <main id="main">
         <PressHero />
         <FactSheet />
@@ -28,7 +28,7 @@ export default function PressPage() {
         <DownloadableAssets />
         <PressContact />
       </main>
-      <PublicSiteFooter />
+      <Footer />
     </>
   )
 }

@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
-import { PublicSiteHeader } from '@/components/layout/PublicSiteHeader'
-import { PublicSiteFooter } from '@/components/layout/PublicSiteFooter'
+import { Nav } from '@/components/landing/Nav'
+import { Footer } from '@/components/landing/Footer'
 import { BlogHeader } from '@/components/blog/BlogHeader'
 import { BlogCard } from '@/components/blog/BlogCard'
 import { ShareButtons } from '@/components/blog/ShareButtons'
@@ -57,7 +57,7 @@ export default async function BlogPostPage({
 
   return (
     <>
-      <PublicSiteHeader />
+      <Nav />
       <main id="main">
         <BlogHeader post={post} />
 
@@ -96,7 +96,7 @@ export default async function BlogPostPage({
           </section>
         )}
       </main>
-      <PublicSiteFooter />
+      <Footer />
     </>
   )
 }

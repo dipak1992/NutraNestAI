@@ -24,8 +24,8 @@ function Toggle({ label, description, checked, onChange }: {
   return (
     <div className="flex items-start justify-between gap-4 py-3">
       <div>
-        <p className="text-sm font-medium text-white">{label}</p>
-        <p className="text-xs text-white/40">{description}</p>
+        <p className="text-sm font-medium text-slate-700">{label}</p>
+        <p className="text-xs text-slate-400">{description}</p>
       </div>
       <button
         type="button"
@@ -34,7 +34,7 @@ function Toggle({ label, description, checked, onChange }: {
         onClick={() => onChange(!checked)}
         className={[
           'relative mt-0.5 h-6 w-11 shrink-0 rounded-full transition-colors',
-          checked ? 'bg-[#D97757]' : 'bg-white/20',
+          checked ? 'bg-[#D97757]' : 'bg-orange-100',
         ].join(' ')}
       >
         <span
@@ -73,8 +73,8 @@ export function SectionNotifications({ prefs: initial }: Props) {
   }
 
   return (
-    <section className="rounded-3xl border border-white/10 bg-white/5 p-6">
-      <h2 className="mb-2 flex items-center gap-2 text-base font-semibold text-white">
+    <section className="rounded-3xl border border-orange-100 bg-white/82 p-6">
+      <h2 className="mb-2 flex items-center gap-2 text-base font-semibold text-slate-950">
         <Bell className="h-4 w-4 text-[#D97757]" />
         Notifications
       </h2>

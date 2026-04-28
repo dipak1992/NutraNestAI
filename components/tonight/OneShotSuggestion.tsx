@@ -8,6 +8,8 @@ import { ArrowLeft, ChefHat, RefreshCw, ShoppingCart, Clock, Flame } from 'lucid
 import { useOnboardingStore, useLightOnboardingStore } from '@/lib/store'
 import { useLearningStore } from '@/lib/learning/store'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
+import { useDailySwapLimit } from '@/lib/paywall/use-daily-swap-limit'
+import { PaywallDialog } from '@/components/paywall/PaywallDialog'
 import {
   Dialog,
   DialogContent,
@@ -61,6 +63,7 @@ export function OneShotSuggestion({ mode = 'tonight', title }: Props) {
   const { addCustomItem } = useWeeklyPlanStore()
 
   const { status: paywallStatus } = usePaywallStatus()
+  const swaps = useDailySwapLimit(paywallStatus, 'tonight-one-shot')
 
   const [meal, setMeal] = useState<SmartMealResult | null>(null)
   const [ctx, setCtx] = useState<DecideResponse['context'] | null>(null)
@@ -69,11 +72,13 @@ export function OneShotSuggestion({ mode = 'tonight', title }: Props) {
   const [swapping, setSwapping] = useState(false)
   const [cookedFeedback, setCookedFeedback] = useState(false)
   const [feedbackGiven, setFeedbackGiven] = useState(false)
-  const [trialNudgeOpen, setTrialNudgeOpen] = useState(false)
+  const [paywallOpen, setPaywallOpen] = useState(false)
+  const [paywallCopy, setPaywallCopy] = useState({
+    title: 'Unlock full recipes with Plus',
+    description: 'Cook This is a Plus feature. Upgrade for guided recipes, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning.',
+  })
   const [groceryPromptOpen, setGroceryPromptOpen] = useState(false)
-  const [startingTrial, setStartingTrial] = useState(false)
   const shownIdsRef = useRef<string[]>([])
-  const swapCountRef = useRef(0)
 
   const fetchMeal = useCallback(async (opts: { swap?: boolean } = {}) => {
     setError(null)
@@ -118,6 +123,14 @@ export function OneShotSuggestion({ mode = 'tonight', title }: Props) {
 
   const handleCook = () => {
     if (!meal) return
+    if (!paywallStatus.isPro && !paywallStatus.isFamily) {
+      setPaywallCopy({
+        title: 'Unlock full recipes with Plus',
+        description: 'Cook This is a Plus feature. Upgrade for guided recipes, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning.',
+      })
+      setPaywallOpen(true)
+      return
+    }
     recordLike(meal)
     sendSignal(meal.id, 'cooked', { mode })
     // Store meal for the recipe page, then open grocery prompt
@@ -165,27 +178,17 @@ export function OneShotSuggestion({ mode = 'tonight', title }: Props) {
 
   const handleSwap = () => {
     if (!meal) return
+    if (!swaps.recordSwap()) {
+      setPaywallCopy({
+        title: 'You’ve used your free meal changes today.',
+        description: 'Free includes 3 meal swaps per day. Upgrade to Plus for unlimited meal swaps, personalized picks, and full Cook This recipes.',
+      })
+      setPaywallOpen(true)
+      return
+    }
     recordReject(meal)
     sendSignal(meal.id, 'swapped', { mode })
     void fetchMeal({ swap: true })
-    swapCountRef.current += 1
-    if (swapCountRef.current === 3 && !paywallStatus.isPro) {
-      setTrialNudgeOpen(true)
-      swapCountRef.current = 0
-    }
-  }
-
-  const handleStartTrial = async () => {
-    setStartingTrial(true)
-    try {
-      const res = await fetch('/api/paywall/start-trial', { method: 'POST' })
-      if (res.ok) {
-        setTrialNudgeOpen(false)
-        window.location.reload()
-      }
-    } finally {
-      setStartingTrial(false)
-    }
   }
 
   const handleOrder = () => {
@@ -370,37 +373,21 @@ export function OneShotSuggestion({ mode = 'tonight', title }: Props) {
 
         {meal && !loading && !cookedFeedback && (
           <p className="text-[11px] text-muted-foreground text-center mt-4">
-            Not feeling it? Tap <span className="font-semibold">Swap</span> — we&apos;ll learn.
+            {swaps.isUnlimited
+              ? 'Not feeling it? Swap freely - we will keep learning.'
+              : `${swaps.remaining} swap${swaps.remaining === 1 ? '' : 's'} left today.`}
           </p>
         )}
       </div>
 
-      {/* Trial nudge after 3 swipes */}
-      <Dialog open={trialNudgeOpen} onOpenChange={setTrialNudgeOpen}>
-        <DialogContent className="max-w-sm mx-auto">
-          <DialogHeader>
-            <DialogTitle className="text-lg">Still searching? 🍽️</DialogTitle>
-            <DialogDescription className="text-sm text-muted-foreground mt-1">
-              Unlock unlimited swipes, the full 7-day planner, and your grocery list — free for 7 days, cancel anytime.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="mt-4 flex flex-col gap-3">
-            <button
-              onClick={() => void handleStartTrial()}
-              disabled={startingTrial}
-              className="w-full rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold py-3 text-sm hover:from-amber-600 hover:to-orange-600 transition-all disabled:opacity-60"
-            >
-              {startingTrial ? 'Starting…' : 'Start 7-day free trial'}
-            </button>
-            <button
-              onClick={() => setTrialNudgeOpen(false)}
-              className="w-full text-sm text-muted-foreground py-2"
-            >
-              Keep exploring for free
-            </button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <PaywallDialog
+        open={paywallOpen}
+        onOpenChange={setPaywallOpen}
+        title={paywallCopy.title}
+        description={paywallCopy.description}
+        isAuthenticated={paywallStatus.isAuthenticated}
+        redirectPath="/tonight"
+      />
 
       {/* Grocery prompt after cook feedback */}
       <Dialog open={groceryPromptOpen} onOpenChange={setGroceryPromptOpen}>

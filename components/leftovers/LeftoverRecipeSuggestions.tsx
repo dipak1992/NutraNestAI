@@ -4,29 +4,29 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Clock, ChefHat, Lock, RefreshCw, AlertCircle, ShoppingCart, Volume2 } from 'lucide-react'
+import { Clock, ChefHat, Lock, RefreshCw, AlertCircle, ShoppingCart } from 'lucide-react'
 import type { LeftoverSuggestion } from '@/lib/leftovers/types'
 import type { SmartMealResult } from '@/lib/engine/types'
 import { SaveMealButton } from '@/components/content/SaveMealButton'
-import { RecipeAudioPlayer } from '@/components/recipes/RecipeAudioPlayer'
-import { mealToRecipe, persistMealForRecipe } from '@/lib/recipes/canonical'
+import { persistMealForRecipe } from '@/lib/recipes/canonical'
 import { useWeeklyPlanStore } from '@/lib/planner/store'
+import { PaywallDialog } from '@/components/paywall/PaywallDialog'
+import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 
 type State = 'idle' | 'loading' | 'ready' | 'gated' | 'error'
 
 type Props = {
   leftoverId: string
   leftoverName: string
-  isPlusMember: boolean
 }
 
-export function LeftoverRecipeSuggestions({ leftoverId, leftoverName, isPlusMember }: Props) {
+export function LeftoverRecipeSuggestions({ leftoverId, leftoverName }: Props) {
   const router = useRouter()
   const [state, setState] = useState<State>('idle')
   const [suggestions, setSuggestions] = useState<LeftoverSuggestion[]>([])
   const [error, setError] = useState<string | null>(null)
-  const [audioMealId, setAudioMealId] = useState<string | null>(null)
-  const [audioStep, setAudioStep] = useState(0)
+  const [paywallOpen, setPaywallOpen] = useState(false)
+  const { status } = usePaywallStatus()
   const addCustomItem = useWeeklyPlanStore((s) => s.addCustomItem)
 
   function toMeal(suggestion: LeftoverSuggestion): SmartMealResult {
@@ -73,6 +73,10 @@ export function LeftoverRecipeSuggestions({ leftoverId, leftoverName, isPlusMemb
   }
 
   function cookMeal(meal: SmartMealResult) {
+    if (!status.isPro && !status.isFamily) {
+      setPaywallOpen(true)
+      return
+    }
     persistMealForRecipe(meal, '/leftovers', 'leftovers')
     sessionStorage.setItem('recipe-open-cook', 'true')
     router.push('/tonight/recipe')
@@ -220,7 +224,6 @@ export function LeftoverRecipeSuggestions({ leftoverId, leftoverName, isPlusMemb
             {suggestions.map((s, i) => (
               (() => {
                 const meal = toMeal(s)
-                const recipe = mealToRecipe(meal, 'leftovers')
                 return (
                   <motion.div
                     key={s.id}
@@ -249,27 +252,15 @@ export function LeftoverRecipeSuggestions({ leftoverId, leftoverName, isPlusMemb
                       </span>
                       <span>Uses: {s.usesIngredients.slice(0, 3).join(', ')}</span>
                     </div>
-                    <div className="grid grid-cols-4 gap-1.5 pt-1">
+                    <div className="grid grid-cols-3 gap-1.5 pt-1">
                       <button onClick={() => cookMeal(meal)} className="rounded-lg bg-emerald-600 px-2 py-2 text-[11px] font-semibold text-white">
                         <ChefHat className="mx-auto h-3.5 w-3.5" />Cook
-                      </button>
-                      <button onClick={() => { setAudioStep(0); setAudioMealId(audioMealId === s.id ? null : s.id) }} className="rounded-lg bg-white/10 px-2 py-2 text-[11px] font-semibold text-zinc-200">
-                        <Volume2 className="mx-auto h-3.5 w-3.5" />Listen
                       </button>
                       <SaveMealButton meal={meal} source="leftovers" className="h-auto min-h-0 w-full rounded-lg bg-white/10 px-2 py-2 text-zinc-200 hover:bg-white/15" />
                       <button onClick={() => addGroceries(meal)} className="rounded-lg bg-white/10 px-2 py-2 text-[11px] font-semibold text-zinc-200">
                         <ShoppingCart className="mx-auto h-3.5 w-3.5" />List
                       </button>
                     </div>
-                    {audioMealId === s.id && (
-                      <RecipeAudioPlayer
-                        recipeId={recipe.id}
-                        recipe={recipe}
-                        isPlusMember={isPlusMember}
-                        activeStepIndex={audioStep}
-                        onStepChange={setAudioStep}
-                      />
-                    )}
                   </motion.div>
                 )
               })()
@@ -277,6 +268,14 @@ export function LeftoverRecipeSuggestions({ leftoverId, leftoverName, isPlusMemb
           </motion.div>
         )}
       </AnimatePresence>
+      <PaywallDialog
+        open={paywallOpen}
+        onOpenChange={setPaywallOpen}
+        title="Unlock full recipes with Plus"
+        description="Cook leftover ideas with guided steps, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning."
+        isAuthenticated={status.isAuthenticated}
+        redirectPath="/leftovers"
+      />
     </div>
   )
 }

@@ -11,7 +11,7 @@ type Props = {
 function Bar({ value, max, color }: { value: number; max: number; color: string }) {
   const pct = Math.min(100, Math.round((value / max) * 100))
   return (
-    <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+    <div className="h-1.5 w-full overflow-hidden rounded-full bg-orange-100">
       <div
         className="h-full rounded-full transition-all"
         style={{ width: `${pct}%`, backgroundColor: color }}
@@ -29,19 +29,19 @@ export function NutritionCard({ nutrition, perServing = true }: Props) {
   ]
 
   return (
-    <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
-      <h2 className="mb-4 flex items-center gap-2 text-base font-semibold text-white">
+    <div className="rounded-3xl border border-orange-100/80 bg-white/88 p-5 shadow-sm backdrop-blur">
+      <h2 className="mb-4 flex items-center gap-2 text-base font-semibold text-slate-950">
         <Activity className="h-4 w-4 text-[#D97757]" />
         Nutrition
-        {perServing && <span className="text-xs font-normal text-white/40">per serving</span>}
+        {perServing && <span className="text-xs font-normal text-slate-500">per serving</span>}
       </h2>
 
       <div className="space-y-3">
         {items.map((item) => (
           <div key={item.label}>
             <div className="mb-1 flex items-center justify-between">
-              <span className="text-xs text-white/60">{item.label}</span>
-              <span className="text-xs font-medium text-white/80">
+              <span className="text-xs text-slate-500">{item.label}</span>
+              <span className="text-xs font-medium text-slate-700">
                 {item.value}{item.unit}
               </span>
             </div>

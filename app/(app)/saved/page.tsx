@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
-import { Bookmark, Pencil, Trash2, Globe, Lock, Calendar, Search, PlusCircle, ChefHat, ShoppingCart, Volume2 } from 'lucide-react'
+import { Bookmark, Pencil, Trash2, Globe, Lock, Calendar, Search, PlusCircle, ChefHat, ShoppingCart } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
@@ -14,8 +14,7 @@ import { EditMealModal } from '@/components/content/EditMealModal'
 import type { SavedMealSummary } from '@/lib/content/types'
 import type { SmartMealResult } from '@/lib/engine/types'
 import { useWeeklyPlanStore } from '@/lib/planner/store'
-import { MealPillar, PILLAR_LABELS, mealToRecipe, pillarLabel } from '@/lib/recipes/canonical'
-import { RecipeAudioPlayer } from '@/components/recipes/RecipeAudioPlayer'
+import { MealPillar, PILLAR_LABELS, pillarLabel } from '@/lib/recipes/canonical'
 
 const CUISINE_EMOJI: Record<string, string> = {
   italian: '🍝',
@@ -43,8 +42,6 @@ export default function SavedMealsPage() {
   const [search, setSearch] = useState('')
   const [sourceFilter, setSourceFilter] = useState<'all' | MealPillar>('all')
   const [sortMode, setSortMode] = useState<'newest' | 'favorites'>('newest')
-  const [audioMeal, setAudioMeal] = useState<SmartMealResult | null>(null)
-  const [audioStep, setAudioStep] = useState(0)
   const { plan, selectedDayIndex, setPlan, setSelectedDayIndex, addCustomItem } = useWeeklyPlanStore()
 
   useEffect(() => {
@@ -124,16 +121,6 @@ export default function SavedMealsPage() {
     sessionStorage.setItem('recipe-back', '/saved')
     sessionStorage.setItem('recipe-source', (meal.pillar_source as MealPillar | undefined) ?? 'saved')
     router.push('/tonight/recipe')
-  }
-
-  async function handleListen(meal: SavedMealSummary) {
-    const mealData = await fetchMealData(meal.id)
-    if (!mealData) {
-      toast.error('Could not load meal details.')
-      return
-    }
-    setAudioStep(0)
-    setAudioMeal(mealData)
   }
 
   async function handleAddGroceries(meal: SavedMealSummary) {
@@ -227,15 +214,6 @@ export default function SavedMealsPage() {
               <option value="favorites">Favorites A-Z</option>
             </select>
           </div>
-          {audioMeal && (
-            <RecipeAudioPlayer
-              recipeId={audioMeal.id}
-              recipe={mealToRecipe(audioMeal, (audioMeal as SmartMealResult & { pillar_source?: MealPillar }).pillar_source ?? 'saved')}
-              isPlusMember
-              activeStepIndex={audioStep}
-              onStepChange={setAudioStep}
-            />
-          )}
         </div>
       )}
 
@@ -328,15 +306,6 @@ export default function SavedMealsPage() {
                 >
                   <ChefHat className="h-3.5 w-3.5" />
                   Cook again
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 text-xs gap-1.5"
-                  onClick={() => void handleListen(meal)}
-                >
-                  <Volume2 className="h-3.5 w-3.5" />
-                  Listen
                 </Button>
                 <Button
                   variant="ghost"

@@ -28,6 +28,9 @@ export default async function CookPage({ params }: Props) {
   ])
 
   const isPlusMember = paywall.isPro || paywall.isFamily
+  if (!isPlusMember) {
+    redirect(`/pricing?feature=cook&redirect=/recipes/${encodeURIComponent(id)}`)
+  }
 
   // Create or resume a cook session
   const { data: existing } = await supabase
@@ -47,5 +50,5 @@ export default async function CookPage({ params }: Props) {
     })
   }
 
-  return <CookMode recipe={recipe} recipeId={id} isPlusMember={isPlusMember} />
+  return <CookMode recipe={recipe} recipeId={id} />
 }

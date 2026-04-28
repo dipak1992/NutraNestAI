@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ChefHat, Share2, Bookmark, BookmarkCheck, Loader2, PlayCircle } from 'lucide-react'
 import type { LoadedRecipe } from '@/app/recipes/[id]/loader'
+import { PaywallDialog } from '@/components/paywall/PaywallDialog'
+import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 
 type Props = {
   recipe: LoadedRecipe
@@ -15,6 +17,8 @@ export function RecipeActions({ recipe, recipeId, hasActiveSession = false }: Pr
   const router = useRouter()
   const [saved, setSaved] = useState(false)
   const [sharing, setSharing] = useState(false)
+  const [paywallOpen, setPaywallOpen] = useState(false)
+  const { status } = usePaywallStatus()
 
   async function handleShare() {
     setSharing(true)
@@ -38,7 +42,13 @@ export function RecipeActions({ recipe, recipeId, hasActiveSession = false }: Pr
       {/* Cook Mode CTA */}
       <button
         type="button"
-        onClick={() => router.push(`/recipes/${recipeId}/cook`)}
+        onClick={() => {
+          if (!status.isPro && !status.isFamily) {
+            setPaywallOpen(true)
+            return
+          }
+          router.push(`/recipes/${recipeId}/cook`)
+        }}
         className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-[#D97757] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#c4694a] sm:flex-none"
       >
         {hasActiveSession ? (
@@ -58,7 +68,7 @@ export function RecipeActions({ recipe, recipeId, hasActiveSession = false }: Pr
       <button
         type="button"
         onClick={() => setSaved((s) => !s)}
-        className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-white/70 transition hover:bg-white/10"
+        className="flex items-center gap-2 rounded-2xl border border-orange-100 bg-white/80 px-4 py-3 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-orange-50"
         aria-label={saved ? 'Unsave recipe' : 'Save recipe'}
       >
         {saved ? (
@@ -74,7 +84,7 @@ export function RecipeActions({ recipe, recipeId, hasActiveSession = false }: Pr
         type="button"
         onClick={handleShare}
         disabled={sharing}
-        className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-white/70 transition hover:bg-white/10 disabled:opacity-50"
+        className="flex items-center gap-2 rounded-2xl border border-orange-100 bg-white/80 px-4 py-3 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-orange-50 disabled:opacity-50"
         aria-label="Share recipe"
       >
         {sharing ? (
@@ -84,6 +94,14 @@ export function RecipeActions({ recipe, recipeId, hasActiveSession = false }: Pr
         )}
         Share
       </button>
+      <PaywallDialog
+        open={paywallOpen}
+        onOpenChange={setPaywallOpen}
+        title="Unlock full recipes with Plus"
+        description="Start Cooking is a Plus feature. Upgrade for guided recipes, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning."
+        isAuthenticated={status.isAuthenticated}
+        redirectPath={`/recipes/${recipeId}`}
+      />
     </div>
   )
 }

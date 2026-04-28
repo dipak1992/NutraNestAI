@@ -8,6 +8,9 @@ import posthog from 'posthog-js'
 import { useOnboardingStore, useLightOnboardingStore } from '@/lib/store'
 import { useLearningStore } from '@/lib/learning/store'
 import { useWeeklyPlanStore } from '@/lib/planner/store'
+import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
+import { useDailySwapLimit } from '@/lib/paywall/use-daily-swap-limit'
+import { PaywallDialog } from '@/components/paywall/PaywallDialog'
 import { showRewardToast } from '@/lib/reward-toast'
 import {
   Dialog,
@@ -67,12 +70,19 @@ export function TonightRecommendation({ refreshKey }: Props) {
   const [swappingDinner, setSwappingDinner] = useState(false)
   const [cookedMealId, setCookedMealId] = useState<string | null>(null)
   const [groceryMeal, setGroceryMeal] = useState<SmartMealResult | null>(null)
+  const [paywallOpen, setPaywallOpen] = useState(false)
+  const [paywallCopy, setPaywallCopy] = useState({
+    title: 'Unlock full recipes with Plus',
+    description: 'Cook This is a Plus feature. Upgrade for guided recipes, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning.',
+  })
   const shownIdsRef = useRef<string[]>([])
 
   const { state: { members } } = useOnboardingStore()
   const light = useLightOnboardingStore()
   const { getBoosts, recordLike, recordReject } = useLearningStore()
   const { addCustomItem } = useWeeklyPlanStore()
+  const { status: paywallStatus } = usePaywallStatus()
+  const swaps = useDailySwapLimit(paywallStatus, 'today-picks')
 
   const getHousehold = useCallback(() =>
     members?.length
@@ -131,6 +141,14 @@ export function TonightRecommendation({ refreshKey }: Props) {
   }, [refreshKey])
 
   const handleCook = useCallback((meal: SmartMealResult) => {
+    if (!paywallStatus.isPro && !paywallStatus.isFamily) {
+      setPaywallCopy({
+        title: 'Unlock full recipes with Plus',
+        description: 'Cook This is a Plus feature. Upgrade for guided recipes, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning.',
+      })
+      setPaywallOpen(true)
+      return
+    }
     recordLike(meal)
     sendSignal(meal.id, 'cooked', { mode: 'tonight' })
     posthog.capture('meal_cooked', { meal_id: meal.id, meal_name: meal.title, mode: 'tonight' })
@@ -139,10 +157,18 @@ export function TonightRecommendation({ refreshKey }: Props) {
     sessionStorage.setItem('recipe-source', 'tonight')
     setCookedMealId(meal.id)
     setGroceryMeal(meal)
-  }, [recordLike])
+  }, [recordLike, paywallStatus.isPro, paywallStatus.isFamily])
 
   const handleSwapLunch = useCallback(async () => {
     if (!lunchMeal) return
+    if (!swaps.recordSwap()) {
+      setPaywallCopy({
+        title: 'You’ve used your free meal changes today.',
+        description: 'Free includes 3 meal swaps per day. Upgrade to Plus for unlimited meal swaps, personalized picks, and full Cook This recipes.',
+      })
+      setPaywallOpen(true)
+      return
+    }
     recordReject(lunchMeal)
     sendSignal(lunchMeal.id, 'swapped', { slot: 'lunch' })
     clearDailyCache()
@@ -156,10 +182,18 @@ export function TonightRecommendation({ refreshKey }: Props) {
     } finally {
       setSwappingLunch(false)
     }
-  }, [lunchMeal, dinnerMeal, recordReject, buildBody])
+  }, [lunchMeal, dinnerMeal, recordReject, buildBody, swaps])
 
   const handleSwapDinner = useCallback(async () => {
     if (!dinnerMeal) return
+    if (!swaps.recordSwap()) {
+      setPaywallCopy({
+        title: 'You’ve used your free meal changes today.',
+        description: 'Free includes 3 meal swaps per day. Upgrade to Plus for unlimited meal swaps, personalized picks, and full Cook This recipes.',
+      })
+      setPaywallOpen(true)
+      return
+    }
     recordReject(dinnerMeal)
     sendSignal(dinnerMeal.id, 'swapped', { slot: 'dinner' })
     clearDailyCache()
@@ -173,7 +207,7 @@ export function TonightRecommendation({ refreshKey }: Props) {
     } finally {
       setSwappingDinner(false)
     }
-  }, [dinnerMeal, lunchMeal, recordReject, buildBody])
+  }, [dinnerMeal, lunchMeal, recordReject, buildBody, swaps])
 
   const handleOrder = useCallback((meal: SmartMealResult) => {
     sendSignal(meal.id, 'accepted', { intent: 'order_ingredients' })
@@ -295,6 +329,14 @@ export function TonightRecommendation({ refreshKey }: Props) {
           </div>
         </DialogContent>
       </Dialog>
+      <PaywallDialog
+        open={paywallOpen}
+        onOpenChange={setPaywallOpen}
+        title={paywallCopy.title}
+        description={paywallCopy.description}
+        isAuthenticated={paywallStatus.isAuthenticated}
+        redirectPath="/dashboard"
+      />
     </section>
   )
 }

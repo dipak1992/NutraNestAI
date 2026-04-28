@@ -61,8 +61,8 @@ export function SectionDietary({ dietary: initialDietary, dislikes: initialDisli
   }
 
   return (
-    <section className="rounded-3xl border border-white/10 bg-white/5 p-6">
-      <h2 className="mb-5 flex items-center gap-2 text-base font-semibold text-white">
+    <section className="rounded-3xl border border-orange-100 bg-white/82 p-6">
+      <h2 className="mb-5 flex items-center gap-2 text-base font-semibold text-slate-950">
         <Leaf className="h-4 w-4 text-[#D97757]" />
         Dietary preferences
       </h2>
@@ -79,8 +79,8 @@ export function SectionDietary({ dietary: initialDietary, dislikes: initialDisli
               className={[
                 'flex items-center gap-2 rounded-2xl border px-3 py-2.5 text-left text-sm font-medium transition',
                 active
-                  ? 'border-[#D97757] bg-[#D97757]/15 text-white'
-                  : 'border-white/10 bg-white/5 text-white/70 hover:border-white/20 hover:bg-white/10',
+                  ? 'border-[#D97757] bg-[#D97757]/15 text-[#9f4f32]'
+                  : 'border-orange-100 bg-white/82 text-slate-600 hover:border-orange-200 hover:bg-orange-50',
               ].join(' ')}
             >
               <span>{opt.emoji}</span>
@@ -92,13 +92,13 @@ export function SectionDietary({ dietary: initialDietary, dislikes: initialDisli
 
       {/* Dislikes */}
       <div className="mb-5">
-        <label className="mb-2 block text-xs font-medium text-white/50">Foods to avoid</label>
+        <label className="mb-2 block text-xs font-medium text-slate-500">Foods to avoid</label>
         <div className="mb-2 flex flex-wrap gap-2">
           {dislikes.map((d) => (
-            <span key={d} className="flex items-center gap-1.5 rounded-full border border-[#D97757]/40 bg-[#D97757]/10 px-3 py-1 text-sm text-white">
+            <span key={d} className="flex items-center gap-1.5 rounded-full border border-[#D97757]/40 bg-[#D97757]/10 px-3 py-1 text-sm text-[#9f4f32]">
               {d}
               <button type="button" onClick={() => setDislikes((prev) => prev.filter((x) => x !== d))}>
-                <X className="h-3 w-3 text-white/50 hover:text-white" />
+                <X className="h-3 w-3 text-slate-500 hover:text-slate-900" />
               </button>
             </span>
           ))}
@@ -110,9 +110,9 @@ export function SectionDietary({ dietary: initialDietary, dislikes: initialDisli
             onChange={(e) => setDislikeInput(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addDislike() } }}
             placeholder="Add a food to avoid…"
-            className="flex-1 rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:border-[#D97757]/60"
+            className="flex-1 rounded-2xl border border-orange-100 bg-white/82 px-4 py-2.5 text-sm text-slate-950 placeholder-slate-400 outline-none focus:border-[#D97757]/60"
           />
-          <button type="button" onClick={addDislike} className="rounded-2xl bg-white/10 px-4 py-2.5 text-sm text-white hover:bg-white/20">
+          <button type="button" onClick={addDislike} className="rounded-2xl bg-orange-50 px-4 py-2.5 text-sm text-slate-700 hover:bg-orange-100">
             Add
           </button>
         </div>

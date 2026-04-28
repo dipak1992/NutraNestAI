@@ -29,7 +29,7 @@ export function SectionDangerZone() {
         <AlertTriangle className="h-4 w-4" />
         Danger zone
       </h2>
-      <p className="mb-5 text-sm text-white/50">
+      <p className="mb-5 text-sm text-slate-500">
         Permanently delete your account and all associated data. This cannot be undone.
       </p>
 
@@ -44,7 +44,7 @@ export function SectionDangerZone() {
         </button>
       ) : (
         <div className="space-y-3">
-          <p className="text-sm text-white/70">
+          <p className="text-sm text-slate-600">
             Type <strong className="text-red-400">DELETE</strong> to confirm:
           </p>
           <input
@@ -52,13 +52,13 @@ export function SectionDangerZone() {
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
             placeholder="DELETE"
-            className="w-full rounded-2xl border border-red-500/30 bg-red-500/5 px-4 py-3 text-sm text-white placeholder-white/20 outline-none focus:border-red-500/60"
+            className="w-full rounded-2xl border border-red-500/30 bg-red-500/5 px-4 py-3 text-sm text-slate-950 placeholder-slate-400 outline-none focus:border-red-500/60"
           />
           <div className="flex gap-3">
             <button
               type="button"
               onClick={() => { setShowConfirm(false); setConfirm('') }}
-              className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white/60 hover:bg-white/10"
+              className="rounded-2xl border border-orange-100 bg-white/82 px-4 py-2.5 text-sm text-slate-500 hover:bg-orange-50"
             >
               Cancel
             </button>

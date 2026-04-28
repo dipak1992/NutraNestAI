@@ -82,11 +82,11 @@ export function SectionHousehold({ members: initialMembers, currentPlan }: Props
   }
 
   return (
-    <section className="rounded-3xl border border-white/10 bg-white/5 p-6">
-      <h2 className="mb-5 flex items-center gap-2 text-base font-semibold text-white">
+    <section className="rounded-3xl border border-orange-100 bg-white/82 p-6">
+      <h2 className="mb-5 flex items-center gap-2 text-base font-semibold text-slate-950">
         <Users className="h-4 w-4 text-[#D97757]" />
         Household members
-        <span className="ml-auto text-xs font-normal text-white/40">
+        <span className="ml-auto text-xs font-normal text-slate-400">
           {members.length} / {limit} members
         </span>
       </h2>
@@ -97,21 +97,21 @@ export function SectionHousehold({ members: initialMembers, currentPlan }: Props
           {members.map((member) => (
             <li
               key={member.id}
-              className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+              className="flex items-center justify-between rounded-2xl border border-orange-100 bg-white/82 px-4 py-3"
             >
               <div className="flex items-center gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-sm">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-50 text-sm">
                   {member.role === 'owner' ? (
                     <Crown className="h-4 w-4 text-[#B8935A]" />
                   ) : member.status === 'accepted' ? (
                     <UserCheck className="h-4 w-4 text-emerald-400" />
                   ) : (
-                    <Mail className="h-4 w-4 text-white/40" />
+                    <Mail className="h-4 w-4 text-slate-400" />
                   )}
                 </div>
                 <div>
-                  <p className="text-sm text-white/80">{member.invited_email}</p>
-                  <p className="text-xs capitalize text-white/40">
+                  <p className="text-sm text-slate-700">{member.invited_email}</p>
+                  <p className="text-xs capitalize text-slate-400">
                     {member.status === 'pending' ? 'Invite pending' : member.status}
                   </p>
                 </div>
@@ -122,7 +122,7 @@ export function SectionHousehold({ members: initialMembers, currentPlan }: Props
                   type="button"
                   onClick={() => handleRemove(member.id)}
                   disabled={removing === member.id}
-                  className="flex h-8 w-8 items-center justify-center rounded-full text-white/30 transition hover:bg-red-500/10 hover:text-red-400 disabled:opacity-40"
+                  className="flex h-8 w-8 items-center justify-center rounded-full text-slate-300 transition hover:bg-red-500/10 hover:text-red-400 disabled:opacity-40"
                   aria-label="Remove member"
                 >
                   {removing === member.id ? (
@@ -146,7 +146,7 @@ export function SectionHousehold({ members: initialMembers, currentPlan }: Props
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Invite by email…"
             required
-            className="flex-1 rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:border-[#D97757]/60 focus:ring-1 focus:ring-[#D97757]/40"
+            className="flex-1 rounded-2xl border border-orange-100 bg-white/82 px-4 py-2.5 text-sm text-slate-950 placeholder-slate-400 outline-none focus:border-[#D97757]/60 focus:ring-1 focus:ring-[#D97757]/40"
           />
           <button
             type="submit"
@@ -158,9 +158,9 @@ export function SectionHousehold({ members: initialMembers, currentPlan }: Props
           </button>
         </form>
       ) : (
-        <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/50">
+        <div className="rounded-2xl border border-orange-100 bg-white/82 px-4 py-3 text-sm text-slate-500">
           Member limit reached for your{' '}
-          <span className="capitalize text-white/70">{currentPlan}</span> plan.{' '}
+          <span className="capitalize text-slate-600">{currentPlan}</span> plan.{' '}
           <a href="/pricing" className="text-[#D97757] hover:underline">
             Upgrade to add more
           </a>

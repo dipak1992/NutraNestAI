@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { quickActionsConfig } from '@/config/quick-actions'
 import { getGreeting } from '@/lib/dashboard/greeting'
 import { calcBudget } from '@/lib/dashboard/budget'
+import { getTonightSuggestion } from '@/lib/dashboard/tonight-intelligence'
 import { buildNudgeCandidates, pickNudge } from '@/lib/dashboard/nudges'
 import type {
   DashboardPayload,
@@ -73,24 +74,7 @@ export async function getDashboardPayload(
 
   const greetingInfo = getGreeting()
 
-  // --- Mock tonight (replace with AI/DB call) ---
-  const tonight = {
-    recipe: {
-      id: 'rec_tonight',
-      name: 'Honey garlic chicken',
-      image: '/landing/family-dinner.jpg',
-      cookTimeMin: 30,
-      difficulty: 'easy' as const,
-      servings: 4,
-      costTotal: 14,
-      costPerServing: 3.5,
-      tags: ['family-friendly', 'high-protein'],
-    },
-    reason: "Based on the chicken in your fridge + an easy weeknight prep window.",
-    alternativesAvailable: 3,
-    isFromPantry: true,
-    usesLeftover: null,
-  }
+  const tonight = await getTonightSuggestion(supabase, userId, plan)
 
   // --- Mock leftovers (replace with DB query) ---
   const leftovers: Leftover[] = []

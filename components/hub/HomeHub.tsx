@@ -17,6 +17,8 @@ import { InsightCards } from '@/components/habit/InsightCards'
 import { useOnboardingStore, useLightOnboardingStore } from '@/lib/store'
 import { useLearningStore } from '@/lib/learning/store'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
+import { useDailySwapLimit } from '@/lib/paywall/use-daily-swap-limit'
+import { PaywallDialog } from '@/components/paywall/PaywallDialog'
 import { DEMO_WEEKLY_PLAN } from '@/lib/demo-data'
 import {
   decideMeal,
@@ -90,6 +92,11 @@ export function HomeHub({ userName }: Props) {
   const [swapping, setSwapping] = useState(false)
   const [activeChip, setActiveChip] = useState<SmartChipId | null>(null)
   const [pantryPhase, setPantryPhase] = useState<'capture' | 'results' | null>(null)
+  const [paywallOpen, setPaywallOpen] = useState(false)
+  const [paywallCopy, setPaywallCopy] = useState({
+    title: 'Unlock full recipes with Plus',
+    description: 'Cook This is a Plus feature. Upgrade for guided recipes, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning.',
+  })
   const shownIdsRef = useRef<string[]>([])
 
   // ── Stores ───────────────────────────────────────────────
@@ -98,6 +105,7 @@ export function HomeHub({ userName }: Props) {
   const router = useRouter()
   const { feedbackHistory, getBoosts, recordLike, recordReject } = useLearningStore()
   const { status: paywallStatus } = usePaywallStatus()
+  const swaps = useDailySwapLimit(paywallStatus, 'home-hub')
 
   // ── Derived ──────────────────────────────────────────────
   const savedCount = useMemo(() =>
@@ -248,6 +256,14 @@ export function HomeHub({ userName }: Props) {
   // ── Meal actions ──────────────────────────────────────────
 
   const handleCook = useCallback((m: SmartMealResult) => {
+    if (!paywallStatus.isPro && !paywallStatus.isFamily) {
+      setPaywallCopy({
+        title: 'Unlock full recipes with Plus',
+        description: 'Cook This is a Plus feature. Upgrade for guided recipes, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning.',
+      })
+      setPaywallOpen(true)
+      return
+    }
     const source: MealPillar = activeTile === 'pantry' ? 'snap' : 'tonight'
     recordLike(m)
     sendSignal(m.id, 'cooked', { mode: activeTile ?? 'tonight' })
@@ -255,9 +271,17 @@ export function HomeHub({ userName }: Props) {
     persistMealForRecipe(m, '/dashboard', source)
     sessionStorage.setItem('recipe-open-cook', 'true')
     router.push('/tonight/recipe')
-  }, [recordLike, activeTile, router])
+  }, [recordLike, activeTile, router, paywallStatus.isPro, paywallStatus.isFamily])
 
   const handleSwap = useCallback(async (m: SmartMealResult) => {
+    if (!swaps.recordSwap()) {
+      setPaywallCopy({
+        title: 'You’ve used your free meal changes today.',
+        description: 'Free includes 3 meal swaps per day. Upgrade to Plus for unlimited meal swaps, personalized picks, and full Cook This recipes.',
+      })
+      setPaywallOpen(true)
+      return
+    }
     recordReject(m)
     sendSignal(m.id, 'swapped', { mode: activeTile ?? 'tonight' })
     posthog.capture('meal_swapped', { meal_id: m.id, meal_name: m.title, mode: activeTile ?? 'tonight', active_chip: activeChip })
@@ -272,7 +296,7 @@ export function HomeHub({ userName }: Props) {
     } finally {
       setSwapping(false)
     }
-  }, [recordReject, activeTile, activeChip, fetchQuick, fetchSurprise, fetchPantry])
+  }, [recordReject, activeTile, activeChip, fetchQuick, fetchSurprise, fetchPantry, swaps])
 
   const handleOrder = useCallback((m: SmartMealResult) => {
     sendSignal(m.id, 'accepted', { mode: activeTile ?? 'tonight', intent: 'order_ingredients' })
@@ -464,7 +488,7 @@ export function HomeHub({ userName }: Props) {
                       </p>
                       <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
                         {savedCount > 0 ? `${savedCount} saved to your favorites. ` : ''}
-                        Pro members save an average of 4.2 hours per week on meal planning.
+                        Plus members save an average of 4.2 hours per week on meal planning.
                       </p>
                     </div>
                   </div>
@@ -472,7 +496,7 @@ export function HomeHub({ userName }: Props) {
                     href="/pricing"
                     className="mt-3 flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition-colors"
                   >
-                    See your Pro preview
+                    See your Plus preview
                     <ChevronRight className="h-4 w-4" />
                   </Link>
                 </div>
@@ -619,6 +643,14 @@ export function HomeHub({ userName }: Props) {
         </AnimatePresence>
       </div>
     </div>
+    <PaywallDialog
+      open={paywallOpen}
+      onOpenChange={setPaywallOpen}
+      title={paywallCopy.title}
+      description={paywallCopy.description}
+      isAuthenticated={paywallStatus.isAuthenticated}
+      redirectPath="/dashboard"
+    />
 
     </>
   )

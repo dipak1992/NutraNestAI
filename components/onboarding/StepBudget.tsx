@@ -26,8 +26,8 @@ export default function StepBudget() {
           <DollarSign className="h-8 w-8 text-[#B8935A]" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-white">Weekly grocery budget</h2>
-          <p className="mt-1 text-sm text-white/60">
+          <h2 className="text-2xl font-bold text-slate-950">Weekly grocery budget</h2>
+          <p className="mt-1 text-sm text-slate-500">
             We'll optimise ingredient overlap to keep costs down.
           </p>
         </div>
@@ -46,18 +46,18 @@ export default function StepBudget() {
                 'flex flex-col items-start rounded-2xl border px-4 py-4 text-left transition',
                 active
                   ? 'border-[#B8935A] bg-[#B8935A]/15'
-                  : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10',
+                  : 'border-orange-100 bg-white/82 hover:border-orange-200 hover:bg-orange-50',
               ].join(' ')}
             >
               <span
                 className={[
                   'text-base font-bold',
-                  active ? 'text-[#B8935A]' : 'text-white',
+                  active ? 'text-[#B8935A]' : 'text-slate-950',
                 ].join(' ')}
               >
                 {preset.label}
               </span>
-              <span className="mt-1 text-xs text-white/50">{preset.hint}</span>
+              <span className="mt-1 text-xs text-slate-500">{preset.hint}</span>
             </button>
           )
         })}
@@ -65,11 +65,11 @@ export default function StepBudget() {
 
       {/* Custom amount */}
       <div>
-        <label className="mb-1.5 block text-xs font-medium text-white/50">
+        <label className="mb-1.5 block text-xs font-medium text-slate-500">
           Or enter a custom amount
         </label>
         <div className="relative">
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40">$</span>
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">$</span>
           <input
             type="number"
             min={10}
@@ -81,13 +81,13 @@ export default function StepBudget() {
               patch({ weeklyBudget: isNaN(v) ? null : v })
             }}
             placeholder="e.g. 120"
-            className="w-full rounded-2xl border border-white/10 bg-white/5 py-3 pl-8 pr-4 text-sm text-white placeholder-white/30 outline-none focus:border-[#B8935A]/60 focus:ring-1 focus:ring-[#B8935A]/40"
+            className="w-full rounded-2xl border border-orange-100 bg-white/82 py-3 pl-8 pr-4 text-sm text-slate-950 placeholder-slate-400 outline-none focus:border-[#B8935A]/60 focus:ring-1 focus:ring-[#B8935A]/40"
           />
         </div>
       </div>
 
       {selected === null && (
-        <p className="text-center text-xs text-white/40">
+        <p className="text-center text-xs text-slate-400">
           Skip if you'd rather not set a budget.
         </p>
       )}

@@ -50,14 +50,14 @@ export default function StepDone() {
         )}
 
         <div>
-          <h2 className="text-2xl font-bold text-white">
+          <h2 className="text-2xl font-bold text-slate-950">
             {isSubmitting
               ? 'Setting up your kitchen…'
               : error
               ? 'Something went wrong'
               : "You're all set! 🎉"}
           </h2>
-          <p className="mt-1 text-sm text-white/60">
+          <p className="mt-1 text-sm text-slate-500">
             {isSubmitting
               ? 'Saving your preferences…'
               : error
@@ -73,7 +73,7 @@ export default function StepDone() {
           {HIGHLIGHTS.map((h) => (
             <li key={h.text} className="flex items-center gap-3">
               <span className="text-xl">{h.emoji}</span>
-              <span className="text-sm text-white/70">{h.text}</span>
+              <span className="text-sm text-slate-600">{h.text}</span>
             </li>
           ))}
         </ul>

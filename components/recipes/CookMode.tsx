@@ -6,7 +6,6 @@ import {
 } from 'lucide-react'
 import type { LoadedRecipe } from '@/app/recipes/[id]/loader'
 import { CookCompleteDialog } from './CookCompleteDialog'
-import { RecipeAudioPlayer } from './RecipeAudioPlayer'
 import { recipeSignature } from '@/lib/recipes/canonical'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -16,7 +15,6 @@ type Recipe = LoadedRecipe
 type Props = {
   recipe: Recipe
   recipeId: string
-  isPlusMember?: boolean
 }
 
 // ─── Timer hook ───────────────────────────────────────────────────────────────
@@ -52,16 +50,16 @@ function useTimer(initialSeconds: number) {
 function StepTimer({ seconds: initialSeconds }: { seconds: number }) {
   const timer = useTimer(initialSeconds)
   return (
-    <div className="mt-4 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+    <div className="mt-4 flex items-center gap-3 rounded-2xl border border-orange-100 bg-white/82 px-4 py-3 shadow-sm">
       <Timer className={['h-4 w-4', timer.done ? 'text-emerald-400' : 'text-[#D97757]'].join(' ')} />
-      <span className={['text-lg font-mono font-bold tabular-nums', timer.done ? 'text-emerald-400' : 'text-white'].join(' ')}>
+      <span className={['text-lg font-mono font-bold tabular-nums', timer.done ? 'text-emerald-600' : 'text-slate-950'].join(' ')}>
         {timer.display}
       </span>
       <div className="ml-auto flex gap-2">
         <button
           type="button"
           onClick={timer.toggle}
-          className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
+          className="flex h-8 w-8 items-center justify-center rounded-full border border-orange-100 bg-orange-50 text-slate-700 hover:bg-orange-100"
           aria-label={timer.running ? 'Pause' : 'Start'}
         >
           {timer.running ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
@@ -69,7 +67,7 @@ function StepTimer({ seconds: initialSeconds }: { seconds: number }) {
         <button
           type="button"
           onClick={timer.reset}
-          className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
+          className="flex h-8 w-8 items-center justify-center rounded-full border border-orange-100 bg-orange-50 text-slate-700 hover:bg-orange-100"
           aria-label="Reset"
         >
           <RotateCcw className="h-3.5 w-3.5" />
@@ -99,9 +97,9 @@ function IngredientCheckStep({ ingredients }: { ingredients: Recipe['ingredients
         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#D97757] text-sm font-bold text-white">
           ✓
         </div>
-        <p className="text-sm text-white/50">Check your ingredients</p>
+        <p className="text-sm text-slate-500">Check your ingredients</p>
       </div>
-      <h2 className="mb-4 text-xl font-medium text-white">
+      <h2 className="mb-4 text-xl font-medium text-slate-950">
         Gather everything before you start
       </h2>
       <ul className="space-y-2">
@@ -113,12 +111,12 @@ function IngredientCheckStep({ ingredients }: { ingredients: Recipe['ingredients
               className={[
                 'flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-left transition',
                 checked.has(i)
-                  ? 'border-emerald-500/30 bg-emerald-500/10 text-white/60 line-through'
-                  : 'border-white/10 bg-white/5 text-white/80 hover:bg-white/10',
+                  ? 'border-emerald-200 bg-emerald-50 text-slate-500 line-through'
+                  : 'border-orange-100 bg-white/82 text-slate-700 hover:bg-orange-50',
               ].join(' ')}
             >
               <span className="text-sm">{ing.name}</span>
-              <span className="flex items-center gap-2 text-sm text-white/50">
+              <span className="flex items-center gap-2 text-sm text-slate-500">
                 {ing.quantity} {ing.unit}
                 {checked.has(i) && <Check className="h-4 w-4 text-emerald-400" />}
               </span>
@@ -132,12 +130,11 @@ function IngredientCheckStep({ ingredients }: { ingredients: Recipe['ingredients
 
 // ─── CookMode ─────────────────────────────────────────────────────────────────
 
-export function CookMode({ recipe, recipeId, isPlusMember = false }: Props) {
+export function CookMode({ recipe, recipeId }: Props) {
   // -1 = ingredient check step, 0..n-1 = cooking steps
   const [current, setCurrent] = useState(-1)
   const [completed, setCompleted] = useState<Set<number>>(new Set())
   const [showComplete, setShowComplete] = useState(false)
-  const [audioActiveStep, setAudioActiveStep] = useState(0)
   const wakeLockRef = useRef<WakeLockSentinel | null>(null)
   const signature = recipeSignature(recipe)
 
@@ -151,7 +148,6 @@ export function CookMode({ recipe, recipeId, isPlusMember = false }: Props) {
     setCurrent(-1)
     setCompleted(new Set())
     setShowComplete(false)
-    setAudioActiveStep(0)
   }, [signature])
 
   // ── Wake lock ──────────────────────────────────────────────────────────────
@@ -187,13 +183,6 @@ export function CookMode({ recipe, recipeId, isPlusMember = false }: Props) {
     return () => window.removeEventListener('keydown', onKey)
   }, [isFirst, isLast, steps.length, showComplete])
 
-  // Sync audio player step → current cook step
-  useEffect(() => {
-    if (audioActiveStep >= 0 && audioActiveStep < steps.length) {
-      setCurrent(audioActiveStep)
-    }
-  }, [audioActiveStep, steps.length])
-
   function markDone(idx: number) {
     setCompleted((prev) => {
       const next = new Set(prev)
@@ -208,28 +197,28 @@ export function CookMode({ recipe, recipeId, isPlusMember = false }: Props) {
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex flex-col bg-[#0f0f0f]">
+      <div className="fixed inset-0 z-50 flex flex-col bg-[radial-gradient(circle_at_top_left,rgba(217,119,87,0.16),transparent_34%),linear-gradient(180deg,#fff7ed_0%,#fefce8_30%,#f8fafc_100%)] text-slate-950">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+        <div className="flex items-center justify-between border-b border-orange-100/80 bg-white/82 px-4 py-3 backdrop-blur-xl">
           <button
             type="button"
             onClick={() => window.history.back()}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-orange-100 bg-orange-50 text-slate-700"
             aria-label="Exit cook mode"
           >
             <X className="h-4 w-4" />
           </button>
           <div className="text-center">
-            <p className="text-xs text-white/40">Cook Mode</p>
-            <p className="text-sm font-semibold text-white truncate max-w-[180px]">{recipe.name}</p>
+            <p className="text-xs text-slate-500">Cook Mode</p>
+            <p className="text-sm font-semibold text-slate-950 truncate max-w-[180px]">{recipe.name}</p>
           </div>
-          <span className="text-sm text-white/40 tabular-nums">
+          <span className="text-sm text-slate-500 tabular-nums">
             {currentDisplayStep} / {totalDisplaySteps}
           </span>
         </div>
 
         {/* Progress bar */}
-        <div className="h-1 bg-white/10">
+        <div className="h-1 bg-orange-100">
           <div
             className="h-full bg-[#D97757] transition-all duration-300"
             style={{ width: `${(currentDisplayStep / totalDisplaySteps) * 100}%` }}
@@ -241,18 +230,6 @@ export function CookMode({ recipe, recipeId, isPlusMember = false }: Props) {
           {isIngredientStep ? (
             <div className="mx-auto w-full max-w-lg space-y-4">
               <IngredientCheckStep ingredients={recipe.ingredients} />
-
-              {/* Audio player on ingredient step */}
-              <RecipeAudioPlayer
-                recipeId={recipeId}
-                recipe={recipe}
-                isPlusMember={isPlusMember}
-                activeStepIndex={audioActiveStep}
-                onStepChange={(idx) => {
-                  setAudioActiveStep(idx)
-                  setCurrent(idx)
-                }}
-              />
             </div>
           ) : step ? (
             <div className="mx-auto w-full max-w-lg">
@@ -270,7 +247,7 @@ export function CookMode({ recipe, recipeId, isPlusMember = false }: Props) {
               </div>
 
               {/* Instruction */}
-              <p className="text-xl font-medium leading-relaxed text-white">{step.instruction}</p>
+              <p className="text-xl font-medium leading-relaxed text-slate-950">{step.instruction}</p>
 
               {/* Timer if step has one */}
               {step.timerSeconds && step.timerSeconds > 0 && (
@@ -282,7 +259,7 @@ export function CookMode({ recipe, recipeId, isPlusMember = false }: Props) {
                 <button
                   type="button"
                   onClick={() => markDone(current)}
-                  className="mt-6 rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/60 transition hover:bg-white/10"
+                  className="mt-6 rounded-2xl border border-orange-100 bg-white/82 px-4 py-2 text-sm text-slate-600 transition hover:bg-orange-50"
                 >
                   ✓ Mark as done
                 </button>
@@ -292,13 +269,13 @@ export function CookMode({ recipe, recipeId, isPlusMember = false }: Props) {
         </div>
 
         {/* Navigation */}
-        <div className="border-t border-white/10 px-5 py-4">
+        <div className="border-t border-orange-100/80 bg-white/82 px-5 py-4 backdrop-blur-xl">
           <div className="mx-auto flex max-w-lg gap-3">
             <button
               type="button"
               onClick={() => setCurrent((c) => Math.max(-1, c - 1))}
               disabled={isFirst}
-              className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 py-3 text-sm font-medium text-white/70 transition hover:bg-white/10 disabled:opacity-30"
+              className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-orange-100 bg-white py-3 text-sm font-medium text-slate-700 transition hover:bg-orange-50 disabled:opacity-30"
             >
               <ChevronLeft className="h-4 w-4" />
               Back

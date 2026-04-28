@@ -43,8 +43,8 @@ export default function StepDietary() {
           <Leaf className="h-8 w-8 text-[#D97757]" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-white">Dietary preferences</h2>
-          <p className="mt-1 text-sm text-white/60">
+          <h2 className="text-2xl font-bold text-slate-950">Dietary preferences</h2>
+          <p className="mt-1 text-sm text-slate-500">
             Select all that apply — we'll filter every meal accordingly.
           </p>
         </div>
@@ -62,8 +62,8 @@ export default function StepDietary() {
               className={[
                 'flex items-center gap-2 rounded-2xl border px-4 py-3 text-left text-sm font-medium transition',
                 active
-                  ? 'border-[#D97757] bg-[#D97757]/15 text-white'
-                  : 'border-white/10 bg-white/5 text-white/70 hover:border-white/20 hover:bg-white/10',
+                  ? 'border-[#D97757] bg-[#D97757]/15 text-[#9f4f32]'
+                  : 'border-orange-100 bg-white/82 text-slate-600 hover:border-orange-200 hover:bg-orange-50',
               ].join(' ')}
             >
               <span className="text-lg">{opt.emoji}</span>
@@ -75,7 +75,7 @@ export default function StepDietary() {
 
       {/* Skip hint */}
       {selected.length === 0 && (
-        <p className="text-center text-xs text-white/40">
+        <p className="text-center text-xs text-slate-400">
           No restrictions? Leave blank and continue.
         </p>
       )}

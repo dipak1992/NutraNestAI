@@ -8,9 +8,10 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { SaveMealButton } from '@/components/content/SaveMealButton'
 import { CookMode } from '@/components/recipes/CookMode'
-import { RecipeAudioPlayer } from '@/components/recipes/RecipeAudioPlayer'
 import { useWeeklyPlanStore } from '@/lib/planner/store'
 import { mealToRecipe, type MealPillar } from '@/lib/recipes/canonical'
+import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
+import { PaywallDialog } from '@/components/paywall/PaywallDialog'
 import type { SmartMealResult, SmartVariation } from '@/lib/engine/types'
 
 function MemberVariation({ variation }: { variation: SmartVariation }) {
@@ -62,7 +63,8 @@ export default function TonightRecipePage() {
   const [imgFailed, setImgFailed] = useState(false)
   const [source, setSource] = useState<MealPillar>('tonight')
   const [showCookMode, setShowCookMode] = useState(false)
-  const [audioStep, setAudioStep] = useState(0)
+  const [paywallOpen, setPaywallOpen] = useState(false)
+  const { status } = usePaywallStatus()
   const addCustomItem = useWeeklyPlanStore((s) => s.addCustomItem)
 
   useEffect(() => {
@@ -94,6 +96,22 @@ export default function TonightRecipePage() {
 
   const recipe = mealToRecipe(meal, source)
 
+  if (showCookMode && !status.isPro && !status.isFamily) {
+    return (
+      <PaywallDialog
+        open
+        onOpenChange={(open) => {
+          setPaywallOpen(open)
+          if (!open) setShowCookMode(false)
+        }}
+        title="Unlock full recipes with Plus"
+        description="Start Cooking is a Plus feature. Upgrade for guided recipes, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning."
+        isAuthenticated={status.isAuthenticated}
+        redirectPath="/tonight/recipe"
+      />
+    )
+  }
+
   function addIngredientsToGrocery() {
     if (!meal) return
     const items = meal.shoppingList?.length
@@ -121,7 +139,6 @@ export default function TonightRecipePage() {
       <CookMode
         recipe={recipe}
         recipeId={recipe.id}
-        isPlusMember
       />
     )
   }
@@ -166,24 +183,24 @@ export default function TonightRecipePage() {
             )}
           </div>
           <div className="mt-5 flex flex-wrap gap-2">
-            <Button onClick={() => setShowCookMode(true)} className="gap-2 bg-emerald-600 hover:bg-emerald-700">
+            <Button
+              onClick={() => {
+                if (!status.isPro && !status.isFamily) {
+                  setPaywallOpen(true)
+                  return
+                }
+                setShowCookMode(true)
+              }}
+              className="gap-2 bg-emerald-600 hover:bg-emerald-700"
+            >
               <ChefHat className="h-4 w-4" />
-              Let&apos;s Cook
+              Start Cooking
             </Button>
             <SaveMealButton meal={meal} source={source} className="h-10 w-10 border border-border" />
             <Button variant="outline" onClick={addIngredientsToGrocery} className="gap-2">
               <ShoppingCart className="h-4 w-4" />
               Add groceries
             </Button>
-          </div>
-          <div className="mt-4">
-            <RecipeAudioPlayer
-              recipeId={recipe.id}
-              recipe={recipe}
-              isPlusMember
-              activeStepIndex={audioStep}
-              onStepChange={setAudioStep}
-            />
           </div>
         </div>
 
@@ -267,6 +284,14 @@ export default function TonightRecipePage() {
           </section>
         )}
       </div>
+      <PaywallDialog
+        open={paywallOpen}
+        onOpenChange={setPaywallOpen}
+        title="Unlock full recipes with Plus"
+        description="Start Cooking is a Plus feature. Upgrade for guided recipes, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning."
+        isAuthenticated={status.isAuthenticated}
+        redirectPath="/tonight/recipe"
+      />
     </div>
   )
 }

@@ -50,10 +50,10 @@ export function CookCompleteDialog({ recipe, recipeId, onClose }: Props) {
       />
 
       {/* Sheet */}
-      <div className="fixed inset-x-0 bottom-0 z-50 mx-auto max-w-md rounded-t-3xl bg-[#0f0f0f] border-t border-white/10 shadow-2xl">
+      <div className="fixed inset-x-0 bottom-0 z-50 mx-auto max-w-md rounded-t-3xl border-t border-orange-100 bg-white shadow-2xl">
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1">
-          <div className="h-1 w-10 rounded-full bg-white/20" />
+          <div className="h-1 w-10 rounded-full bg-orange-200" />
         </div>
 
         <div className="px-6 pb-10 pt-3 space-y-6">
@@ -61,12 +61,12 @@ export function CookCompleteDialog({ recipe, recipeId, onClose }: Props) {
           <div className="flex items-start justify-between">
             <div>
               <div className="text-3xl mb-1">🎉</div>
-              <h2 className="text-xl font-bold text-white">Nice cooking!</h2>
-              <p className="text-sm text-white/50 mt-0.5">{recipe.name}</p>
+              <h2 className="text-xl font-bold text-slate-950">Nice cooking!</h2>
+              <p className="text-sm text-slate-500 mt-0.5">{recipe.name}</p>
             </div>
             <button
               onClick={onClose}
-              className="shrink-0 rounded-full p-1.5 text-white/40 hover:bg-white/10 hover:text-white"
+              className="shrink-0 rounded-full p-1.5 text-slate-400 hover:bg-orange-50 hover:text-slate-700"
             >
               <X className="h-4 w-4" />
             </button>
@@ -74,7 +74,7 @@ export function CookCompleteDialog({ recipe, recipeId, onClose }: Props) {
 
           {/* Star rating */}
           <div>
-            <p className="text-xs font-semibold text-white/50 uppercase tracking-wide mb-2">
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
               Rate this recipe
             </p>
             <div className="flex gap-1.5">
@@ -92,7 +92,7 @@ export function CookCompleteDialog({ recipe, recipeId, onClose }: Props) {
                     className={`h-7 w-7 transition-colors ${
                       n <= (hoverRating || rating)
                         ? 'fill-amber-400 text-amber-400'
-                        : 'text-white/20'
+                        : 'text-slate-200'
                     }`}
                   />
                 </button>
@@ -102,7 +102,7 @@ export function CookCompleteDialog({ recipe, recipeId, onClose }: Props) {
 
           {/* Servings cooked */}
           <div>
-            <p className="text-xs font-semibold text-white/50 uppercase tracking-wide mb-2">
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
               Servings cooked
             </p>
             <div className="flex items-center gap-3">
@@ -110,19 +110,19 @@ export function CookCompleteDialog({ recipe, recipeId, onClose }: Props) {
                 type="button"
                 onClick={() => setServingsCooked((s) => Math.max(1, s - 1))}
                 disabled={servingsCooked <= 1}
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 disabled:opacity-30"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-orange-100 bg-orange-50 text-slate-700 hover:bg-orange-100 disabled:opacity-30"
                 aria-label="Decrease servings"
               >
                 <Minus className="h-4 w-4" />
               </button>
-              <span className="min-w-[3rem] text-center text-2xl font-bold text-white tabular-nums">
+              <span className="min-w-[3rem] text-center text-2xl font-bold text-slate-950 tabular-nums">
                 {servingsCooked}
               </span>
               <button
                 type="button"
                 onClick={() => setServingsCooked((s) => Math.min(20, s + 1))}
                 disabled={servingsCooked >= 20}
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 disabled:opacity-30"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-orange-100 bg-orange-50 text-slate-700 hover:bg-orange-100 disabled:opacity-30"
                 aria-label="Increase servings"
               >
                 <Plus className="h-4 w-4" />
@@ -133,10 +133,10 @@ export function CookCompleteDialog({ recipe, recipeId, onClose }: Props) {
           {/* Leftover servings */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-semibold text-white/50 uppercase tracking-wide">
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
                 Leftover servings to track
               </p>
-              <span className="text-sm font-bold text-white tabular-nums">
+              <span className="text-sm font-bold text-slate-950 tabular-nums">
                 {leftoverServings}
               </span>
             </div>

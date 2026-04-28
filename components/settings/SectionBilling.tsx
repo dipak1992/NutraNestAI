@@ -42,35 +42,35 @@ export function SectionBilling({
     : null
 
   return (
-    <section className="rounded-3xl border border-white/10 bg-white/5 p-6">
-      <h2 className="mb-5 flex items-center gap-2 text-base font-semibold text-white">
+    <section className="rounded-3xl border border-orange-100 bg-white/82 p-6">
+      <h2 className="mb-5 flex items-center gap-2 text-base font-semibold text-slate-950">
         <CreditCard className="h-4 w-4 text-[#B8935A]" />
         Billing
       </h2>
 
       {/* Current plan */}
-      <div className="mb-5 rounded-2xl border border-white/10 bg-white/5 p-4">
+      <div className="mb-5 rounded-2xl border border-orange-100 bg-white/82 p-4">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-xs text-white/40">Current plan</p>
-            <p className="mt-0.5 text-lg font-bold text-white">{plan.name}</p>
-            <p className="text-sm text-white/50">{plan.tagline}</p>
+            <p className="text-xs text-slate-400">Current plan</p>
+            <p className="mt-0.5 text-lg font-bold text-slate-950">{plan.name}</p>
+            <p className="text-sm text-slate-500">{plan.tagline}</p>
             {statusLabel && (
               <p className="mt-1 text-xs text-amber-400">{statusLabel}</p>
             )}
           </div>
           <div className="text-right">
-            <p className="text-xl font-bold text-white">
+            <p className="text-xl font-bold text-slate-950">
               {plan.priceMonthly === 0 ? 'Free' : `$${plan.priceMonthly}`}
             </p>
             {plan.priceMonthly > 0 && (
-              <p className="text-xs text-white/40">/month</p>
+              <p className="text-xs text-slate-400">/month</p>
             )}
           </div>
         </div>
 
         {renewsAt && (
-          <p className="mt-3 text-xs text-white/40">
+          <p className="mt-3 text-xs text-slate-400">
             Renews {new Date(renewsAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
           </p>
         )}
@@ -90,7 +90,7 @@ export function SectionBilling({
             type="button"
             onClick={openPortal}
             disabled={loading}
-            className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-white/10 disabled:opacity-60"
+            className="flex items-center gap-2 rounded-2xl border border-orange-100 bg-white/82 px-5 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-orange-50 disabled:opacity-60"
           >
             {loading ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />

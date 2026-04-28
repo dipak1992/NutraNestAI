@@ -13,7 +13,6 @@ import {
   DollarSign,
   RefreshCw,
   Loader2,
-  Volume2,
   ShoppingCart,
   ChevronDown,
   ChevronUp,
@@ -23,9 +22,10 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { SaveMealButton } from '@/components/content/SaveMealButton'
-import { RecipeAudioPlayer } from '@/components/recipes/RecipeAudioPlayer'
 import { useWeeklyPlanStore } from '@/lib/planner/store'
-import { mealToRecipe, persistMealForRecipe } from '@/lib/recipes/canonical'
+import { persistMealForRecipe } from '@/lib/recipes/canonical'
+import { PaywallDialog } from '@/components/paywall/PaywallDialog'
+import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 
 // ── Cuisine visual map ────────────────────────────────────────
 
@@ -68,16 +68,19 @@ function MealDayCard({ meal, dayLabel, date, onRegenerate, isRegenerating }: Mea
   const [showVariations, setShowVariations] = useState(false)
   const [showIngredients, setShowIngredients] = useState(false)
   const [showSteps, setShowSteps] = useState(false)
-  const [showAudio, setShowAudio] = useState(false)
-  const [audioStep, setAudioStep] = useState(0)
+  const [paywallOpen, setPaywallOpen] = useState(false)
   const router = useRouter()
+  const { status } = usePaywallStatus()
   const addCustomItem = useWeeklyPlanStore((s) => s.addCustomItem)
   const style = getStyle(meal.cuisineType)
   const pantryItems = meal.ingredients.filter((i) => i.fromPantry)
   const toBuyItems = meal.ingredients.filter((i) => !i.fromPantry)
-  const recipe = mealToRecipe(meal, 'weekly')
 
   function openRecipe(cook = false) {
+    if (cook && !status.isPro && !status.isFamily) {
+      setPaywallOpen(true)
+      return
+    }
     persistMealForRecipe(meal, '/planner', 'weekly')
     if (cook) sessionStorage.setItem('recipe-open-cook', 'true')
     else sessionStorage.removeItem('recipe-open-cook')
@@ -147,7 +150,7 @@ function MealDayCard({ meal, dayLabel, date, onRegenerate, isRegenerating }: Mea
         )}
       </div>
 
-      <div className="grid grid-cols-3 border-t border-current/10 bg-white/45">
+      <div className="grid grid-cols-2 border-t border-current/10 bg-white/45">
         <button
           type="button"
           onClick={() => openRecipe(true)}
@@ -158,33 +161,13 @@ function MealDayCard({ meal, dayLabel, date, onRegenerate, isRegenerating }: Mea
         </button>
         <button
           type="button"
-          onClick={() => setShowAudio((value) => !value)}
-          className="flex items-center justify-center gap-1.5 border-x border-current/10 py-2.5 text-xs font-semibold text-primary hover:bg-white/70"
-        >
-          <Volume2 className="h-3.5 w-3.5" />
-          Listen
-        </button>
-        <button
-          type="button"
           onClick={addGroceries}
-          className="flex items-center justify-center gap-1.5 py-2.5 text-xs font-semibold text-blue-700 hover:bg-white/70"
+          className="flex items-center justify-center gap-1.5 border-l border-current/10 py-2.5 text-xs font-semibold text-blue-700 hover:bg-white/70"
         >
           <ShoppingCart className="h-3.5 w-3.5" />
           Grocery
         </button>
       </div>
-
-      {showAudio && (
-        <div className="border-t border-current/10 p-3">
-          <RecipeAudioPlayer
-            recipeId={recipe.id}
-            recipe={recipe}
-            isPlusMember
-            activeStepIndex={audioStep}
-            onStepChange={setAudioStep}
-          />
-        </div>
-      )}
 
       {/* Pantry usage hint */}
       {pantryItems.length > 0 && (
@@ -303,6 +286,14 @@ function MealDayCard({ meal, dayLabel, date, onRegenerate, isRegenerating }: Mea
           {meal.meta.selectionReason}
         </div>
       )}
+      <PaywallDialog
+        open={paywallOpen}
+        onOpenChange={setPaywallOpen}
+        title="Unlock full recipes with Plus"
+        description="Cook weekly meals with guided recipes, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning."
+        isAuthenticated={status.isAuthenticated}
+        redirectPath="/planner"
+      />
     </div>
   )
 }
@@ -405,7 +396,7 @@ function LockedDayCard({
               <span className="text-amber-700">{dayLabel}</span> is locked on Free
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed mb-4">
-              Unlock this meal — <strong className="text-foreground">{meal.title}</strong> — plus the full grocery list with Pro.
+              Unlock this meal — <strong className="text-foreground">{meal.title}</strong> — plus the full grocery list with Plus.
             </p>
             <button
               type="button"
@@ -431,7 +422,7 @@ function LockedDayCard({
       </div>
       <p className="text-sm font-semibold text-foreground">{dayLabel} · {date}</p>
       <p className="mt-2 text-sm text-muted-foreground">
-        This day is part of the Pro-only weekly plan unlock.
+        This day is part of the Plus-only weekly plan unlock.
       </p>
       <button
         type="button"

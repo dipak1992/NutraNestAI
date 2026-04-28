@@ -146,7 +146,6 @@ export function LeftoverModal({ isPlusMember }: Props) {
                 <LeftoverRecipeSuggestions
                   leftoverId={leftover.id}
                   leftoverName={leftover.name}
-                  isPlusMember={isPlusMember}
                 />
               )}
 

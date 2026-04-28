@@ -64,31 +64,6 @@ export function recipeSignature(recipe: Pick<LoadedRecipe, 'id' | 'name' | 'ingr
   })
 }
 
-export function buildRecipeScript(recipe: LoadedRecipe) {
-  const parts: string[] = [`Let's cook ${recipe.name}.`]
-  if (recipe.description) parts.push(recipe.description)
-  if (recipe.ingredients.length > 0) {
-    parts.push('You will need:')
-    recipe.ingredients.forEach((ingredient) => {
-      parts.push(`${ingredient.quantity} ${ingredient.unit} ${ingredient.name}.`)
-    })
-  }
-  parts.push("Let's begin.")
-  recipe.steps.forEach((step, index) => {
-    parts.push(`Step ${step.order || index + 1}. ${step.instruction}`)
-  })
-  parts.push('Great job. Enjoy your meal.')
-  return parts.join(' ')
-}
-
-export function recipeSegments(recipe: LoadedRecipe) {
-  return recipe.steps.map((step, index) => ({
-    stepIndex: index,
-    stepOrder: step.order || index + 1,
-    text: `Step ${step.order || index + 1}. ${step.instruction}`,
-  }))
-}
-
 export function persistMealForRecipe(meal: SmartMealResult, backPath: string, source: MealPillar) {
   sessionStorage.setItem('tonight-meal', JSON.stringify(meal))
   sessionStorage.setItem('recipe-back', backPath)

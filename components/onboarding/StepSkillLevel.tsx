@@ -40,8 +40,8 @@ export default function StepSkillLevel() {
           <ChefHat className="h-8 w-8 text-[#D97757]" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-white">Cooking skill level</h2>
-          <p className="mt-1 text-sm text-white/60">
+          <h2 className="text-2xl font-bold text-slate-950">Cooking skill level</h2>
+          <p className="mt-1 text-sm text-slate-500">
             We'll match recipe complexity to your comfort zone.
           </p>
         </div>
@@ -60,15 +60,15 @@ export default function StepSkillLevel() {
                 'flex w-full items-start gap-4 rounded-2xl border px-5 py-4 text-left transition',
                 active
                   ? 'border-[#D97757] bg-[#D97757]/15'
-                  : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10',
+                  : 'border-orange-100 bg-white/82 hover:border-orange-200 hover:bg-orange-50',
               ].join(' ')}
             >
               <span className="mt-0.5 text-3xl">{level.emoji}</span>
               <div>
-                <p className={['font-semibold', active ? 'text-white' : 'text-white/90'].join(' ')}>
+                <p className={['font-semibold', active ? 'text-[#9f4f32]' : 'text-slate-700'].join(' ')}>
                   {level.label}
                 </p>
-                <p className="mt-0.5 text-sm text-white/50">{level.description}</p>
+                <p className="mt-0.5 text-sm text-slate-500">{level.description}</p>
               </div>
               {/* Radio indicator */}
               <div
@@ -76,7 +76,7 @@ export default function StepSkillLevel() {
                   'ml-auto mt-1 h-5 w-5 shrink-0 rounded-full border-2 transition',
                   active
                     ? 'border-[#D97757] bg-[#D97757]'
-                    : 'border-white/30 bg-transparent',
+                    : 'border-orange-200 bg-transparent',
                 ].join(' ')}
               />
             </button>

@@ -43,9 +43,9 @@ export default async function SettingsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#0f0f0f] px-4 py-10">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(217,119,87,0.14),transparent_34%),linear-gradient(180deg,#fff7ed_0%,#fefce8_28%,#f8fafc_100%)] px-4 py-10">
       <div className="mx-auto max-w-2xl">
-        <h1 className="mb-8 text-2xl font-bold text-white">Settings</h1>
+        <h1 className="mb-8 text-2xl font-bold text-slate-950">Settings</h1>
         <SettingsClient
           firstName={firstName}
           email={email}

@@ -12,6 +12,9 @@ import { Clock, ChefHat, Users, Heart, RefreshCw, Shuffle, Loader2, ThumbsUp, Th
 import type { SmartMealRequest, SmartMealResult } from '@/lib/engine/types'
 import { useLearningStore } from '@/lib/learning/store'
 import { MealResultCard } from './MealResultCard'
+import { PaywallDialog } from '@/components/paywall/PaywallDialog'
+import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
+import { useDailySwapLimit } from '@/lib/paywall/use-daily-swap-limit'
 
 // ─── Card style map by cuisine ───────────────────────────────────────────────
 
@@ -219,9 +222,16 @@ export function MealSwipeStack({ mode, input }: Props) {
   const [loading, setLoading] = useState(true)
   const [feedbackFlash, setFeedbackFlash] = useState<'like' | 'reject' | null>(null)
   const [selectedMeal, setSelectedMeal] = useState<SmartMealResult | null>(null)
+  const [paywallOpen, setPaywallOpen] = useState(false)
+  const [paywallCopy, setPaywallCopy] = useState({
+    title: 'Unlock full recipes with Plus',
+    description: 'Cook This is a Plus feature. Upgrade for guided recipes, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning.',
+  })
   const seenIds = useRef<string[]>([])
   const shuffleCount = useRef(0)
   const { recordLike, recordReject, recordSave, getBoosts } = useLearningStore()
+  const { status } = usePaywallStatus()
+  const swaps = useDailySwapLimit(status, 'meal-swipe-stack')
 
   async function loadMeals(count: number) {
     setLoading(true)
@@ -270,6 +280,14 @@ export function MealSwipeStack({ mode, input }: Props) {
   }, [topIdx, meals.length, loading])
 
   function handleDismiss() {
+    if (!swaps.recordSwap()) {
+      setPaywallCopy({
+        title: 'You’ve used your free meal changes today',
+        description: 'Free includes 3 meal swaps per day. Upgrade to Plus for unlimited meal swaps, personalized picks, and full Cook This recipes.',
+      })
+      setPaywallOpen(true)
+      return
+    }
     setTopIdx(prev => prev + 1)
   }
 
@@ -403,7 +421,17 @@ export function MealSwipeStack({ mode, input }: Props) {
       {/* Cook this — primary CTA */}
       <motion.button
         whileTap={{ scale: 0.97 }}
-        onClick={() => setSelectedMeal(topMeal)}
+        onClick={() => {
+          if (!status.isPro && !status.isFamily) {
+            setPaywallCopy({
+              title: 'Unlock full recipes with Plus',
+              description: 'Cook This is a Plus feature. Upgrade for guided recipes, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning.',
+            })
+            setPaywallOpen(true)
+            return
+          }
+          setSelectedMeal(topMeal)
+        }}
         className="w-full flex items-center justify-center gap-2 h-14 rounded-2xl text-white font-semibold text-base"
         style={{
           background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
@@ -413,6 +441,11 @@ export function MealSwipeStack({ mode, input }: Props) {
         Cook this
         <ChevronRight className="h-4 w-4" />
       </motion.button>
+      {!status.isPro && !status.isFamily && (
+        <p className="text-center text-xs text-muted-foreground">
+          {swaps.remaining > 0 ? `${swaps.remaining} swaps left today` : 'Free swaps used today'}
+        </p>
+      )}
 
       {/* action bar */}
       <div className="flex items-center justify-center gap-3">
@@ -488,6 +521,14 @@ export function MealSwipeStack({ mode, input }: Props) {
           />
         )}
       </AnimatePresence>
+      <PaywallDialog
+        open={paywallOpen}
+        onOpenChange={setPaywallOpen}
+        title={paywallCopy.title}
+        description={paywallCopy.description}
+        isAuthenticated={status.isAuthenticated}
+        redirectPath="/tonight"
+      />
     </div>
   )
 }

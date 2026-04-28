@@ -76,15 +76,15 @@ export function OnboardingShell({
   }
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] flex flex-col">
+    <div className="min-h-screen flex flex-col bg-[radial-gradient(circle_at_top_left,rgba(217,119,87,0.16),transparent_32%),linear-gradient(180deg,#fff7ed_0%,#fefce8_34%,#f8fafc_100%)] text-slate-950">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-[#1a1a1a] border-b border-white/10">
+      <header className="sticky top-0 z-10 border-b border-orange-100/80 bg-white/82 backdrop-blur-xl">
         <div className="mx-auto max-w-lg px-4 h-14 flex items-center justify-between gap-3">
           <button
             type="button"
             onClick={handleBack}
             aria-label={isFirst ? 'Go home' : 'Previous step'}
-            className="w-9 h-9 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors text-white"
+            className="w-9 h-9 rounded-full text-slate-700 hover:bg-orange-50 flex items-center justify-center transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
@@ -95,7 +95,7 @@ export function OnboardingShell({
             <button
               type="button"
               onClick={handleSkip}
-              className="text-xs text-white/50 hover:text-white px-2 py-1"
+              className="text-xs text-slate-500 hover:text-slate-900 px-2 py-1"
             >
               Skip
             </button>
@@ -105,7 +105,7 @@ export function OnboardingShell({
         </div>
 
         {/* Progress bar */}
-        <div className="h-1 bg-white/10">
+        <div className="h-1 bg-orange-100">
           <div
             className="h-full bg-[#D97757] transition-all duration-500"
             style={{ width: `${progress}%` }}
@@ -126,7 +126,7 @@ export function OnboardingShell({
                       ? 'bg-[#D97757] text-white'
                       : i === stepIndex
                       ? 'bg-[#D97757]/20 text-[#D97757] ring-2 ring-[#D97757]'
-                      : 'bg-white/10 text-white/40',
+                      : 'bg-white/80 text-slate-400 ring-1 ring-orange-100',
                   )}
                 >
                   {i < stepIndex ? <Check className="w-3.5 h-3.5" /> : i + 1}
@@ -134,7 +134,7 @@ export function OnboardingShell({
                 <span
                   className={cn(
                     'text-[10px] font-medium',
-                    i === stepIndex ? 'text-[#D97757]' : 'text-white/40',
+                    i === stepIndex ? 'text-[#D97757]' : 'text-slate-400',
                   )}
                 >
                   {s.label}
@@ -144,7 +144,7 @@ export function OnboardingShell({
                 <div
                   className={cn(
                     'w-8 h-px mb-4',
-                    i < stepIndex ? 'bg-[#D97757]' : 'bg-white/15',
+                    i < stepIndex ? 'bg-[#D97757]' : 'bg-orange-100',
                   )}
                 />
               )}
@@ -160,7 +160,7 @@ export function OnboardingShell({
 
       {/* Footer CTA */}
       <footer
-        className="sticky bottom-0 bg-[#1a1a1a] border-t border-white/10 px-4 py-4"
+        className="sticky bottom-0 border-t border-orange-100/80 bg-white/88 px-4 py-4 backdrop-blur-xl"
         style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
       >
         <div className="mx-auto max-w-lg flex items-center gap-3">
@@ -168,7 +168,7 @@ export function OnboardingShell({
             <button
               type="button"
               onClick={() => useOnboardingStore.getState().back()}
-              className="flex items-center gap-1.5 text-sm text-white/50 hover:text-white px-3 py-2"
+              className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 px-3 py-2"
             >
               <ArrowLeft className="w-4 h-4" />
               Back

@@ -10,6 +10,9 @@ import { useLightOnboardingStore } from '@/lib/store'
 import { computeMealBadges } from '@/lib/engine/badges'
 import { SmartChips } from './SmartChips'
 import { MealResultCard } from './MealResultCard'
+import { PaywallDialog } from '@/components/paywall/PaywallDialog'
+import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
+import { useDailySwapLimit } from '@/lib/paywall/use-daily-swap-limit'
 
 // ─── Card style map (mirrors MealSwipeStack) ─────────────────────────────────
 
@@ -68,11 +71,18 @@ export function QuickSuggestion() {
   const [loading, setLoading] = useState(true)
   const [swapping, setSwapping] = useState(false)
   const [showDetail, setShowDetail] = useState(false)
+  const [paywallOpen, setPaywallOpen] = useState(false)
+  const [paywallCopy, setPaywallCopy] = useState({
+    title: 'Unlock full recipes with Plus',
+    description: 'Cook This is a Plus feature. Upgrade for guided recipes, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning.',
+  })
   const [saved, setSaved] = useState(false)
   const [activeChip, setActiveChip] = useState<SmartChipId | null>(null)
   const seenIds = useRef<string[]>([])
   const { recordLike, recordSave, recordChipSwap, getBoosts } = useLearningStore()
   const { hasKids, pickyEater, householdType } = useLightOnboardingStore()
+  const { status } = usePaywallStatus()
+  const swaps = useDailySwapLimit(status, 'quick-suggestion')
   const [badges, setBadges] = useState<MealBadge[]>([])
 
   const household = {
@@ -111,6 +121,14 @@ export function QuickSuggestion() {
 
   function handleCook() {
     if (meal) {
+      if (!status.isPro && !status.isFamily) {
+        setPaywallCopy({
+          title: 'Unlock full recipes with Plus',
+          description: 'Cook This is a Plus feature. Upgrade for guided recipes, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning.',
+        })
+        setPaywallOpen(true)
+        return
+      }
       recordLike(meal)
       setShowDetail(true)
     }
@@ -118,6 +136,14 @@ export function QuickSuggestion() {
 
   async function handleSwap(chipId?: SmartChipId) {
     if (!meal) return
+    if (!swaps.recordSwap()) {
+      setPaywallCopy({
+        title: 'You’ve used your free meal changes today',
+        description: 'Free includes 3 meal swaps per day. Upgrade to Plus for unlimited meal swaps, personalized picks, and full Cook This recipes.',
+      })
+      setPaywallOpen(true)
+      return
+    }
     setSwapping(true)
     if (chipId) {
       recordChipSwap(meal, chipId)
@@ -296,7 +322,14 @@ export function QuickSuggestion() {
 
         {/* ── Smart chips — "Not quite? Try:" ── */}
         <div>
-          <p className="text-xs text-muted-foreground mb-2">Not quite? Try:</p>
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <p className="text-xs text-muted-foreground">Not quite? Try:</p>
+            {!status.isPro && !status.isFamily && (
+              <p className="text-xs text-muted-foreground">
+                {swaps.remaining > 0 ? `${swaps.remaining} swaps left today` : 'Free swaps used'}
+              </p>
+            )}
+          </div>
           <SmartChips
             onChipTap={(chipId) => handleSwap(chipId)}
             activeChip={activeChip}
@@ -319,6 +352,14 @@ export function QuickSuggestion() {
           />
         )}
       </AnimatePresence>
+      <PaywallDialog
+        open={paywallOpen}
+        onOpenChange={setPaywallOpen}
+        title={paywallCopy.title}
+        description={paywallCopy.description}
+        isAuthenticated={status.isAuthenticated}
+        redirectPath="/dashboard"
+      />
     </>
   )
 }

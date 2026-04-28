@@ -45,8 +45,8 @@ export default function StepDislikes() {
           <ThumbsDown className="h-8 w-8 text-[#D97757]" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-white">Foods you dislike</h2>
-          <p className="mt-1 text-sm text-white/60">
+          <h2 className="text-2xl font-bold text-slate-950">Foods you dislike</h2>
+          <p className="mt-1 text-sm text-slate-500">
             We'll avoid these in every meal plan. Type or tap a suggestion.
           </p>
         </div>
@@ -60,7 +60,7 @@ export default function StepDislikes() {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKey}
           placeholder="e.g. Cilantro, Mushrooms…"
-          className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/30 outline-none focus:border-[#D97757]/60 focus:ring-1 focus:ring-[#D97757]/40"
+          className="w-full rounded-2xl border border-orange-100 bg-white/82 px-4 py-3 text-sm text-slate-950 placeholder-slate-400 outline-none focus:border-[#D97757]/60 focus:ring-1 focus:ring-[#D97757]/40"
         />
         {input.trim() && (
           <button
@@ -79,13 +79,13 @@ export default function StepDislikes() {
           {dislikes.map((item) => (
             <span
               key={item}
-              className="flex items-center gap-1.5 rounded-full border border-[#D97757]/40 bg-[#D97757]/15 px-3 py-1 text-sm text-white"
+              className="flex items-center gap-1.5 rounded-full border border-[#D97757]/40 bg-[#D97757]/15 px-3 py-1 text-sm text-[#9f4f32]"
             >
               {item}
               <button
                 type="button"
                 onClick={() => remove(item)}
-                className="text-white/50 hover:text-white"
+                className="text-slate-500 hover:text-slate-900"
                 aria-label={`Remove ${item}`}
               >
                 <X className="h-3 w-3" />
@@ -97,7 +97,7 @@ export default function StepDislikes() {
 
       {/* Suggestions */}
       <div>
-        <p className="mb-2 text-xs font-medium uppercase tracking-wider text-white/40">
+        <p className="mb-2 text-xs font-medium uppercase tracking-wider text-slate-400">
           Common dislikes
         </p>
         <div className="flex flex-wrap gap-2">
@@ -106,7 +106,7 @@ export default function StepDislikes() {
               key={s}
               type="button"
               onClick={() => add(s)}
-              className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-white/70 transition hover:border-white/20 hover:bg-white/10 hover:text-white"
+              className="rounded-full border border-orange-100 bg-white/82 px-3 py-1 text-sm text-slate-600 transition hover:border-orange-200 hover:bg-orange-50 hover:text-slate-900"
             >
               + {s}
             </button>
@@ -115,7 +115,7 @@ export default function StepDislikes() {
       </div>
 
       {dislikes.length === 0 && (
-        <p className="text-center text-xs text-white/40">
+        <p className="text-center text-xs text-slate-400">
           No dislikes? Leave blank and continue.
         </p>
       )}

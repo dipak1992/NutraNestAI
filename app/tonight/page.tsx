@@ -728,7 +728,7 @@ function TonightPageInner() {
                   <p className="mt-2 text-xs text-muted-foreground">
                     {swipesRemaining > 0
                       ? `${swipesRemaining} free swipe${swipesRemaining === 1 ? '' : 's'} left today after this preview.`
-                      : 'Free swipes used. Pro unlocks unlimited inspiration.'}
+                      : 'Free swipes used. Plus unlocks unlimited inspiration.'}
                   </p>
                 )}
               </motion.div>
@@ -794,7 +794,7 @@ function TonightPageInner() {
           open={paywallOpen}
           onOpenChange={setPaywallOpen}
           title="You’ve used your free Tonight swipes"
-          description="Keep the instant preview, then unlock unlimited swipes, the full weekly planner, grocery list, and advanced family tools with Pro."
+          description="Keep the instant preview, then unlock unlimited swipes, the full weekly planner, grocery list, and advanced family tools with Plus."
           isAuthenticated={status.isAuthenticated}
           redirectPath={`/tonight?mode=${mode}`}
         />

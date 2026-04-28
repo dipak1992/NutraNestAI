@@ -21,29 +21,29 @@ function Counter({
   max?: number
 }) {
   return (
-    <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-5 py-4">
+    <div className="flex items-center justify-between rounded-2xl border border-orange-100 bg-white/82 px-5 py-4">
       <div className="flex items-center gap-3">
         <span className="text-2xl">{emoji}</span>
-        <span className="text-sm font-medium text-white/90">{label}</span>
+        <span className="text-sm font-medium text-slate-700">{label}</span>
       </div>
       <div className="flex items-center gap-3">
         <button
           type="button"
           onClick={() => onChange(Math.max(min, value - 1))}
           disabled={value <= min}
-          className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 disabled:opacity-30"
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-50 text-slate-700 transition hover:bg-orange-100 disabled:opacity-30"
           aria-label={`Decrease ${label}`}
         >
           <Minus className="h-4 w-4" />
         </button>
-        <span className="w-6 text-center text-lg font-semibold text-white tabular-nums">
+        <span className="w-6 text-center text-lg font-semibold text-slate-950 tabular-nums">
           {value}
         </span>
         <button
           type="button"
           onClick={() => onChange(Math.min(max, value + 1))}
           disabled={value >= max}
-          className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 disabled:opacity-30"
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-50 text-slate-700 transition hover:bg-orange-100 disabled:opacity-30"
           aria-label={`Increase ${label}`}
         >
           <Plus className="h-4 w-4" />
@@ -70,8 +70,8 @@ export default function StepHouseholdSize() {
           <Users className="h-8 w-8 text-[#D97757]" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-white">Who's eating?</h2>
-          <p className="mt-1 text-sm text-white/60">
+          <h2 className="text-2xl font-bold text-slate-950">Who's eating?</h2>
+          <p className="mt-1 text-sm text-slate-500">
             We'll personalise portions and meal ideas for your household.
           </p>
         </div>
@@ -90,7 +90,7 @@ export default function StepHouseholdSize() {
       </div>
 
       {/* Summary pill */}
-      <p className="text-center text-sm text-white/50">
+      <p className="text-center text-sm text-slate-500">
         {total === 1 ? 'Just you — solo mode activated 🎯' : `${total} people in your household`}
       </p>
     </div>

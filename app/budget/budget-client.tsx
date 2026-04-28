@@ -18,6 +18,8 @@ import type { SmartMealResult } from '@/lib/engine/types'
 import { SaveMealButton } from '@/components/content/SaveMealButton'
 import { useWeeklyPlanStore } from '@/lib/planner/store'
 import { persistMealForRecipe } from '@/lib/recipes/canonical'
+import { PaywallDialog } from '@/components/paywall/PaywallDialog'
+import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 
 // ─── Tabs ─────────────────────────────────────────────────────────────────────
 
@@ -296,6 +298,8 @@ type SwapSuggestion = {
 
 function SwapCard({ swap, onCook }: { swap: SwapSuggestion; onCook: (meal: SmartMealResult) => void }) {
   const addCustomItem = useWeeklyPlanStore((s) => s.addCustomItem)
+  const [paywallOpen, setPaywallOpen] = useState(false)
+  const { status } = usePaywallStatus()
   const meal: SmartMealResult = {
     id: `budget-${swap.swapMeal.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
     title: swap.swapMeal,
@@ -360,7 +364,13 @@ function SwapCard({ swap, onCook }: { swap: SwapSuggestion; onCook: (meal: Smart
           <p className="text-xs text-neutral-500 mt-1">{swap.reason}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <button
-              onClick={() => onCook(meal)}
+              onClick={() => {
+                if (!status.isPro && !status.isFamily) {
+                  setPaywallOpen(true)
+                  return
+                }
+                onCook(meal)
+              }}
               className="rounded-lg bg-[#D97757] px-3 py-1.5 text-xs font-semibold text-white"
             >
               Cook
@@ -380,6 +390,14 @@ function SwapCard({ swap, onCook }: { swap: SwapSuggestion; onCook: (meal: Smart
           </span>
         </div>
       </div>
+      <PaywallDialog
+        open={paywallOpen}
+        onOpenChange={setPaywallOpen}
+        title="Unlock full recipes with Plus"
+        description="Cook budget swaps with guided steps, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning."
+        isAuthenticated={status.isAuthenticated}
+        redirectPath="/budget"
+      />
     </div>
   )
 }

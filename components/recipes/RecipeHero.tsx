@@ -10,9 +10,9 @@ export function RecipeHero({ recipe }: Props) {
   const totalTime = recipe.prepTimeMin + recipe.cookTimeMin
 
   const difficultyColor = {
-    easy: 'text-emerald-400',
-    medium: 'text-amber-400',
-    hard: 'text-red-400',
+    easy: 'text-emerald-200',
+    medium: 'text-amber-200',
+    hard: 'text-red-200',
   }[recipe.difficulty]
 
   return (
@@ -28,12 +28,12 @@ export function RecipeHero({ recipe }: Props) {
             priority
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-white/5 text-6xl">
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-orange-50 via-amber-50 to-emerald-50 text-6xl">
             🍽️
           </div>
         )}
         {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f0f] via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/82 via-slate-950/16 to-transparent" />
       </div>
 
       {/* Content overlay */}

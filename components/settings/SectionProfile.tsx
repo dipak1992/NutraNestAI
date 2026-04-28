@@ -29,8 +29,8 @@ export function SectionProfile({ firstName, email }: Props) {
   }
 
   return (
-    <section className="rounded-3xl border border-white/10 bg-white/5 p-6">
-      <h2 className="mb-5 flex items-center gap-2 text-base font-semibold text-white">
+    <section className="rounded-3xl border border-orange-100 bg-white/82 p-6">
+      <h2 className="mb-5 flex items-center gap-2 text-base font-semibold text-slate-950">
         <User className="h-4 w-4 text-[#D97757]" />
         Profile
       </h2>
@@ -42,14 +42,14 @@ export function SectionProfile({ firstName, email }: Props) {
             👤
           </div>
           <div>
-            <p className="text-sm font-medium text-white">{email}</p>
-            <p className="text-xs text-white/40">Email managed via your auth provider</p>
+            <p className="text-sm font-medium text-slate-700">{email}</p>
+            <p className="text-xs text-slate-400">Email managed via your auth provider</p>
           </div>
         </div>
 
         {/* First name field */}
         <div>
-          <label className="mb-1.5 block text-xs font-medium text-white/50">
+          <label className="mb-1.5 block text-xs font-medium text-slate-500">
             First name
           </label>
           <input
@@ -57,7 +57,7 @@ export function SectionProfile({ firstName, email }: Props) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Your first name"
-            className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/30 outline-none focus:border-[#D97757]/60 focus:ring-1 focus:ring-[#D97757]/40"
+            className="w-full rounded-2xl border border-orange-100 bg-white/82 px-4 py-3 text-sm text-slate-950 placeholder-slate-400 outline-none focus:border-[#D97757]/60 focus:ring-1 focus:ring-[#D97757]/40"
           />
         </div>
 

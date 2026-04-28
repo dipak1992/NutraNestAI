@@ -11,35 +11,35 @@ import { cn } from '@/lib/utils'
 /* ─────────────────────── DATA ─────────────────────── */
 
 const FREE_FEATURES = [
-  'Tonight Suggestions (3/day)',
-  'Snap & Cook — fridge scan (3/week)',
-  'Basic grocery list',
-  '1 member profile',
-  'Basic dietary filters',
+  { icon: '🌙', text: 'Tonight Suggestions (3/day)' },
+  { icon: '📸', text: 'Snap & Cook — fridge scan (3/week)' },
+  { icon: '🛒', text: 'Basic grocery list' },
+  { icon: '👤', text: '1 member profile' },
+  { icon: '🥗', text: 'Basic dietary filters' },
 ]
 
 const PLUS_FEATURES = [
-  'Everything in Free',
-  'Unlimited Tonight Suggestions',
-  'Unlimited Snap & Cook scans',
-  'Weekly Autopilot — 7 dinners, one tap',
-  'Leftovers AI — track & use leftovers',
-  'Budget Intelligence — weekly spend tracking',
-  'Smart grocery list export',
-  'Up to 6 household members',
-  'Household memory & preferences',
-  'Meal history & saved favorites',
-  'Faster AI responses',
+  { icon: '✨', text: 'Everything in Free', highlight: false },
+  { icon: '🌙', text: 'Unlimited Tonight Suggestions', highlight: true },
+  { icon: '📸', text: 'Unlimited Snap & Cook scans', highlight: false },
+  { icon: '🗓️', text: 'Weekly Autopilot — 7 dinners, one tap', highlight: true },
+  { icon: '🍱', text: 'Leftovers AI — track & use leftovers', highlight: true },
+  { icon: '💰', text: 'Budget Intelligence — weekly spend tracking', highlight: true },
+  { icon: '🛒', text: 'Smart grocery list export', highlight: false },
+  { icon: '👨‍👩‍👧‍👦', text: 'Up to 6 household members', highlight: false },
+  { icon: '🧠', text: 'Household memory & preferences', highlight: false },
+  { icon: '📖', text: 'Meal history & saved favorites', highlight: false },
+  { icon: '⚡', text: 'Faster AI responses', highlight: false },
 ]
 
 const FAQ = [
   {
     q: 'Is there a free version?',
-    a: 'Yes. The free plan gives you Tonight Suggestions, up to 3 Snap & Cook scans per week, and a basic grocery list — enough to experience how MealEase thinks. When you\'re ready for Weekly Autopilot, Leftovers AI, or Budget Intelligence, upgrade anytime.',
+    a: "Yes. The free plan gives you Tonight Suggestions, up to 3 Snap & Cook scans per week, and a basic grocery list — enough to experience how MealEase thinks. When you're ready for Weekly Autopilot, Leftovers AI, or Budget Intelligence, upgrade anytime.",
   },
   {
     q: 'What is a household profile?',
-    a: 'A profile stores preferences, allergies, age groups, and food goals for one person. Profiles are not separate logins — they help MealEase personalize every meal for each person at your table. Free plan includes 1 profile. Plus includes up to 6.',
+    a: "A profile stores preferences, allergies, age groups, and food goals for one person. Profiles are not separate logins — they help MealEase personalize every meal for each person at your table. Free plan includes 1 profile. Plus includes up to 6.",
   },
   {
     q: 'What is Weekly Autopilot?',
@@ -47,11 +47,11 @@ const FAQ = [
   },
   {
     q: 'What is Leftovers AI?',
-    a: 'After you cook, MealEase asks if you have leftovers. Say yes and we track them — what they are, when they expire, and how many servings remain. We\'ll remind you before they go bad and suggest recipes that use them up.',
+    a: "After you cook, MealEase asks if you have leftovers. Say yes and we track them — what they are, when they expire, and how many servings remain. We'll remind you before they go bad and suggest recipes that use them up.",
   },
   {
     q: 'What is Budget Intelligence?',
-    a: 'Set a weekly food budget and we\'ll estimate recipe costs, track your spending, warn you before you go over, and suggest cheaper meal swaps when needed. Includes weekly history and category breakdown.',
+    a: "Set a weekly food budget and we'll estimate recipe costs, track your spending, warn you before you go over, and suggest cheaper meal swaps when needed. Includes weekly history and category breakdown.",
   },
   {
     q: 'Can I cancel anytime?',
@@ -88,7 +88,6 @@ export function PricingContent() {
       })
       const data = await res.json()
       if (data.error === 'billing_not_configured') {
-        // Fall back to trial start
         const trialRes = await fetch('/api/paywall/start-trial', { method: 'POST' })
         const trialData = await trialRes.json()
         if (!trialRes.ok) { toast.error(trialData.error || 'Could not start trial'); return }
@@ -109,12 +108,15 @@ export function PricingContent() {
 
       {/* ── HERO ── */}
       <section className="pt-16 pb-10 text-center px-4">
+        <div className="inline-flex items-center gap-2 rounded-full bg-[#D97757]/10 text-[#D97757] text-xs font-bold px-4 py-1.5 mb-5 uppercase tracking-widest">
+          ✦ Simple pricing
+        </div>
         <h1 className="font-serif text-4xl md:text-5xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50">
-          Simple pricing.{' '}
-          <span className="italic text-[#D97757]">No surprises.</span>
+          Stop stressing about dinner.{' '}
+          <span className="italic text-[#D97757]">Start tonight.</span>
         </h1>
         <p className="mt-4 text-lg text-neutral-600 dark:text-neutral-400 max-w-xl mx-auto">
-          Start free. Upgrade when you&rsquo;re ready.
+          Free forever. Upgrade when you want the full experience.
         </p>
       </section>
 
@@ -170,9 +172,9 @@ export function PricingContent() {
 
             <ul className="flex-1 space-y-3 mb-8">
               {FREE_FEATURES.map((f) => (
-                <li key={f} className="flex items-start gap-2 text-sm">
-                  <span className="text-emerald-500 mt-0.5 flex-shrink-0">✓</span>
-                  <span className="text-neutral-700 dark:text-neutral-300">{f}</span>
+                <li key={f.text} className="flex items-center gap-2.5 text-sm">
+                  <span className="text-base shrink-0">{f.icon}</span>
+                  <span className="text-neutral-700 dark:text-neutral-300">{f.text}</span>
                 </li>
               ))}
             </ul>
@@ -185,62 +187,129 @@ export function PricingContent() {
             </Link>
           </div>
 
-          {/* PLUS */}
-          <div className="relative flex flex-col h-full rounded-2xl p-8 bg-neutral-900 dark:bg-neutral-800 text-white ring-2 ring-[#D97757]">
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-              <span className="bg-[#D97757] text-white text-xs font-semibold px-4 py-1 rounded-full whitespace-nowrap">
-                Most popular
+          {/* PLUS — premium dark card */}
+          <div className="relative flex flex-col h-full rounded-2xl overflow-hidden ring-2 ring-[#D97757]">
+            {/* Layered gradient background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#1a0e06] via-[#1e1208] to-neutral-900" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_100%_0%,_rgba(217,119,87,0.25),_transparent)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_0%_100%,_rgba(251,191,36,0.08),_transparent)]" />
+            {/* Dot pattern */}
+            <div
+              className="absolute inset-0 opacity-[0.04]"
+              style={{
+                backgroundImage: 'radial-gradient(circle, #D97757 1px, transparent 1px)',
+                backgroundSize: '18px 18px',
+              }}
+            />
+
+            {/* Most popular badge */}
+            <div className="absolute -top-px left-1/2 -translate-x-1/2">
+              <span className="bg-[#D97757] text-white text-xs font-bold px-5 py-1 rounded-b-full whitespace-nowrap shadow-lg">
+                ✦ Most popular
               </span>
             </div>
 
-            <div className="mb-6">
-              <div className="text-sm font-semibold uppercase tracking-widest mb-2 text-[#D97757]">
-                Plus
-              </div>
-              <div className="flex items-baseline gap-1">
-                {isAnnual ? (
-                  <>
-                    <span className="font-serif text-5xl font-bold">${proAnnualMonthly}</span>
-                    <span className="text-sm text-neutral-400">/mo</span>
-                    <span className="text-sm text-neutral-500 line-through ml-1">${proMonthly}</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="font-serif text-5xl font-bold">${proMonthly}</span>
-                    <span className="text-sm text-neutral-400">/month</span>
-                  </>
+            <div className="relative z-10 flex flex-col h-full p-8 pt-10">
+              <div className="mb-6">
+                <div className="text-sm font-bold uppercase tracking-widest mb-2 text-[#D97757]">
+                  Plus
+                </div>
+                <div className="flex items-baseline gap-1">
+                  {isAnnual ? (
+                    <>
+                      <span className="font-serif text-5xl font-bold text-white">${proAnnualMonthly}</span>
+                      <span className="text-sm text-neutral-400">/mo</span>
+                      <span className="text-sm text-neutral-500 line-through ml-1">${proMonthly}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="font-serif text-5xl font-bold text-white">${proMonthly}</span>
+                      <span className="text-sm text-neutral-400">/month</span>
+                    </>
+                  )}
+                </div>
+                {isAnnual && (
+                  <p className="mt-1 text-xs text-neutral-400">${proAnnual}/yr · billed annually</p>
                 )}
+                <p className="mt-2 text-sm text-neutral-400">
+                  Everything you need to end the dinner spiral.
+                </p>
               </div>
-              {isAnnual && (
-                <p className="mt-1 text-xs text-neutral-400">${proAnnual}/yr billed annually</p>
-              )}
-              <p className="mt-2 text-sm text-neutral-400">
-                Everything you need to stop the dinner spiral.
+
+              <ul className="flex-1 space-y-2.5 mb-8">
+                {PLUS_FEATURES.map((f) => (
+                  <li key={f.text} className="flex items-center gap-2.5 text-sm">
+                    <span className="text-base shrink-0">{f.icon}</span>
+                    <span className={f.highlight ? 'text-white font-medium' : 'text-neutral-300'}>
+                      {f.text}
+                    </span>
+                    {f.highlight && (
+                      <span className="ml-auto shrink-0 text-[10px] font-bold text-[#D97757] bg-[#D97757]/15 rounded-full px-1.5 py-0.5 uppercase tracking-wide">
+                        Plus
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+
+              <button
+                onClick={() => handleCheckout(isAnnual ? 'pro_yearly' : 'pro_monthly')}
+                disabled={paywallLoading || status.isPro}
+                className="block w-full text-center rounded-xl bg-gradient-to-r from-[#D97757] to-[#E8895A] hover:from-[#C86646] hover:to-[#D97757] disabled:opacity-60 py-3.5 text-sm font-bold text-white transition-all shadow-lg shadow-orange-900/30"
+              >
+                {status.isPro ? '✓ You have Plus' : isAnnual ? `Start free trial — $${proAnnualMonthly}/mo` : `Start free trial — $${proMonthly}/mo`}
+              </button>
+
+              <p className="text-center text-xs text-neutral-500 mt-3">
+                7-day free trial · No credit card required · Cancel anytime
               </p>
             </div>
-
-            <ul className="flex-1 space-y-3 mb-8">
-              {PLUS_FEATURES.map((f) => (
-                <li key={f} className="flex items-start gap-2 text-sm">
-                  <span className="text-emerald-400 mt-0.5 flex-shrink-0">✓</span>
-                  <span className="text-neutral-300">{f}</span>
-                </li>
-              ))}
-            </ul>
-
-            <button
-              onClick={() => handleCheckout(isAnnual ? 'pro_yearly' : 'pro_monthly')}
-              disabled={paywallLoading || status.isPro}
-              className="block w-full text-center rounded-xl bg-[#D97757] hover:bg-[#c4694a] disabled:opacity-60 py-3 text-sm font-semibold text-white transition-colors"
-            >
-              {status.isPro ? '✓ You have Plus' : 'Start free — upgrade anytime'}
-            </button>
           </div>
         </div>
+      </section>
 
-        <p className="text-center text-sm text-neutral-500 dark:text-neutral-400 mt-6">
-          No credit card required · 7-day free trial · Cancel anytime
-        </p>
+      {/* ── FEATURE HIGHLIGHTS ── */}
+      <section className="pb-16 px-4">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-serif text-2xl font-bold text-neutral-900 dark:text-neutral-50 text-center mb-8">
+            What you unlock with Plus
+          </h2>
+          <div className="grid sm:grid-cols-2 gap-4">
+            {[
+              {
+                icon: '🗓️',
+                title: 'Weekly Autopilot',
+                desc: 'One tap. Seven dinners planned, personalised to your household and budget.',
+              },
+              {
+                icon: '🍱',
+                title: 'Leftovers AI',
+                desc: 'Track leftovers after cooking. Get reminders and recipes before they expire.',
+              },
+              {
+                icon: '💰',
+                title: 'Budget Intelligence',
+                desc: 'Set a weekly food budget. We track spend, warn you early, and suggest swaps.',
+              },
+              {
+                icon: '🛒',
+                title: 'Smart Grocery List',
+                desc: 'Auto-generated from your week plan. Export or share with one tap.',
+              },
+            ].map((item) => (
+              <div
+                key={item.title}
+                className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-5 flex gap-4"
+              >
+                <div className="shrink-0 text-2xl">{item.icon}</div>
+                <div>
+                  <p className="font-semibold text-neutral-900 dark:text-neutral-50 text-sm">{item.title}</p>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 leading-relaxed">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* ── FAQ ── */}
@@ -284,17 +353,25 @@ export function PricingContent() {
         {!status.isAuthenticated ? (
           <Link
             href="/signup"
-            className="inline-flex items-center gap-2 rounded-xl bg-[#D97757] hover:bg-[#c4694a] px-8 py-3.5 text-sm font-semibold text-white transition-colors"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#D97757] hover:bg-[#c4694a] px-8 py-3.5 text-sm font-semibold text-white transition-colors shadow-md shadow-orange-200/50 dark:shadow-none"
           >
             Get started free →
           </Link>
-        ) : (
+        ) : status.isPro ? (
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 dark:border-neutral-700 px-8 py-3.5 text-sm font-semibold text-neutral-900 dark:text-neutral-50 hover:border-[#D97757] transition-colors"
+            className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 px-8 py-3.5 text-sm font-semibold text-white transition-colors"
           >
-            Go to dashboard →
+            ✓ Go to dashboard →
           </Link>
+        ) : (
+          <button
+            onClick={() => handleCheckout(isAnnual ? 'pro_yearly' : 'pro_monthly')}
+            disabled={paywallLoading}
+            className="inline-flex items-center gap-2 rounded-xl bg-[#D97757] hover:bg-[#c4694a] px-8 py-3.5 text-sm font-semibold text-white transition-colors disabled:opacity-60"
+          >
+            Start your free trial →
+          </button>
         )}
         <p className="text-neutral-400 text-xs mt-6">
           Questions?{' '}

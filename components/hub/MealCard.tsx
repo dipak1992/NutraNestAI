@@ -8,6 +8,8 @@ import type { SmartMealResult } from '@/lib/engine/types'
 import { SaveMealButton } from '@/components/content/SaveMealButton'
 import { ShareMealButton } from '@/components/content/ShareMealButton'
 import { persistMealForRecipe, type MealPillar } from '@/lib/recipes/canonical'
+import { PaywallDialog } from '@/components/paywall/PaywallDialog'
+import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 
 // ── Helpers ─────────────────────────────────────────────────
 
@@ -52,7 +54,9 @@ interface Props {
 export function MealCard({ meal, pantryMatch, swapping, onCook, onSwap, onOrder, source = 'tonight' }: Props) {
   const [showIngredients, setShowIngredients] = useState(false)
   const [showSteps, setShowSteps] = useState(false)
+  const [paywallOpen, setPaywallOpen] = useState(false)
   const router = useRouter()
+  const { status } = usePaywallStatus()
 
   // ── Safe null guards — prevent crash if meal data is incomplete ──
   if (!meal || !meal.id) {
@@ -77,6 +81,14 @@ export function MealCard({ meal, pantryMatch, swapping, onCook, onSwap, onOrder,
       persistMealForRecipe(meal, '/dashboard', source)
     } catch {}
     router.push('/tonight/recipe')
+  }
+
+  function handleCookClick() {
+    if (!status.isPro && !status.isFamily) {
+      setPaywallOpen(true)
+      return
+    }
+    onCook()
   }
 
   return (
@@ -226,7 +238,7 @@ export function MealCard({ meal, pantryMatch, swapping, onCook, onSwap, onOrder,
       {/* 3-button footer — Cook / Swap / Order */}
       <div className="grid grid-cols-3 border-t border-border/60">
         <button
-          onClick={onCook}
+          onClick={handleCookClick}
           className="flex flex-col items-center justify-center gap-1 py-3.5 hover:bg-emerald-50 transition-colors group"
         >
           <ChefHat className="h-5 w-5 text-emerald-600" />
@@ -250,6 +262,14 @@ export function MealCard({ meal, pantryMatch, swapping, onCook, onSwap, onOrder,
           <span className="text-xs font-semibold text-blue-700 group-hover:text-blue-800">Order</span>
         </button>
       </div>
+      <PaywallDialog
+        open={paywallOpen}
+        onOpenChange={setPaywallOpen}
+        title="Unlock full recipes with Plus"
+        description="Cook This is a Plus feature. Upgrade for guided recipes, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning."
+        isAuthenticated={status.isAuthenticated}
+        redirectPath="/dashboard"
+      />
     </motion.div>
   )
 }

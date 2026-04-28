@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Clock, Users, ChevronRight, Recycle, Sparkles, Leaf, DollarSign, Heart, RefreshCw } from 'lucide-react'
@@ -7,6 +8,9 @@ import { CardShell } from './shared/CardShell'
 import { useDashboardStore } from '@/stores/dashboardStore'
 import { cn } from '@/lib/utils'
 import { persistMealForRecipe } from '@/lib/recipes/canonical'
+import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
+import { useDailySwapLimit } from '@/lib/paywall/use-daily-swap-limit'
+import { PaywallDialog } from '@/components/paywall/PaywallDialog'
 import type { Recipe, TonightState } from '@/lib/dashboard/types'
 import type { SmartMealResult } from '@/lib/engine/types'
 
@@ -97,6 +101,13 @@ function toSmartMeal(recipe: Recipe, reason: string, isFromPantry: boolean): Sma
 
 export function TonightCard({ state }: Props) {
   const router = useRouter()
+  const [paywallOpen, setPaywallOpen] = useState(false)
+  const [paywallCopy, setPaywallCopy] = useState({
+    title: 'Unlock full recipes with Plus',
+    description: 'Cook with guided steps, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning.',
+  })
+  const { status } = usePaywallStatus()
+  const swaps = useDailySwapLimit(status, 'dashboard-tonight')
   const regenerate = useDashboardStore((s) => s.regenerateTonight)
   const isRegenerating = useDashboardStore((s) => s.isRegeneratingTonight)
 
@@ -136,9 +147,29 @@ export function TonightCard({ state }: Props) {
   const mealEmoji = getMealEmoji(recipe.name)
 
   function handleCookThis() {
+    if (!status.isPro && !status.isFamily) {
+      setPaywallCopy({
+        title: 'Unlock full recipes with Plus',
+        description: 'Start Cooking is a Plus feature. Upgrade for guided recipes, unlimited swaps, smarter Tonight suggestions, and premium planning tools.',
+      })
+      setPaywallOpen(true)
+      return
+    }
     persistMealForRecipe(toSmartMeal(recipe, reason, state.isFromPantry), '/dashboard', 'tonight')
     sessionStorage.setItem('recipe-open-cook', 'true')
     router.push('/tonight/recipe')
+  }
+
+  function handleRegenerate() {
+    if (!swaps.recordSwap()) {
+      setPaywallCopy({
+        title: 'You’ve used your free meal changes today',
+        description: 'Free includes 3 meal swaps per day. Upgrade to Plus for unlimited meal swaps, personalized picks, and full Cook This recipes.',
+      })
+      setPaywallOpen(true)
+      return
+    }
+    void regenerate()
   }
 
   return (
@@ -173,7 +204,7 @@ export function TonightCard({ state }: Props) {
           <div className="flex flex-wrap items-center gap-2 mb-4">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-[#D97757] text-white text-xs font-bold px-3 py-1.5 shadow-sm shadow-orange-300/40 dark:shadow-none">
               <Sparkles className="w-3 h-3" />
-              Tonight&rsquo;s Pick
+              {status.isPro || status.isFamily ? 'Tonight’s Smart Pick' : 'Tonight’s Pick'}
             </span>
             {usesLeftover && (
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 text-xs font-semibold px-3 py-1.5 border border-emerald-200 dark:border-emerald-800">
@@ -233,6 +264,14 @@ export function TonightCard({ state }: Props) {
           )}
         </div>
 
+        {!status.isPro && !status.isFamily && (
+          <p className="relative z-10 mt-3 text-xs font-medium text-neutral-600 dark:text-neutral-400">
+            {swaps.remaining > 0
+              ? `${swaps.remaining} swap${swaps.remaining === 1 ? '' : 's'} left today`
+              : 'Free swaps used today'}
+          </p>
+        )}
+
         {/* Regenerating overlay */}
         {isRegenerating && (
           <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/70 dark:bg-neutral-950/70 backdrop-blur-sm">
@@ -270,7 +309,7 @@ export function TonightCard({ state }: Props) {
           </button>
 
           <button
-            onClick={() => regenerate()}
+            onClick={handleRegenerate}
             disabled={isRegenerating || state.alternativesAvailable === 0}
             className="inline-flex items-center justify-center gap-2 bg-neutral-100 dark:bg-neutral-800/80 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 font-medium rounded-full px-5 py-3 min-h-[48px] transition-colors disabled:opacity-40 disabled:cursor-not-allowed border border-neutral-200 dark:border-neutral-700"
           >
@@ -278,7 +317,30 @@ export function TonightCard({ state }: Props) {
             {isRegenerating ? 'Finding…' : 'Show another'}
           </button>
         </div>
+        {!status.isPro && !status.isFamily && (
+          <button
+            type="button"
+            onClick={() => {
+              setPaywallCopy({
+                title: 'Ready to cook smarter?',
+                description: 'Want meals based on your preferences, groceries, and leftovers? Upgrade to Plus for smarter Tonight picks and full recipe guidance.',
+              })
+              setPaywallOpen(true)
+            }}
+            className="mt-3 text-left text-xs text-[#D97757] hover:text-[#C86646]"
+          >
+            Want meals based on your preferences, groceries, and leftovers?
+          </button>
+        )}
       </div>
+      <PaywallDialog
+        open={paywallOpen}
+        onOpenChange={setPaywallOpen}
+        title={paywallCopy.title}
+        description={paywallCopy.description}
+        isAuthenticated={status.isAuthenticated}
+        redirectPath="/dashboard"
+      />
     </CardShell>
   )
 }

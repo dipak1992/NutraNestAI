@@ -86,7 +86,7 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
                 Free
               </Badge>
               <Button asChild size="sm" className="hidden sm:inline-flex">
-                <Link href="/pricing?intent=pro">Upgrade to Plus</Link>
+                <Link href="/upgrade">Upgrade to Plus</Link>
               </Button>
             </>
           )}
@@ -134,7 +134,7 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
                 {!isPaid && (
                   <button
                     role="menuitem"
-                    onClick={() => { closeMenu(); router.push('/pricing?intent=pro') }}
+                    onClick={() => { closeMenu(); router.push('/upgrade') }}
                     className="flex w-full items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors"
                   >
                     <Crown className="h-4 w-4" />

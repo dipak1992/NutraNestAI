@@ -260,6 +260,15 @@ export function PricingContent() {
                 {status.isPro ? '✓ You have Plus' : isAnnual ? `Start free trial — $${proAnnualMonthly}/mo` : `Start free trial — $${proMonthly}/mo`}
               </button>
 
+              {!status.isPro && (
+                <Link
+                  href={`/upgrade?plan=${isAnnual ? 'pro_yearly' : 'pro_monthly'}`}
+                  className="block w-full text-center rounded-xl border border-[#D97757]/40 hover:border-[#D97757] py-3 text-sm font-semibold text-[#D97757] hover:bg-[#D97757]/10 transition-all mt-2"
+                >
+                  Buy Plus now →
+                </Link>
+              )}
+
               <p className="text-center text-xs text-neutral-500 mt-3">
                 7-day free trial · No credit card required · Cancel anytime
               </p>

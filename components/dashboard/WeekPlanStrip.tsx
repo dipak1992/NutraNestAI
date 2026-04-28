@@ -115,7 +115,7 @@ export function WeekPlanStrip() {
                   <p className="text-xs text-neutral-400 mt-0.5">7 dinners planned in one tap</p>
                 </div>
                 <Link
-                  href="/pricing"
+                  href="/upgrade?feature=autopilot"
                   className="shrink-0 inline-flex items-center gap-1 bg-[#D97757] hover:bg-[#C86646] text-white text-xs font-bold rounded-full px-3 py-1.5 transition-colors"
                 >
                   Upgrade
@@ -165,7 +165,7 @@ export function WeekPlanStrip() {
           </Link>
         ) : (
           <Link
-            href="/pricing"
+            href="/upgrade?feature=autopilot"
             className="inline-flex items-center gap-1 text-xs font-bold text-[#D97757] bg-[#D97757]/10 hover:bg-[#D97757]/20 rounded-full px-2.5 py-1 transition-colors whitespace-nowrap shrink-0"
           >
             <Lock className="w-3 h-3" />
@@ -215,7 +215,7 @@ export function WeekPlanStrip() {
             Days 4–7 are locked. <span className="font-semibold text-neutral-800 dark:text-neutral-200">Upgrade to Plus</span> for full-week Autopilot.
           </p>
           <Link
-            href="/pricing"
+            href="/upgrade?feature=autopilot"
             className="shrink-0 text-xs font-bold text-[#D97757] hover:underline"
           >
             Upgrade →
@@ -283,7 +283,7 @@ function FreeDayCell({ day, locked }: { day: DayPlan; locked: boolean }) {
   if (locked) {
     return (
       <Link
-        href="/pricing"
+        href="/upgrade?feature=autopilot"
         className="group relative flex flex-col items-center gap-1 p-1.5 rounded-xl transition-colors hover:bg-[#D97757]/5"
         aria-label={`${day.dayAbbrev} — Plus required`}
       >

@@ -44,8 +44,8 @@ export async function POST(req: Request) {
       customer: customerId,
       mode: 'subscription',
       line_items: [{ price: plan.stripePriceId, quantity: 1 }],
-      success_url: `${origin}/pricing?success=1`,
-      cancel_url: `${origin}/pricing?cancelled=1`,
+      success_url: `${origin}/dashboard?upgraded=1`,
+      cancel_url: `${origin}/upgrade?cancelled=1`,
       metadata: { supabase_user_id: user.id, plan_id: planId },
       subscription_data: {
         metadata: { supabase_user_id: user.id, plan_id: planId },

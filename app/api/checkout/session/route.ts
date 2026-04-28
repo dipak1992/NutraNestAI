@@ -66,7 +66,7 @@ export async function POST(req: Request) {
     body.set('line_items[0][price]', priceId)
     body.set('line_items[0][quantity]', '1')
     body.set('success_url', `${site}/dashboard?welcome=${plan}&session_id={CHECKOUT_SESSION_ID}`)
-    body.set('cancel_url', `${site}/pricing?cancelled=1`)
+    body.set('cancel_url', `${site}/upgrade?cancelled=1`)
     body.set('customer_email', user.email ?? '')
     body.set('client_reference_id', user.id)
     body.set('allow_promotion_codes', 'true')

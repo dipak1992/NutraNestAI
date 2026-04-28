@@ -63,7 +63,7 @@ export function QuickActions() {
           return (
             <Link
               key={a.id}
-              href={gated ? '/pricing' : a.href}
+              href={gated ? `/upgrade?feature=${a.id}` : a.href}
               className={pillBase}
               aria-label={gated ? `${a.label} — requires Plus` : a.label}
             >

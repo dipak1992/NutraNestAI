@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
 import { useOnboardingStore } from '@/stores/onboardingStore'
@@ -24,9 +24,8 @@ export function OnboardingShell({
   onNext,
 }: Props) {
   const router = useRouter()
+  // Read step only — actions via getState() to avoid re-render subscriptions
   const step = useOnboardingStore((s) => s.step)
-  const next = useOnboardingStore((s) => s.next)
-  const back = useOnboardingStore((s) => s.back)
   const isSubmitting = useOnboardingStore((s) => s.isSubmitting)
 
   const stepIndex = STEPS.findIndex((s) => s.id === step)
@@ -34,29 +33,46 @@ export function OnboardingShell({
   const isFirst = stepIndex === 0
   const isLast = stepIndex === STEPS.length - 1
 
-  // ESC to go back
+  // Use ref for isFirst to avoid re-registering the ESC listener on every step change
+  const isFirstRef = useRef(isFirst)
+  isFirstRef.current = isFirst
+
+  // ESC to go back — stable listener using ref
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape' && !isFirst) back()
+      if (e.key === 'Escape' && !isFirstRef.current) {
+        useOnboardingStore.getState().back()
+      }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [isFirst, back])
+  }, []) // empty deps — stable via ref
 
   async function handleNext() {
     if (onNext) await onNext()
     if (isLast) {
       // Last step — submit and redirect to dashboard
-      const { submit } = useOnboardingStore.getState()
       try {
-        await submit()
+        await useOnboardingStore.getState().submit()
       } catch {
         // Even if submit fails, redirect so user isn't stuck
       }
       router.push('/dashboard')
     } else {
-      next()
+      useOnboardingStore.getState().next()
     }
+  }
+
+  function handleBack() {
+    if (isFirst) {
+      router.push('/')
+    } else {
+      useOnboardingStore.getState().back()
+    }
+  }
+
+  function handleSkip() {
+    useOnboardingStore.getState().next()
   }
 
   return (
@@ -65,7 +81,8 @@ export function OnboardingShell({
       <header className="sticky top-0 z-10 bg-[#1a1a1a] border-b border-white/10">
         <div className="mx-auto max-w-lg px-4 h-14 flex items-center justify-between gap-3">
           <button
-            onClick={() => (isFirst ? router.push('/') : back())}
+            type="button"
+            onClick={handleBack}
             aria-label={isFirst ? 'Go home' : 'Previous step'}
             className="w-9 h-9 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors text-white"
           >
@@ -76,7 +93,8 @@ export function OnboardingShell({
 
           {skippable ? (
             <button
-              onClick={() => next()}
+              type="button"
+              onClick={handleSkip}
               className="text-xs text-white/50 hover:text-white px-2 py-1"
             >
               Skip
@@ -141,13 +159,15 @@ export function OnboardingShell({
       </main>
 
       {/* Footer CTA */}
-      <footer className="sticky bottom-0 bg-[#1a1a1a] border-t border-white/10 px-4 py-4"
+      <footer
+        className="sticky bottom-0 bg-[#1a1a1a] border-t border-white/10 px-4 py-4"
         style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
       >
         <div className="mx-auto max-w-lg flex items-center gap-3">
           {!isFirst && (
             <button
-              onClick={back}
+              type="button"
+              onClick={() => useOnboardingStore.getState().back()}
               className="flex items-center gap-1.5 text-sm text-white/50 hover:text-white px-3 py-2"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -155,6 +175,7 @@ export function OnboardingShell({
             </button>
           )}
           <button
+            type="button"
             onClick={handleNext}
             disabled={!canProceed || isSubmitting}
             className="flex-1 flex items-center justify-center gap-2 bg-[#D97757] hover:bg-[#C86646] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-full px-5 py-3 min-h-[48px] transition-colors"

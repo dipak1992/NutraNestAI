@@ -45,10 +45,12 @@ function countPreferences(data: {
 // ─── Client ───────────────────────────────────────────────────────────────────
 
 export function OnboardingClient() {
-  const step         = useOnboardingStore((s) => s.step)
-  const data         = useOnboardingStore((s) => s.data)
-  const householdSize = data.householdSize
-  const skillLevel   = data.skillLevel
+  const step          = useOnboardingStore((s) => s.step)
+  const householdSize = useOnboardingStore((s) => s.data.householdSize)
+  const skillLevel    = useOnboardingStore((s) => s.data.skillLevel)
+  const dietary       = useOnboardingStore((s) => s.data.dietary)
+  const dislikes      = useOnboardingStore((s) => s.data.dislikes)
+  const weeklyBudget  = useOnboardingStore((s) => s.data.weeklyBudget)
 
   // Determine whether the current step allows proceeding
   const canProceed: boolean = (() => {
@@ -57,7 +59,7 @@ export function OnboardingClient() {
       case 'skill':     return !!skillLevel
       case 'budget': {
         // Last step: require at least 3 total preferences across all steps
-        return countPreferences(data) >= 3
+        return countPreferences({ householdSize, dietary, dislikes, skillLevel, weeklyBudget }) >= 3
       }
       default:          return true   // dietary / dislikes are optional per-step
     }

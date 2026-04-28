@@ -3,7 +3,7 @@
 import type { SubscriptionTier } from '@/types'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Home,
@@ -17,18 +17,12 @@ import {
   LogOut,
   User,
   Crown,
+  BarChart2,
+  Gift,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { createClient } from '@/lib/supabase/client'
 import { useUIStore } from '@/lib/store'
 import { MealEaseLogo } from '@/components/ui/MealEaseLogo'
@@ -51,11 +45,35 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
   const router = useRouter()
   const { sidebarOpen, toggleSidebar } = useUIStore()
   const [signingOut, setSigningOut] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
   const isPro = subscriptionTier === 'pro'
   const isPaid = isPro
 
+  // Close menu on click outside
+  useEffect(() => {
+    if (!menuOpen) return
+    function handleClick(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false)
+      }
+    }
+    function handleEscape(e: KeyboardEvent) {
+      if (e.key === 'Escape') setMenuOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    document.addEventListener('keydown', handleEscape)
+    return () => {
+      document.removeEventListener('mousedown', handleClick)
+      document.removeEventListener('keydown', handleEscape)
+    }
+  }, [menuOpen])
+
+  const closeMenu = useCallback(() => setMenuOpen(false), [])
+
   async function handleSignOut() {
     setSigningOut(true)
+    closeMenu()
     const supabase = createClient()
     await supabase.auth.signOut()
     router.push('/')
@@ -112,44 +130,80 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
               <Link href="/pricing?intent=pro">Upgrade to Plus</Link>
             </Button>
           )}
-          <DropdownMenu>
-            <DropdownMenuTrigger className="rounded-full p-0 border-0 bg-transparent hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 outline-none">
-              <Avatar className="h-8 w-8">
-                <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              {userEmail && (
-                <>
-                  <div className="px-2 py-1.5 text-xs text-muted-foreground truncate">
-                    {userEmail}
-                  </div>
-                  <DropdownMenuSeparator />
-                </>
-              )}
-              <DropdownMenuItem onClick={() => router.push('/settings')}>
-                <User className="h-4 w-4" />
-                Profile &amp; Settings
-              </DropdownMenuItem>
-              {!isPaid && (
-                <DropdownMenuItem onClick={() => router.push('/pricing?intent=pro')}>
-                  <Crown className="h-4 w-4" />
-                  Upgrade to Plus
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={handleSignOut}
-                disabled={signingOut}
-                className="text-destructive focus:text-destructive flex items-center gap-2"
+
+          {/* Account menu — simple React state, no Base UI */}
+          <div className="relative" ref={menuRef}>
+            <button
+              type="button"
+              aria-haspopup="menu"
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen((v) => !v)}
+              className="rounded-full p-0 border-0 bg-transparent hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 outline-none"
+            >
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-semibold">
+                {initials}
+              </span>
+            </button>
+
+            {menuOpen && (
+              <div
+                role="menu"
+                className="absolute right-0 top-full mt-2 w-52 rounded-xl border border-border bg-background shadow-lg py-1 z-50 animate-in fade-in-0 zoom-in-95"
               >
-                <LogOut className="h-4 w-4" />
-                {signingOut ? 'Signing out…' : 'Sign out'}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                {userEmail && (
+                  <>
+                    <div className="px-3 py-2 text-xs text-muted-foreground truncate border-b border-border">
+                      {userEmail}
+                    </div>
+                  </>
+                )}
+                <button
+                  role="menuitem"
+                  onClick={() => { closeMenu(); router.push('/settings') }}
+                  className="flex w-full items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors"
+                >
+                  <User className="h-4 w-4" />
+                  Profile &amp; Settings
+                </button>
+                <button
+                  role="menuitem"
+                  onClick={() => { closeMenu(); router.push('/insights') }}
+                  className="flex w-full items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors"
+                >
+                  <BarChart2 className="h-4 w-4" />
+                  Insights
+                </button>
+                {!isPaid && (
+                  <button
+                    role="menuitem"
+                    onClick={() => { closeMenu(); router.push('/pricing?intent=pro') }}
+                    className="flex w-full items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors"
+                  >
+                    <Crown className="h-4 w-4" />
+                    Upgrade to Plus
+                  </button>
+                )}
+                <button
+                  role="menuitem"
+                  onClick={() => { closeMenu(); router.push('/referrals') }}
+                  className="flex w-full items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors"
+                >
+                  <Gift className="h-4 w-4" />
+                  Refer Friends
+                </button>
+                <div className="border-t border-border my-1" />
+                <button
+                  role="menuitem"
+                  onClick={handleSignOut}
+                  disabled={signingOut}
+                  className="flex w-full items-center gap-2 px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-50"
+                >
+                  <LogOut className="h-4 w-4" />
+                  {signingOut ? 'Signing out…' : 'Sign out'}
+                </button>
+              </div>
+            )}
+          </div>
 
           {/* Mobile menu toggle */}
           <Button

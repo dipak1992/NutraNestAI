@@ -1,19 +1,61 @@
 'use client'
 
-import Image from 'next/image'
-import Link from 'next/link'
-import { Check, Circle, Sparkles, Lock } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
+import {
+  ArrowLeft,
+  ChefHat,
+  Clock,
+  Lock,
+  RefreshCw,
+  ShoppingCart,
+  Sparkles,
+} from 'lucide-react'
 import { CardShell } from './shared/CardShell'
 import { useDashboardStore } from '@/stores/dashboardStore'
 import { useBudgetStore } from '@/stores/budgetStore'
+import { useWeeklyPlanStore } from '@/lib/planner/store'
+import { buildGroceryList } from '@/lib/planner/grocery'
+import { DAY_LABELS } from '@/lib/planner/types'
+import { useLightOnboardingStore } from '@/lib/store'
+import { useLearningStore } from '@/lib/learning/store'
+import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
+import { useDailySwapLimit } from '@/lib/paywall/use-daily-swap-limit'
+import { PaywallDialog } from '@/components/paywall/PaywallDialog'
+import { SaveMealButton } from '@/components/content/SaveMealButton'
+import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import type { DayPlan } from '@/lib/dashboard/types'
+import { persistMealForRecipe } from '@/lib/recipes/canonical'
+import { trackEvent } from '@/lib/analytics'
+import type { SmartMealRequest, SmartMealResult } from '@/lib/engine/types'
+import type { GroceryList, WeeklyPlan } from '@/lib/planner/types'
 
-// Free users get Mon–Wed (3 days) unlocked; Thu–Sun are locked
 const FREE_UNLOCKED_DAYS = 3
 
+type WeeklyPlanResponse = {
+  meals: SmartMealResult[]
+  groceryList: GroceryList | null
+  isPreview: boolean
+  previewDays: number
+}
+
+function formatDate(date: string) {
+  const day = new Date(`${date}T12:00:00`)
+  return day.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+}
+
+function parseQuantity(value: string | number) {
+  const parsed = Number.parseFloat(String(value))
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 1
+}
+
+function isLockedDay(dayIndex: number, isPlusMember: boolean) {
+  return !isPlusMember && dayIndex >= FREE_UNLOCKED_DAYS
+}
+
 export function WeekPlanStrip() {
-  const weekPlan = useDashboardStore((s) => s.weekPlan)
+  const router = useRouter()
   const user = useDashboardStore((s) => s.user)
   const budgetHydrated = useBudgetStore((s) => s.hydrated)
   const budgetPlan = useBudgetStore((s) => s.plan)
@@ -21,16 +63,39 @@ export function WeekPlanStrip() {
   const weekSpent = useBudgetStore((s) => s.weekSpent)
   const alertLevel = useBudgetStore((s) => s.alertLevel)
   const openDrawer = useBudgetStore((s) => s.openDrawer)
+  const plan = useWeeklyPlanStore((s) => s.plan)
+  const setPlan = useWeeklyPlanStore((s) => s.setPlan)
+  const groceryList = useWeeklyPlanStore((s) => s.groceryList)
+  const setGroceryList = useWeeklyPlanStore((s) => s.setGroceryList)
+  const clearGrocery = useWeeklyPlanStore((s) => s.clearGrocery)
+  const storeFormat = useWeeklyPlanStore((s) => s.storeFormat)
+  const isGeneratingWeek = useWeeklyPlanStore((s) => s.isGeneratingWeek)
+  const setIsGeneratingWeek = useWeeklyPlanStore((s) => s.setIsGeneratingWeek)
+  const addCustomItem = useWeeklyPlanStore((s) => s.addCustomItem)
+  const {
+    hasKids,
+    pickyEater,
+    dislikedFoods,
+    cuisines,
+    lowEnergy,
+    country,
+    cookingTimeMinutes,
+    householdType,
+  } = useLightOnboardingStore()
+  const getBoosts = useLearningStore((s) => s.getBoosts)
+  const { status } = usePaywallStatus()
+  const swaps = useDailySwapLimit(status, 'weekly-section')
 
-  if (!weekPlan) return null
+  const [selectedDayIndex, setSelectedDayIndex] = useState<number | null>(null)
+  const [swappingDayIndex, setSwappingDayIndex] = useState<number | null>(null)
+  const [paywallOpen, setPaywallOpen] = useState(false)
 
-  const isPlusMember = user?.plan === 'plus' || user?.plan === 'family'
-  const hasPlan = weekPlan.days.some((d) => d.recipe)
+  const isPlusMember = status.isPro || status.isFamily || user?.plan === 'plus' || user?.plan === 'family'
+  const plannedDays = plan.days.filter((day) => day.meal).length
+  const hasPlan = plannedDays > 0
+  const selectedDay = selectedDayIndex === null ? null : plan.days[selectedDayIndex] ?? null
 
-  // Budget inline display
-  const showBudget =
-    budgetHydrated && budgetPlan !== 'free' && weeklyLimit != null
-
+  const showBudget = budgetHydrated && budgetPlan !== 'free' && weeklyLimit != null
   const budgetColorClass =
     alertLevel === 'over'
       ? 'text-red-600 dark:text-red-400'
@@ -38,272 +103,502 @@ export function WeekPlanStrip() {
         ? 'text-amber-600 dark:text-amber-400'
         : 'text-emerald-700 dark:text-emerald-400'
 
-  // Empty state — no plan yet
-  if (!hasPlan) {
-    return (
-      <CardShell className="overflow-hidden">
-        {/* Gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-amber-50/60 to-rose-50 dark:from-[#1e1208] dark:via-neutral-900 dark:to-neutral-950" />
+  const heading = isPlusMember
+    ? 'Your week is ready'
+    : hasPlan
+      ? 'Your next 3 days are ready'
+      : 'Your first 3 days free'
+
+  const subtext = isPlusMember
+    ? 'Full 7-day planning powered by MealEase.'
+    : hasPlan
+      ? 'Tap any day to view meals.'
+      : 'Try MealEase weekly planning before upgrading.'
+
+  const primaryCta = isPlusMember
+    ? hasPlan ? 'Refresh Week' : 'Generate Week'
+    : hasPlan ? 'Refresh My 3 Days' : 'Generate My 3 Days'
+
+  const selectedMeal = selectedDay?.meal ?? null
+
+  const buildRequest = useCallback(
+    (excludeIds?: string[]): SmartMealRequest => {
+      const adultsCount =
+        householdType === 'solo' ? 1 : householdType === 'couple' ? 2 : 2
+      const kidsCount = hasKids ? 1 : 0
+      return {
+        household: { adultsCount, kidsCount, toddlersCount: 0, babiesCount: 0 },
+        cuisinePreferences: cuisines.length > 0 ? cuisines : undefined,
+        lowEnergy,
+        locality: country || undefined,
+        maxCookTime: cookingTimeMinutes > 0 ? cookingTimeMinutes : 45,
+        pickyEater: pickyEater
+          ? { active: true, dislikedFoods: dislikedFoods.length > 0 ? dislikedFoods : undefined }
+          : undefined,
+        excludeIds,
+      }
+    },
+    [hasKids, pickyEater, dislikedFoods, cuisines, lowEnergy, country, cookingTimeMinutes, householdType],
+  )
+
+  useEffect(() => {
+    trackEvent('weekly_section_viewed', {
+      plan: isPlusMember ? 'plus' : 'free',
+      planned_days: plannedDays,
+    })
+  }, [isPlusMember, plannedDays])
+
+  const openLockedDay = useCallback((dayIndex: number) => {
+    trackEvent('locked_day_clicked', { day_index: dayIndex })
+    setPaywallOpen(true)
+  }, [])
+
+  const openDay = useCallback((dayIndex: number) => {
+    if (isLockedDay(dayIndex, isPlusMember)) {
+      openLockedDay(dayIndex)
+      return
+    }
+    const day = plan.days[dayIndex]
+    if (!day?.meal) {
+      toast.message('Generate your plan first.', {
+        description: isPlusMember ? 'Generate Week will fill all 7 days.' : 'Generate My 3 Days will fill your free preview.',
+      })
+      return
+    }
+    trackEvent('unlocked_day_opened', {
+      day_index: dayIndex,
+      meal_id: day.meal.id,
+      plan: isPlusMember ? 'plus' : 'free',
+    })
+    setSelectedDayIndex(dayIndex)
+  }, [isPlusMember, openLockedDay, plan.days])
+
+  const handleGenerate = useCallback(async () => {
+    const eventName = isPlusMember
+      ? hasPlan ? 'week_refreshed' : 'plus_generate_week_clicked'
+      : 'generate_3days_clicked'
+    trackEvent(eventName, { source: 'dashboard_weekly_section' })
+
+    setIsGeneratingWeek(true)
+    try {
+      const res = await fetch('/api/weekly-plan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          baseRequest: buildRequest(),
+          learnedBoosts: getBoosts(),
+          storeFormat,
+          weekStart: plan.weekStart,
+        }),
+      })
+
+      if (!res.ok) {
+        if (res.status === 401) {
+          router.push('/login?redirect=/dashboard')
+          return
+        }
+        throw new Error(`Weekly plan failed: ${res.status}`)
+      }
+
+      const data = (await res.json()) as WeeklyPlanResponse
+      const nextPlan: WeeklyPlan = {
+        ...plan,
+        days: plan.days.map((day, index) => ({
+          ...day,
+          meal: data.meals[index] ?? null,
+        })),
+        generatedAt: new Date().toISOString(),
+      }
+      setPlan(nextPlan)
+      setSelectedDayIndex(0)
+
+      if (data.groceryList) setGroceryList(data.groceryList)
+      else clearGrocery()
+
+      toast.success(isPlusMember ? 'Week generated.' : 'Your 3-day preview is ready.', {
+        description: isPlusMember ? 'All 7 days are ready.' : 'Tap Mon, Tue, or Wed to use your meals.',
+      })
+    } catch {
+      toast.error('Could not generate your week. Try again in a moment.')
+    } finally {
+      setIsGeneratingWeek(false)
+    }
+  }, [
+    buildRequest,
+    clearGrocery,
+    getBoosts,
+    hasPlan,
+    isPlusMember,
+    plan,
+    router,
+    setGroceryList,
+    setIsGeneratingWeek,
+    setPlan,
+    storeFormat,
+  ])
+
+  const handleAddGroceries = useCallback((meal: SmartMealResult) => {
+    const lines = meal.shoppingList?.length
+      ? meal.shoppingList
+      : meal.ingredients.filter((item) => !item.fromPantry)
+
+    for (const item of lines) {
+      addCustomItem({
+        name: item.name,
+        quantity: parseQuantity(item.quantity),
+        unit: item.unit || 'unit',
+        category: item.category || 'other',
+      })
+    }
+    toast.success('Ingredients added to your grocery list.')
+  }, [addCustomItem])
+
+  const handleCook = useCallback((meal: SmartMealResult) => {
+    if (!isPlusMember) {
+      setPaywallOpen(true)
+      return
+    }
+    persistMealForRecipe(meal, '/dashboard', 'weekly')
+    sessionStorage.setItem('recipe-open-cook', 'true')
+    router.push('/tonight/recipe')
+  }, [isPlusMember, router])
+
+  const handleSwap = useCallback(async (dayIndex: number) => {
+    const currentMeal = plan.days[dayIndex]?.meal
+    if (!currentMeal) return
+    if (!isPlusMember && !swaps.recordSwap()) {
+      setPaywallOpen(true)
+      return
+    }
+
+    setSwappingDayIndex(dayIndex)
+    try {
+      const excludeIds = plan.days
+        .map((day) => day.meal?.id)
+        .filter((id): id is string => Boolean(id))
+      const res = await fetch('/api/smart-meal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...buildRequest(excludeIds),
+          learnedBoosts: getBoosts(),
+        }),
+      })
+      if (!res.ok) throw new Error('Swap failed')
+      const meal = (await res.json()) as SmartMealResult
+      const nextPlan: WeeklyPlan = {
+        ...plan,
+        days: plan.days.map((day) =>
+          day.dayIndex === dayIndex ? { ...day, meal } : day,
+        ),
+      }
+      setPlan(nextPlan)
+
+      if (groceryList) {
+        const grocery = buildGroceryList(
+          nextPlan.days.filter((day) => day.meal).map((day) => day.meal!),
+          groceryList.items.filter((item) => item.isInPantry).map((item) => item.name),
+          storeFormat,
+          plan.weekStart,
+        )
+        setGroceryList(grocery)
+      }
+      toast.success(`${DAY_LABELS[dayIndex]} swapped.`)
+    } catch {
+      toast.error('Could not swap this meal. Try again.')
+    } finally {
+      setSwappingDayIndex(null)
+    }
+  }, [
+    buildRequest,
+    getBoosts,
+    groceryList,
+    isPlusMember,
+    plan,
+    setGroceryList,
+    setPlan,
+    storeFormat,
+    swaps,
+  ])
+
+  const upgradeBenefits = useMemo(() => [
+    'all 7 days unlocked',
+    'unlimited swaps',
+    'personalized plans',
+    'Cook This recipes',
+    'grocery planning',
+  ], [])
+
+  return (
+    <>
+      <CardShell className="overflow-hidden" ariaLabel="This week's meal plan">
+        <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-amber-50/60 to-white dark:from-[#1e1208] dark:via-neutral-900 dark:to-neutral-950" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_100%_0%,_rgba(217,119,87,0.12),_transparent)]" />
 
-        <div className="relative z-10 p-6 md:p-8">
-          {/* Header row */}
-          <div className="flex items-center justify-between mb-5">
-            <div className="flex items-center gap-2">
-              <span aria-hidden>📅</span>
-              <h2 className="font-serif text-lg font-bold text-neutral-900 dark:text-neutral-50">
-                This week
+        <div className="relative z-10 p-5 md:p-6">
+          <header className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <div className="mb-1 flex items-center gap-2">
+                <span aria-hidden>📅</span>
+                <p className="text-[11px] font-bold uppercase tracking-wide text-[#D97757]">
+                  This Week
+                </p>
+              </div>
+              <h2 className="font-serif text-xl font-bold text-neutral-950 dark:text-neutral-50">
+                {heading}
               </h2>
+              <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
+                {subtext}
+              </p>
+              {isPlusMember && (
+                <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-500">
+                  Powered by Autopilot
+                </p>
+              )}
             </div>
+
             {showBudget && (
               <button
                 onClick={openDrawer}
                 className={cn(
-                  'flex items-center gap-1.5 text-sm font-medium rounded-full px-3 py-1',
-                  'bg-white/70 dark:bg-neutral-800 hover:bg-white dark:hover:bg-neutral-700 transition-colors',
-                  budgetColorClass
+                  'flex shrink-0 items-center gap-1 rounded-full bg-white/80 px-2.5 py-1 text-xs font-semibold shadow-sm transition hover:bg-white',
+                  budgetColorClass,
                 )}
                 aria-label="Open budget details"
               >
                 <span aria-hidden>💰</span>
                 <span>${weekSpent.toFixed(0)}/{weeklyLimit}</span>
-                {alertLevel === 'caution' && <span aria-label="Warning">⚠️</span>}
-                {alertLevel === 'over' && <span aria-label="Over budget">🚨</span>}
               </button>
             )}
+          </header>
+
+          <div className="mt-5 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {plan.days.map((day) => {
+              const locked = isLockedDay(day.dayIndex, isPlusMember)
+              const active = selectedDayIndex === day.dayIndex
+              return (
+                <button
+                  key={day.dayIndex}
+                  type="button"
+                  onClick={() => openDay(day.dayIndex)}
+                  className={cn(
+                    'min-w-[4.25rem] rounded-2xl border px-2.5 py-3 text-center transition',
+                    active
+                      ? 'border-[#D97757] bg-white shadow-md shadow-orange-200/50'
+                      : 'border-white/70 bg-white/70 hover:bg-white',
+                  )}
+                  aria-label={`${DAY_LABELS[day.dayIndex]} ${locked ? 'locked' : 'unlocked'}`}
+                >
+                  <p className="text-xs font-bold text-neutral-900">{DAY_LABELS[day.dayIndex]}</p>
+                  <p className="mt-0.5 text-[11px] text-neutral-500">{formatDate(day.date)}</p>
+                  <div className={cn(
+                    'mx-auto mt-2 flex h-8 w-8 items-center justify-center rounded-full',
+                    locked ? 'bg-orange-50 text-[#D97757]' : day.meal ? 'bg-emerald-50 text-emerald-700' : 'bg-neutral-100 text-neutral-400',
+                  )}>
+                    {locked ? <Lock className="h-4 w-4" /> : <span aria-hidden>{day.meal ? '🔓' : '○'}</span>}
+                  </div>
+                  <p className="mt-2 truncate text-[10px] font-semibold text-neutral-600">
+                    {locked ? 'Plus' : day.meal ? day.meal.title : 'Free'}
+                  </p>
+                </button>
+              )
+            })}
           </div>
 
-          {isPlusMember ? (
-            /* Plus: full autopilot CTA */
-            <div className="text-center py-2">
-              <div className="text-3xl mb-3" aria-hidden>🗓️</div>
-              <h3 className="font-semibold text-neutral-900 dark:text-neutral-50">
-                Plan your whole week in one tap
-              </h3>
-              <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400 max-w-sm mx-auto">
-                Generate 7 dinners with Autopilot — personalised to your household and budget.
-              </p>
-              <Link
-                href="/planner?autopilot=true"
-                className="mt-5 inline-flex items-center gap-2 bg-[#D97757] hover:bg-[#C86646] text-white font-semibold rounded-full px-5 py-3 min-h-[48px] transition-colors shadow-md shadow-orange-200/40 dark:shadow-none"
-              >
-                <Sparkles className="w-4 h-4" />
-                Run Autopilot
-              </Link>
-            </div>
+          <Button
+            type="button"
+            onClick={() => void handleGenerate()}
+            disabled={isGeneratingWeek}
+            className="mt-5 h-12 w-full rounded-2xl bg-[#D97757] text-sm font-bold text-white hover:bg-[#C86646]"
+          >
+            {isGeneratingWeek ? (
+              <>
+                <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <Sparkles className="mr-2 h-4 w-4" />
+                {primaryCta}
+              </>
+            )}
+          </Button>
+
+          {selectedDay && selectedMeal ? (
+            <DayDetail
+              dayLabel={DAY_LABELS[selectedDay.dayIndex]}
+              meal={selectedMeal}
+              isPlusMember={isPlusMember}
+              isSwapping={swappingDayIndex === selectedDay.dayIndex}
+              swapsRemaining={swaps.isUnlimited ? null : swaps.remaining}
+              onBack={() => setSelectedDayIndex(null)}
+              onAddGroceries={() => handleAddGroceries(selectedMeal)}
+              onCook={() => handleCook(selectedMeal)}
+              onSwap={() => void handleSwap(selectedDay.dayIndex)}
+            />
           ) : (
-            /* Free: show 3-day preview + locked days + upgrade nudge */
-            <div>
-              <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">
-                Your first 3 days are ready. Upgrade to plan the full week.
+            <div className="mt-5 rounded-2xl border border-white/70 bg-white/70 p-4">
+              <p className="text-sm font-semibold text-neutral-900">
+                {isPlusMember ? 'Plan all 7 dinners from here.' : 'Start with your free 3-day preview.'}
               </p>
+              <p className="mt-1 text-xs leading-relaxed text-neutral-600">
+                {isPlusMember
+                  ? 'Generate Week fills every day and keeps this section usable from the dashboard.'
+                  : 'Generate My 3 Days, then tap Mon, Tue, or Wed to save meals, add groceries, or swap within your free limit.'}
+              </p>
+            </div>
+          )}
 
-              {/* 7-day grid with locked days */}
-              <div className="grid grid-cols-7 gap-1.5 mb-5">
-                {weekPlan.days.map((d, i) => (
-                  <FreeDayCell key={d.id} day={d} locked={i >= FREE_UNLOCKED_DAYS} />
-                ))}
-              </div>
-
-              {/* Upgrade CTA */}
-              <div className="rounded-2xl bg-neutral-900 dark:bg-neutral-800 border border-[#D97757]/30 p-4 flex items-center gap-4">
-                <div className="shrink-0 flex h-10 w-10 items-center justify-center rounded-full bg-[#D97757]/20">
-                  <Sparkles className="w-5 h-5 text-[#D97757]" />
+          {!isPlusMember && hasPlan && (
+            <div className="mt-4 rounded-2xl border border-[#D97757]/20 bg-neutral-950 p-4 text-white">
+              <div className="flex items-start gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#D97757]/20">
+                  <Sparkles className="h-4 w-4 text-[#D97757]" />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-white">Autopilot — Plus feature</p>
-                  <p className="text-xs text-neutral-400 mt-0.5">7 dinners planned in one tap</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold">Unlock your full week with Plus</p>
+                  <p className="mt-1 text-xs text-white/60">
+                    Get all 7 days, Cook This recipes, unlimited swaps, and grocery planning.
+                  </p>
                 </div>
-                <Link
-                  href="/upgrade?feature=autopilot"
-                  className="shrink-0 inline-flex items-center gap-1 bg-[#D97757] hover:bg-[#C86646] text-white text-xs font-bold rounded-full px-3 py-1.5 transition-colors"
+                <button
+                  type="button"
+                  onClick={() => {
+                    trackEvent('upgrade_from_weekly_lock', { source: 'dashboard_upgrade_card' })
+                    setPaywallOpen(true)
+                  }}
+                  className="shrink-0 rounded-full bg-[#D97757] px-3 py-1.5 text-xs font-bold text-white hover:bg-[#C86646]"
                 >
                   Upgrade
-                </Link>
+                </button>
               </div>
             </div>
           )}
         </div>
       </CardShell>
-    )
-  }
 
+      <PaywallDialog
+        open={paywallOpen}
+        onOpenChange={(open) => {
+          if (!open) trackEvent('paywall_dismissed', { feature: 'weekly_autopilot' })
+          setPaywallOpen(open)
+        }}
+        title="Unlock your full week with Plus"
+        description={`Plus includes ${upgradeBenefits.join(', ')}.`}
+        isAuthenticated={status.isAuthenticated}
+        feature="weekly_autopilot"
+        redirectPath="/dashboard"
+      />
+    </>
+  )
+}
+
+function DayDetail({
+  dayLabel,
+  meal,
+  isPlusMember,
+  isSwapping,
+  swapsRemaining,
+  onBack,
+  onAddGroceries,
+  onCook,
+  onSwap,
+}: {
+  dayLabel: string
+  meal: SmartMealResult
+  isPlusMember: boolean
+  isSwapping: boolean
+  swapsRemaining: number | null
+  onBack: () => void
+  onAddGroceries: () => void
+  onCook: () => void
+  onSwap: () => void
+}) {
   return (
-    <CardShell className="p-5 md:p-6" ariaLabel="This week's meal plan">
-      {/* Header row: title + budget badge + autopilot link */}
-      <header className="flex items-center justify-between mb-4 md:mb-5">
-        <div className="flex items-center gap-2 min-w-0">
-          <span aria-hidden>📅</span>
-          <h2 className="font-serif text-lg font-bold text-neutral-900 dark:text-neutral-50 whitespace-nowrap">
-            This week
-          </h2>
-          {showBudget && (
-            <button
-              onClick={openDrawer}
-              className={cn(
-                'flex items-center gap-1 text-xs font-semibold rounded-full px-2.5 py-1 ml-1',
-                'bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors',
-                budgetColorClass
-              )}
-              aria-label="Open budget details"
-            >
-              <span aria-hidden>💰</span>
-              <span>${weekSpent.toFixed(0)}/{weeklyLimit}</span>
-              {alertLevel === 'caution' && <span aria-label="Warning">⚠️</span>}
-              {alertLevel === 'over' && <span aria-label="Over budget">🚨</span>}
-            </button>
-          )}
+    <section className="mt-5 rounded-3xl border border-white/80 bg-white/88 p-4 shadow-sm backdrop-blur">
+      <button
+        type="button"
+        onClick={onBack}
+        className="mb-3 inline-flex items-center gap-1 text-xs font-semibold text-neutral-500 hover:text-neutral-900"
+      >
+        <ArrowLeft className="h-3.5 w-3.5" />
+        Back to week
+      </button>
+
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-xs font-bold uppercase tracking-wide text-[#D97757]">{dayLabel}</p>
+          <h3 className="mt-1 text-lg font-bold leading-tight text-neutral-950">{meal.title}</h3>
+          <p className="mt-1 line-clamp-2 text-sm text-neutral-600">{meal.tagline || meal.description}</p>
         </div>
+        <SaveMealButton meal={meal} source="weekly" className="h-9 w-9 shrink-0 border border-orange-100 bg-orange-50" />
+      </div>
 
-        {isPlusMember ? (
-          <Link
-            href="/planner"
-            className="inline-flex items-center gap-1 text-sm font-medium text-[#D97757] hover:text-[#C86646] transition-colors whitespace-nowrap shrink-0"
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            Autopilot →
-          </Link>
-        ) : (
-          <Link
-            href="/upgrade?feature=autopilot"
-            className="inline-flex items-center gap-1 text-xs font-bold text-[#D97757] bg-[#D97757]/10 hover:bg-[#D97757]/20 rounded-full px-2.5 py-1 transition-colors whitespace-nowrap shrink-0"
-          >
-            <Lock className="w-3 h-3" />
-            Plus
-          </Link>
-        )}
-      </header>
-
-      <div className="grid grid-cols-7 gap-1.5 md:gap-2">
-        {weekPlan.days.map((d, i) => (
-          isPlusMember ? (
-            <DayCell key={d.id} day={d} />
-          ) : (
-            <FreeDayCell key={d.id} day={d} locked={i >= FREE_UNLOCKED_DAYS} />
-          )
+      <div className="mt-3 flex flex-wrap gap-1.5">
+        <span className="inline-flex items-center gap-1 rounded-full bg-orange-50 px-2.5 py-1 text-xs font-semibold text-[#9f4f32]">
+          <Clock className="h-3 w-3" />
+          {meal.totalTime}m
+        </span>
+        <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+          {meal.difficulty}
+        </span>
+        {meal.tags?.slice(0, 2).map((tag) => (
+          <span key={tag} className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-semibold text-neutral-600">
+            {tag}
+          </span>
         ))}
       </div>
 
-      {/* Progress bar */}
-      <div className="mt-4 space-y-1.5">
-        <div
-          className="h-1.5 rounded-full bg-neutral-100 dark:bg-neutral-800 overflow-hidden"
-          role="progressbar"
-          aria-valuenow={weekPlan.completionPercentage}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-label={`${weekPlan.completionPercentage}% of week cooked`}
+      {meal.meta?.selectionReason && (
+        <p className="mt-3 rounded-2xl bg-neutral-50 px-3 py-2 text-xs leading-relaxed text-neutral-600">
+          {meal.meta.selectionReason}
+        </p>
+      )}
+
+      {!isPlusMember && swapsRemaining !== null && (
+        <p className="mt-3 text-xs text-neutral-500">
+          {swapsRemaining} swap{swapsRemaining === 1 ? '' : 's'} left today.
+        </p>
+      )}
+
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        <Button
+          type="button"
+          onClick={onAddGroceries}
+          variant="outline"
+          className="h-11 rounded-2xl"
         >
-          <div
-            className="h-full bg-[#D97757] transition-all duration-500"
-            style={{ width: `${weekPlan.completionPercentage}%` }}
-          />
-        </div>
-        <div className="flex justify-between text-xs text-neutral-500 dark:text-neutral-400">
-          <span>{weekPlan.completionPercentage}% cooked</span>
-          {isPlusMember && (
-            <span>Est. ${weekPlan.estimatedTotalCost.toFixed(0)} this week</span>
+          <ShoppingCart className="mr-2 h-4 w-4" />
+          Groceries
+        </Button>
+        <Button
+          type="button"
+          onClick={onSwap}
+          disabled={isSwapping}
+          variant="outline"
+          className="h-11 rounded-2xl"
+        >
+          <RefreshCw className={cn('mr-2 h-4 w-4', isSwapping && 'animate-spin')} />
+          Swap
+        </Button>
+        <Button
+          type="button"
+          onClick={onCook}
+          className="col-span-2 h-11 rounded-2xl bg-emerald-600 text-white hover:bg-emerald-700"
+        >
+          {isPlusMember ? (
+            <>
+              <ChefHat className="mr-2 h-4 w-4" />
+              Cook This
+            </>
+          ) : (
+            <>
+              <Lock className="mr-2 h-4 w-4" />
+              Cook This with Plus
+            </>
           )}
-        </div>
+        </Button>
       </div>
-
-      {/* Free user upgrade nudge below grid */}
-      {!isPlusMember && (
-        <div className="mt-4 rounded-xl bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-200 dark:border-neutral-700 px-4 py-3 flex items-center gap-3">
-          <Lock className="w-4 h-4 text-[#D97757] shrink-0" />
-          <p className="text-xs text-neutral-600 dark:text-neutral-400 flex-1">
-            Days 4–7 are locked. <span className="font-semibold text-neutral-800 dark:text-neutral-200">Upgrade to Plus</span> for full-week Autopilot.
-          </p>
-          <Link
-            href="/upgrade?feature=autopilot"
-            className="shrink-0 text-xs font-bold text-[#D97757] hover:underline"
-          >
-            Upgrade →
-          </Link>
-        </div>
-      )}
-    </CardShell>
+    </section>
   )
-}
-
-// ─── DayCell (Plus users — fully interactive) ─────────────────────────────────
-
-function DayCell({ day }: { day: DayPlan }) {
-  return (
-    <Link
-      href={`/planner?day=${day.id}`}
-      className={cn(
-        'group relative flex flex-col items-center gap-1 p-1.5 rounded-xl transition-colors',
-        'hover:bg-neutral-50 dark:hover:bg-neutral-800/60'
-      )}
-      aria-label={`${day.dayAbbrev} ${day.date}: ${day.recipe?.name ?? 'empty'}`}
-    >
-      <div className="text-[10px] font-medium uppercase tracking-wider text-neutral-500">
-        {day.dayAbbrev}
-      </div>
-      <div className="text-xs text-neutral-400">{day.date}</div>
-
-      <div className="relative aspect-square w-full rounded-lg overflow-hidden bg-neutral-100 dark:bg-neutral-800 ring-1 ring-neutral-200/60 dark:ring-neutral-700/60">
-        {day.recipe ? (
-          <Image
-            src={day.recipe.image}
-            alt=""
-            fill
-            sizes="(max-width: 768px) 14vw, 100px"
-            className="object-cover"
-            onError={(e) => {
-              ;(e.target as HTMLImageElement).style.display = 'none'
-            }}
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-neutral-300 dark:text-neutral-700">
-            <Circle className="w-4 h-4" />
-          </div>
-        )}
-
-        {day.status === 'cooked' && (
-          <div className="absolute inset-0 bg-emerald-500/80 flex items-center justify-center">
-            <Check className="w-5 h-5 text-white" strokeWidth={3} />
-          </div>
-        )}
-      </div>
-
-      {day.recipe && (
-        <div className="text-[10px] font-semibold text-neutral-700 dark:text-neutral-300">
-          ${day.recipe.costTotal.toFixed(0)}
-        </div>
-      )}
-    </Link>
-  )
-}
-
-// ─── FreeDayCell (free users — locked days show padlock) ──────────────────────
-
-function FreeDayCell({ day, locked }: { day: DayPlan; locked: boolean }) {
-  if (locked) {
-    return (
-      <Link
-        href="/upgrade?feature=autopilot"
-        className="group relative flex flex-col items-center gap-1 p-1.5 rounded-xl transition-colors hover:bg-[#D97757]/5"
-        aria-label={`${day.dayAbbrev} — Plus required`}
-      >
-        <div className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">
-          {day.dayAbbrev}
-        </div>
-        <div className="text-xs text-neutral-300 dark:text-neutral-600">{day.date}</div>
-
-        <div className="relative aspect-square w-full rounded-lg overflow-hidden bg-neutral-100 dark:bg-neutral-800 ring-1 ring-neutral-200/60 dark:ring-neutral-700/60">
-          <div className="w-full h-full flex items-center justify-center bg-neutral-100 dark:bg-neutral-800/80">
-            <Lock className="w-3.5 h-3.5 text-[#D97757]/60" />
-          </div>
-        </div>
-
-        <div className="text-[9px] font-bold text-[#D97757]/70 uppercase tracking-wide">
-          Plus
-        </div>
-      </Link>
-    )
-  }
-
-  return <DayCell day={day} />
 }

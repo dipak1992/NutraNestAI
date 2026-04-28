@@ -206,7 +206,7 @@ export function TonightCard({ state }: Props) {
         {/* CTAs — Cook This + Show Another */}
         <div className="mt-auto pt-5 flex flex-col sm:flex-row gap-2.5">
           <Link
-            href={`/meal/${recipe.id}`}
+            href={`/recipes/${recipe.id}/cook`}
             className="flex-1 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#D97757] to-[#E8895A] hover:from-[#C86646] hover:to-[#D97757] text-white font-semibold rounded-full px-5 py-3 min-h-[48px] transition-all shadow-md shadow-orange-200/50 dark:shadow-none"
           >
             Cook this

@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { getPaywallStatus } from '@/lib/paywall/server'
 import { loadRecipe } from '../loader'
 import { CookMode } from '@/components/recipes/CookMode'
 
@@ -8,7 +9,7 @@ type Props = {
 }
 
 export const metadata = {
-  title: 'Cook Mode — NutriNest AI',
+  title: 'Cook Mode — MealEase AI',
 }
 
 export default async function CookPage({ params }: Props) {
@@ -18,7 +19,12 @@ export default async function CookPage({ params }: Props) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const recipe = await loadRecipe(id)
+  const [recipe, paywall] = await Promise.all([
+    loadRecipe(id),
+    getPaywallStatus(),
+  ])
+
+  const isPlusMember = paywall.isPro || paywall.isFamily
 
   // Create or resume a cook session
   const { data: existing } = await supabase
@@ -38,5 +44,5 @@ export default async function CookPage({ params }: Props) {
     })
   }
 
-  return <CookMode recipe={recipe} recipeId={id} />
+  return <CookMode recipe={recipe} recipeId={id} isPlusMember={isPlusMember} />
 }

@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { useDashboardStore } from '@/stores/dashboardStore'
 import { useScanStore } from '@/stores/scanStore'
-import { LockBadge } from './shared/LockBadge'
 import { isActionGated } from '@/config/quick-actions'
 import { hapticTap } from '@/lib/scan/haptics'
 import { cn } from '@/lib/utils'
@@ -27,35 +26,35 @@ export function QuickActions() {
         🎯 Quick actions
       </h2>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      {/* Horizontal scrollable pill row — matches spec layout */}
+      <div className="flex flex-wrap gap-2.5">
         {actions.map((a) => {
           const gated = isActionGated(a.requiredPlan, user.plan)
           const isScanAction = SCAN_ACTION_IDS.includes(a.id)
 
+          const pillBase = cn(
+            'inline-flex items-center gap-2 rounded-full px-4 py-2.5 min-h-[44px]',
+            'text-sm font-semibold transition-all',
+            'ring-1 ring-neutral-200/80 dark:ring-neutral-700',
+            'bg-white dark:bg-neutral-900',
+            'hover:ring-[#D97757]/50 hover:bg-[#D97757]/5 hover:-translate-y-0.5 hover:shadow-sm',
+            gated && 'opacity-60'
+          )
+
           if (isScanAction && !gated) {
-            // Render as button that opens scan modal
             return (
               <button
                 key={a.id}
                 onClick={() => { hapticTap(); openScan('auto') }}
-                className={cn(
-                  'relative group block rounded-2xl p-4 min-h-[96px] text-left',
-                  'bg-white dark:bg-neutral-900 ring-1 ring-neutral-200/70 dark:ring-neutral-800',
-                  'hover:ring-[#D97757]/40 hover:-translate-y-0.5 hover:shadow-sm',
-                  'transition-all'
-                )}
+                className={pillBase}
                 aria-label={a.label}
               >
-                <div className="flex items-start justify-between">
-                  <span className="text-2xl" aria-hidden>{a.icon}</span>
-                </div>
-                <div className="mt-3 text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-                  {a.label}
-                </div>
+                <span aria-hidden className="text-base">{a.icon}</span>
+                <span>{a.label}</span>
                 {a.status && (
-                  <div className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">
-                    {a.status}
-                  </div>
+                  <span className="text-[11px] font-normal text-neutral-500 dark:text-neutral-400">
+                    ({a.status})
+                  </span>
                 )}
               </button>
             )
@@ -65,25 +64,20 @@ export function QuickActions() {
             <Link
               key={a.id}
               href={gated ? '/pricing' : a.href}
-              className={cn(
-                'relative group block rounded-2xl p-4 min-h-[96px]',
-                'bg-white dark:bg-neutral-900 ring-1 ring-neutral-200/70 dark:ring-neutral-800',
-                'hover:ring-[#D97757]/40 hover:-translate-y-0.5 hover:shadow-sm',
-                'transition-all'
-              )}
+              className={pillBase}
               aria-label={gated ? `${a.label} — requires Plus` : a.label}
             >
-              <div className="flex items-start justify-between">
-                <span className="text-2xl" aria-hidden>{a.icon}</span>
-                {gated && <LockBadge />}
-              </div>
-              <div className="mt-3 text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-                {a.label}
-              </div>
-              {a.status && (
-                <div className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">
-                  {a.status}
-                </div>
+              <span aria-hidden className="text-base">{a.icon}</span>
+              <span>{a.label}</span>
+              {gated && (
+                <span className="text-[10px] font-bold uppercase tracking-wide text-[#D97757] bg-[#D97757]/10 rounded-full px-1.5 py-0.5">
+                  Plus
+                </span>
+              )}
+              {!gated && a.status && (
+                <span className="text-[11px] font-normal text-neutral-500 dark:text-neutral-400">
+                  ({a.status})
+                </span>
               )}
             </Link>
           )

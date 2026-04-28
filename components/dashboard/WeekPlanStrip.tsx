@@ -2,58 +2,123 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { Check, Circle, ChevronRight, Sparkles } from 'lucide-react'
+import { Check, Circle, Sparkles } from 'lucide-react'
 import { CardShell } from './shared/CardShell'
 import { useDashboardStore } from '@/stores/dashboardStore'
+import { useBudgetStore } from '@/stores/budgetStore'
 import { cn } from '@/lib/utils'
 import type { DayPlan } from '@/lib/dashboard/types'
 
 export function WeekPlanStrip() {
   const weekPlan = useDashboardStore((s) => s.weekPlan)
+  const budgetHydrated = useBudgetStore((s) => s.hydrated)
+  const budgetPlan = useBudgetStore((s) => s.plan)
+  const weeklyLimit = useBudgetStore((s) => s.settings.weeklyLimit)
+  const weekSpent = useBudgetStore((s) => s.weekSpent)
+  const alertLevel = useBudgetStore((s) => s.alertLevel)
+  const openDrawer = useBudgetStore((s) => s.openDrawer)
+
   if (!weekPlan) return null
 
   const hasPlan = weekPlan.days.some((d) => d.recipe)
 
+  // Budget inline display
+  const showBudget =
+    budgetHydrated && budgetPlan !== 'free' && weeklyLimit != null
+
+  const budgetColorClass =
+    alertLevel === 'over'
+      ? 'text-red-600 dark:text-red-400'
+      : alertLevel === 'caution'
+        ? 'text-amber-600 dark:text-amber-400'
+        : 'text-emerald-700 dark:text-emerald-400'
+
   if (!hasPlan) {
     return (
-      <CardShell className="p-6 md:p-8 text-center bg-gradient-to-br from-[#FDF6F1] to-white dark:from-neutral-900 dark:to-neutral-950">
-        <div className="text-3xl mb-3" aria-hidden>📅</div>
-        <h3 className="font-serif text-xl font-bold text-neutral-900 dark:text-neutral-50">
-          Plan your whole week in one tap
-        </h3>
-        <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400 max-w-sm mx-auto">
-          Generate your first week with Autopilot — personalised to your household and budget.
-        </p>
-        <Link
-          href="/planner?autopilot=true"
-          className="mt-5 inline-flex items-center gap-2 bg-[#D97757] hover:bg-[#C86646] text-white font-medium rounded-full px-5 py-3 min-h-[48px] transition-colors"
-        >
-          <Sparkles className="w-4 h-4" />
-          Run Autopilot
-        </Link>
+      <CardShell className="p-6 md:p-8 bg-gradient-to-br from-[#FDF6F1] to-white dark:from-neutral-900 dark:to-neutral-950">
+        {/* Header row */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <span aria-hidden>📅</span>
+            <h2 className="font-serif text-lg font-bold text-neutral-900 dark:text-neutral-50">
+              This week
+            </h2>
+          </div>
+          {showBudget && (
+            <button
+              onClick={openDrawer}
+              className={cn(
+                'flex items-center gap-1.5 text-sm font-medium rounded-full px-3 py-1',
+                'bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors',
+                budgetColorClass
+              )}
+              aria-label="Open budget details"
+            >
+              <span aria-hidden>💰</span>
+              <span>
+                ${weekSpent.toFixed(0)}/{weeklyLimit}
+              </span>
+              {alertLevel === 'caution' && <span aria-label="Warning">⚠️</span>}
+              {alertLevel === 'over' && <span aria-label="Over budget">🚨</span>}
+            </button>
+          )}
+        </div>
+
+        <div className="text-center py-4">
+          <div className="text-3xl mb-3" aria-hidden>🗓️</div>
+          <h3 className="font-semibold text-neutral-900 dark:text-neutral-50">
+            Plan your whole week in one tap
+          </h3>
+          <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400 max-w-sm mx-auto">
+            Generate your first week with Autopilot — personalised to your household and budget.
+          </p>
+          <Link
+            href="/planner?autopilot=true"
+            className="mt-5 inline-flex items-center gap-2 bg-[#D97757] hover:bg-[#C86646] text-white font-medium rounded-full px-5 py-3 min-h-[48px] transition-colors"
+          >
+            <Sparkles className="w-4 h-4" />
+            Run Autopilot
+          </Link>
+        </div>
       </CardShell>
     )
   }
 
   return (
     <CardShell className="p-5 md:p-6" ariaLabel="This week's meal plan">
+      {/* Header row: title + budget badge + autopilot link */}
       <header className="flex items-center justify-between mb-4 md:mb-5">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 min-w-0">
           <span aria-hidden>📅</span>
-          <h2 className="font-serif text-lg font-bold text-neutral-900 dark:text-neutral-50">
+          <h2 className="font-serif text-lg font-bold text-neutral-900 dark:text-neutral-50 whitespace-nowrap">
             This week
           </h2>
-          <span className="text-xs text-neutral-500 dark:text-neutral-400">
-            {weekPlan.completionPercentage}% complete
-          </span>
+          {showBudget && (
+            <button
+              onClick={openDrawer}
+              className={cn(
+                'flex items-center gap-1 text-xs font-semibold rounded-full px-2.5 py-1 ml-1',
+                'bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors',
+                budgetColorClass
+              )}
+              aria-label="Open budget details"
+            >
+              <span aria-hidden>💰</span>
+              <span>
+                ${weekSpent.toFixed(0)}/{weeklyLimit}
+              </span>
+              {alertLevel === 'caution' && <span aria-label="Warning">⚠️</span>}
+              {alertLevel === 'over' && <span aria-label="Over budget">🚨</span>}
+            </button>
+          )}
         </div>
+
         <Link
           href="/planner"
-          className="inline-flex items-center gap-1 text-sm font-medium text-[#D97757] hover:text-[#C86646] transition-colors"
+          className="inline-flex items-center gap-1 text-sm font-medium text-[#D97757] hover:text-[#C86646] transition-colors whitespace-nowrap shrink-0"
         >
           <Sparkles className="w-3.5 h-3.5" />
-          Autopilot
-          <ChevronRight className="w-3.5 h-3.5" />
+          Autopilot →
         </Link>
       </header>
 
@@ -63,8 +128,8 @@ export function WeekPlanStrip() {
         ))}
       </div>
 
-      {/* Progress */}
-      <div className="mt-5 space-y-2">
+      {/* Progress bar */}
+      <div className="mt-4 space-y-1.5">
         <div
           className="h-1.5 rounded-full bg-neutral-100 dark:bg-neutral-800 overflow-hidden"
           role="progressbar"
@@ -88,11 +153,9 @@ export function WeekPlanStrip() {
 }
 
 function DayCell({ day }: { day: DayPlan }) {
-  const href = day.recipe ? `/planner?day=${day.id}` : `/planner?day=${day.id}`
-
   return (
     <Link
-      href={href}
+      href={`/planner?day=${day.id}`}
       className={cn(
         'group relative flex flex-col items-center gap-1 p-1.5 rounded-xl transition-colors',
         'hover:bg-neutral-50 dark:hover:bg-neutral-800/60'

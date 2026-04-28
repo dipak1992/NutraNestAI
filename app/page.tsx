@@ -46,8 +46,8 @@ export default async function LandingPage() {
         <Hero />
         <HowItWorks />
         <FivePillarsSection />
-        <SocialProof />
         <ComparisonTable />
+        <SocialProof />
         <PricingTeaser />
         <FAQ />
         <FinalCTA />

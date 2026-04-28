@@ -16,6 +16,14 @@ export const faqs = [
     a: "Tell us your household size, budget, and a few preferences. We plan seven dinners using what's in your fridge, what's on sale, and what you've loved before.",
   },
   {
+    q: 'Can I just use ChatGPT for meal ideas?',
+    a: 'Yes, and it can be useful for brainstorming. MealEase is different because it is built specifically for meal planning: it remembers your household preferences, helps you swap meals quickly, creates grocery-ready plans, and supports a weekly routine instead of making you start from a blank prompt every night.',
+  },
+  {
+    q: 'How is MealEase different from a recipe generator?',
+    a: 'MealEase is not just a recipe generator. It helps you choose, adjust, save, shop for, and organize meals around your real household.',
+  },
+  {
     q: 'Do I need to enter recipes myself?',
     a: "Nope. We have thousands built in, and we write new ones for you based on what you have. Zero data entry.",
   },

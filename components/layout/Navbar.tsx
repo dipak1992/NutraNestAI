@@ -2,19 +2,9 @@
 
 import type { SubscriptionTier } from '@/types'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Home,
-  Utensils,
-  Camera,
-  CalendarDays,
-  Refrigerator,
-  Wallet,
-  Settings,
-  Menu,
-  X,
   LogOut,
   User,
   Crown,
@@ -25,35 +15,17 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { createClient } from '@/lib/supabase/client'
-import { useUIStore } from '@/lib/store'
 import { MealEaseLogo } from '@/components/ui/MealEaseLogo'
 
-// 5 Pillars navigation
-const navLinks = [
-  { href: '/dashboard',         label: 'Home',      icon: Home },
-  { href: '/dashboard/tonight', label: 'Tonight',   icon: Utensils },
-  { href: '/dashboard/cook',    label: 'Snap & Cook', icon: Camera },
-  { href: '/planner',           label: 'Autopilot', icon: CalendarDays },
-  { href: '/leftovers',         label: 'Leftovers', icon: Refrigerator },
-  { href: '/budget',            label: 'Budget',    icon: Wallet },
-]
-
-function isNavActive(pathname: string | null, href: string) {
-  if (href === '/dashboard') return pathname === '/dashboard'
-  return pathname?.startsWith(href)
-}
-
 export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: string; subscriptionTier?: SubscriptionTier }) {
-  const pathname = usePathname()
   const router = useRouter()
-  const { sidebarOpen, toggleSidebar } = useUIStore()
   const [signingOut, setSigningOut] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const isPro = subscriptionTier === 'pro'
   const isPaid = isPro
 
-  // Close menu on click outside
+  // Close menu on click outside or Escape
   useEffect(() => {
     if (!menuOpen) return
     function handleClick(e: MouseEvent) {
@@ -95,26 +67,7 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
           <MealEaseLogo size="md" />
         </Link>
 
-        {/* Desktop nav — 5 pillars + Home */}
-        <nav className="hidden md:flex items-center gap-1">
-          {navLinks.map(({ href, label, icon: Icon }) => (
-            <Link
-              key={href}
-              href={href}
-              className={cn(
-                'flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-                isNavActive(pathname, href)
-                  ? 'bg-primary/10 text-primary'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-              )}
-            >
-              <Icon className="h-4 w-4" />
-              {label}
-            </Link>
-          ))}
-        </nav>
-
-        {/* Right side */}
+        {/* Right side — tier badge + upgrade + account */}
         <div className="flex items-center gap-2">
           <Badge
             variant="outline"
@@ -128,13 +81,14 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
             {isPaid ? <Crown className="mr-1.5 h-3 w-3" /> : null}
             {subscriptionTier}
           </Badge>
+
           {!isPaid && (
             <Button asChild size="sm" className="hidden sm:inline-flex">
               <Link href="/pricing?intent=pro">Upgrade to Plus</Link>
             </Button>
           )}
 
-          {/* Account menu — simple React state, no Base UI */}
+          {/* Account menu */}
           <div className="relative" ref={menuRef}>
             <button
               type="button"
@@ -154,11 +108,9 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
                 className="absolute right-0 top-full mt-2 w-52 rounded-xl border border-border bg-background shadow-lg py-1 z-50 animate-in fade-in-0 zoom-in-95"
               >
                 {userEmail && (
-                  <>
-                    <div className="px-3 py-2 text-xs text-muted-foreground truncate border-b border-border">
-                      {userEmail}
-                    </div>
-                  </>
+                  <div className="px-3 py-2 text-xs text-muted-foreground truncate border-b border-border">
+                    {userEmail}
+                  </div>
                 )}
                 <button
                   role="menuitem"
@@ -207,68 +159,8 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
               </div>
             )}
           </div>
-
-          {/* Mobile menu toggle */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
-            onClick={toggleSidebar}
-          >
-            {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </Button>
         </div>
       </div>
-
-      {/* Mobile nav */}
-      <AnimatePresence>
-        {sidebarOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.2 }}
-            className="md:hidden border-t border-border/60 bg-background"
-          >
-            <nav className="flex flex-col gap-1 p-4">
-              {navLinks.map(({ href, label, icon: Icon }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  onClick={() => useUIStore.getState().setSidebarOpen(false)}
-                  className={cn(
-                    'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
-                    isNavActive(pathname, href)
-                      ? 'bg-primary/10 text-primary'
-                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                  )}
-                >
-                  <Icon className="h-4 w-4" />
-                  {label}
-                </Link>
-              ))}
-              <Link
-                href="/settings"
-                onClick={() => useUIStore.getState().setSidebarOpen(false)}
-                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-              >
-                <Settings className="h-4 w-4" />
-                Settings
-              </Link>
-              {!isPaid && (
-                <Link
-                  href="/pricing?intent=pro"
-                  onClick={() => useUIStore.getState().setSidebarOpen(false)}
-                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-primary hover:bg-primary/5 transition-colors"
-                >
-                  <Crown className="h-4 w-4" />
-                  Upgrade to Plus
-                </Link>
-              )}
-            </nav>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </header>
   )
 }

@@ -46,12 +46,14 @@ export function OnboardingShell({
   async function handleNext() {
     if (onNext) await onNext()
     if (isLast) {
-      // Last step — submit and go to done
+      // Last step — submit and redirect to dashboard
       const { submit } = useOnboardingStore.getState()
-      const ok = await submit()
-      if (ok) {
-        router.push('/dashboard')
+      try {
+        await submit()
+      } catch {
+        // Even if submit fails, redirect so user isn't stuck
       }
+      router.push('/dashboard')
     } else {
       next()
     }

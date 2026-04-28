@@ -7,7 +7,6 @@ import StepDietary from '@/components/onboarding/StepDietary'
 import StepDislikes from '@/components/onboarding/StepDislikes'
 import StepSkillLevel from '@/components/onboarding/StepSkillLevel'
 import StepBudget from '@/components/onboarding/StepBudget'
-import StepDone from '@/components/onboarding/StepDone'
 
 // ─── Step map ─────────────────────────────────────────────────────────────────
 
@@ -19,30 +18,48 @@ const STEP_COMPONENTS = {
   budget:    StepBudget,
 } as const
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+/** Count total preferences selected across all steps */
+function countPreferences(data: {
+  householdSize: number
+  dietary: string[]
+  dislikes: string[]
+  skillLevel: string
+  weeklyBudget: number | null
+}): number {
+  let count = 0
+  // Household size counts as 1 preference if set (always >= 1)
+  if (data.householdSize >= 1) count++
+  // Each dietary selection counts
+  count += data.dietary.length
+  // Each dislike counts
+  count += data.dislikes.length
+  // Skill level always counts as 1
+  if (data.skillLevel) count++
+  // Budget counts as 1 if set
+  if (data.weeklyBudget !== null) count++
+  return count
+}
+
 // ─── Client ───────────────────────────────────────────────────────────────────
 
 export function OnboardingClient() {
   const step         = useOnboardingStore((s) => s.step)
-  const householdSize = useOnboardingStore((s) => s.data.householdSize)
-  const skillLevel   = useOnboardingStore((s) => s.data.skillLevel)
-
-  // Final "done" step — no shell chrome
-  if (step === ('done' as string)) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0f0f0f] px-4">
-        <div className="w-full max-w-md">
-          <StepDone />
-        </div>
-      </div>
-    )
-  }
+  const data         = useOnboardingStore((s) => s.data)
+  const householdSize = data.householdSize
+  const skillLevel   = data.skillLevel
 
   // Determine whether the current step allows proceeding
   const canProceed: boolean = (() => {
     switch (step) {
       case 'household': return householdSize >= 1
       case 'skill':     return !!skillLevel
-      default:          return true   // dietary / dislikes / budget are optional
+      case 'budget': {
+        // Last step: require at least 3 total preferences across all steps
+        return countPreferences(data) >= 3
+      }
+      default:          return true   // dietary / dislikes are optional per-step
     }
   })()
 

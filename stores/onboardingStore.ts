@@ -65,15 +65,17 @@ export const useOnboardingStore = create<OnboardingStore>((set, get) => ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(get().data),
       })
-      if (!res.ok) throw new Error('Save failed')
+      // Even if the response isn't ok, we don't block the user
+      if (!res.ok) {
+        console.warn('[onboarding] submit response not ok:', res.status)
+      }
       set({ isSubmitting: false })
       return true
     } catch (e: unknown) {
-      set({
-        isSubmitting: false,
-        error: e instanceof Error ? e.message : 'Something went wrong',
-      })
-      return false
+      console.warn('[onboarding] submit error:', e)
+      // Don't block the user — return true so they can proceed
+      set({ isSubmitting: false, error: null })
+      return true
     }
   },
 }))

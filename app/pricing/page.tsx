@@ -1,5 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
-import { PublicSiteHeader } from '@/components/layout/PublicSiteHeader'
+import { Nav } from '@/components/landing/Nav'
 import { PricingContent } from '@/components/pricing/PricingContent'
 import type { Metadata } from 'next'
 
@@ -11,8 +10,8 @@ export const metadata: Metadata = {
 export default async function PricingPage() {
   return (
     <>
-      <PublicSiteHeader />
-      <main className="min-h-screen bg-background">
+      <Nav />
+      <main className="min-h-screen bg-white dark:bg-neutral-950">
         <PricingContent />
       </main>
     </>

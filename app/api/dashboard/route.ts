@@ -68,7 +68,7 @@ export async function getDashboardPayload(
     recipe: {
       id: 'rec_tonight',
       name: 'Honey garlic chicken',
-      image: '/mock/honey-garlic-chicken.jpg',
+      image: '/landing/family-dinner.jpg',
       cookTimeMin: 30,
       difficulty: 'easy' as const,
       servings: 4,

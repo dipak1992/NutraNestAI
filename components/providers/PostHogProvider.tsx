@@ -1,11 +1,9 @@
 'use client'
 
-import posthog from 'posthog-js'
-import { PostHogProvider as PHProvider } from 'posthog-js/react'
-
 // PostHog is initialized via instrumentation-client.ts (Next.js 15.3+ approach).
-// This wrapper provides the React context so usePostHog() works in client components.
-// PHProvider gracefully handles the case where posthog hasn't been initialized.
+// We intentionally do NOT use PHProvider from posthog-js/react here because
+// it causes React #185 (Maximum update depth exceeded) in React 19.
+// Components that need posthog can import it directly: import posthog from 'posthog-js'
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
-  return <PHProvider client={posthog}>{children}</PHProvider>
+  return <>{children}</>
 }

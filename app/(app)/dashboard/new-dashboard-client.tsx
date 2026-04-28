@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo } from 'react'
+import { useEffect, useRef } from 'react'
 import { useDashboardStore } from '@/stores/dashboardStore'
 import { useBudgetStore } from '@/stores/budgetStore'
 import { GreetingHeader } from '@/components/dashboard/GreetingHeader'
@@ -23,29 +23,32 @@ export function NewDashboardClient({ initial }: { initial: DashboardPayload }) {
   const leftovers = useDashboardStore((s) => s.leftovers)
   const budget = useDashboardStore((s) => s.budget)
 
-  // Build budget payload once to avoid re-creating on every render
-  const budgetPayload = useMemo(() => ({
-    settings: {
-      weeklyLimit: initial.budget.weeklyLimit,
-      strictMode: false,
-      zipCode: null,
-      preferredStore: null,
-    },
-    currentWeek: {
-      weekStart: new Date().toISOString().split('T')[0],
-      spent: initial.budget.weekSpent,
-      estimated: 0,
-      mealsCooked: 0,
-      breakdown: [],
-    },
-    history: [],
-    plan: initial.user.plan,
-  }), [initial])
-
+  // Only hydrate once on mount — avoid re-render loop from changing `initial` reference
+  const hydratedRef = useRef(false)
   useEffect(() => {
+    if (hydratedRef.current) return
+    hydratedRef.current = true
+
     hydrate(initial)
-    hydrateBudget(budgetPayload)
-  }, [initial, budgetPayload, hydrate, hydrateBudget])
+    hydrateBudget({
+      settings: {
+        weeklyLimit: initial.budget.weeklyLimit,
+        strictMode: false,
+        zipCode: null,
+        preferredStore: null,
+      },
+      currentWeek: {
+        weekStart: new Date().toISOString().split('T')[0],
+        spent: initial.budget.weekSpent,
+        estimated: 0,
+        mealsCooked: 0,
+        breakdown: [],
+      },
+      history: [],
+      plan: initial.user.plan,
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Use initial data directly while store hydrates — avoids blank screen
   const displayUser = user ?? initial.user

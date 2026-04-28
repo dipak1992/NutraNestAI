@@ -1,5 +1,7 @@
 -- Saved meal contract for all five active MealEase pillars.
 
+create extension if not exists "pg_trgm";
+
 create table if not exists saved_meals (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references profiles(id) on delete cascade,

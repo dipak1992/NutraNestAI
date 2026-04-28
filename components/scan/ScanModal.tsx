@@ -29,7 +29,8 @@ export function ScanModal() {
   const errorMessage = useScanStore((s) => s.errorMessage)
   const openedAt = useScanStore((s) => s.openedAt)
 
-  const { close, setMode, capture, retake, confirmType, setError, reset } = useScanStore()
+  // Get actions via getState() to avoid subscribing to the entire store (React #185)
+  const { close, setMode, capture, retake, confirmType, setError, reset } = useScanStore.getState()
 
   const overlayRef = useRef<HTMLDivElement>(null)
 

@@ -9,14 +9,11 @@ import { calculateExpirationDate } from '@/lib/leftovers/expiration-calculator'
 type Step = 'ask' | 'quantity' | 'saved'
 
 export function LeftoverCookedPrompt() {
-  const { cookedPromptOpen, cookedPromptData, closeCookedPrompt, addLeftover } = useLeftoversStore(
-    (s) => ({
-      cookedPromptOpen: s.cookedPromptOpen,
-      cookedPromptData: s.cookedPromptData,
-      closeCookedPrompt: s.closeCookedPrompt,
-      addLeftover: s.addLeftover,
-    }),
-  )
+  // Granular selectors — avoid object selector which creates new ref on every render (React #185)
+  const cookedPromptOpen = useLeftoversStore((s) => s.cookedPromptOpen)
+  const cookedPromptData = useLeftoversStore((s) => s.cookedPromptData)
+  const closeCookedPrompt = useLeftoversStore((s) => s.closeCookedPrompt)
+  const addLeftover = useLeftoversStore((s) => s.addLeftover)
 
   const [step, setStep] = useState<Step>('ask')
   const [servings, setServings] = useState(1)

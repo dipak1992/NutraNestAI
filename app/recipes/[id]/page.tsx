@@ -1,7 +1,7 @@
-import { redirect } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { DashboardNav } from '@/components/dashboard/DashboardNav'
-import { loadRecipe } from './loader'
+import { RecipeNotFoundError, loadRecipe } from './loader'
 import { RecipeHero } from '@/components/recipes/RecipeHero'
 import { IngredientList } from '@/components/recipes/IngredientList'
 import { NutritionCard } from '@/components/recipes/NutritionCard'
@@ -14,7 +14,11 @@ type Props = {
 
 export async function generateMetadata({ params }: Props) {
   const { id } = await params
-  const recipe = await loadRecipe(id)
+  const recipe = await loadRecipe(id).catch((error) => {
+    if (error instanceof RecipeNotFoundError) return null
+    throw error
+  })
+  if (!recipe) return { title: 'Recipe not found — NutriNest AI' }
   return {
     title: `${recipe.name} — NutriNest AI`,
     description: recipe.description,
@@ -29,7 +33,10 @@ export default async function RecipePage({ params, searchParams }: Props) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const recipe = await loadRecipe(id)
+  const recipe = await loadRecipe(id).catch((error) => {
+    if (error instanceof RecipeNotFoundError) notFound()
+    throw error
+  })
 
   // Check if there's an active cook session
   const { data: activeSession } = await supabase

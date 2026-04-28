@@ -148,6 +148,8 @@ export const useWeeklyPlanStore = create<WeeklyPlanStore>()(
       clearGrocery: () => set({ groceryList: null }),
       addCustomItem: (item) =>
         set((s) => {
+          const normalizedName = item.name.trim().toLowerCase().replace(/\s+/g, ' ')
+          const normalizedUnit = item.unit.trim().toLowerCase()
           const list = s.groceryList
           if (!list) {
             // Create a new list if none exists
@@ -171,6 +173,27 @@ export const useWeeklyPlanStore = create<WeeklyPlanStore>()(
               storeFormat: s.storeFormat,
             }
             return { groceryList: newList }
+          }
+          const existing = list.items.find((line) =>
+            line.name.trim().toLowerCase().replace(/\s+/g, ' ') === normalizedName &&
+            line.unit.trim().toLowerCase() === normalizedUnit &&
+            line.category === item.category
+          )
+          if (existing) {
+            return {
+              groceryList: {
+                ...list,
+                items: list.items.map((line) =>
+                  line.id === existing.id
+                    ? {
+                        ...line,
+                        quantity: Math.round((line.quantity + item.quantity) * 100) / 100,
+                        note: line.note ?? item.note,
+                      }
+                    : line
+                ),
+              },
+            }
           }
           return {
             groceryList: {

@@ -7,6 +7,7 @@ import { Clock, ChefHat, RefreshCw, ShoppingCart, Flame, ChevronDown, ChevronUp,
 import type { SmartMealResult } from '@/lib/engine/types'
 import { SaveMealButton } from '@/components/content/SaveMealButton'
 import { ShareMealButton } from '@/components/content/ShareMealButton'
+import { persistMealForRecipe, type MealPillar } from '@/lib/recipes/canonical'
 
 // ── Helpers ─────────────────────────────────────────────────
 
@@ -43,11 +44,12 @@ interface Props {
   onCook: () => void
   onSwap: () => void
   onOrder: () => void
+  source?: MealPillar
 }
 
 // ── Component ───────────────────────────────────────────────
 
-export function MealCard({ meal, pantryMatch, swapping, onCook, onSwap, onOrder }: Props) {
+export function MealCard({ meal, pantryMatch, swapping, onCook, onSwap, onOrder, source = 'tonight' }: Props) {
   const [showIngredients, setShowIngredients] = useState(false)
   const [showSteps, setShowSteps] = useState(false)
   const router = useRouter()
@@ -72,8 +74,7 @@ export function MealCard({ meal, pantryMatch, swapping, onCook, onSwap, onOrder 
 
   function handleViewRecipe() {
     try {
-      sessionStorage.setItem('tonight-meal', JSON.stringify(meal))
-      sessionStorage.setItem('recipe-back', '/dashboard')
+      persistMealForRecipe(meal, '/dashboard', source)
     } catch {}
     router.push('/tonight/recipe')
   }
@@ -113,7 +114,7 @@ export function MealCard({ meal, pantryMatch, swapping, onCook, onSwap, onOrder 
           )}
           <div className="ml-auto flex items-center gap-1">
             <ShareMealButton meal={meal} className="h-7 w-7" />
-            <SaveMealButton meal={meal} className="h-7 w-7" />
+            <SaveMealButton meal={meal} source={source} className="h-7 w-7" />
           </div>
         </div>
       </div>

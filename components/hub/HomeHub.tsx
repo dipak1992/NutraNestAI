@@ -25,6 +25,7 @@ import {
   fallbackHousehold,
 } from '@/lib/decide/client'
 import type { SmartMealResult, SmartMealRequest } from '@/lib/engine/types'
+import { persistMealForRecipe, type MealPillar } from '@/lib/recipes/canonical'
 import type { SmartChipId, LifeStage } from '@/types'
 
 // ── Intent tiles ────────────────────────────────────────────
@@ -247,10 +248,14 @@ export function HomeHub({ userName }: Props) {
   // ── Meal actions ──────────────────────────────────────────
 
   const handleCook = useCallback((m: SmartMealResult) => {
+    const source: MealPillar = activeTile === 'pantry' ? 'snap' : 'tonight'
     recordLike(m)
     sendSignal(m.id, 'cooked', { mode: activeTile ?? 'tonight' })
     posthog.capture('meal_cooked', { meal_id: m.id, meal_name: m.title, mode: activeTile ?? 'tonight' })
-  }, [recordLike, activeTile])
+    persistMealForRecipe(m, '/dashboard', source)
+    sessionStorage.setItem('recipe-open-cook', 'true')
+    router.push('/tonight/recipe')
+  }, [recordLike, activeTile, router])
 
   const handleSwap = useCallback(async (m: SmartMealResult) => {
     recordReject(m)
@@ -579,6 +584,7 @@ export function HomeHub({ userName }: Props) {
                   onCook={() => handleCook(meal)}
                   onSwap={() => void handleSwap(meal)}
                   onOrder={() => handleOrder(meal)}
+                  source="tonight"
                 />
               )}
 
@@ -589,6 +595,7 @@ export function HomeHub({ userName }: Props) {
                   onCook={handleCook}
                   onSwap={(m) => void handleSwap(m)}
                   onOrder={handleOrder}
+                  source="snap"
                 />
               )}
 

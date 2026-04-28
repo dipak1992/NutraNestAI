@@ -27,6 +27,7 @@ import { MealCard } from '@/components/hub/MealCard'
 import { SnapCookErrorBoundary } from '@/components/hub/SnapCookErrorBoundary'
 import { cn } from '@/lib/utils'
 import type { SmartMealResult } from '@/lib/engine/types'
+import { persistMealForRecipe, type MealPillar } from '@/lib/recipes/canonical'
 import type { SubscriptionTier } from '@/types'
 
 type CookMode = 'snap' | 'pantry' | 'leftover'
@@ -252,9 +253,13 @@ export default function CookPillarPage() {
 
   const handleCook = useCallback((meal: SmartMealResult) => {
     if (!meal?.id) return
+    const source: MealPillar = activeChip === 'leftover' ? 'leftovers' : 'snap'
     recordLike(meal)
     sendSignal(meal.id, 'cooked', { mode: activeChip ?? 'snap' })
-  }, [recordLike, activeChip])
+    persistMealForRecipe(meal, '/dashboard/cook', source)
+    sessionStorage.setItem('recipe-open-cook', 'true')
+    router.push('/tonight/recipe')
+  }, [recordLike, activeChip, router])
 
   const handleSwap = useCallback(() => {
     if (activeChip === 'pantry') handlePantryFetch()
@@ -374,7 +379,7 @@ export default function CookPillarPage() {
               ) : pantryMatches.length > 0 ? (
                 <SnapCookErrorBoundary onReset={handleErrorBoundaryReset} onEditIngredients={handleErrorBoundaryEditIngredients} onBack={handleErrorBoundaryBack}>
                   <>
-                    <PantryMatchList matches={pantryMatches} onCook={handleCook} onSwap={handleSwap} onOrder={() => {}} />
+                    <PantryMatchList matches={pantryMatches} onCook={handleCook} onSwap={handleSwap} onOrder={() => {}} source="snap" />
                     <div className="mt-4 flex gap-2">
                       <Button variant="outline" size="sm" onClick={() => { setPantryPhase('capture'); setPantryMatches([]); setSnapError(null) }} className="gap-1.5">
                         <Camera className="h-3.5 w-3.5" /> Scan again
@@ -455,7 +460,7 @@ export default function CookPillarPage() {
                       <h2 className="text-lg font-bold text-foreground">{leftoverMeal.title}</h2>
                       <p className="text-xs text-muted-foreground mt-0.5">Made from: {leftoverItems.join(', ')}</p>
                     </div>
-                    <MealCard meal={leftoverMeal} onCook={() => handleCook(leftoverMeal)} onSwap={() => { setLeftoverMeal(null); handleLeftoverGenerate() }} onOrder={() => {}} />
+                    <MealCard meal={leftoverMeal} onCook={() => handleCook(leftoverMeal)} onSwap={() => { setLeftoverMeal(null); handleLeftoverGenerate() }} onOrder={() => {}} source="leftovers" />
                     <div className="mt-4 flex gap-2">
                       <Button variant="outline" size="sm" onClick={() => { setLeftoverMeal(null); setLeftoverItems([]) }} className="gap-1.5">Start over</Button>
                       <Button variant="outline" size="sm" disabled={loading} onClick={() => { setLeftoverMeal(null); handleLeftoverGenerate() }} className="gap-1.5 ml-auto">

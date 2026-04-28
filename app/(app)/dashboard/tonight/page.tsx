@@ -363,7 +363,7 @@ export default function TonightPillarPage() {
 
                 {/* Actions */}
                 <div className="border-t border-border/60 px-5 py-3 flex items-center gap-2">
-                  <SaveMealButton meal={meal} className="h-9 w-9 rounded-md border border-border/60" />
+                  <SaveMealButton meal={meal} source="tonight" className="h-9 w-9 rounded-md border border-border/60" />
                   <ShareMealButton meal={meal} className="h-9 w-9 rounded-md border border-border/60" />
                   <Button
                     variant="outline"

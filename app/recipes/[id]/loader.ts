@@ -56,6 +56,13 @@ const MOCK_RECIPE: LoadedRecipe = {
 
 // ─── loadRecipe ───────────────────────────────────────────────────────────────
 
+export class RecipeNotFoundError extends Error {
+  constructor(id: string) {
+    super(`Recipe not found: ${id}`)
+    this.name = 'RecipeNotFoundError'
+  }
+}
+
 export async function loadRecipe(id: string): Promise<LoadedRecipe> {
   // Return mock for the mock id
   if (id === 'mock') return MOCK_RECIPE
@@ -69,7 +76,7 @@ export async function loadRecipe(id: string): Promise<LoadedRecipe> {
       .eq('id', id)
       .single()
 
-    if (error || !data) return MOCK_RECIPE
+    if (error || !data) throw new RecipeNotFoundError(id)
 
     // Map DB row → LoadedRecipe
     return {
@@ -78,8 +85,8 @@ export async function loadRecipe(id: string): Promise<LoadedRecipe> {
       image: data.image_url ?? data.image ?? null,
       description: data.description ?? null,
       servings: data.servings ?? 4,
-      cookTimeMin: data.cook_time_min ?? data.cook_time ?? 30,
-      prepTimeMin: data.prep_time_min ?? data.prep_time ?? 10,
+      cookTimeMin: data.cook_time_minutes ?? data.cook_time_min ?? data.cook_time ?? 30,
+      prepTimeMin: data.prep_time_minutes ?? data.prep_time_min ?? data.prep_time ?? 10,
       difficulty: data.difficulty ?? 'easy',
       costTotal: data.cost_total ?? data.estimated_cost ?? 0,
       costPerServing: data.cost_per_serving ?? 0,
@@ -91,7 +98,8 @@ export async function loadRecipe(id: string): Promise<LoadedRecipe> {
       })) ?? [],
       nutrition: data.nutrition ?? undefined,
     }
-  } catch {
-    return MOCK_RECIPE
+  } catch (error) {
+    if (error instanceof RecipeNotFoundError) throw error
+    throw new RecipeNotFoundError(id)
   }
 }

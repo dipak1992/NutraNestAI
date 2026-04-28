@@ -3,6 +3,7 @@
 import { AnimatePresence } from 'framer-motion'
 import { MealCard } from './MealCard'
 import type { SmartMealResult } from '@/lib/engine/types'
+import type { MealPillar } from '@/lib/recipes/canonical'
 
 interface PantryMatch {
   meal: SmartMealResult
@@ -14,9 +15,10 @@ interface Props {
   onCook: (meal: SmartMealResult) => void
   onSwap: (meal: SmartMealResult) => void
   onOrder: (meal: SmartMealResult) => void
+  source?: MealPillar
 }
 
-export function PantryMatchList({ matches, onCook, onSwap, onOrder }: Props) {
+export function PantryMatchList({ matches, onCook, onSwap, onOrder, source = 'snap' }: Props) {
   // Safe guard: ensure matches is always an array
   const safeMatches = Array.isArray(matches) ? matches : []
 
@@ -46,6 +48,7 @@ export function PantryMatchList({ matches, onCook, onSwap, onOrder }: Props) {
               onCook={() => onCook(m.meal)}
               onSwap={() => onSwap(m.meal)}
               onOrder={() => onOrder(m.meal)}
+              source={source}
             />
           )
         })}

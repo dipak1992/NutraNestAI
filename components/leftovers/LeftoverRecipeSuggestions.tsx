@@ -1,9 +1,16 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Clock, ChefHat, Lock, RefreshCw, AlertCircle } from 'lucide-react'
+import { Clock, ChefHat, Lock, RefreshCw, AlertCircle, ShoppingCart, Volume2 } from 'lucide-react'
 import type { LeftoverSuggestion } from '@/lib/leftovers/types'
+import type { SmartMealResult } from '@/lib/engine/types'
+import { SaveMealButton } from '@/components/content/SaveMealButton'
+import { RecipeAudioPlayer } from '@/components/recipes/RecipeAudioPlayer'
+import { mealToRecipe, persistMealForRecipe } from '@/lib/recipes/canonical'
+import { useWeeklyPlanStore } from '@/lib/planner/store'
 
 type State = 'idle' | 'loading' | 'ready' | 'gated' | 'error'
 
@@ -14,9 +21,74 @@ type Props = {
 }
 
 export function LeftoverRecipeSuggestions({ leftoverId, leftoverName, isPlusMember }: Props) {
+  const router = useRouter()
   const [state, setState] = useState<State>('idle')
   const [suggestions, setSuggestions] = useState<LeftoverSuggestion[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [audioMealId, setAudioMealId] = useState<string | null>(null)
+  const [audioStep, setAudioStep] = useState(0)
+  const addCustomItem = useWeeklyPlanStore((s) => s.addCustomItem)
+
+  function toMeal(suggestion: LeftoverSuggestion): SmartMealResult {
+    return {
+      id: suggestion.id,
+      title: suggestion.name,
+      tagline: `Uses ${leftoverName}`,
+      description: suggestion.description,
+      cuisineType: 'leftovers',
+      imageUrl: suggestion.image ?? undefined,
+      prepTime: 5,
+      cookTime: suggestion.cookTimeMin,
+      totalTime: suggestion.cookTimeMin + 5,
+      estimatedCost: 4,
+      servings: 2,
+      difficulty: suggestion.difficulty === 'medium' ? 'moderate' : suggestion.difficulty,
+      tags: ['Leftovers AI', 'low-waste'],
+      ingredients: [
+        { name: leftoverName, quantity: '1', unit: 'portion', fromPantry: true, category: 'other' },
+        { name: 'Eggs or protein boost', quantity: '2', unit: 'whole', fromPantry: false, category: 'other' },
+        { name: 'Fresh vegetables', quantity: '2', unit: 'cups', fromPantry: false, category: 'produce' },
+      ],
+      steps: [
+        `Warm the ${leftoverName} gently so it is hot throughout.`,
+        'Add the fresh ingredients and cook until tender.',
+        'Season, taste, and serve while warm.',
+      ],
+      variations: [],
+      leftoverTip: null,
+      shoppingList: [
+        { name: 'Eggs or protein boost', quantity: '2', unit: 'whole', category: 'protein', estimatedCost: 2, substituteOptions: [] },
+        { name: 'Fresh vegetables', quantity: '2', unit: 'cups', category: 'produce', estimatedCost: 2, substituteOptions: [] },
+      ],
+      meta: {
+        score: 1,
+        matchedPantryItems: [leftoverName, ...suggestion.usesIngredients],
+        pantryUtilization: 0.5,
+        simplifiedForEnergy: true,
+        pickyEaterAdjusted: false,
+        localityApplied: false,
+        selectionReason: 'Built from your leftovers.',
+      },
+    }
+  }
+
+  function cookMeal(meal: SmartMealResult) {
+    persistMealForRecipe(meal, '/leftovers', 'leftovers')
+    sessionStorage.setItem('recipe-open-cook', 'true')
+    router.push('/tonight/recipe')
+  }
+
+  function addGroceries(meal: SmartMealResult) {
+    for (const item of meal.shoppingList) {
+      addCustomItem({
+        name: item.name,
+        quantity: Number.parseFloat(String(item.quantity)) || 1,
+        unit: item.unit || 'unit',
+        category: item.category || 'other',
+      })
+    }
+    toast.success('Missing ingredients added.')
+  }
 
   async function fetchSuggestions() {
     setState('loading')
@@ -146,34 +218,61 @@ export function LeftoverRecipeSuggestions({ leftoverId, leftoverName, isPlusMemb
             className="space-y-2"
           >
             {suggestions.map((s, i) => (
-              <motion.div
-                key={s.id}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.06 }}
-                className="rounded-xl bg-white/5 p-3 space-y-1.5"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <p className="text-sm font-semibold text-white leading-tight">{s.name}</p>
-                  <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                    s.difficulty === 'easy'
-                      ? 'bg-emerald-500/20 text-emerald-300'
-                      : s.difficulty === 'medium'
-                      ? 'bg-amber-500/20 text-amber-300'
-                      : 'bg-red-500/20 text-red-300'
-                  }`}>
-                    {s.difficulty}
-                  </span>
-                </div>
-                <p className="text-xs text-zinc-400 leading-relaxed">{s.description}</p>
-                <div className="flex items-center gap-3 text-[10px] text-zinc-500">
-                  <span className="flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    {s.cookTimeMin} min
-                  </span>
-                  <span>Uses: {s.usesIngredients.slice(0, 3).join(', ')}</span>
-                </div>
-              </motion.div>
+              (() => {
+                const meal = toMeal(s)
+                const recipe = mealToRecipe(meal, 'leftovers')
+                return (
+                  <motion.div
+                    key={s.id}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.06 }}
+                    className="rounded-xl bg-white/5 p-3 space-y-2"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="text-sm font-semibold text-white leading-tight">{s.name}</p>
+                      <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                        s.difficulty === 'easy'
+                          ? 'bg-emerald-500/20 text-emerald-300'
+                          : s.difficulty === 'medium'
+                          ? 'bg-amber-500/20 text-amber-300'
+                          : 'bg-red-500/20 text-red-300'
+                      }`}>
+                        {s.difficulty}
+                      </span>
+                    </div>
+                    <p className="text-xs text-zinc-400 leading-relaxed">{s.description}</p>
+                    <div className="flex items-center gap-3 text-[10px] text-zinc-500">
+                      <span className="flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {s.cookTimeMin} min
+                      </span>
+                      <span>Uses: {s.usesIngredients.slice(0, 3).join(', ')}</span>
+                    </div>
+                    <div className="grid grid-cols-4 gap-1.5 pt-1">
+                      <button onClick={() => cookMeal(meal)} className="rounded-lg bg-emerald-600 px-2 py-2 text-[11px] font-semibold text-white">
+                        <ChefHat className="mx-auto h-3.5 w-3.5" />Cook
+                      </button>
+                      <button onClick={() => { setAudioStep(0); setAudioMealId(audioMealId === s.id ? null : s.id) }} className="rounded-lg bg-white/10 px-2 py-2 text-[11px] font-semibold text-zinc-200">
+                        <Volume2 className="mx-auto h-3.5 w-3.5" />Listen
+                      </button>
+                      <SaveMealButton meal={meal} source="leftovers" className="h-auto min-h-0 w-full rounded-lg bg-white/10 px-2 py-2 text-zinc-200 hover:bg-white/15" />
+                      <button onClick={() => addGroceries(meal)} className="rounded-lg bg-white/10 px-2 py-2 text-[11px] font-semibold text-zinc-200">
+                        <ShoppingCart className="mx-auto h-3.5 w-3.5" />List
+                      </button>
+                    </div>
+                    {audioMealId === s.id && (
+                      <RecipeAudioPlayer
+                        recipeId={recipe.id}
+                        recipe={recipe}
+                        isPlusMember={isPlusMember}
+                        activeStepIndex={audioStep}
+                        onStepChange={setAudioStep}
+                      />
+                    )}
+                  </motion.div>
+                )
+              })()
             ))}
           </motion.div>
         )}

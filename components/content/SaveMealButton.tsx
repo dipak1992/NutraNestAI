@@ -6,13 +6,15 @@ import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import type { SmartMealResult } from '@/lib/engine/types'
+import type { MealPillar } from '@/lib/recipes/canonical'
 
 interface SaveMealButtonProps {
   meal: SmartMealResult
+  source?: MealPillar
   className?: string
 }
 
-export function SaveMealButton({ meal, className }: SaveMealButtonProps) {
+export function SaveMealButton({ meal, source = 'tonight', className }: SaveMealButtonProps) {
   const [saved, setSaved] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -23,7 +25,7 @@ export function SaveMealButton({ meal, className }: SaveMealButtonProps) {
       const res = await fetch('/api/content/meals', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ meal }),
+        body: JSON.stringify({ meal, source }),
       })
       if (!res.ok) {
         const data = await res.json() as { error?: string }

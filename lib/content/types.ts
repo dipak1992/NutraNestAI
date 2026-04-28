@@ -1,5 +1,6 @@
 import type { SmartMealResult } from '@/lib/engine/types'
 import type { WeeklyPlan } from '@/lib/planner/types'
+import type { MealPillar } from '@/lib/recipes/canonical'
 
 export interface SavedMeal {
   id: string
@@ -9,6 +10,7 @@ export interface SavedMeal {
   description: string | null
   cuisine_type: string | null
   meal_data: SmartMealResult
+  pillar_source?: MealPillar | null
   is_public: boolean
   published_at: string | null
   created_at: string
@@ -25,6 +27,7 @@ export interface SavedMealSummary {
   is_public: boolean
   created_at: string
   published_at: string | null
+  pillar_source?: MealPillar | null
 }
 
 export interface PublishedPlan {

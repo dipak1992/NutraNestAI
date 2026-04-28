@@ -5,6 +5,8 @@ import {
   Play, Pause, SkipBack, SkipForward, Volume2, Loader2, X, Mic,
 } from 'lucide-react'
 import Link from 'next/link'
+import type { LoadedRecipe } from '@/app/recipes/[id]/loader'
+import { buildRecipeScript, recipeSegments, recipeSignature } from '@/lib/recipes/canonical'
 
 type AudioSegment = {
   stepIndex: number
@@ -22,6 +24,7 @@ type AudioData = {
 
 type Props = {
   recipeId: string
+  recipe?: LoadedRecipe
   isPlusMember: boolean
   activeStepIndex: number
   onStepChange?: (stepIndex: number) => void
@@ -29,6 +32,7 @@ type Props = {
 
 export function RecipeAudioPlayer({
   recipeId,
+  recipe,
   isPlusMember,
   activeStepIndex,
   onStepChange,
@@ -44,12 +48,25 @@ export function RecipeAudioPlayer({
   const [playbackRate, setPlaybackRate] = useState(1)
   const [webSpeechStep, setWebSpeechStep] = useState(0)
   const [showUpgrade, setShowUpgrade] = useState(false)
+  const signature = recipe ? recipeSignature(recipe) : recipeId
 
   const loadAudio = useCallback(async () => {
     if (!isPlusMember) {
       setShowUpgrade(true)
       return
     }
+
+    if (recipe) {
+      setAudioData({
+        audioUrl: null,
+        script: buildRecipeScript(recipe),
+        segments: recipeSegments(recipe),
+        provider: 'web-speech',
+        cached: false,
+      })
+      return
+    }
+
     setLoading(true)
     setError(null)
     try {
@@ -67,12 +84,31 @@ export function RecipeAudioPlayer({
     } finally {
       setLoading(false)
     }
-  }, [recipeId, isPlusMember])
+  }, [recipe, recipeId, isPlusMember])
+
+  useEffect(() => {
+    audioRef.current?.pause()
+    audioRef.current = null
+    window.speechSynthesis?.cancel()
+    synthRef.current = null
+    setAudioData(null)
+    setLoading(false)
+    setError(null)
+    setIsPlaying(false)
+    setCurrentTime(0)
+    setDuration(0)
+    setWebSpeechStep(0)
+    setShowUpgrade(false)
+  }, [signature])
 
   // Sync audio element playback rate
   useEffect(() => {
     if (audioRef.current) audioRef.current.playbackRate = playbackRate
   }, [playbackRate])
+
+  useEffect(() => {
+    if (!isPlaying) setWebSpeechStep(Math.max(0, activeStepIndex))
+  }, [activeStepIndex, isPlaying])
 
   // Web Speech API narration
   const speakStep = useCallback((stepIdx: number, segments: AudioSegment[]) => {

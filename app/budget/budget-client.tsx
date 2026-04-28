@@ -12,6 +12,12 @@ import { SpendingHistory } from '@/components/budget/SpendingHistory'
 import { Wallet, TrendingUp, ArrowRight, RefreshCw } from 'lucide-react'
 import type { BudgetPayload } from '@/lib/budget/types'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
+import type { SmartMealResult } from '@/lib/engine/types'
+import { SaveMealButton } from '@/components/content/SaveMealButton'
+import { useWeeklyPlanStore } from '@/lib/planner/store'
+import { persistMealForRecipe } from '@/lib/recipes/canonical'
 
 // ─── Tabs ─────────────────────────────────────────────────────────────────────
 
@@ -20,6 +26,7 @@ type Tab = 'overview' | 'history' | 'swaps'
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function BudgetClient({ initial }: { initial: BudgetPayload }) {
+  const router = useRouter()
   const hydrate = useBudgetStore((s) => s.hydrate)
   const hydrated = useBudgetStore((s) => s.hydrated)
   const settings = useBudgetStore((s) => s.settings)
@@ -210,7 +217,11 @@ export function BudgetClient({ initial }: { initial: BudgetPayload }) {
                         Cheaper alternatives to save money this week:
                       </p>
                       {swaps.map((swap, i) => (
-                        <SwapCard key={i} swap={swap} />
+                        <SwapCard key={i} swap={swap} onCook={(meal) => {
+                          persistMealForRecipe(meal, '/budget', 'budget')
+                          sessionStorage.setItem('recipe-open-cook', 'true')
+                          router.push('/tonight/recipe')
+                        }} />
                       ))}
                     </div>
                   ) : (
@@ -283,7 +294,57 @@ type SwapSuggestion = {
   reason: string
 }
 
-function SwapCard({ swap }: { swap: SwapSuggestion }) {
+function SwapCard({ swap, onCook }: { swap: SwapSuggestion; onCook: (meal: SmartMealResult) => void }) {
+  const addCustomItem = useWeeklyPlanStore((s) => s.addCustomItem)
+  const meal: SmartMealResult = {
+    id: `budget-${swap.swapMeal.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
+    title: swap.swapMeal,
+    tagline: `Budget swap saves about $${swap.savings.toFixed(2)}`,
+    description: swap.reason,
+    cuisineType: 'budget',
+    prepTime: 10,
+    cookTime: 20,
+    totalTime: 30,
+    estimatedCost: swap.swapCost,
+    servings: 4,
+    difficulty: 'easy',
+    tags: ['Budget Intelligence', 'lower-cost'],
+    ingredients: [
+      { name: swap.swapMeal, quantity: '1', unit: 'meal kit', fromPantry: false, category: 'other' },
+    ],
+    steps: [
+      `Prepare ${swap.swapMeal} using your preferred recipe method.`,
+      'Use pantry staples first, then add only the missing lower-cost ingredients.',
+      'Taste, adjust seasoning, and serve.',
+    ],
+    variations: [],
+    leftoverTip: null,
+    shoppingList: [
+      { name: swap.swapMeal, quantity: '1', unit: 'meal kit', category: 'pantry', estimatedCost: swap.swapCost, substituteOptions: [] },
+    ],
+    meta: {
+      score: 1,
+      matchedPantryItems: [],
+      pantryUtilization: 0,
+      simplifiedForEnergy: false,
+      pickyEaterAdjusted: false,
+      localityApplied: false,
+      selectionReason: swap.reason,
+    },
+  }
+
+  function addGroceries() {
+    for (const item of meal.shoppingList) {
+      addCustomItem({
+        name: item.name,
+        quantity: Number.parseFloat(String(item.quantity)) || 1,
+        unit: item.unit || 'unit',
+        category: item.category || 'other',
+      })
+    }
+    toast.success('Budget meal added to grocery list.')
+  }
+
   return (
     <div className="rounded-2xl bg-white dark:bg-neutral-900 ring-1 ring-neutral-200 dark:ring-neutral-800 px-4 py-3">
       <div className="flex items-start justify-between gap-3">
@@ -297,6 +358,21 @@ function SwapCard({ swap }: { swap: SwapSuggestion }) {
             {swap.swapMeal} (${swap.swapCost.toFixed(2)})
           </p>
           <p className="text-xs text-neutral-500 mt-1">{swap.reason}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button
+              onClick={() => onCook(meal)}
+              className="rounded-lg bg-[#D97757] px-3 py-1.5 text-xs font-semibold text-white"
+            >
+              Cook
+            </button>
+            <SaveMealButton meal={meal} source="budget" className="h-8 w-8 rounded-lg border border-neutral-200 dark:border-neutral-700" />
+            <button
+              onClick={addGroceries}
+              className="rounded-lg border border-neutral-200 px-3 py-1.5 text-xs font-semibold text-neutral-700 dark:border-neutral-700 dark:text-neutral-200"
+            >
+              Add groceries
+            </button>
+          </div>
         </div>
         <div className="flex-shrink-0 text-right">
           <span className="inline-block bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-xs font-semibold px-2 py-1 rounded-full">

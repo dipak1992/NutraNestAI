@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { DAY_LABELS, DAY_FULL, GROCERY_ICONS } from '@/lib/planner/types'
 import type { SmartMealResult } from '@/lib/engine/types'
@@ -12,6 +13,8 @@ import {
   DollarSign,
   RefreshCw,
   Loader2,
+  Volume2,
+  ShoppingCart,
   ChevronDown,
   ChevronUp,
   Leaf,
@@ -20,6 +23,9 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { SaveMealButton } from '@/components/content/SaveMealButton'
+import { RecipeAudioPlayer } from '@/components/recipes/RecipeAudioPlayer'
+import { useWeeklyPlanStore } from '@/lib/planner/store'
+import { mealToRecipe, persistMealForRecipe } from '@/lib/recipes/canonical'
 
 // ── Cuisine visual map ────────────────────────────────────────
 
@@ -62,10 +68,42 @@ function MealDayCard({ meal, dayLabel, date, onRegenerate, isRegenerating }: Mea
   const [showVariations, setShowVariations] = useState(false)
   const [showIngredients, setShowIngredients] = useState(false)
   const [showSteps, setShowSteps] = useState(false)
+  const [showAudio, setShowAudio] = useState(false)
+  const [audioStep, setAudioStep] = useState(0)
   const router = useRouter()
+  const addCustomItem = useWeeklyPlanStore((s) => s.addCustomItem)
   const style = getStyle(meal.cuisineType)
   const pantryItems = meal.ingredients.filter((i) => i.fromPantry)
   const toBuyItems = meal.ingredients.filter((i) => !i.fromPantry)
+  const recipe = mealToRecipe(meal, 'weekly')
+
+  function openRecipe(cook = false) {
+    persistMealForRecipe(meal, '/planner', 'weekly')
+    if (cook) sessionStorage.setItem('recipe-open-cook', 'true')
+    else sessionStorage.removeItem('recipe-open-cook')
+    router.push('/tonight/recipe')
+  }
+
+  function addGroceries() {
+    const items = meal.shoppingList?.length
+      ? meal.shoppingList
+      : toBuyItems.map((item) => ({
+          name: item.name,
+          quantity: item.quantity,
+          unit: item.unit,
+          category: item.category,
+        }))
+
+    for (const item of items) {
+      addCustomItem({
+        name: item.name,
+        quantity: Number.parseFloat(String(item.quantity)) || 1,
+        unit: item.unit || 'unit',
+        category: item.category || 'other',
+      })
+    }
+    toast.success('Ingredients added to grocery list.')
+  }
 
   return (
     <div className={cn('rounded-2xl border-2 overflow-hidden', style.bg)}>
@@ -82,7 +120,7 @@ function MealDayCard({ meal, dayLabel, date, onRegenerate, isRegenerating }: Mea
           <p className="text-muted-foreground text-sm mt-0.5 line-clamp-2">{meal.tagline}</p>
         </div>
         <div className="flex items-center gap-0.5 flex-shrink-0">
-          <SaveMealButton meal={meal} />
+          <SaveMealButton meal={meal} source="weekly" />
           <Button
             variant="ghost"
             size="icon"
@@ -108,6 +146,45 @@ function MealDayCard({ meal, dayLabel, date, onRegenerate, isRegenerating }: Mea
           <span className="flex items-center gap-1"><DollarSign className="h-3.5 w-3.5" />${meal.estimatedCost.toFixed(2)}</span>
         )}
       </div>
+
+      <div className="grid grid-cols-3 border-t border-current/10 bg-white/45">
+        <button
+          type="button"
+          onClick={() => openRecipe(true)}
+          className="flex items-center justify-center gap-1.5 py-2.5 text-xs font-semibold text-emerald-700 hover:bg-white/70"
+        >
+          <ChefHat className="h-3.5 w-3.5" />
+          Cook
+        </button>
+        <button
+          type="button"
+          onClick={() => setShowAudio((value) => !value)}
+          className="flex items-center justify-center gap-1.5 border-x border-current/10 py-2.5 text-xs font-semibold text-primary hover:bg-white/70"
+        >
+          <Volume2 className="h-3.5 w-3.5" />
+          Listen
+        </button>
+        <button
+          type="button"
+          onClick={addGroceries}
+          className="flex items-center justify-center gap-1.5 py-2.5 text-xs font-semibold text-blue-700 hover:bg-white/70"
+        >
+          <ShoppingCart className="h-3.5 w-3.5" />
+          Grocery
+        </button>
+      </div>
+
+      {showAudio && (
+        <div className="border-t border-current/10 p-3">
+          <RecipeAudioPlayer
+            recipeId={recipe.id}
+            recipe={recipe}
+            isPlusMember
+            activeStepIndex={audioStep}
+            onStepChange={setAudioStep}
+          />
+        </div>
+      )}
 
       {/* Pantry usage hint */}
       {pantryItems.length > 0 && (
@@ -213,11 +290,7 @@ function MealDayCard({ meal, dayLabel, date, onRegenerate, isRegenerating }: Mea
       {/* View Full Recipe */}
       <div className="border-t border-current/10 px-4 py-2">
         <button
-          onClick={() => {
-            sessionStorage.setItem('tonight-meal', JSON.stringify(meal))
-            sessionStorage.setItem('recipe-back', '/planner')
-            router.push('/tonight/recipe')
-          }}
+          onClick={() => openRecipe(false)}
           className="w-full text-center text-sm font-semibold text-primary hover:underline"
         >
           🍳 View Full Recipe

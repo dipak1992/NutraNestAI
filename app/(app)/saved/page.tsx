@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
-import { Bookmark, Pencil, Trash2, Globe, Lock, Calendar, Search, PlusCircle, ChefHat } from 'lucide-react'
+import { Bookmark, Pencil, Trash2, Globe, Lock, Calendar, Search, PlusCircle, ChefHat, ShoppingCart, Volume2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
@@ -14,6 +14,8 @@ import { EditMealModal } from '@/components/content/EditMealModal'
 import type { SavedMealSummary } from '@/lib/content/types'
 import type { SmartMealResult } from '@/lib/engine/types'
 import { useWeeklyPlanStore } from '@/lib/planner/store'
+import { MealPillar, PILLAR_LABELS, mealToRecipe, pillarLabel } from '@/lib/recipes/canonical'
+import { RecipeAudioPlayer } from '@/components/recipes/RecipeAudioPlayer'
 
 const CUISINE_EMOJI: Record<string, string> = {
   italian: '🍝',
@@ -39,7 +41,11 @@ export default function SavedMealsPage() {
   const [editTarget, setEditTarget] = useState<SavedMealSummary | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<SavedMealSummary | null>(null)
   const [search, setSearch] = useState('')
-  const { plan, selectedDayIndex, setPlan, setSelectedDayIndex } = useWeeklyPlanStore()
+  const [sourceFilter, setSourceFilter] = useState<'all' | MealPillar>('all')
+  const [sortMode, setSortMode] = useState<'newest' | 'favorites'>('newest')
+  const [audioMeal, setAudioMeal] = useState<SmartMealResult | null>(null)
+  const [audioStep, setAudioStep] = useState(0)
+  const { plan, selectedDayIndex, setPlan, setSelectedDayIndex, addCustomItem } = useWeeklyPlanStore()
 
   useEffect(() => {
     fetch('/api/content/meals')
@@ -87,6 +93,27 @@ export default function SavedMealsPage() {
     return data.meal?.meal_data ?? null
   }
 
+  function addMealGroceries(mealData: SmartMealResult) {
+    const items = mealData.shoppingList?.length
+      ? mealData.shoppingList
+      : mealData.ingredients.filter((item) => !item.fromPantry).map((item) => ({
+          name: item.name,
+          quantity: item.quantity,
+          unit: item.unit,
+          category: item.category,
+        }))
+
+    for (const item of items) {
+      addCustomItem({
+        name: item.name,
+        quantity: Number.parseFloat(String(item.quantity)) || 1,
+        unit: item.unit || 'unit',
+        category: item.category || 'other',
+      })
+    }
+    toast.success('Ingredients added to grocery list.')
+  }
+
   async function handleCookAgain(meal: SavedMealSummary) {
     const mealData = await fetchMealData(meal.id)
     if (!mealData) {
@@ -95,7 +122,27 @@ export default function SavedMealsPage() {
     }
     sessionStorage.setItem('tonight-meal', JSON.stringify(mealData))
     sessionStorage.setItem('recipe-back', '/saved')
+    sessionStorage.setItem('recipe-source', (meal.pillar_source as MealPillar | undefined) ?? 'saved')
     router.push('/tonight/recipe')
+  }
+
+  async function handleListen(meal: SavedMealSummary) {
+    const mealData = await fetchMealData(meal.id)
+    if (!mealData) {
+      toast.error('Could not load meal details.')
+      return
+    }
+    setAudioStep(0)
+    setAudioMeal(mealData)
+  }
+
+  async function handleAddGroceries(meal: SavedMealSummary) {
+    const mealData = await fetchMealData(meal.id)
+    if (!mealData) {
+      toast.error('Could not load meal details.')
+      return
+    }
+    addMealGroceries(mealData)
   }
 
   async function handleAddToWeek(meal: SavedMealSummary) {
@@ -117,6 +164,14 @@ export default function SavedMealsPage() {
     toast.success('Added to weekly plan', { description: `Placed on ${new Date(nextPlan.days[targetDay].date).toLocaleDateString('en-US', { weekday: 'long' })}.` })
     router.push('/planner')
   }
+
+  const filteredMeals = meals
+    .filter((m) => m.title.toLowerCase().includes(search.toLowerCase()))
+    .filter((m) => sourceFilter === 'all' || m.pillar_source === sourceFilter)
+    .sort((a, b) => {
+      if (sortMode === 'favorites') return a.title.localeCompare(b.title)
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    })
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -140,14 +195,47 @@ export default function SavedMealsPage() {
 
       {/* Search */}
       {!loading && meals.length > 0 && (
-        <div className="relative mb-6">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search saved meals…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
-          />
+        <div className="mb-6 space-y-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search saved meals…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <select
+              value={sourceFilter}
+              onChange={(e) => setSourceFilter(e.target.value as 'all' | MealPillar)}
+              className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+              aria-label="Filter by pillar"
+            >
+              <option value="all">All pillars</option>
+              {(Object.keys(PILLAR_LABELS) as MealPillar[]).map((pillar) => (
+                <option key={pillar} value={pillar}>{PILLAR_LABELS[pillar]}</option>
+              ))}
+            </select>
+            <select
+              value={sortMode}
+              onChange={(e) => setSortMode(e.target.value as 'newest' | 'favorites')}
+              className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+              aria-label="Sort saved meals"
+            >
+              <option value="newest">Newest first</option>
+              <option value="favorites">Favorites A-Z</option>
+            </select>
+          </div>
+          {audioMeal && (
+            <RecipeAudioPlayer
+              recipeId={audioMeal.id}
+              recipe={mealToRecipe(audioMeal, (audioMeal as SmartMealResult & { pillar_source?: MealPillar }).pillar_source ?? 'saved')}
+              isPlusMember
+              activeStepIndex={audioStep}
+              onStepChange={setAudioStep}
+            />
+          )}
         </div>
       )}
 
@@ -163,7 +251,7 @@ export default function SavedMealsPage() {
       {/* Meals grid */}
       {!loading && meals.length > 0 && (
         <div className="grid gap-4 sm:grid-cols-2">
-          {meals.filter((m) => m.title.toLowerCase().includes(search.toLowerCase())).map((meal) => (
+          {filteredMeals.map((meal) => (
             <div
               key={meal.id}
               className="rounded-xl border border-border/60 bg-card overflow-hidden hover:border-primary/30 transition-colors"
@@ -178,6 +266,11 @@ export default function SavedMealsPage() {
                     {meal.cuisine_type && (
                       <Badge variant="secondary" className="text-xs capitalize">
                         {meal.cuisine_type}
+                      </Badge>
+                    )}
+                    {meal.pillar_source && (
+                      <Badge variant="outline" className="text-xs">
+                        {pillarLabel(meal.pillar_source)}
                       </Badge>
                     )}
                     <button
@@ -240,10 +333,28 @@ export default function SavedMealsPage() {
                   variant="ghost"
                   size="sm"
                   className="h-8 text-xs gap-1.5"
+                  onClick={() => void handleListen(meal)}
+                >
+                  <Volume2 className="h-3.5 w-3.5" />
+                  Listen
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 text-xs gap-1.5"
                   onClick={() => void handleAddToWeek(meal)}
                 >
                   <PlusCircle className="h-3.5 w-3.5" />
                   Add to week
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 text-xs gap-1.5"
+                  onClick={() => void handleAddGroceries(meal)}
+                >
+                  <ShoppingCart className="h-3.5 w-3.5" />
+                  Groceries
                 </Button>
                 <Button
                   variant="ghost"

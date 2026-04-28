@@ -706,7 +706,7 @@ function TonightPageInner() {
                 className="text-center mt-8"
               >
                 <div className="flex items-center justify-center gap-2">
-                  <SaveMealButton meal={meal} className="h-9 w-9 rounded-md border border-border/60" />
+                  <SaveMealButton meal={meal} source="tonight" className="h-9 w-9 rounded-md border border-border/60" />
                   <ShareMealButton meal={meal} className="h-9 w-9 rounded-md border border-border/60" />
                   <Button
                     variant="outline"

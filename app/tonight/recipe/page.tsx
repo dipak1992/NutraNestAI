@@ -2,8 +2,15 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Clock, ChefHat, Users, ShieldCheck } from 'lucide-react'
+import { ArrowLeft, Clock, ChefHat, Users, ShieldCheck, ShoppingCart } from 'lucide-react'
+import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { SaveMealButton } from '@/components/content/SaveMealButton'
+import { CookMode } from '@/components/recipes/CookMode'
+import { RecipeAudioPlayer } from '@/components/recipes/RecipeAudioPlayer'
+import { useWeeklyPlanStore } from '@/lib/planner/store'
+import { mealToRecipe, type MealPillar } from '@/lib/recipes/canonical'
 import type { SmartMealResult, SmartVariation } from '@/lib/engine/types'
 
 function MemberVariation({ variation }: { variation: SmartVariation }) {
@@ -53,12 +60,22 @@ export default function TonightRecipePage() {
   const router = useRouter()
   const [meal, setMeal] = useState<SmartMealResult | null>(null)
   const [imgFailed, setImgFailed] = useState(false)
+  const [source, setSource] = useState<MealPillar>('tonight')
+  const [showCookMode, setShowCookMode] = useState(false)
+  const [audioStep, setAudioStep] = useState(0)
+  const addCustomItem = useWeeklyPlanStore((s) => s.addCustomItem)
 
   useEffect(() => {
     const raw = sessionStorage.getItem('tonight-meal')
     if (raw) {
       try {
         setMeal(JSON.parse(raw) as SmartMealResult)
+        const storedSource = sessionStorage.getItem('recipe-source') as MealPillar | null
+        if (storedSource) setSource(storedSource)
+        if (sessionStorage.getItem('recipe-open-cook') === 'true') {
+          sessionStorage.removeItem('recipe-open-cook')
+          setShowCookMode(true)
+        }
       } catch {
         router.replace('/tonight')
       }
@@ -72,6 +89,40 @@ export default function TonightRecipePage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-pulse text-muted-foreground">Loading recipe…</div>
       </div>
+    )
+  }
+
+  const recipe = mealToRecipe(meal, source)
+
+  function addIngredientsToGrocery() {
+    if (!meal) return
+    const items = meal.shoppingList?.length
+      ? meal.shoppingList
+      : meal.ingredients.filter((item) => !item.fromPantry).map((item) => ({
+          name: item.name,
+          quantity: item.quantity,
+          unit: item.unit,
+          category: item.category,
+        }))
+
+    for (const item of items) {
+      addCustomItem({
+        name: item.name,
+        quantity: Number.parseFloat(String(item.quantity)) || 1,
+        unit: item.unit || 'unit',
+        category: item.category || 'other',
+      })
+    }
+    toast.success('Ingredients added to grocery list.')
+  }
+
+  if (showCookMode) {
+    return (
+      <CookMode
+        recipe={recipe}
+        recipeId={recipe.id}
+        isPlusMember
+      />
     )
   }
 
@@ -113,6 +164,26 @@ export default function TonightRecipePage() {
             {meal.estimatedCost != null && (
               <span className="flex items-center gap-1">~${meal.estimatedCost.toFixed(2)}</span>
             )}
+          </div>
+          <div className="mt-5 flex flex-wrap gap-2">
+            <Button onClick={() => setShowCookMode(true)} className="gap-2 bg-emerald-600 hover:bg-emerald-700">
+              <ChefHat className="h-4 w-4" />
+              Let&apos;s Cook
+            </Button>
+            <SaveMealButton meal={meal} source={source} className="h-10 w-10 border border-border" />
+            <Button variant="outline" onClick={addIngredientsToGrocery} className="gap-2">
+              <ShoppingCart className="h-4 w-4" />
+              Add groceries
+            </Button>
+          </div>
+          <div className="mt-4">
+            <RecipeAudioPlayer
+              recipeId={recipe.id}
+              recipe={recipe}
+              isPlusMember
+              activeStepIndex={audioStep}
+              onStepChange={setAudioStep}
+            />
           </div>
         </div>
 

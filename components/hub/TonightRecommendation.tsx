@@ -136,6 +136,7 @@ export function TonightRecommendation({ refreshKey }: Props) {
     posthog.capture('meal_cooked', { meal_id: meal.id, meal_name: meal.title, mode: 'tonight' })
     showRewardToast('mealCooked')
     sessionStorage.setItem('tonight-meal', JSON.stringify(meal))
+    sessionStorage.setItem('recipe-source', 'tonight')
     setCookedMealId(meal.id)
     setGroceryMeal(meal)
   }, [recordLike])
@@ -332,7 +333,7 @@ function MealSlot({ label, meal, swapping, cooked, onCook, onSwap, onOrder }: Me
       <div className="px-4 pt-3 pb-1 flex items-center justify-between">
         <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{label}</span>
         <div className="flex items-center gap-1">
-          <SaveMealButton meal={meal} className="h-7 w-7" />
+          <SaveMealButton meal={meal} source="tonight" className="h-7 w-7" />
           <ShareMealButton meal={meal} className="h-7 w-7" />
           <button
             onClick={onSwap}

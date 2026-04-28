@@ -7,6 +7,7 @@ import {
 import type { LoadedRecipe } from '@/app/recipes/[id]/loader'
 import { CookCompleteDialog } from './CookCompleteDialog'
 import { RecipeAudioPlayer } from './RecipeAudioPlayer'
+import { recipeSignature } from '@/lib/recipes/canonical'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -138,12 +139,20 @@ export function CookMode({ recipe, recipeId, isPlusMember = false }: Props) {
   const [showComplete, setShowComplete] = useState(false)
   const [audioActiveStep, setAudioActiveStep] = useState(0)
   const wakeLockRef = useRef<WakeLockSentinel | null>(null)
+  const signature = recipeSignature(recipe)
 
   const steps = recipe.steps
   const isIngredientStep = current === -1
   const isFirst = current === -1
   const isLast  = current === steps.length - 1
   const step    = steps[current] ?? null
+
+  useEffect(() => {
+    setCurrent(-1)
+    setCompleted(new Set())
+    setShowComplete(false)
+    setAudioActiveStep(0)
+  }, [signature])
 
   // ── Wake lock ──────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -236,6 +245,7 @@ export function CookMode({ recipe, recipeId, isPlusMember = false }: Props) {
               {/* Audio player on ingredient step */}
               <RecipeAudioPlayer
                 recipeId={recipeId}
+                recipe={recipe}
                 isPlusMember={isPlusMember}
                 activeStepIndex={audioActiveStep}
                 onStepChange={(idx) => {

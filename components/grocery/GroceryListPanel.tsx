@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useRef } from 'react'
 import { useWeeklyPlanStore } from '@/lib/planner/store'
+import { buildGroceryList } from '@/lib/planner/grocery'
 import { CATEGORY_ORDER, GROCERY_ICONS, WALMART_AISLES } from '@/lib/planner/types'
 import type { GroceryLine, StoreFormat } from '@/lib/planner/types'
 import { cn } from '@/lib/utils'
@@ -365,8 +366,10 @@ function CategorySection({
 export function GroceryListPanel() {
   const {
     groceryList,
+    plan,
     storeFormat,
     setStoreFormat,
+    setGroceryList,
     togglePantryItem,
     toggleChecked,
     checkAllInCategory,
@@ -384,6 +387,15 @@ export function GroceryListPanel() {
   const [newUnit, setNewUnit] = useState('')
   const [newCategory, setNewCategory] = useState('other')
   const [newNote, setNewNote] = useState('')
+
+  function regenerateFromWeeklyPlan() {
+    const meals = plan.days
+      .filter((day) => day.meal)
+      .map((day) => day.meal!)
+    if (meals.length === 0) return
+    const pantryNames = groceryList?.items.filter((item) => item.isInPantry).map((item) => item.name) ?? []
+    setGroceryList(buildGroceryList(meals, pantryNames, storeFormat, plan.weekStart))
+  }
 
   // Group items by category, sorted by CATEGORY_ORDER
   const grouped = useMemo(() => {
@@ -413,6 +425,12 @@ export function GroceryListPanel() {
           <p className="text-sm">
             Generate a weekly meal plan to auto-fill your list, or add items manually below.
           </p>
+          {plan.days.some((day) => day.meal) && (
+            <Button size="sm" className="mt-4" onClick={regenerateFromWeeklyPlan}>
+              <RotateCcw className="h-4 w-4 mr-1.5" />
+              Regenerate from weekly plan
+            </Button>
+          )}
         </div>
 
         {/* Add custom item — accessible without a meal plan */}
@@ -553,11 +571,21 @@ export function GroceryListPanel() {
           <Button
             variant="ghost"
             size="sm"
+            onClick={regenerateFromWeeklyPlan}
+            className="text-muted-foreground"
+            disabled={!plan.days.some((day) => day.meal)}
+          >
+            <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
+            Regenerate
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={uncheckAll}
             className="text-muted-foreground"
           >
             <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
-            Reset
+            Uncheck all
           </Button>
           <Button
             variant="outline"

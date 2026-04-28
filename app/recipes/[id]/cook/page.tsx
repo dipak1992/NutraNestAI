@@ -1,7 +1,7 @@
-import { redirect } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getPaywallStatus } from '@/lib/paywall/server'
-import { loadRecipe } from '../loader'
+import { RecipeNotFoundError, loadRecipe } from '../loader'
 import { CookMode } from '@/components/recipes/CookMode'
 
 type Props = {
@@ -20,7 +20,10 @@ export default async function CookPage({ params }: Props) {
   if (!user) redirect('/login')
 
   const [recipe, paywall] = await Promise.all([
-    loadRecipe(id),
+    loadRecipe(id).catch((error) => {
+      if (error instanceof RecipeNotFoundError) notFound()
+      throw error
+    }),
     getPaywallStatus(),
   ])
 

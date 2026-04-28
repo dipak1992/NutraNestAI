@@ -13,14 +13,14 @@ export const quickActionsConfig: QuickAction[] = [
     label: 'Leftovers AI',
     icon: '🍱',
     href: '/leftovers',
-    requiredPlan: 'free',
+    requiredPlan: 'plus',
   },
   {
     id: 'grocery',
     label: 'Grocery List',
     icon: '🛒',
     href: '/grocery-list',
-    requiredPlan: 'free',
+    requiredPlan: 'plus',
   },
   {
     id: 'budget',

@@ -25,16 +25,12 @@ type Props = {
 }
 
 export function LeftoversClient({ initialLeftovers, initialInsights, isPlusMember }: Props) {
-  const { hydrate, hydrated, filter, setFilter, getFiltered, insights } = useLeftoversStore(
-    (s) => ({
-      hydrate: s.hydrate,
-      hydrated: s.hydrated,
-      filter: s.filter,
-      setFilter: s.setFilter,
-      getFiltered: s.getFiltered,
-      insights: s.insights,
-    }),
-  )
+  const hydrate = useLeftoversStore((s) => s.hydrate)
+  const hydrated = useLeftoversStore((s) => s.hydrated)
+  const filter = useLeftoversStore((s) => s.filter)
+  const setFilter = useLeftoversStore((s) => s.setFilter)
+  const getFiltered = useLeftoversStore((s) => s.getFiltered)
+  const insights = useLeftoversStore((s) => s.insights)
 
   // Hydrate store on mount
   useEffect(() => {

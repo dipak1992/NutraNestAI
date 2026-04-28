@@ -25,15 +25,12 @@ type Props = {
 }
 
 export function LeftoverModal({ isPlusMember }: Props) {
-  const { isModalOpen, selectedId, closeModal, getById, markUsed, markDiscarded } =
-    useLeftoversStore((s) => ({
-      isModalOpen: s.isModalOpen,
-      selectedId: s.selectedId,
-      closeModal: s.closeModal,
-      getById: s.getById,
-      markUsed: s.markUsed,
-      markDiscarded: s.markDiscarded,
-    }))
+  const isModalOpen = useLeftoversStore((s) => s.isModalOpen)
+  const selectedId = useLeftoversStore((s) => s.selectedId)
+  const closeModal = useLeftoversStore((s) => s.closeModal)
+  const getById = useLeftoversStore((s) => s.getById)
+  const markUsed = useLeftoversStore((s) => s.markUsed)
+  const markDiscarded = useLeftoversStore((s) => s.markDiscarded)
 
   const leftover = selectedId ? getById(selectedId) : null
   const urgency = leftover?.urgency ?? 'fresh'

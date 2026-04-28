@@ -35,6 +35,6 @@ export function isActionGated(
   required: Plan,
   userPlan: Plan
 ): boolean {
-  const rank: Record<Plan, number> = { free: 0, plus: 1 }
+  const rank: Record<Plan, number> = { free: 0, plus: 1, family: 1 }
   return rank[userPlan] < rank[required]
 }

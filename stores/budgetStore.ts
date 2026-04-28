@@ -19,7 +19,7 @@ type BudgetStore = {
   mealsCooked: number
   breakdown: CategorySpend[]
   history: SpendingHistoryWeek[]
-  plan: 'free' | 'plus'
+  plan: 'free' | 'plus' | 'family'
 
   // Derived (computed on hydrate/update)
   percentUsed: number

@@ -1,4 +1,12 @@
-export type Plan = 'free' | 'plus'
+export type Plan = 'free' | 'plus' | 'family'
+
+export type AlertLevel = 'safe' | 'caution' | 'over'
+
+export type UsageLimits = {
+  scansUsed: number
+  scansLimit: number
+  scansRemaining: number
+}
 
 export type Recipe = {
   id: string
@@ -45,7 +53,7 @@ export type BudgetState = {
   weeklyLimit: number | null
   weekSpent: number
   percentUsed: number
-  alertLevel: 'safe' | 'caution' | 'over'
+  alertLevel: AlertLevel
 }
 
 export type DayPlan = {
@@ -74,15 +82,20 @@ export type ContextualNudgeType =
   | 'pantry_scan_reminder'
   | 'referral'
 
+export type NudgeVariant = 'info' | 'warning' | 'danger' | 'success' | 'promo'
+
 export type Nudge = {
   id: string
   type: ContextualNudgeType
   priority: number
   title: string
   body: string
+  /** Alias for body — spec uses message, body is canonical */
+  message?: string
   ctaLabel: string
   ctaHref: string
   dismissible: boolean
+  variant: NudgeVariant
 }
 
 export type QuickAction = {
@@ -100,6 +113,8 @@ export type DashboardPayload = {
     firstName: string
     plan: Plan
     hasSeenTour: boolean
+    onboardingComplete: boolean
+    createdAt: string
   }
   greeting: {
     greeting: string
@@ -113,5 +128,5 @@ export type DashboardPayload = {
   quickActions: QuickAction[]
   nudge: Nudge | null
   household: { memberCount: number; maxMembers: number }
-  limits: { scansUsed: number; scansLimit: number }
+  limits: UsageLimits
 }

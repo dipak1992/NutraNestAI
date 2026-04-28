@@ -36,12 +36,13 @@ export async function getDashboardPayload(
   // --- Real profile fetch ---
   const { data: profile } = await supabase
     .from('profiles')
-    .select('full_name, subscription_tier')
+    .select('full_name, subscription_tier, onboarding_complete, created_at')
     .eq('id', userId)
     .maybeSingle()
 
   const emailRes = await supabase.auth.getUser()
-  const email = emailRes.data.user?.email ?? ''
+  const authUser = emailRes.data.user
+  const email = authUser?.email ?? ''
   const emailPrefix = email.split('@')[0]
 
   const rawName =
@@ -56,10 +57,19 @@ export async function getDashboardPayload(
   const tierMap: Record<string, Plan> = {
     pro: 'plus',
     plus: 'plus',
-    family: 'plus',
+    family: 'family',
     free: 'free',
   }
   const plan: Plan = tierMap[profile?.subscription_tier ?? 'free'] ?? 'free'
+
+  // Onboarding complete — default true if column doesn't exist yet
+  const onboardingComplete: boolean = profile?.onboarding_complete ?? true
+
+  // User creation date — prefer auth metadata, fall back to profile, then now
+  const createdAt: string =
+    authUser?.created_at ??
+    profile?.created_at ??
+    new Date().toISOString()
 
   const greetingInfo = getGreeting()
 
@@ -107,19 +117,32 @@ export async function getDashboardPayload(
   const budget = calcBudget(null, 0)
 
   const household = { memberCount: 1, maxMembers: 6 }
-  const limits = { scansUsed: 0, scansLimit: plan === 'free' ? 5 : 999 }
+  const scansLimit = plan === 'free' ? 5 : 999
+  const scansUsed = 0
+  const limits = {
+    scansUsed,
+    scansLimit,
+    scansRemaining: Math.max(0, scansLimit - scansUsed),
+  }
 
   const quickActions = quickActionsConfig.map((a) => {
     let status: string | undefined
     if (a.id === 'leftovers')
       status = leftovers.length > 0 ? `${leftovers.length} item${leftovers.length === 1 ? '' : 's'}` : undefined
     if (a.id === 'scan' && plan === 'free')
-      status = `${limits.scansLimit - limits.scansUsed} scans left`
+      status = `${limits.scansRemaining} scans left`
     return { ...a, status }
   })
 
   const base: DashboardPayload = {
-    user: { id: userId, firstName, plan, hasSeenTour: true },
+    user: {
+      id: userId,
+      firstName,
+      plan,
+      hasSeenTour: true,
+      onboardingComplete,
+      createdAt,
+    },
     greeting: greetingInfo,
     tonight,
     weekPlan,

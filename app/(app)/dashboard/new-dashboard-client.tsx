@@ -15,13 +15,17 @@ import { ContextualNudge } from '@/components/dashboard/ContextualNudge'
 import { FloatingScanButton } from '@/components/dashboard/FloatingScanButton'
 import type { DashboardPayload } from '@/lib/dashboard/types'
 
+const REFRESH_INTERVAL_MS = 60_000 // 60 seconds
+
 export function NewDashboardClient({ initial }: { initial: DashboardPayload }) {
   const hydrate = useDashboardStore((s) => s.hydrate)
+  const refresh = useDashboardStore((s) => s.refresh)
   const hydrateBudget = useBudgetStore((s) => s.hydrate)
   const user = useDashboardStore((s) => s.user)
   const tonight = useDashboardStore((s) => s.tonight)
   const leftovers = useDashboardStore((s) => s.leftovers)
   const budget = useDashboardStore((s) => s.budget)
+  const error = useDashboardStore((s) => s.error)
 
   // Only hydrate once on mount — avoid re-render loop from changing `initial` reference
   const hydratedRef = useRef(false)
@@ -50,6 +54,15 @@ export function NewDashboardClient({ initial }: { initial: DashboardPayload }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // 60-second auto-refresh — keeps dashboard data fresh without full page reload
+  useEffect(() => {
+    const timer = setInterval(() => {
+      refresh()
+    }, REFRESH_INTERVAL_MS)
+    return () => clearInterval(timer)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   // Use initial data directly while store hydrates — avoids blank screen
   const displayUser = user ?? initial.user
   const displayTonight = tonight ?? initial.tonight
@@ -61,6 +74,25 @@ export function NewDashboardClient({ initial }: { initial: DashboardPayload }) {
         id="main"
         className="max-w-[1400px] mx-auto px-4 md:px-8 py-6 md:py-10 pb-28 md:pb-16 space-y-6 md:space-y-8"
       >
+        {/* Non-blocking error banner — shown when background refresh fails */}
+        {error && (
+          <div
+            role="alert"
+            className="flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800/50 dark:bg-red-950/30 dark:text-red-400"
+          >
+            <span className="shrink-0 text-base">⚠️</span>
+            <span>
+              Could not refresh dashboard data.{' '}
+              <button
+                onClick={() => refresh()}
+                className="font-medium underline underline-offset-2 hover:no-underline"
+              >
+                Try again
+              </button>
+            </span>
+          </div>
+        )}
+
         <GreetingHeader firstName={displayUser.firstName} budget={budget} />
 
         <BudgetBar />

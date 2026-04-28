@@ -2,192 +2,84 @@
 
 import { useState, useCallback } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { motion } from 'framer-motion'
-import {
-  Check,
-  Crown,
-  Sparkles,
-  Star,
-  Shield,
-  Users,
-  Quote,
-  ArrowRight,
-  Zap,
-  X,
-  CreditCard,
-  Clock,
-  ShieldCheck,
-  ChevronDown,
-} from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 import { PRICING_TIERS, PRO_ANNUAL_SAVINGS } from '@/lib/paywall/config'
-// $83/yr ÷ 12 = $6.92/mo displayed when annual toggle is active
 import { cn } from '@/lib/utils'
-import { AboutSnippet } from '@/components/about/AboutSnippet'
 
 /* ─────────────────────── DATA ─────────────────────── */
 
-const TESTIMONIALS = [
-  {
-    quote: 'I recommend MealEase to clients who struggle with meal planning. The allergy support and personalization is better than anything else I\'ve seen.',
-    name: 'Priya R.',
-    role: 'Registered Dietitian',
-    avatar: 'PR',
-    color: 'bg-emerald-100 text-emerald-700',
-  },
-  {
-    quote: "I used to spend 30 minutes every evening deciding what to cook. Now I just open MealEase and dinner is planned in seconds. My kids actually eat what I make.",
-    name: 'Sarah M.',
-    role: 'Mom of 3, Austin TX',
-    avatar: 'SM',
-    color: 'bg-violet-100 text-violet-700',
-  },
-  {
-    quote: 'Living solo, I used to default to the same 5 takeout places. Now I actually cook and enjoy it. The budget modes helped me save money too.',
-    name: 'James K.',
-    role: 'Software engineer, remote',
-    avatar: 'JK',
-    color: 'bg-blue-100 text-blue-700',
-  },
+const FREE_FEATURES = [
+  'Tonight Suggestions (3/day)',
+  'Snap & Cook (3 scans/week)',
+  'Basic grocery list',
+  '1 member profile',
+  'Basic dietary filters',
 ]
 
-const COMPARISON_FEATURES = [
-  { feature: 'Tonight Dinner', free: true, pro: true },
-  { feature: 'Daily meal generations', free: '3 per day', pro: 'Unlimited' },
-  { feature: 'Simple grocery list', free: true, pro: true },
-  { feature: 'Unlimited regenerations', free: false, pro: true },
-  { feature: 'Weekly Planner', free: '3-day preview', pro: 'Full 7 days' },
-  { feature: 'Save preferences', free: false, pro: true },
-  { feature: 'Member profiles †', free: '1 profile', pro: 'Up to 6 profiles' },
-  { feature: 'Household memory', free: false, pro: true },
-  { feature: 'Snap & Cook scans', free: '3/week', pro: 'Unlimited' },
-  { feature: 'Smart Menu Scan', free: false, pro: true },
-  { feature: 'Food Check (calorie snap)', free: false, pro: true },
-  { feature: 'Personal nutrition profile', free: false, pro: true },
-  { feature: 'Budget meal mode', free: false, pro: true },
-  { feature: 'Healthy mode', free: false, pro: true },
-  { feature: 'Meal history', free: false, pro: true },
-  { feature: 'Faster AI responses', free: false, pro: true },
-  { feature: 'Pantry Mode', free: false, pro: true },
-  { feature: 'Shared grocery lists', free: false, pro: true },
+const PLUS_FEATURES = [
+  'Unlimited meal generations',
+  'Unlimited Snap & Cook',
+  'Full 7-day Weekly Planner',
+  'Weekly Autopilot',
+  'Smart Menu Scan ✨',
+  'Food Check — calorie snap ✨',
+  'Budget meal mode',
+  'Healthy mode',
+  'Up to 2 member profiles',
+  'Household memory',
+  'Saved preferences',
+  'Meal history',
+  'Faster AI responses',
 ]
 
 const FAQ = [
   {
-    q: 'Is this just another recipe app?',
-    a: 'Not even close. Recipe apps give you a database and leave you to scroll. MealEase is a decision engine — it knows your household, your energy level, your fridge, and your kids\' quirks, then tells you exactly what to make tonight. No browsing. No decision fatigue. Just dinner, handled.',
+    q: 'Is there a free version?',
+    a: 'Yes. The free plan gives you Tonight Suggestions, up to 3 meal ideas daily, and a basic grocery list — enough to experience how MealEase thinks. When you\'re ready for Weekly Autopilot or Household Memory, upgrade anytime. Plus includes a 7-day free trial.',
   },
   {
     q: 'What is a household profile?',
-    a: 'A household profile stores preferences, allergies, age groups, and food goals for one person in your household. Profiles are not separate logins — they are preference records that help MealEase personalize every meal for each person at your table. Free plan includes 1 profile. Plus includes up to 6.',
-  },
-  {
-    q: 'Are profiles separate logins? Can my spouse use MealEase too?',
-    a: 'Not yet — profiles are preference records, not separate accounts. One account manages all profiles. Your spouse\'s preferences, allergies, and food goals are stored in their profile and used to personalize every meal. Shared login support is on our roadmap for a future update.',
-  },
-  {
-    q: 'How many household members can I add?',
-    a: 'Free plan: 1 personal profile. Plus plan: up to 6 household member profiles with full preferences, allergy tracking, and cuisine preferences.',
-  },
-  {
-    q: 'Can I share grocery lists or meal plans?',
-    a: 'Yes. Pro includes shared grocery lists and shared meal planning — so everyone in the household stays on the same page.',
-  },
-  {
-    q: 'How does Household Memory work?',
-    a: 'Every time you cook, save, skip, or swap a meal, MealEase quietly learns. It tracks which cuisines your household gravitates toward, what your picky eater actually ate, and which nights you tend to reach for something fast. Over weeks, your suggestions get sharper — like a sous chef who\'s been with your family for years.',
+    a: 'A profile stores preferences, allergies, age groups, and food goals for one person. Profiles are not separate logins — they help MealEase personalize every meal for each person at your table. Free plan includes 1 profile. Plus includes up to 2.',
   },
   {
     q: 'What is Weekly Autopilot?',
-    a: 'One tap, seven nights planned. Autopilot builds a full week of dinners tailored to your household — balancing variety, nutrition, prep time, and what you already have on hand. It generates a smart grocery list alongside it. You review, tweak if you want, and you\'re done. Sunday planning in under 60 seconds.',
+    a: 'One tap, seven nights planned. Autopilot builds a full week of dinners tailored to your household — balancing variety, nutrition, prep time, and what you already have on hand. It generates a smart grocery list alongside it.',
   },
   {
-    q: 'Can it help picky eaters?',
-    a: 'This is one of the things we built MealEase to solve. The Picky Eater tool suggests meals with high acceptance likelihood based on your child\'s profile — textures they tolerate, flavors they\'ve accepted before, and gentle ways to introduce new foods. It even scores each suggestion so you know what to expect before you start cooking.',
+    q: 'How does Household Memory work?',
+    a: 'Every time you cook, save, skip, or swap a meal, MealEase quietly learns. It tracks which cuisines your household gravitates toward and which nights you tend to reach for something fast. Over weeks, your suggestions get sharper.',
   },
   {
-    q: 'Can it help save money on groceries?',
-    a: 'Yes — and most users notice it within the first two weeks. Budget Mode filters meals by cost. Pantry Mode builds dinners from what you already have, reducing waste. Weekly Autopilot minimizes impulse buys by giving you a precise shopping list before you walk into the store. Less food thrown away, fewer last-minute takeout orders.',
+    q: 'Can I cancel anytime?',
+    a: 'Yes — cancel with one click from your account settings. No questions asked. Your plan stays active until the end of the current billing period.',
   },
   {
-    q: 'What makes MealEase different from ChatGPT meal plans?',
-    a: 'ChatGPT gives you a generic list and forgets you exist five minutes later. MealEase remembers your household — allergies, preferences, what your toddler refused last Tuesday. It integrates with your pantry, builds grocery lists, and gets smarter every week. It\'s the difference between asking a stranger for advice and having a system that actually knows your family.',
+    q: 'What is Smart Menu Scan?',
+    a: 'Photograph any restaurant menu and choose a goal — lose weight, high protein, budget-friendly, or more. AI highlights exactly what to order based on your personal nutrition profile.',
   },
-  {
-    q: 'Is there a free version?',
-    a: 'Yes. The free plan gives you Tonight Dinner, up to three meal ideas daily, and basic grocery lists — enough to experience how MealEase thinks. When you\'re ready for Weekly Autopilot or Household Memory, upgrade anytime. Plus includes a 7-day free trial, and you can cancel with one click.',
-  },
-  {
-    q: 'Can MealEase help me order healthier at restaurants?',
-    a: 'Yes. Smart Menu Scan lets you photograph any restaurant menu and choose a goal — lose weight, high protein, budget-friendly, or more. AI highlights exactly what to order based on your personal nutrition profile. It works with sit-down restaurants, fast food chains, takeout menus, and even handwritten specials.',
-  },
-  {
-    q: 'How does the calorie estimation feature work?',
-    a: 'Food Check uses AI vision to analyze a photo of any plate or snack. It estimates calorie ranges with a confidence level, shows protein levels, gives a goal-fit verdict (healthy, balanced, or indulgent), and suggests smarter swaps when relevant. It\'s like having a nutritionist in your pocket.',
-  },
-  {
-    q: 'What\'s the difference between personal preferences and household settings?',
-    a: 'Household settings power meal planning — allergies, ages, and shared preferences for everyone at the table. Personal preferences are just for you — your weight goal, protein focus, and individual dietary needs. Smart Menu Scan and Food Check use your personal profile so recommendations are tailored to your body and goals.',
-  },
-]
-
-const TRUST_SIGNALS = [
-  { label: '3,200+ households', icon: Users },
-  { label: '4.9/5 rating', icon: Star },
-  { label: 'Cancel anytime', icon: ShieldCheck },
-  { label: 'Secure checkout', icon: CreditCard },
 ]
 
 /* ─────────────────────── COMPONENT ─────────────────────── */
 
 export function PricingContent() {
   const [isAnnual, setIsAnnual] = useState(true)
-  const [isStartingTrial, setIsStartingTrial] = useState(false)
-  const [showComparison, setShowComparison] = useState(false)
+  const [openFaq, setOpenFaq] = useState<number | null>(null)
   const { status, loading: paywallLoading } = usePaywallStatus()
   const router = useRouter()
 
-  const proMonthly = PRICING_TIERS.pro.monthlyPrice
-  const proAnnual = PRICING_TIERS.pro.yearlyPrice
-
-  const handleStartTrial = useCallback(async () => {
-    if (!status.isAuthenticated) {
-      router.push('/signup?plan=pro&trial=1')
-      return
-    }
-    if (status.isPro) {
-      toast.info('You already have Plus!')
-      return
-    }
-    setIsStartingTrial(true)
-    try {
-      const res = await fetch('/api/paywall/start-trial', { method: 'POST' })
-      const data = await res.json()
-      if (!res.ok) {
-        toast.error(data.error || 'Could not start trial')
-        return
-      }
-      toast.success('Your 7-day free trial is active!', {
-        description: 'Enjoy full Plus access to every feature.',
-      })
-      router.push('/dashboard')
-      router.refresh()
-    } catch {
-      toast.error('Something went wrong. Try again.')
-    } finally {
-      setIsStartingTrial(false)
-    }
-  }, [status, router])
+  const proMonthly = PRICING_TIERS.pro.monthlyPrice   // 9.99
+  const proAnnual  = PRICING_TIERS.pro.yearlyPrice    // 83
+  const proAnnualMonthly = (proAnnual / 12).toFixed(2) // 6.92
 
   const handleCheckout = useCallback(async (plan: 'pro_monthly' | 'pro_yearly') => {
     if (!status.isAuthenticated) {
       router.push(`/signup?plan=${plan}`)
+      return
+    }
+    if (status.isPro) {
+      toast.info('You already have Plus!')
       return
     }
     try {
@@ -198,419 +90,220 @@ export function PricingContent() {
       })
       const data = await res.json()
       if (data.error === 'billing_not_configured') {
-        handleStartTrial()
+        // Fall back to trial start
+        const trialRes = await fetch('/api/paywall/start-trial', { method: 'POST' })
+        const trialData = await trialRes.json()
+        if (!trialRes.ok) { toast.error(trialData.error || 'Could not start trial'); return }
+        toast.success('Your 7-day free trial is active!')
+        router.push('/dashboard')
+        router.refresh()
         return
       }
-      if (!res.ok) {
-        toast.error(data.error || 'Could not start checkout')
-        return
-      }
-      if (data.url) {
-        window.location.href = data.url
-      }
+      if (!res.ok) { toast.error(data.error || 'Could not start checkout'); return }
+      if (data.url) window.location.href = data.url
     } catch {
       toast.error('Something went wrong. Try again.')
     }
-  }, [status, router, handleStartTrial])
+  }, [status, router])
 
   return (
-    <div className="relative">
-      {/* ═══════════════════ HERO ═══════════════════ */}
-      <section className="relative overflow-hidden pt-20 pb-8">
-        <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
-          <Image src="/landing/family-dinner.jpg" alt="" fill sizes="(max-width: 767px) 0px, 100vw" className="object-cover object-center hidden md:block" quality={75} />
-          <Image src="/mobile/family-mobile.jpg" alt="" fill sizes="(max-width: 767px) 100vw, 0px" className="object-cover object-[center_30%] md:hidden" quality={70} />
-          <div className="absolute inset-0 bg-white/[0.94]" />
-          <div className="absolute inset-0 bg-gradient-to-b from-white via-transparent to-white" />
-          <div className="absolute inset-0 bg-[radial-gradient(800px_400px_at_50%_20%,rgba(16,185,129,0.08),transparent_60%)]" />
-        </div>
+    <div className="min-h-screen bg-white dark:bg-neutral-950">
 
-        <div className="relative z-[1] mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary/8 border border-primary/10 px-4 py-2 text-sm font-medium text-primary">
-              <Sparkles className="h-4 w-4" />
-              Honest pricing, zero surprises
-            </div>
-
-            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-[3.5rem] leading-[1.1] mb-5">
-              Choose the plan that fits{' '}
-              <span className="relative inline-block">
-                <span className="text-primary">your kitchen.</span>
-                <svg className="absolute -bottom-1 left-0 w-full h-3 text-emerald-400/30" viewBox="0 0 200 8" preserveAspectRatio="none">
-                  <path d="M0 7 Q50 0 100 5 Q150 10 200 3" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-                </svg>
-              </span>
-            </h1>
-
-            <p className="mx-auto max-w-2xl text-lg text-muted-foreground leading-relaxed mb-8">
-              Whether you&apos;re cooking for one or feeding a household of six, MealEase scales to your life. Start free, upgrade when you&apos;re ready.
-            </p>
-
-            <div className="flex flex-wrap items-center justify-center gap-5 text-sm text-muted-foreground">
-              {TRUST_SIGNALS.map((t) => (
-                <span key={t.label} className="inline-flex items-center gap-1.5">
-                  <t.icon className="h-4 w-4 text-primary/60" />
-                  {t.label}
-                </span>
-              ))}
-            </div>
-          </motion.div>
-        </div>
+      {/* ── HERO ── */}
+      <section className="pt-16 pb-10 text-center px-4">
+        <h1 className="font-serif text-4xl md:text-5xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50">
+          Simple pricing.{' '}
+          <span className="italic text-[#D97757]">No surprises.</span>
+        </h1>
+        <p className="mt-4 text-lg text-neutral-600 dark:text-neutral-400 max-w-xl mx-auto">
+          Start free. Upgrade when you&rsquo;re ready.
+        </p>
       </section>
 
-      {/* ═══════════════════ BILLING TOGGLE ═══════════════════ */}
-      <section className="relative z-[1] py-6">
-        <div className="flex items-center justify-center">
-          <div className="inline-flex items-center rounded-full border border-border/60 bg-white p-1.5 shadow-sm">
-            <button
-              onClick={() => setIsAnnual(false)}
-              className={cn(
-                'text-sm font-semibold px-6 py-2.5 rounded-full transition-all',
-                !isAnnual ? 'bg-foreground text-white shadow-md' : 'text-muted-foreground hover:text-foreground',
-              )}
-            >
-              Monthly
-            </button>
-            <button
-              onClick={() => setIsAnnual(true)}
-              className={cn(
-                'text-sm font-semibold px-6 py-2.5 rounded-full transition-all flex items-center gap-2',
-                isAnnual ? 'bg-foreground text-white shadow-md' : 'text-muted-foreground hover:text-foreground',
-              )}
-            >
-              Annual
-              <Badge className="border-0 bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5">
-                SAVE {PRO_ANNUAL_SAVINGS}%
-              </Badge>
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════ PRICING CARDS ═══════════════════ */}
-      <section className="relative z-[1] pb-16 pt-6">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:gap-8 items-start"
+      {/* ── BILLING TOGGLE ── */}
+      <section className="flex justify-center pb-8 px-4">
+        <div className="inline-flex items-center rounded-full border border-neutral-200 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-800 p-1">
+          <button
+            onClick={() => setIsAnnual(false)}
+            className={cn(
+              'text-sm font-semibold px-5 py-2 rounded-full transition-all',
+              !isAnnual
+                ? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-50 shadow-sm'
+                : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200',
+            )}
           >
-            {/* ── FREE ── */}
-            <div className="relative flex flex-col rounded-[28px] border border-border/60 bg-white p-8 hover:shadow-lg transition-shadow duration-300">
-              <div className="mb-8">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="h-12 w-12 rounded-2xl bg-slate-100 flex items-center justify-center">
-                    <Zap className="h-5 w-5 text-slate-600" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold">Free</h2>
-                    <p className="text-xs text-muted-foreground">Forever free</p>
-                  </div>
-                </div>
-                <p className="text-sm font-medium text-foreground/80 mb-6 leading-relaxed italic">
-                  &ldquo;Get unstuck tonight.&rdquo;
-                </p>
-                <div className="flex items-baseline">
-                  <span className="text-5xl font-bold tracking-tight">$0</span>
-                  <span className="ml-2 text-sm text-muted-foreground">/forever</span>
-                </div>
-              </div>
-
-              <ul className="mb-8 flex-1 space-y-3.5">
-                {['Tonight suggestions', 'Basic Snap & Cook', '3 meal ideas per day', 'Simple grocery list', '1 member profile', 'Basic dietary filters'].map((f) => (
-                  <li key={f} className="flex items-start gap-3 text-sm">
-                    <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-500" />
-                    <span>{f}</span>
-                  </li>
-                ))}
-                {['Unlimited generations', 'Weekly Autopilot', 'Household Memory'].map((f) => (
-                  <li key={f} className="flex items-start gap-3 text-sm text-muted-foreground/50">
-                    <X className="mt-0.5 h-4 w-4 flex-shrink-0" />
-                    <span>{f}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <Button asChild variant="outline" size="lg" className="w-full h-13 rounded-2xl text-[15px] font-semibold border-border/80 hover:bg-muted/50">
-                <Link href="/signup">Start Free</Link>
-              </Button>
-            </div>
-
-            {/* ── PLUS ── */}
-            <div className="relative flex flex-col rounded-[28px] border-2 border-primary/40 bg-white p-8 shadow-[0_20px_60px_-12px_rgba(16,185,129,0.15),0_0_0_1px_rgba(16,185,129,0.08)] md:scale-[1.04] md:-translate-y-4">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-primary px-5 py-1.5 text-xs font-bold text-white tracking-wide shadow-lg shadow-primary/25">
-                  <Crown className="h-3.5 w-3.5" />
-                  BEST VALUE
-                </span>
-              </div>
-
-              <div className="mb-8">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-primary to-emerald-600 flex items-center justify-center text-white shadow-md shadow-primary/20">
-                    <Crown className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold">Plus</h2>
-                    <p className="text-xs text-muted-foreground">For individuals, couples &amp; households</p>
-                  </div>
-                </div>
-                <p className="text-sm font-medium text-foreground/80 mb-6 leading-relaxed italic">
-                  &ldquo;Meal planning that remembers your life.&rdquo;
-                </p>
-                <div>
-                  {isAnnual ? (
-                    <>
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-5xl font-bold tracking-tight">${(proAnnual / 12).toFixed(2)}</span>
-                        <span className="text-sm text-muted-foreground">/mo</span>
-                        <span className="text-sm text-muted-foreground line-through ml-1">${proMonthly}</span>
-                      </div>
-                      <div className="mt-2 flex items-center gap-2">
-                        <Badge className="bg-emerald-100 text-emerald-800 border-0 text-[11px] font-bold">Save {PRO_ANNUAL_SAVINGS}%</Badge>
-                        <span className="text-xs text-muted-foreground">${proAnnual}/yr billed annually</span>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="flex items-baseline">
-                        <span className="text-5xl font-bold tracking-tight">${proMonthly}</span>
-                        <span className="ml-2 text-sm text-muted-foreground">/month</span>
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-2">Billed monthly</p>
-                    </>
-                  )}
-                </div>
-              </div>
-
-              <ul className="mb-8 flex-1 space-y-3.5">
-                {[
-                  'Up to 6 member profiles',
-                  'Household Memory',
-                  'Weekly Autopilot',
-                  'Smart Menu Scan ✨',
-                  'Food Check (calorie snap) ✨',
-                  'Budget Mode',
-                  'Dinner Date Night',
-                  'Pantry Mode',
-                  'Shared grocery lists',
-                  'Saved preferences',
-                  'Unlimited meal generations',
-                  'Full 7-day Weekly Planner',
-                  'Faster AI responses',
-                  'Meal history',
-                ].map((f) => (
-                  <li key={f} className="flex items-start gap-3 text-sm">
-                    <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
-                    <span className="font-medium">{f}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <div className="space-y-3">
-                {!status.isPro ? (
-                  <>
-                    <Button
-                      size="lg"
-                      className="w-full h-13 rounded-2xl text-[15px] font-semibold bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/25 hover:scale-[1.01] transition-all gap-2"
-                      onClick={() => isAnnual ? handleCheckout('pro_yearly') : handleCheckout('pro_monthly')}
-                      disabled={paywallLoading}
-                    >
-                      Start 7-Day Free Trial
-                      <ArrowRight className="h-4 w-4" />
-                    </Button>
-                    <p className="text-center text-xs text-muted-foreground flex items-center justify-center gap-1.5">
-                      <Clock className="h-3 w-3" />
-                      7-day free trial · Cancel anytime
-                    </p>
-                  </>
-                ) : (
-                  <Button disabled size="lg" className="w-full h-13 rounded-2xl">✓ You have Plus</Button>
-                )}
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Annual savings nudge */}
-          {!isAnnual && (
-            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mt-8 text-center">
-              <button
-                onClick={() => setIsAnnual(true)}
-                className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-5 py-2.5 text-sm font-semibold text-emerald-800 hover:bg-emerald-100 transition-colors"
-              >
-                <Sparkles className="h-4 w-4" />
-                Switch to annual and save {PRO_ANNUAL_SAVINGS}%
-                <ArrowRight className="h-3.5 w-3.5" />
-              </button>
-            </motion.div>
-          )}
+            Monthly
+          </button>
+          <button
+            onClick={() => setIsAnnual(true)}
+            className={cn(
+              'text-sm font-semibold px-5 py-2 rounded-full transition-all flex items-center gap-2',
+              isAnnual
+                ? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-50 shadow-sm'
+                : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200',
+            )}
+          >
+            Annual
+            <span className="bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+              SAVE {PRO_ANNUAL_SAVINGS}%
+            </span>
+          </button>
         </div>
       </section>
 
-      {/* ═══════════════════ GUARANTEE ═══════════════════ */}
-      <section className="py-8">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-[20px] border border-emerald-200/80 bg-gradient-to-r from-emerald-50/80 to-teal-50/60 px-8 py-6 flex items-start gap-5">
-            <div className="h-12 w-12 rounded-2xl bg-emerald-100 flex items-center justify-center flex-shrink-0">
-              <Shield className="h-6 w-6 text-emerald-600" />
-            </div>
-            <div>
-              <p className="font-bold text-base mb-1">Risk-free guarantee</p>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Plus includes a 7-day free trial. Cancel anytime with one click — no questions asked. Your plan stays active until the end of the current billing period.
+      {/* ── PRICING CARDS ── */}
+      <section className="pb-16 px-4">
+        <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+
+          {/* FREE */}
+          <div className="relative flex flex-col h-full rounded-2xl p-8 bg-[#FDF6F1] dark:bg-neutral-900 ring-1 ring-black/5 dark:ring-white/5">
+            <div className="mb-6">
+              <div className="text-sm font-semibold uppercase tracking-widest mb-2 text-neutral-500 dark:text-neutral-400">
+                Free
+              </div>
+              <div className="flex items-baseline gap-1">
+                <span className="font-serif text-5xl font-bold text-neutral-900 dark:text-neutral-50">$0</span>
+                <span className="text-sm text-neutral-500">/ forever</span>
+              </div>
+              <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
+                For households just getting started.
               </p>
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* ═══════════════════ SOCIAL PROOF ═══════════════════ */}
-      <section className="py-16">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10">
-            <div className="inline-flex items-center gap-1 mb-3">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <Star key={i} className="h-5 w-5 fill-amber-400 text-amber-400" />
+            <ul className="flex-1 space-y-3 mb-8">
+              {FREE_FEATURES.map((f) => (
+                <li key={f} className="flex items-start gap-2 text-sm">
+                  <span className="text-emerald-500 mt-0.5 flex-shrink-0">✓</span>
+                  <span className="text-neutral-700 dark:text-neutral-300">{f}</span>
+                </li>
               ))}
+            </ul>
+
+            <Link
+              href="/signup"
+              className="block w-full text-center rounded-xl border border-neutral-300 dark:border-neutral-700 py-3 text-sm font-semibold text-neutral-900 dark:text-neutral-50 hover:border-[#D97757] hover:text-[#D97757] transition-colors"
+            >
+              Start free
+            </Link>
+          </div>
+
+          {/* PLUS */}
+          <div className="relative flex flex-col h-full rounded-2xl p-8 bg-neutral-900 dark:bg-neutral-800 text-white ring-2 ring-[#D97757]">
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+              <span className="bg-[#D97757] text-white text-xs font-semibold px-4 py-1 rounded-full whitespace-nowrap">
+                Most popular
+              </span>
             </div>
-            <h2 className="text-2xl font-bold tracking-tight">People are loving this</h2>
-            <p className="mt-2 text-sm text-muted-foreground">Real feedback from real households</p>
-          </div>
-          <div className="grid gap-6 sm:grid-cols-3">
-            {TESTIMONIALS.map(({ quote, name, role, avatar, color }) => (
-              <div key={name} className="rounded-2xl border border-border/50 bg-white p-6 relative hover:shadow-lg transition-shadow duration-300">
-                <Quote className="absolute top-4 right-4 h-8 w-8 text-primary/8" />
-                <div className="flex gap-0.5 mb-4">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <Star key={i} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                  ))}
-                </div>
-                <p className="text-sm leading-relaxed text-foreground mb-5">&ldquo;{quote}&rdquo;</p>
-                <div className="flex items-center gap-3 pt-4 border-t border-border/40">
-                  <div className={`h-10 w-10 rounded-full ${color} flex items-center justify-center text-sm font-bold`}>
-                    {avatar}
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold">{name}</p>
-                    <p className="text-xs text-muted-foreground">{role}</p>
-                  </div>
-                </div>
+
+            <div className="mb-6">
+              <div className="text-sm font-semibold uppercase tracking-widest mb-2 text-[#D97757]">
+                Plus
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
+              <div className="flex items-baseline gap-1">
+                {isAnnual ? (
+                  <>
+                    <span className="font-serif text-5xl font-bold">${proAnnualMonthly}</span>
+                    <span className="text-sm text-neutral-400">/mo</span>
+                    <span className="text-sm text-neutral-500 line-through ml-1">${proMonthly}</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="font-serif text-5xl font-bold">${proMonthly}</span>
+                    <span className="text-sm text-neutral-400">/month</span>
+                  </>
+                )}
+              </div>
+              {isAnnual && (
+                <p className="mt-1 text-xs text-neutral-400">${proAnnual}/yr billed annually</p>
+              )}
+              <p className="mt-2 text-sm text-neutral-400">
+                Everything you need to stop the dinner spiral.
+              </p>
+            </div>
 
-      {/* ═══════════════════ COMPARISON TABLE ═══════════════════ */}
-      <section className="py-16">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold tracking-tight mb-2">Compare every feature</h2>
-            <p className="text-sm text-muted-foreground">Everything you need, nothing you don&apos;t</p>
-          </div>
+            <ul className="flex-1 space-y-3 mb-8">
+              {PLUS_FEATURES.map((f) => (
+                <li key={f} className="flex items-start gap-2 text-sm">
+                  <span className="text-emerald-400 mt-0.5 flex-shrink-0">✓</span>
+                  <span className="text-neutral-300">{f}</span>
+                </li>
+              ))}
+            </ul>
 
-          <button
-            onClick={() => setShowComparison(!showComparison)}
-            className="mx-auto mb-6 flex items-center gap-2 rounded-full border border-border/60 bg-white px-5 py-2.5 text-sm font-semibold text-foreground hover:bg-muted/50 transition-colors shadow-sm"
-          >
-            {showComparison ? 'Hide' : 'Show'} full comparison
-            <ChevronDown className={cn('h-4 w-4 transition-transform', showComparison && 'rotate-180')} />
-          </button>
-
-          {showComparison && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              transition={{ duration: 0.3 }}
+            <button
+              onClick={() => handleCheckout(isAnnual ? 'pro_yearly' : 'pro_monthly')}
+              disabled={paywallLoading || status.isPro}
+              className="block w-full text-center rounded-xl bg-[#D97757] hover:bg-[#c4694a] disabled:opacity-60 py-3 text-sm font-semibold text-white transition-colors"
             >
-              <div className="rounded-2xl border border-border/60 overflow-hidden bg-white">
-                <div className="overflow-x-auto">
-                  <div className="min-w-[400px]">
-                    <div className="grid grid-cols-3 bg-muted/50 text-sm font-semibold sticky top-0">
-                      <div className="px-5 py-3.5">Feature</div>
-                      <div className="px-5 py-3.5 text-center">Free</div>
-                      <div className="px-5 py-3.5 text-center text-primary">Plus</div>
-                    </div>
-                    {COMPARISON_FEATURES.map(({ feature, free, pro }, i) => (
-                      <div key={feature} className={`grid grid-cols-3 text-sm ${i % 2 === 0 ? 'bg-background' : 'bg-muted/20'}`}>
-                        <div className="px-5 py-3.5 font-medium">{feature}</div>
-                        <div className="px-5 py-3.5 text-center text-muted-foreground">
-                          {typeof free === 'boolean' ? (free ? <Check className="mx-auto h-4 w-4 text-emerald-600" /> : <span className="text-muted-foreground/40">&mdash;</span>) : free}
-                        </div>
-                        <div className="px-5 py-3.5 text-center font-medium">
-                          {typeof pro === 'boolean' ? (pro ? <Check className="mx-auto h-4 w-4 text-emerald-600" /> : <span className="text-muted-foreground/40">&mdash;</span>) : pro}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <p className="text-xs text-muted-foreground text-center py-2 sm:hidden">Swipe to see all plans &rarr;</p>
-                </div>
-              </div>
-              {/* Footnotes */}
-              <div className="px-5 py-3 border-t border-border/40 bg-muted/20">
-                <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  <span className="font-semibold">†</span> Profiles store preferences, allergies, age groups, and food goals — not separate logins.
-                </p>
-              </div>
-            </motion.div>
-          )}
+              {status.isPro ? '✓ You have Plus' : 'Start free — upgrade anytime'}
+            </button>
+          </div>
         </div>
+
+        <p className="text-center text-sm text-neutral-500 dark:text-neutral-400 mt-6">
+          No credit card required · 7-day free trial · Cancel anytime
+        </p>
       </section>
 
-      {/* ═══════════════════ ABOUT SNIPPET ═══════════════════ */}
-      <section className="py-8">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-          <AboutSnippet />
-        </div>
-      </section>
-
-      {/* ═══════════════════ FAQ ═══════════════════ */}
-      <section className="py-16">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-          <h2 className="mb-8 text-center text-2xl font-bold tracking-tight">Common Questions</h2>
-          <Accordion className="space-y-2">
+      {/* ── FAQ ── */}
+      <section className="py-16 px-4 bg-[#FDF6F1] dark:bg-neutral-900">
+        <div className="max-w-2xl mx-auto">
+          <h2 className="font-serif text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50 text-center mb-10">
+            Common questions
+          </h2>
+          <div className="space-y-3">
             {FAQ.map(({ q, a }, i) => (
-              <AccordionItem key={q} value={`faq-${i}`} className="rounded-2xl border border-border/50 bg-white px-5">
-                <AccordionTrigger className="font-semibold text-sm text-left py-4 hover:no-underline">{q}</AccordionTrigger>
-                <AccordionContent className="text-sm leading-relaxed text-muted-foreground pb-4">{a}</AccordionContent>
-              </AccordionItem>
+              <div
+                key={q}
+                className="rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 overflow-hidden"
+              >
+                <button
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  className="w-full flex items-center justify-between px-6 py-4 text-left text-sm font-semibold text-neutral-900 dark:text-neutral-50 hover:text-[#D97757] transition-colors"
+                >
+                  {q}
+                  <span className={cn('ml-4 flex-shrink-0 text-lg leading-none transition-transform', openFaq === i && 'rotate-45')}>+</span>
+                </button>
+                {openFaq === i && (
+                  <div className="px-6 pb-5 text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                    {a}
+                  </div>
+                )}
+              </div>
             ))}
-          </Accordion>
+          </div>
         </div>
       </section>
 
-      {/* ═══════════════════ BOTTOM CTA ═══════════════════ */}
-      <section className="relative overflow-hidden py-20">
-        <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-[radial-gradient(600px_300px_at_50%_50%,rgba(16,185,129,0.08),transparent_60%)]" />
-        </div>
-        <div className="relative z-[1] mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 text-center">
-          <h3 className="text-2xl font-bold tracking-tight mb-3">Ready to simplify dinner?</h3>
-          <p className="text-muted-foreground mb-8 text-sm leading-relaxed">
-            Join 3,200+ households who stopped stressing about meals. Start free, upgrade when you&apos;re ready.
-          </p>
-          {!status.isAuthenticated ? (
-            <Button
-              size="lg"
-              className="h-14 px-10 rounded-2xl text-base font-semibold bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 hover:shadow-xl hover:scale-[1.01] transition-all gap-2"
-              asChild
-            >
-              <Link href="/signup">
-                Get Started Free
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-          ) : (
-            <Button asChild size="lg" variant="outline" className="h-14 px-10 rounded-2xl text-base font-semibold">
-              <Link href="/dashboard">Go to dashboard</Link>
-            </Button>
-          )}
-          <p className="text-muted-foreground text-xs mt-8">
-            Questions?{' '}
-            <a href="mailto:hello@mealeaseai.com" className="text-primary hover:underline">hello@mealeaseai.com</a>
-          </p>
-        </div>
+      {/* ── BOTTOM CTA ── */}
+      <section className="py-16 px-4 text-center">
+        <h3 className="font-serif text-2xl font-bold text-neutral-900 dark:text-neutral-50 mb-3">
+          Ready to simplify dinner?
+        </h3>
+        <p className="text-neutral-500 dark:text-neutral-400 mb-8 text-sm max-w-md mx-auto">
+          Join thousands of households who stopped stressing about meals. Start free, upgrade when you&rsquo;re ready.
+        </p>
+        {!status.isAuthenticated ? (
+          <Link
+            href="/signup"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#D97757] hover:bg-[#c4694a] px-8 py-3.5 text-sm font-semibold text-white transition-colors"
+          >
+            Get started free →
+          </Link>
+        ) : (
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 dark:border-neutral-700 px-8 py-3.5 text-sm font-semibold text-neutral-900 dark:text-neutral-50 hover:border-[#D97757] transition-colors"
+          >
+            Go to dashboard →
+          </Link>
+        )}
+        <p className="text-neutral-400 text-xs mt-6">
+          Questions?{' '}
+          <a href="mailto:hello@mealeaseai.com" className="text-[#D97757] hover:underline">
+            hello@mealeaseai.com
+          </a>
+        </p>
       </section>
     </div>
   )

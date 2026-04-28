@@ -1,11 +1,14 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Clock, Users, ChevronRight, Recycle, Sparkles, Leaf, DollarSign, Heart, RefreshCw } from 'lucide-react'
 import { CardShell } from './shared/CardShell'
 import { useDashboardStore } from '@/stores/dashboardStore'
 import { cn } from '@/lib/utils'
-import type { TonightState } from '@/lib/dashboard/types'
+import { persistMealForRecipe } from '@/lib/recipes/canonical'
+import type { Recipe, TonightState } from '@/lib/dashboard/types'
+import type { SmartMealResult } from '@/lib/engine/types'
 
 type Props = {
   state: TonightState
@@ -47,7 +50,53 @@ function getMealEmoji(name: string): string {
   return '🍽️'
 }
 
+function toSmartMeal(recipe: Recipe, reason: string, isFromPantry: boolean): SmartMealResult {
+  return {
+    id: recipe.id,
+    title: recipe.name,
+    tagline: reason,
+    description: reason,
+    cuisineType: 'comfort',
+    imageUrl: recipe.image,
+    prepTime: 10,
+    cookTime: recipe.cookTimeMin,
+    totalTime: recipe.cookTimeMin + 10,
+    estimatedCost: recipe.costTotal,
+    servings: recipe.servings,
+    difficulty: recipe.difficulty === 'medium' ? 'moderate' : recipe.difficulty,
+    tags: recipe.tags ?? ['Tonight Suggestions'],
+    ingredients: [
+      { name: recipe.name, quantity: '1', unit: 'meal', fromPantry: isFromPantry, category: 'other' },
+      { name: 'Protein or main ingredient', quantity: '1', unit: 'portion', fromPantry: isFromPantry, category: 'protein' },
+      { name: 'Vegetables or side', quantity: '2', unit: 'cups', fromPantry: false, category: 'produce' },
+      { name: 'Seasoning and sauce', quantity: '1', unit: 'to taste', fromPantry: true, category: 'condiment' },
+    ],
+    steps: [
+      `Gather the ingredients for ${recipe.name}.`,
+      'Prep the main ingredient and vegetables before heating the pan.',
+      `Cook ${recipe.name} over medium heat until everything is hot and cooked through.`,
+      'Taste, adjust seasoning, and serve warm.',
+    ],
+    variations: [],
+    leftoverTip: 'Save extra portions in an airtight container for lunch tomorrow.',
+    shoppingList: [
+      { name: 'Protein or main ingredient', quantity: '1', unit: 'portion', category: 'protein', estimatedCost: Math.max(0, recipe.costTotal * 0.6), substituteOptions: [] },
+      { name: 'Vegetables or side', quantity: '2', unit: 'cups', category: 'produce', estimatedCost: Math.max(0, recipe.costTotal * 0.25), substituteOptions: [] },
+    ],
+    meta: {
+      score: 1,
+      matchedPantryItems: isFromPantry ? [recipe.name] : [],
+      pantryUtilization: isFromPantry ? 0.5 : 0,
+      simplifiedForEnergy: recipe.cookTimeMin <= 30,
+      pickyEaterAdjusted: false,
+      localityApplied: false,
+      selectionReason: reason,
+    },
+  }
+}
+
 export function TonightCard({ state }: Props) {
+  const router = useRouter()
   const regenerate = useDashboardStore((s) => s.regenerateTonight)
   const isRegenerating = useDashboardStore((s) => s.isRegeneratingTonight)
 
@@ -85,6 +134,12 @@ export function TonightCard({ state }: Props) {
   const { recipe, reason, usesLeftover } = state
   const badges = getTagBadges(recipe.tags)
   const mealEmoji = getMealEmoji(recipe.name)
+
+  function handleCookThis() {
+    persistMealForRecipe(toSmartMeal(recipe, reason, state.isFromPantry), '/dashboard', 'tonight')
+    sessionStorage.setItem('recipe-open-cook', 'true')
+    router.push('/tonight/recipe')
+  }
 
   return (
     <CardShell ariaLabel="Tonight's dinner" className="flex flex-col min-h-[420px] overflow-hidden">
@@ -205,13 +260,14 @@ export function TonightCard({ state }: Props) {
 
         {/* CTAs — Cook This + Show Another */}
         <div className="mt-auto pt-5 flex flex-col sm:flex-row gap-2.5">
-          <Link
-            href={`/recipes/${recipe.id}/cook`}
+          <button
+            type="button"
+            onClick={handleCookThis}
             className="flex-1 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#D97757] to-[#E8895A] hover:from-[#C86646] hover:to-[#D97757] text-white font-semibold rounded-full px-5 py-3 min-h-[48px] transition-all shadow-md shadow-orange-200/50 dark:shadow-none"
           >
             Cook this
             <ChevronRight className="w-4 h-4" />
-          </Link>
+          </button>
 
           <button
             onClick={() => regenerate()}

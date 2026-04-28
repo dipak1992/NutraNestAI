@@ -13,7 +13,7 @@ export function FounderStory() {
               <figure>
                 <div className="relative aspect-[4/5] rounded-3xl overflow-hidden bg-neutral-100 dark:bg-neutral-800 ring-1 ring-neutral-200 dark:ring-neutral-800">
                   <Image
-                    src="/founders/dipak-suprabha.jpg"
+                    src="/founders/dipak-suprabha.png"
                     alt="Dipak and Suprabha, co-founders of MealEase, with their two young children"
                     fill
                     sizes="(max-width: 1024px) 100vw, 40vw"

@@ -47,7 +47,7 @@ export const PLANS: Record<PlanId, PlanDef> = {
   plus: {
     id: 'plus',
     name: 'Plus',
-    priceMonthly: 7.99,
+    priceMonthly: 9.99,
     stripePriceId: process.env.STRIPE_PLUS_PRICE_ID ?? null,
     tagline: 'Most popular',
     badge: 'Most popular',

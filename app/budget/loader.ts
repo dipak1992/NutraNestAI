@@ -6,7 +6,7 @@ import { computeAlertLevel, getCurrentWeekStart, formatWeekStart } from '@/lib/b
 
 export async function loadBudgetPayload(
   userId: string,
-  plan: 'free' | 'plus' | 'family',
+  plan: 'free' | 'plus',
 ): Promise<BudgetPayload> {
   const supabase = await createClient()
 

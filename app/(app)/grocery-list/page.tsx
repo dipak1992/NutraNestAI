@@ -31,7 +31,7 @@ export default function GroceryListPage() {
         <div className="mt-6">
           <ProPaywallCard
             title="Turn your meal plan into a shopping list"
-            description="Upgrade to Pro to unlock auto-built grocery lists with quantities, pantry deduction, and store formatting — for all 7 days."
+            description="Upgrade to Plus to unlock auto-built grocery lists with quantities, pantry deduction, and store formatting — for all 7 days."
             isAuthenticated={status.isAuthenticated}
             redirectPath="/grocery-list"
           />

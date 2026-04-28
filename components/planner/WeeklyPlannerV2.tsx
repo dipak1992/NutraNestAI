@@ -182,12 +182,10 @@ export function WeeklyPlannerV2() {
         })
       } else {
         setShowPlannerLock(false)
-        if (status.isFamily) {
-          posthog.capture(Analytics.FAMILY_PLAN_GENERATED, {
-            household_size: memberCount,
-            planned_days: 7,
-          })
-        }
+        posthog.capture(Analytics.FAMILY_PLAN_GENERATED, {
+          household_size: memberCount,
+          planned_days: 7,
+        })
         toast.success('Week planned!', { description: '7 meals + grocery list ready.' })
       }
     } catch {

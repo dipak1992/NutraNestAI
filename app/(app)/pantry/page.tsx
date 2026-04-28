@@ -95,8 +95,8 @@ export default function PantryPage() {
     return (
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <ProPaywallCard
-          title="Pantry tracking is a Pro feature"
-          description="Track what you already have, cut waste, and let MealEase prioritize pantry ingredients automatically with Pro."
+          title="Pantry tracking is a Plus feature"
+          description="Track what you already have, cut waste, and let MealEase prioritize pantry ingredients automatically with Plus."
           isAuthenticated={status.isAuthenticated}
           redirectPath="/pantry"
         />

@@ -56,7 +56,7 @@ export async function getDashboardPayload(
   const tierMap: Record<string, Plan> = {
     pro: 'plus',
     plus: 'plus',
-    family: 'family',
+    family: 'plus',
     free: 'free',
   }
   const plan: Plan = tierMap[profile?.subscription_tier ?? 'free'] ?? 'free'

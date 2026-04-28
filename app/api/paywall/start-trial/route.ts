@@ -1,6 +1,6 @@
 // ============================================================
 // API: POST /api/paywall/start-trial
-// Starts a free trial by setting temp_pro_until or temp_family_until.
+// Starts a free trial by setting temp_pro_until.
 // One-time only per user.
 // ============================================================
 
@@ -9,7 +9,7 @@ import { createClient } from '@/lib/supabase/server'
 import { sendTrialStartedEmail } from '@/lib/email/triggers'
 import { serverEnv } from '@/lib/env'
 
-export async function POST(req: Request) {
+export async function POST(_req: Request) {
   try {
     const supabase = await createClient()
     const {
@@ -20,12 +20,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Login required to start trial' }, { status: 401 })
     }
 
-    const { tier = 'pro' } = (await req.json()) as { tier?: 'pro' | 'family' }
-
-    // Validate tier
-    if (!['pro', 'family'].includes(tier)) {
-      return NextResponse.json({ error: 'Invalid tier for trial' }, { status: 400 })
-    }
+    const tier = 'pro'
 
     // Check existing profile
     const { data: profile } = await supabase
@@ -74,7 +69,6 @@ export async function POST(req: Request) {
     // Fire trial-started email (non-blocking)
     if (user.email) {
       const firstName = profile?.full_name?.split(' ')[0] ?? undefined
-      const tierDisplay = tier === 'family' ? 'Family Plus' : 'Pro'
       void sendTrialStartedEmail({
         to: user.email,
         firstName,

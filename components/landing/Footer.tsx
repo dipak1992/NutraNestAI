@@ -13,19 +13,18 @@ const links = {
   Company: [
     { label: 'About', href: '/about' },
     { label: 'Blog', href: '/blog' },
-    { label: 'Careers', href: '/careers' },
     { label: 'Press', href: '/press' },
   ],
   Support: [
     { label: 'Help Center', href: '/help' },
     { label: 'Contact', href: '/contact' },
-    { label: 'Status', href: '/status' },
+    { label: 'Status', href: 'https://status.mealeaseai.com' },
     { label: 'FAQ', href: '#faq' },
   ],
   Legal: [
     { label: 'Privacy Policy', href: '/privacy' },
     { label: 'Terms of Service', href: '/terms' },
-    { label: 'Cookie Policy', href: '/cookies' },
+    { label: 'Cookie Policy', href: '/cookie-policy' },
   ],
 }
 

@@ -238,15 +238,11 @@ export default function FamilySettingsPage() {
   // ── Paywall dialog config ───────────────────────────────────────────────
   const paywallTitle = tier === 'free'
     ? 'Unlock More Profiles'
-    : tier === 'pro'
-      ? 'Upgrade to Family Plus'
-      : 'Profile Limit Reached'
+    : 'Profile Limit Reached'
 
   const paywallDescription = tier === 'free'
-    ? 'Upgrade to Pro for 2 profiles, or Family Plus for up to 6 members with full preferences.'
-    : tier === 'pro'
-      ? 'Family Plus lets you add up to 6 members with full profiles — picky eater settings, cuisine preferences, lunchbox planning, and more.'
-      : `Family Plus supports up to ${maxMembers} members.`
+    ? 'Upgrade to Plus for up to 6 household member profiles with full preferences.'
+    : `Plus supports up to ${maxMembers} members.`
 
   if (loading) {
     return (

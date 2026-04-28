@@ -27,6 +27,7 @@ import { Badge } from '@/components/ui/badge'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 import { PRICING_TIERS, PRO_ANNUAL_SAVINGS } from '@/lib/paywall/config'
+// $83/yr ÷ 12 = $6.92/mo displayed when annual toggle is active
 import { cn } from '@/lib/utils'
 import { AboutSnippet } from '@/components/about/AboutSnippet'
 
@@ -84,7 +85,7 @@ const FAQ = [
   },
   {
     q: 'What is a household profile?',
-    a: 'A household profile stores preferences, allergies, age groups, and food goals for one person in your household. Profiles are not separate logins — they are preference records that help MealEase personalize every meal for each person at your table. Free plan includes 1 profile. Pro includes up to 6.',
+    a: 'A household profile stores preferences, allergies, age groups, and food goals for one person in your household. Profiles are not separate logins — they are preference records that help MealEase personalize every meal for each person at your table. Free plan includes 1 profile. Plus includes up to 6.',
   },
   {
     q: 'Are profiles separate logins? Can my spouse use MealEase too?',
@@ -92,7 +93,7 @@ const FAQ = [
   },
   {
     q: 'How many household members can I add?',
-    a: 'Free plan: 1 personal profile. Pro plan: up to 6 household member profiles with full preferences, allergy tracking, and cuisine preferences.',
+    a: 'Free plan: 1 personal profile. Plus plan: up to 6 household member profiles with full preferences, allergy tracking, and cuisine preferences.',
   },
   {
     q: 'Can I share grocery lists or meal plans?',
@@ -120,7 +121,7 @@ const FAQ = [
   },
   {
     q: 'Is there a free version?',
-    a: 'Yes. The free plan gives you Tonight Dinner, up to three meal ideas daily, and basic grocery lists — enough to experience how MealEase thinks. When you\'re ready for Weekly Autopilot or Household Memory, upgrade anytime. Pro includes a 7-day free trial, and you can cancel with one click.',
+    a: 'Yes. The free plan gives you Tonight Dinner, up to three meal ideas daily, and basic grocery lists — enough to experience how MealEase thinks. When you\'re ready for Weekly Autopilot or Household Memory, upgrade anytime. Plus includes a 7-day free trial, and you can cancel with one click.',
   },
   {
     q: 'Can MealEase help me order healthier at restaurants?',
@@ -161,7 +162,7 @@ export function PricingContent() {
       return
     }
     if (status.isPro) {
-      toast.info('You already have Pro!')
+      toast.info('You already have Plus!')
       return
     }
     setIsStartingTrial(true)
@@ -173,7 +174,7 @@ export function PricingContent() {
         return
       }
       toast.success('Your 7-day free trial is active!', {
-        description: 'Enjoy full Pro access to every feature.',
+        description: 'Enjoy full Plus access to every feature.',
       })
       router.push('/dashboard')
       router.refresh()
@@ -336,7 +337,7 @@ export function PricingContent() {
               </Button>
             </div>
 
-            {/* ── PRO ── */}
+            {/* ── PLUS ── */}
             <div className="relative flex flex-col rounded-[28px] border-2 border-primary/40 bg-white p-8 shadow-[0_20px_60px_-12px_rgba(16,185,129,0.15),0_0_0_1px_rgba(16,185,129,0.08)] md:scale-[1.04] md:-translate-y-4">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-primary px-5 py-1.5 text-xs font-bold text-white tracking-wide shadow-lg shadow-primary/25">
@@ -351,7 +352,7 @@ export function PricingContent() {
                     <Crown className="h-5 w-5" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold">Pro</h2>
+                    <h2 className="text-xl font-bold">Plus</h2>
                     <p className="text-xs text-muted-foreground">For individuals, couples &amp; households</p>
                   </div>
                 </div>
@@ -425,7 +426,7 @@ export function PricingContent() {
                     </p>
                   </>
                 ) : (
-                  <Button disabled size="lg" className="w-full h-13 rounded-2xl">✓ You have Pro</Button>
+                  <Button disabled size="lg" className="w-full h-13 rounded-2xl">✓ You have Plus</Button>
                 )}
               </div>
             </div>
@@ -457,7 +458,7 @@ export function PricingContent() {
             <div>
               <p className="font-bold text-base mb-1">Risk-free guarantee</p>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Pro includes a 7-day free trial. Cancel anytime with one click — no questions asked. Your plan stays active until the end of the current billing period.
+                Plus includes a 7-day free trial. Cancel anytime with one click — no questions asked. Your plan stays active until the end of the current billing period.
               </p>
             </div>
           </div>
@@ -529,7 +530,7 @@ export function PricingContent() {
                     <div className="grid grid-cols-3 bg-muted/50 text-sm font-semibold sticky top-0">
                       <div className="px-5 py-3.5">Feature</div>
                       <div className="px-5 py-3.5 text-center">Free</div>
-                      <div className="px-5 py-3.5 text-center text-primary">Pro</div>
+                      <div className="px-5 py-3.5 text-center text-primary">Plus</div>
                     </div>
                     {COMPARISON_FEATURES.map(({ feature, free, pro }, i) => (
                       <div key={feature} className={`grid grid-cols-3 text-sm ${i % 2 === 0 ? 'bg-background' : 'bg-muted/20'}`}>

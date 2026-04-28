@@ -12,9 +12,9 @@ export const PRICING_TIERS = {
     yearlyPriceId: undefined,
   },
   pro: {
-    name: 'Pro',
-    monthlyPrice: 7.99,
-    yearlyPrice: 59,
+    name: 'Plus',
+    monthlyPrice: 9.99,
+    yearlyPrice: 83,
     monthlyPriceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_MONTHLY,
     yearlyPriceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_YEARLY,
   },

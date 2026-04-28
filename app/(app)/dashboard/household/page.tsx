@@ -251,16 +251,13 @@ export default function HouseholdPillarPage() {
             <Badge
               className={cn(
                 'text-xs border-0',
-                status.isFamily
-                  ? 'bg-emerald-100 text-emerald-700'
-                  : status.isPro
-                    ? 'bg-amber-100 text-amber-700'
-                    : 'bg-violet-100 text-violet-700',
+                status.isPro
+                  ? 'bg-amber-100 text-amber-700'
+                  : 'bg-violet-100 text-violet-700',
               )}
             >
-              {status.isFamily && <Crown className="h-3 w-3 mr-1" />}
               {status.isPro && <Crown className="h-3 w-3 mr-1" />}
-              {status.tier.charAt(0).toUpperCase() + status.tier.slice(1)}
+              {status.isPro ? 'Plus' : 'Free'}
             </Badge>
           </div>
 
@@ -289,11 +286,11 @@ export default function HouseholdPillarPage() {
             )}
           </div>
 
-          {/* Family members preview */}
-          {status.isFamily && members.length > 0 && (
+          {/* Household members preview */}
+          {status.isPro && members.length > 0 && (
             <div className="mt-3 pt-3 border-t border-violet-200/40">
               <p className="text-[11px] font-medium text-muted-foreground mb-2">
-                Family Members ({members.length})
+                Household Members ({members.length})
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {members.map(m => (
@@ -340,26 +337,20 @@ export default function HouseholdPillarPage() {
             emoji="👤"
             title="Household Profiles"
             subtitle={
-              status.isFamily
-                ? `Supports up to 6 household member profiles — preferences, allergies, kids tools, and more`
-                : status.isPro
-                  ? 'Add up to 2 profiles. Upgrade to Family Plus for up to 6 with full preferences.'
-                  : 'Add your personal profile. Upgrade to Pro for 2 profiles, or Family Plus for up to 6.'
+              status.isPro
+                ? 'Add up to 6 household member profiles — preferences, allergies, kids tools, and more'
+                : 'Add your personal profile. Upgrade to Plus for up to 6 profiles.'
             }
             href="/family"
             badge={
-              status.isFamily
+              status.isPro
                 ? `${members.length} profiles`
-                : status.isPro
-                  ? 'Pro · 2 profiles'
-                  : 'Free · 1 profile'
+                : 'Free · 1 profile'
             }
             badgeColor={
-              status.isFamily
-                ? 'bg-violet-50 text-violet-700'
-                : status.isPro
-                  ? 'bg-emerald-50 text-emerald-700'
-                  : 'bg-slate-50 text-slate-600'
+              status.isPro
+                ? 'bg-emerald-50 text-emerald-700'
+                : 'bg-slate-50 text-slate-600'
             }
           >
             {members.length === 0 && (
@@ -375,15 +366,13 @@ export default function HouseholdPillarPage() {
                   }}
                 >
                   <Plus className="h-3 w-3" />
-                  {status.isFamily ? 'Add first member' : 'Add your profile'}
+                  Add your profile
                 </Button>
               </div>
             )}
-            {!status.isFamily && (
-              <p className="mt-1.5 text-[11px] text-muted-foreground/70">
-                Profiles store preferences, allergies, and food goals — not separate logins.
-              </p>
-            )}
+            <p className="mt-1.5 text-[11px] text-muted-foreground/70">
+              Profiles store preferences, allergies, and food goals — not separate logins.
+            </p>
           </SectionCard>
 
           {/* 3. Household Memory */}
@@ -401,11 +390,11 @@ export default function HouseholdPillarPage() {
               !features.householdMemory
                 ? () => handleLockedClick(
                     'Unlock Household Memory',
-                    'Pro unlocks intelligent learning — MealEase remembers preferences, feedback, and patterns to suggest better meals every week.'
+                    'Plus unlocks intelligent learning — MealEase remembers preferences, feedback, and patterns to suggest better meals every week.'
                   )
                 : undefined
             }
-            badge={features.householdMemory ? 'Active' : 'Pro'}
+            badge={features.householdMemory ? 'Active' : 'Plus'}
             badgeColor={features.householdMemory ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}
           >
             {features.householdMemory && <IntelligenceSummary />}
@@ -492,7 +481,7 @@ export default function HouseholdPillarPage() {
           <span>
             {features.householdMemory
               ? 'Intelligence layer active — learning your preferences'
-              : 'Upgrade to Pro to activate the intelligence layer'}
+              : 'Upgrade to Plus to activate the intelligence layer'}
           </span>
         </motion.div>
       </div>

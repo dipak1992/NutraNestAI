@@ -51,7 +51,7 @@ export async function POST(req: Request) {
     const baseRequest = prefs ? applyPrefsToEngineRequest(rawBaseRequest, prefs) : rawBaseRequest
 
     let familyOverrides: ReturnType<typeof buildFamilyEngineOverrides> | null = null
-    if (user && paywall.isFamily) {
+    if (user && paywall.isPro) {
       try {
         const members = await getFamilyMembers(supabase as any, user.id)
         if (members.length > 0) {

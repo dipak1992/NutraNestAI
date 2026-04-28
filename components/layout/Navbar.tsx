@@ -109,7 +109,7 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
           </Badge>
           {!isPaid && (
             <Button asChild size="sm" className="hidden sm:inline-flex">
-              <Link href="/pricing?intent=pro">Upgrade to Pro</Link>
+              <Link href="/pricing?intent=pro">Upgrade to Plus</Link>
             </Button>
           )}
           <DropdownMenu>
@@ -136,7 +136,7 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
               {!isPaid && (
                 <DropdownMenuItem onClick={() => router.push('/pricing?intent=pro')}>
                   <Crown className="h-4 w-4" />
-                  Upgrade to Pro
+                  Upgrade to Plus
                 </DropdownMenuItem>
               )}
               <DropdownMenuSeparator />
@@ -205,7 +205,7 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
                   className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-primary hover:bg-primary/5 transition-colors"
                 >
                   <Crown className="h-4 w-4" />
-                  Upgrade to Pro
+                  Upgrade to Plus
                 </Link>
               )}
             </nav>

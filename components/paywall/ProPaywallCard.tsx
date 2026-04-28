@@ -16,8 +16,7 @@ interface ProPaywallCardProps {
   isAuthenticated: boolean
   redirectPath?: string
   compact?: boolean
-  /** @deprecated family tier removed — always shows Pro */
-  tier?: 'pro' | 'family'
+  tier?: 'pro'
 }
 
 export function ProPaywallCard({
@@ -45,7 +44,7 @@ export function ProPaywallCard({
         toast.error(data.error || 'Could not start trial')
         return
       }
-      toast.success('Your 7-day Pro trial is active!', {
+      toast.success('Your 7-day Plus trial is active!', {
         description: 'Enjoy full access to every feature.',
       })
       router.refresh()
@@ -70,7 +69,7 @@ export function ProPaywallCard({
         <div className="flex-1">
           <Badge className="mb-2.5 border-primary/20 bg-primary/8 text-primary text-[11px] font-semibold tracking-wide uppercase">
             <Lock className="mr-1.5 h-3 w-3" />
-            {isAuthenticated ? 'Pro Feature' : 'Account Required'}
+            {isAuthenticated ? 'Plus Feature' : 'Account Required'}
           </Badge>
           <h3 className="text-xl font-bold tracking-tight leading-snug">{title}</h3>
           <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed max-w-md">{description}</p>
@@ -101,7 +100,7 @@ export function ProPaywallCard({
               size="lg"
               className="gradient-sage border-0 text-white hover:opacity-90 shadow-md shadow-primary/15 gap-2"
             >
-              {isStartingTrial ? 'Starting trial…' : 'Try Pro free for 7 days'}
+              {isStartingTrial ? 'Starting trial…' : 'Try Plus free for 7 days'}
               {!isStartingTrial && <ArrowRight className="h-4 w-4" />}
             </Button>
             <Button asChild variant="ghost" size="lg" className="text-muted-foreground">

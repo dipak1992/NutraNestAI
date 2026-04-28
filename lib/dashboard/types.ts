@@ -1,4 +1,4 @@
-export type Plan = 'free' | 'plus' | 'family'
+export type Plan = 'free' | 'plus'
 
 export type Recipe = {
   id: string

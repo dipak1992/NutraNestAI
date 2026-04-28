@@ -8,9 +8,9 @@ export async function PATCH(req: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const tier = await getUserTier(supabase as any, user.id)
-  if (tier !== 'family') {
+  if (tier !== 'pro') {
     return NextResponse.json(
-      { error: 'Unlock Family Plus to personalize meals for every family member.' },
+      { error: 'Upgrade to Pro to personalize meals for every family member.' },
       { status: 403 },
     )
   }

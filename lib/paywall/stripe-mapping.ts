@@ -35,18 +35,18 @@ export function mapPriceIdToTier(priceId: string | undefined): PriceMapping | nu
       displayName: 'Pro Yearly',
       monthlyEquivalent: 7.99, // $59/12 = $4.92/month equivalent
     },
-    // Family Plus tier
+    // Legacy Family Plus price IDs — map to pro for backward compat
     [process.env.STRIPE_PRICE_FAMILY_MONTHLY || '']: {
-      tier: 'family',
+      tier: 'pro',
       interval: 'monthly',
-      displayName: 'Family Plus Monthly',
-      monthlyEquivalent: 12.99,
+      displayName: 'Pro Monthly (legacy family)',
+      monthlyEquivalent: 7.99,
     },
     [process.env.STRIPE_PRICE_FAMILY_YEARLY || '']: {
-      tier: 'family',
+      tier: 'pro',
       interval: 'yearly',
-      displayName: 'Family Plus Yearly',
-      monthlyEquivalent: 12.99, // $99/12 = $8.25/month equivalent
+      displayName: 'Pro Yearly (legacy family)',
+      monthlyEquivalent: 7.99,
     },
   }
 
@@ -68,8 +68,7 @@ export function extractTierFromSubscription(subscription: Record<string, unknown
   const metadata = subscription['metadata'] as Record<string, unknown> | undefined
   if (metadata?.plan) {
     const plan = String(metadata.plan)
-    if (plan.startsWith('family')) return 'family'
-    if (plan.startsWith('pro')) return 'pro'
+    if (plan.startsWith('family') || plan.startsWith('pro')) return 'pro'
   }
 
   // Fall back to price ID extraction

@@ -31,7 +31,7 @@ export const POST = withErrorHandler('pantry/vision', async (req: Request) => {
 
   const tier = normalizeTier(profile?.subscription_tier)
   const isTempPro = !!profile?.temp_pro_until && new Date(profile.temp_pro_until) > new Date()
-  const isPaidOrTrial = tier === 'pro' || tier === 'family' || isTempPro
+  const isPaidOrTrial = tier === 'pro' || isTempPro
 
   if (!isPaidOrTrial) {
     const now = new Date()

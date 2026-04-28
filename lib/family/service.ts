@@ -3,11 +3,10 @@ import type { SubscriptionTier } from '@/types'
 import type { FamilyEngineOverrides, FamilyHouseholdSummary, FamilyMemberRecord } from '@/lib/family/types'
 
 // ── Tier-based member limits ──────────────────────────────────────────────
-// Free: 1 profile (yourself), Pro: 2 profiles, Family Plus: 6 profiles
+// Free: 1 profile (yourself), Pro: up to 6 profiles
 const TIER_MEMBER_LIMITS: Record<SubscriptionTier, number> = {
   free: 1,
-  pro: 2,
-  family: 6,
+  pro: 6,
 }
 
 export function getMaxMembersForTier(tier: SubscriptionTier): number {
@@ -17,10 +16,8 @@ export function getMaxMembersForTier(tier: SubscriptionTier): number {
 export function getTierUpgradeMessage(tier: SubscriptionTier): string | null {
   switch (tier) {
     case 'free':
-      return 'Upgrade to Pro for 2 profiles, or Family Plus for up to 6.'
+      return 'Upgrade to Pro for up to 6 profiles.'
     case 'pro':
-      return 'Upgrade to Family Plus to add up to 6 family members.'
-    case 'family':
       return null
     default:
       return 'Upgrade to add more profiles.'
@@ -45,7 +42,7 @@ function unique(values: string[]): string[] {
   return Array.from(new Set(values.map((v) => v.trim().toLowerCase()).filter(Boolean)))
 }
 
-export async function getUserTier(supabase: SupabaseLike, userId: string): Promise<'free' | 'pro' | 'family'> {
+export async function getUserTier(supabase: SupabaseLike, userId: string): Promise<SubscriptionTier> {
   const { data } = await supabase
     .from('profiles')
     .select('subscription_tier')

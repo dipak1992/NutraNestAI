@@ -85,8 +85,7 @@ async function handleCheckoutCompleted(session: Record<string, unknown>) {
   let tier: SubscriptionTier = 'pro'
   if (metadata?.plan) {
     const plan = String(metadata.plan)
-    if (plan.includes('family')) tier = 'family'
-    else if (plan.includes('pro')) tier = 'pro'
+    if (plan.includes('pro') || plan.includes('family')) tier = 'pro'
   }
 
   const supabase = adminSupabase()

@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
     if (user) {
       const tier = await getUserTier(supabase as any, user.id)
-      if (tier === 'family') {
+      if (tier === 'pro') {
         const members = await getFamilyMembers(supabase as any, user.id)
         if (members.length > 0) {
           familyOverrides = buildFamilyEngineOverrides(members)

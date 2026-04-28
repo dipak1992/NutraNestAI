@@ -1,4 +1,4 @@
-export type PlanId = 'free' | 'plus' | 'family'
+export type PlanId = 'free' | 'plus'
 
 export type PlanDef = {
   id: PlanId
@@ -73,34 +73,10 @@ export const PLANS: Record<PlanId, PlanDef> = {
       prioritySupport: false,
     },
   },
-  family: {
-    id: 'family',
-    name: 'Family',
-    priceMonthly: 14.99,
-    stripePriceId: process.env.STRIPE_FAMILY_PRICE_ID ?? null,
-    tagline: 'For bigger households',
-    badge: 'Best for families',
-    features: [
-      'Everything in Plus',
-      'Up to 6 household members',
-      'Shared meal plans & grocery lists',
-      'Kid-friendly suggestions',
-      'Multi-profile meal balancing',
-    ],
-    limits: {
-      fridgeScansPerWeek: 'unlimited',
-      menuScansPerMonth: 'unlimited',
-      aiLeftoverSuggestions: 'unlimited',
-      budgetTracking: true,
-      autopilot: true,
-      householdMembers: 6,
-      prioritySupport: false,
-    },
-  },
 }
 
 export function planRank(plan: PlanId): number {
-  return { free: 0, plus: 1, family: 2 }[plan]
+  return { free: 0, plus: 1 }[plan]
 }
 
 export function isAtLeast(userPlan: PlanId, required: PlanId): boolean {

@@ -18,7 +18,7 @@ export default async function BudgetPage() {
   if (!user) redirect('/login')
 
   const paywall = await getPaywallStatus()
-  const plan = paywall.isPro ? (paywall.isFamily ? 'family' : 'plus') : 'free'
+  const plan = paywall.isPro ? 'plus' : 'free'
 
   const payload = await loadBudgetPayload(user.id, plan)
 

@@ -16,7 +16,7 @@ export async function GET() {
   }
 
   const paywall = await getPaywallStatus()
-  const plan = paywall.isPro ? (paywall.isFamily ? 'family' : 'plus') : 'free'
+  const plan = paywall.isPro ? 'plus' : 'free'
 
   const payload = await loadBudgetPayload(user.id, plan)
   return NextResponse.json(payload)

@@ -152,19 +152,6 @@ export const PLAN_LIMITS: Record<string, PlanLimits> = {
     household_sharing: false,
     nutrition_info: true,
   },
-  family: {
-    tier: 'family',
-    max_household_members: 12,
-    max_saved_recipes: 500,
-    max_pantry_items: 500,
-    weekly_autopilot: true,
-    snap_and_cook: true,
-    leftovers_ai: true,
-    budget_intelligence: true,
-    grocery_export: true,
-    household_sharing: true,
-    nutrition_info: true,
-  },
 }
 
 // ============================================================

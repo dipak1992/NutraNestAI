@@ -70,9 +70,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid role' }, { status: 400 })
   }
 
-  // Pro tier gets simplified profiles (name + role + allergies + dietary only)
-  // Family Plus gets full rich profiles
-  const isFullProfile = tier === 'family'
+  // Pro tier gets full rich profiles
+  const isFullProfile = tier === 'pro'
 
   const payload: Record<string, unknown> = {
     household_id: household.id,

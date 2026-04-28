@@ -53,9 +53,9 @@ export interface TonightChip {
 export const TONIGHT_CHIPS: TonightChip[] = [
   { id: 'fast',       label: 'Fast',       emoji: '⚡', requiredTier: 'free' },
   { id: 'budget',     label: 'Budget',     emoji: '💰', requiredTier: 'pro' },
-  { id: 'kids',       label: 'Kids',       emoji: '👶', requiredTier: 'family' },
+  { id: 'kids',       label: 'Kids',       emoji: '👶', requiredTier: 'pro' },
   { id: 'date-night', label: 'Date Night', emoji: '🕯️', requiredTier: 'pro' },
-  { id: 'guests',     label: 'Guests',     emoji: '🍽️', requiredTier: 'family' },
+  { id: 'guests',     label: 'Guests',     emoji: '🍽️', requiredTier: 'pro' },
 ]
 
 // ── Pillar card definitions ───────────────────────────────────────────────────
@@ -170,22 +170,6 @@ export const TIER_FEATURES: Record<SubscriptionTier, TierFeatures> = {
     tonightBasic: true,
     tonightBudget: true,
     tonightDateNight: true,
-    tonightGuests: false,
-    tonightKidsSafe: false,
-    manualPlanning: true,
-    weeklyAutopilot: true,
-    snapCookBasic: true,
-    pantryMeals: true,
-    smartLeftovers: true,
-    oneProfile: true,
-    householdMemory: true,
-    multiMember: false,
-    kidsTools: false,
-  },
-  family: {
-    tonightBasic: true,
-    tonightBudget: true,
-    tonightDateNight: true,
     tonightGuests: true,
     tonightKidsSafe: true,
     manualPlanning: true,
@@ -202,7 +186,7 @@ export const TIER_FEATURES: Record<SubscriptionTier, TierFeatures> = {
 
 // ── Tier check helpers ────────────────────────────────────────────────────────
 
-const TIER_RANK: Record<SubscriptionTier, number> = { free: 0, pro: 1, family: 2 }
+const TIER_RANK: Record<SubscriptionTier, number> = { free: 0, pro: 1 }
 
 export function hasAccess(userTier: SubscriptionTier, requiredTier: SubscriptionTier): boolean {
   return TIER_RANK[userTier] >= TIER_RANK[requiredTier]
@@ -240,7 +224,7 @@ export const UPGRADE_TRIGGERS: UpgradeTrigger[] = [
   {
     id: 'kids-filters',
     condition: 'User has used kids filters 3+ times',
-    targetTier: 'family',
+    targetTier: 'pro',
     message: 'Kids tools make every meal safe and picky-eater approved.',
     cta: 'Unlock Kids Tools',
   },
@@ -261,8 +245,8 @@ export const UPGRADE_TRIGGERS: UpgradeTrigger[] = [
   {
     id: 'multi-member',
     condition: 'User tried to add more than 1 household member',
-    targetTier: 'family',
-    message: 'Family Plus supports up to 6 members with conflict balancing.',
-    cta: 'Unlock Family Plus',
+    targetTier: 'pro',
+    message: 'Pro supports up to 6 household members with conflict balancing.',
+    cta: 'Upgrade to Pro',
   },
 ]

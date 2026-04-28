@@ -25,14 +25,12 @@ function PillarCardUI({
   card,
   index,
   isPro,
-  isFamily,
   userTier,
 }: {
   card: PillarCard
   index: number
   isPro: boolean
-  isFamily: boolean
-  userTier: 'free' | 'pro' | 'family'
+  userTier: 'free' | 'pro'
 }) {
   const showPremiumCta = card.premiumCta && hasAccess(userTier, card.premiumCta.requiredTier)
 
@@ -200,7 +198,6 @@ export function DashboardHub({ displayName }: Props) {
               card={card}
               index={i}
               isPro={status.isPro}
-              isFamily={status.isFamily}
               userTier={status.tier}
             />
           ))}

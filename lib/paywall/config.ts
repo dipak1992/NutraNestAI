@@ -18,13 +18,6 @@ export const PRICING_TIERS = {
     monthlyPriceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_MONTHLY,
     yearlyPriceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_YEARLY,
   },
-  family: {
-    name: 'Family Plus',
-    monthlyPrice: 14.99,
-    yearlyPrice: 119,
-    monthlyPriceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_FAMILY_MONTHLY,
-    yearlyPriceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_FAMILY_YEARLY,
-  },
 } as const
 
 // ── Stripe trial days (configurable via ENV) ──────────────────────────────────
@@ -65,15 +58,15 @@ export const FAMILY_ANNUAL_SAVINGS = PRO_ANNUAL_SAVINGS // alias kept for compat
 // ── Tier normalization & checks ───────────────────────────────────────────
 
 export function normalizeTier(tier: string | null | undefined): SubscriptionTier {
-  if (tier === 'pro' || tier === 'family') return tier
+  if (tier === 'pro' || tier === 'family') return 'pro'
   return 'free'
 }
 
 export function isProTier(tier: SubscriptionTier | string | null | undefined): boolean {
   const normalized = typeof tier === 'string' ? normalizeTier(tier) : 'free'
-  return normalized === 'pro' || normalized === 'family'
+  return normalized === 'pro'
 }
 
 export function isFamilyTier(_tier: SubscriptionTier | string | null | undefined): boolean {
-  return _tier === 'family'
+  return false
 }

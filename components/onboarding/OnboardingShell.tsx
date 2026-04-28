@@ -45,18 +45,27 @@ export function OnboardingShell({
 
   async function handleNext() {
     if (onNext) await onNext()
-    if (!isLast) next()
+    if (isLast) {
+      // Last step — submit and go to done
+      const { submit } = useOnboardingStore.getState()
+      const ok = await submit()
+      if (ok) {
+        router.push('/dashboard')
+      }
+    } else {
+      next()
+    }
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 flex flex-col">
+    <div className="min-h-screen bg-[#0f0f0f] flex flex-col">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800">
+      <header className="sticky top-0 z-10 bg-[#1a1a1a] border-b border-white/10">
         <div className="mx-auto max-w-lg px-4 h-14 flex items-center justify-between gap-3">
           <button
             onClick={() => (isFirst ? router.push('/') : back())}
             aria-label={isFirst ? 'Go home' : 'Previous step'}
-            className="w-9 h-9 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 flex items-center justify-center transition-colors"
+            className="w-9 h-9 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors text-white"
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
@@ -66,7 +75,7 @@ export function OnboardingShell({
           {skippable ? (
             <button
               onClick={() => next()}
-              className="text-xs text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200 px-2 py-1"
+              className="text-xs text-white/50 hover:text-white px-2 py-1"
             >
               Skip
             </button>
@@ -76,7 +85,7 @@ export function OnboardingShell({
         </div>
 
         {/* Progress bar */}
-        <div className="h-1 bg-neutral-100 dark:bg-neutral-800">
+        <div className="h-1 bg-white/10">
           <div
             className="h-full bg-[#D97757] transition-all duration-500"
             style={{ width: `${progress}%` }}
@@ -97,7 +106,7 @@ export function OnboardingShell({
                       ? 'bg-[#D97757] text-white'
                       : i === stepIndex
                       ? 'bg-[#D97757]/20 text-[#D97757] ring-2 ring-[#D97757]'
-                      : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400',
+                      : 'bg-white/10 text-white/40',
                   )}
                 >
                   {i < stepIndex ? <Check className="w-3.5 h-3.5" /> : i + 1}
@@ -105,7 +114,7 @@ export function OnboardingShell({
                 <span
                   className={cn(
                     'text-[10px] font-medium',
-                    i === stepIndex ? 'text-[#D97757]' : 'text-neutral-400',
+                    i === stepIndex ? 'text-[#D97757]' : 'text-white/40',
                   )}
                 >
                   {s.label}
@@ -115,7 +124,7 @@ export function OnboardingShell({
                 <div
                   className={cn(
                     'w-8 h-px mb-4',
-                    i < stepIndex ? 'bg-[#D97757]' : 'bg-neutral-200 dark:bg-neutral-700',
+                    i < stepIndex ? 'bg-[#D97757]' : 'bg-white/15',
                   )}
                 />
               )}
@@ -130,14 +139,14 @@ export function OnboardingShell({
       </main>
 
       {/* Footer CTA */}
-      <footer className="sticky bottom-0 bg-white dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-800 px-4 py-4"
+      <footer className="sticky bottom-0 bg-[#1a1a1a] border-t border-white/10 px-4 py-4"
         style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
       >
         <div className="mx-auto max-w-lg flex items-center gap-3">
           {!isFirst && (
             <button
               onClick={back}
-              className="flex items-center gap-1.5 text-sm text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200 px-3 py-2"
+              className="flex items-center gap-1.5 text-sm text-white/50 hover:text-white px-3 py-2"
             >
               <ArrowLeft className="w-4 h-4" />
               Back
@@ -148,7 +157,7 @@ export function OnboardingShell({
             disabled={!canProceed || isSubmitting}
             className="flex-1 flex items-center justify-center gap-2 bg-[#D97757] hover:bg-[#C86646] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-full px-5 py-3 min-h-[48px] transition-colors"
           >
-            {isSubmitting ? 'Saving…' : ctaLabel}
+            {isSubmitting ? 'Saving…' : isLast ? 'Finish' : ctaLabel}
             {!isSubmitting && <ArrowRight className="w-4 h-4" />}
           </button>
         </div>

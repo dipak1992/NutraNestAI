@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
@@ -161,20 +162,34 @@ export function PricingContent() {
     <div className="min-h-screen bg-white dark:bg-neutral-950">
 
       {/* ── HERO ── */}
-      <section className="pt-16 pb-10 text-center px-4 overflow-hidden">
-        <div className="inline-flex items-center gap-2 rounded-full bg-[#D97757]/10 text-[#D97757] text-xs font-bold px-4 py-1.5 mb-5 uppercase tracking-widest">
-          ✦ Simple pricing
+      <section className="relative overflow-hidden bg-neutral-950 px-4 py-16 text-center text-white md:py-24">
+        <Image
+          src="/landing/grocery.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover opacity-38"
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,10,10,0.72),rgba(10,10,10,0.78)),radial-gradient(circle_at_50%_0%,rgba(217,119,87,0.38),transparent_34%)]"
+        />
+        <div className="relative z-10">
+        <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-[#FFD2BD] backdrop-blur">
+          Simple pricing
         </div>
-        <h1 className="mx-auto max-w-[320px] font-serif text-4xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50 sm:max-w-4xl md:text-5xl">
+        <h1 className="mx-auto mt-5 max-w-[320px] font-serif text-4xl font-bold tracking-tight text-white sm:max-w-4xl md:text-5xl">
           Stop stressing about dinner.{' '}
           <span className="italic text-[#D97757]">Start tonight.</span>
         </h1>
         <p
-          className="mx-auto mt-4 text-lg text-neutral-600 dark:text-neutral-400 sm:max-w-xl"
+          className="mx-auto mt-4 text-lg text-white/76 sm:max-w-xl"
           style={{ maxWidth: 'min(320px, calc(100vw - 40px))' }}
         >
           Free forever. Upgrade when you want the full experience.
         </p>
+        </div>
       </section>
 
       {/* ── BILLING TOGGLE ── */}
@@ -362,6 +377,14 @@ export function PricingContent() {
               </p>
             </div>
           </div>
+        </div>
+        <div className="mx-auto mt-8 max-w-3xl rounded-2xl border border-[#D97757]/20 bg-[#FDF6F1] p-5 text-center shadow-sm shadow-neutral-900/5 dark:border-[#D97757]/20 dark:bg-neutral-900">
+          <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+            ★★★★★ “It replaced the nightly group text about dinner.”
+          </p>
+          <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+            Trusted by thousands of households planning dinner, groceries, leftovers, and budget in one place.
+          </p>
         </div>
       </section>
 

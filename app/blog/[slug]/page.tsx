@@ -3,6 +3,7 @@ import { Nav } from '@/components/landing/Nav'
 import { Footer } from '@/components/landing/Footer'
 import { BlogHeader } from '@/components/blog/BlogHeader'
 import { BlogCard } from '@/components/blog/BlogCard'
+import { BlogCTA } from '@/components/blog/BlogCTA'
 import { ShareButtons } from '@/components/blog/ShareButtons'
 import { NewsletterBlock } from '@/components/blog/NewsletterBlock'
 import { blogMDXComponents } from '@/lib/blog/mdx-components'
@@ -64,6 +65,8 @@ export default async function BlogPostPage({
         <article>
           <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
             <MDXContent components={blogMDXComponents} />
+
+            <BlogCTA variant="post" category={post.category} />
 
             <hr className="my-12 border-0 h-px bg-neutral-200 dark:bg-neutral-800" />
 

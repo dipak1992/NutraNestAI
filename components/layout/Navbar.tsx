@@ -11,7 +11,6 @@ import {
   BarChart2,
   Gift,
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { createClient } from '@/lib/supabase/client'
@@ -22,13 +21,16 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
   const [signingOut, setSigningOut] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
   const isPro = subscriptionTier === 'pro'
   const isPaid = isPro
 
   // Close menu on click outside or Escape
   useEffect(() => {
     if (!menuOpen) return
-    function handleClick(e: MouseEvent) {
+    function handlePointerDown(e: PointerEvent) {
+      // Ignore clicks on the toggle button itself — the onClick handler manages that
+      if (buttonRef.current && buttonRef.current.contains(e.target as Node)) return
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
         setMenuOpen(false)
       }
@@ -36,10 +38,10 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
     function handleEscape(e: KeyboardEvent) {
       if (e.key === 'Escape') setMenuOpen(false)
     }
-    document.addEventListener('mousedown', handleClick)
+    document.addEventListener('pointerdown', handlePointerDown)
     document.addEventListener('keydown', handleEscape)
     return () => {
-      document.removeEventListener('mousedown', handleClick)
+      document.removeEventListener('pointerdown', handlePointerDown)
       document.removeEventListener('keydown', handleEscape)
     }
   }, [menuOpen])
@@ -94,6 +96,7 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
           {/* Account menu */}
           <div className="relative" ref={menuRef}>
             <button
+              ref={buttonRef}
               type="button"
               aria-haspopup="menu"
               aria-expanded={menuOpen}
@@ -108,7 +111,7 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
             {menuOpen && (
               <div
                 role="menu"
-                className="absolute right-0 top-full mt-2 w-52 rounded-xl border border-border bg-background shadow-lg py-1 z-50 animate-in fade-in-0 zoom-in-95"
+                className="absolute right-0 top-full mt-2 w-52 rounded-xl border border-border bg-background shadow-lg py-1 z-50"
               >
                 {userEmail && (
                   <div className="px-3 py-2 text-xs text-muted-foreground truncate border-b border-border">

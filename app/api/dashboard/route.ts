@@ -126,6 +126,9 @@ export async function getDashboardPayload(
     return { ...a, status }
   })
 
+  const _now = new Date()
+  const _hour = _now.getHours()
+
   const base: DashboardPayload = {
     user: {
       id: userId,
@@ -144,6 +147,16 @@ export async function getDashboardPayload(
       suggestedRecipes: [],
     },
     budget,
+    retention: {
+      expiringSoon: leftovers.filter((l) => l.daysUntilExpiry <= 2).length,
+      isSunday: _now.getDay() === 0,
+      isDinnerWindow: _hour >= 16 && _hour < 20,
+      plannedDays: weekPlan.days.filter((d) => d.recipe !== null).length,
+      weeklyBudgetRemaining:
+        budget.weeklyLimit != null
+          ? Math.max(0, budget.weeklyLimit - budget.weekSpent)
+          : null,
+    },
     quickActions,
     nudge: null,
     household,

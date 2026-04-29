@@ -107,6 +107,14 @@ export type QuickAction = {
   status?: string
 }
 
+export type RetentionState = {
+  expiringSoon: number
+  isSunday: boolean
+  isDinnerWindow: boolean
+  plannedDays: number
+  weeklyBudgetRemaining: number | null
+}
+
 export type DashboardPayload = {
   user: {
     id: string
@@ -129,4 +137,5 @@ export type DashboardPayload = {
   nudge: Nudge | null
   household: { memberCount: number; maxMembers: number }
   limits: UsageLimits
+  retention: RetentionState
 }

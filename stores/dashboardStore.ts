@@ -6,6 +6,7 @@ import type {
   LeftoversState,
   WeekPlanState,
   BudgetState,
+  RetentionState,
   Nudge,
   QuickAction,
 } from '@/lib/dashboard/types'
@@ -21,6 +22,7 @@ type DashboardStore = {
   leftovers: LeftoversState | null
   weekPlan: WeekPlanState | null
   budget: BudgetState | null
+  retention: RetentionState | null
   quickActions: QuickAction[]
   nudge: Nudge | null
   household: DashboardPayload['household'] | null
@@ -59,6 +61,7 @@ export const useDashboardStore = create<DashboardStore>()(
       leftovers: null,
       weekPlan: null,
       budget: null,
+      retention: null,
       quickActions: [],
       nudge: null,
       household: null,
@@ -78,6 +81,7 @@ export const useDashboardStore = create<DashboardStore>()(
           leftovers: payload.leftovers,
           weekPlan: payload.weekPlan,
           budget: payload.budget,
+          retention: payload.retention,
           quickActions: payload.quickActions,
           nudge: payload.nudge,
           household: payload.household,
@@ -108,6 +112,7 @@ export const useDashboardStore = create<DashboardStore>()(
             leftovers: payload.leftovers,
             weekPlan: payload.weekPlan,
             budget: payload.budget,
+            retention: payload.retention,
             quickActions: payload.quickActions,
             nudge,
             household: payload.household,

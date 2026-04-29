@@ -1,8 +1,11 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import Link from 'next/link'
+import { Camera, Refrigerator } from 'lucide-react'
 import { useDashboardStore } from '@/stores/dashboardStore'
 import { useBudgetStore } from '@/stores/budgetStore'
+import { useScanStore } from '@/stores/scanStore'
 import { GreetingHeader } from '@/components/dashboard/GreetingHeader'
 import { BudgetBar } from '@/components/budget/BudgetBar'
 import { BudgetDrawer } from '@/components/budget/BudgetDrawer'
@@ -12,6 +15,7 @@ import { LeftoversCard } from '@/components/dashboard/LeftoversCard'
 import { WeekPlanStrip } from '@/components/dashboard/WeekPlanStrip'
 import { QuickActions } from '@/components/dashboard/QuickActions'
 import { ContextualNudge } from '@/components/dashboard/ContextualNudge'
+import { hapticTap } from '@/lib/scan/haptics'
 import type { DashboardPayload } from '@/lib/dashboard/types'
 
 const REFRESH_INTERVAL_MS = 60_000 // 60 seconds
@@ -25,6 +29,7 @@ export function NewDashboardClient({ initial }: { initial: DashboardPayload }) {
   const leftovers = useDashboardStore((s) => s.leftovers)
   const budget = useDashboardStore((s) => s.budget)
   const error = useDashboardStore((s) => s.error)
+  const openScan = useScanStore((s) => s.open)
 
   // Only hydrate once on mount — avoid re-render loop from changing `initial` reference
   const hydratedRef = useRef(false)
@@ -94,21 +99,53 @@ export function NewDashboardClient({ initial }: { initial: DashboardPayload }) {
 
         <GreetingHeader firstName={displayUser.firstName} budget={budget} />
 
-        <BudgetBar />
-
-        <ContextualNudge />
-
-        {/* Tonight + Leftovers — 2/3 + 1/3 on desktop */}
-        <div className="grid lg:grid-cols-3 gap-5 md:gap-6">
-          <div className="lg:col-span-2">
+        {/* Primary decision: make tonight's dinner obvious before utilities compete for attention. */}
+        <div className="grid xl:grid-cols-[minmax(0,1fr)_22rem] gap-4 md:gap-6 items-start">
+          <div>
             <TonightCard state={displayTonight} />
           </div>
-          <div className="lg:col-span-1">
+          <div className="hidden xl:block">
             <LeftoversCard state={displayLeftovers} />
           </div>
         </div>
 
+        <section aria-label="Quick dinner helpers" className="grid grid-cols-2 gap-3">
+          <button
+            type="button"
+            onClick={() => { hapticTap(); openScan('auto') }}
+            className="group flex min-h-[76px] items-center gap-3 rounded-2xl bg-white px-4 py-3 text-left ring-1 ring-neutral-200/80 transition hover:-translate-y-0.5 hover:ring-[#D97757]/40 hover:shadow-sm dark:bg-neutral-900 dark:ring-neutral-800"
+          >
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+              <Camera className="h-5 w-5" />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-sm font-bold text-neutral-950 dark:text-neutral-50">Snap fridge</span>
+              <span className="block truncate text-xs text-neutral-500 dark:text-neutral-400">Cook what you have</span>
+            </span>
+          </button>
+          <Link
+            href="/leftovers"
+            className="group flex min-h-[76px] items-center gap-3 rounded-2xl bg-white px-4 py-3 text-left ring-1 ring-neutral-200/80 transition hover:-translate-y-0.5 hover:ring-[#D97757]/40 hover:shadow-sm dark:bg-neutral-900 dark:ring-neutral-800"
+          >
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-orange-50 text-[#D97757] dark:bg-orange-900/30">
+              <Refrigerator className="h-5 w-5" />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-sm font-bold text-neutral-950 dark:text-neutral-50">Use leftovers</span>
+              <span className="block truncate text-xs text-neutral-500 dark:text-neutral-400">Turn extras into dinner</span>
+            </span>
+          </Link>
+        </section>
+
+        <div className="xl:hidden">
+          <LeftoversCard state={displayLeftovers} />
+        </div>
+
         <WeekPlanStrip />
+
+        <BudgetBar />
+
+        <ContextualNudge />
 
         <QuickActions />
       </div>

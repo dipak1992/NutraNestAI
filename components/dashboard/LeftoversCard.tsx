@@ -20,7 +20,7 @@ export function LeftoversCard({ state }: Props) {
     return (
       <CardShell
         ariaLabel="Leftovers"
-        className="p-6 md:p-7 min-h-[260px] lg:min-h-[420px] flex flex-col bg-gradient-to-br from-[#FDF6F1] to-white dark:from-neutral-900 dark:to-neutral-950"
+        className="p-5 md:p-6 min-h-[220px] xl:min-h-[400px] flex flex-col bg-gradient-to-br from-[#FDF6F1] to-white dark:from-neutral-900 dark:to-neutral-950"
       >
         <div className="flex items-center gap-2 mb-5">
           <span className="text-xl" aria-hidden>🍱</span>
@@ -43,7 +43,7 @@ export function LeftoversCard({ state }: Props) {
   }
 
   return (
-    <CardShell ariaLabel="Leftovers" className="flex flex-col min-h-[260px] lg:min-h-[420px]">
+    <CardShell ariaLabel="Leftovers" className="flex flex-col min-h-[220px] xl:min-h-[400px]">
       {/* Urgent banner */}
       {urgentToday && (
         <div

@@ -116,7 +116,7 @@ export function TonightCard({ state }: Props) {
     return (
       <CardShell
         ariaLabel="Tonight's dinner"
-        className="overflow-hidden min-h-[420px] flex flex-col items-center justify-center text-center"
+        className="overflow-hidden min-h-[340px] md:min-h-[380px] flex flex-col items-center justify-center text-center"
       >
         {/* Decorative gradient background */}
         <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-amber-50 to-rose-50 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-950" />
@@ -173,7 +173,7 @@ export function TonightCard({ state }: Props) {
   }
 
   return (
-    <CardShell ariaLabel="Tonight's dinner" className="flex flex-col min-h-[420px] overflow-hidden">
+    <CardShell ariaLabel="Tonight's dinner" className="flex flex-col min-h-[360px] md:min-h-[400px] overflow-visible sm:overflow-hidden">
       {/* Hero banner — rich gradient with decorative elements */}
       <div className="relative px-6 pt-6 pb-5 md:px-8 md:pt-8 md:pb-6 overflow-hidden">
         {/* Layered gradient background */}
@@ -298,7 +298,7 @@ export function TonightCard({ state }: Props) {
         </div>
 
         {/* CTAs — Cook This + Show Another */}
-        <div className="mt-auto pt-5 flex flex-col sm:flex-row gap-2.5">
+        <div className="-mx-6 mt-auto flex flex-col gap-2.5 border-t border-orange-100/70 bg-white/95 px-6 py-3 shadow-[0_-12px_30px_rgba(15,23,42,0.08)] backdrop-blur sm:mx-0 sm:flex-row sm:border-0 sm:bg-transparent sm:px-0 sm:pt-5 sm:pb-0 sm:shadow-none sm:backdrop-blur-0 sticky bottom-[calc(4.25rem+env(safe-area-inset-bottom))] z-20 sm:static">
           <button
             type="button"
             onClick={handleCookThis}

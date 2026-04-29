@@ -4,11 +4,12 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
-import { Bookmark, Pencil, Trash2, Globe, Lock, Calendar, Search, PlusCircle, ChefHat, ShoppingCart } from 'lucide-react'
+import { Bookmark, Pencil, Trash2, Globe, Lock, Calendar, Search, PlusCircle, ChefHat, ShoppingCart, MoreHorizontal, Share2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { ShareButton } from '@/components/content/ShareButton'
 import { EditMealModal } from '@/components/content/EditMealModal'
 import type { SavedMealSummary } from '@/lib/content/types'
@@ -152,6 +153,15 @@ export default function SavedMealsPage() {
     router.push('/planner')
   }
 
+  function handleShare(meal: SavedMealSummary) {
+    if (!meal.slug) return
+    const url = `${window.location.origin}/share/meal/${meal.slug}`
+    navigator.clipboard.writeText(url).then(
+      () => toast.success('Link copied!', { description: url }),
+      () => toast.info('Share this link', { description: url }),
+    )
+  }
+
   const filteredMeals = meals
     .filter((m) => m.title.toLowerCase().includes(search.toLowerCase()))
     .filter((m) => sourceFilter === 'all' || m.pillar_source === sourceFilter)
@@ -285,55 +295,110 @@ export default function SavedMealsPage() {
               </div>
 
               {/* Actions */}
-              <div className="flex items-center gap-1 px-3 pb-3 border-t border-border/40 pt-2">
-                {meal.is_public && (
-                  <ShareButton slug={meal.slug} type="meal" />
-                )}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 text-xs gap-1.5"
-                  onClick={() => setEditTarget(meal)}
-                >
-                  <Pencil className="h-3.5 w-3.5" />
-                  Edit
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 text-xs gap-1.5"
-                  onClick={() => void handleCookAgain(meal)}
-                >
-                  <ChefHat className="h-3.5 w-3.5" />
-                  Cook again
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 text-xs gap-1.5"
-                  onClick={() => void handleAddToWeek(meal)}
-                >
-                  <PlusCircle className="h-3.5 w-3.5" />
-                  Add to week
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 text-xs gap-1.5"
-                  onClick={() => void handleAddGroceries(meal)}
-                >
-                  <ShoppingCart className="h-3.5 w-3.5" />
-                  Groceries
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 text-xs gap-1.5 text-destructive hover:text-destructive ml-auto"
-                  onClick={() => setDeleteTarget(meal)}
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                  Delete
-                </Button>
+              <div className="border-t border-border/40 px-3 pb-3 pt-2">
+                <div className="flex items-center gap-1 sm:hidden">
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="h-9 flex-1 gap-1.5"
+                    onClick={() => void handleCookAgain(meal)}
+                  >
+                    <ChefHat className="h-3.5 w-3.5" />
+                    Cook again
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-9 flex-1 gap-1.5"
+                    onClick={() => void handleAddToWeek(meal)}
+                  >
+                    <PlusCircle className="h-3.5 w-3.5" />
+                    Week
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger
+                      className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border bg-background text-sm font-medium transition-all hover:bg-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                      aria-label={`More actions for ${meal.title}`}
+                    >
+                      <MoreHorizontal className="h-4 w-4" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      {meal.is_public && (
+                        <DropdownMenuItem onClick={() => handleShare(meal)} className="gap-2 px-3 py-2">
+                          <Share2 className="h-4 w-4" />
+                          Share
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuItem onClick={() => setEditTarget(meal)} className="gap-2 px-3 py-2">
+                        <Pencil className="h-4 w-4" />
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => void handleAddGroceries(meal)} className="gap-2 px-3 py-2">
+                        <ShoppingCart className="h-4 w-4" />
+                        Groceries
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => setDeleteTarget(meal)}
+                        variant="destructive"
+                        className="gap-2 px-3 py-2"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+
+                <div className="hidden items-center gap-1 sm:flex">
+                  {meal.is_public && (
+                    <ShareButton slug={meal.slug} type="meal" />
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 text-xs gap-1.5"
+                    onClick={() => setEditTarget(meal)}
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                    Edit
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 text-xs gap-1.5"
+                    onClick={() => void handleCookAgain(meal)}
+                  >
+                    <ChefHat className="h-3.5 w-3.5" />
+                    Cook again
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 text-xs gap-1.5"
+                    onClick={() => void handleAddToWeek(meal)}
+                  >
+                    <PlusCircle className="h-3.5 w-3.5" />
+                    Add to week
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 text-xs gap-1.5"
+                    onClick={() => void handleAddGroceries(meal)}
+                  >
+                    <ShoppingCart className="h-3.5 w-3.5" />
+                    Groceries
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 text-xs gap-1.5 text-destructive hover:text-destructive ml-auto"
+                    onClick={() => setDeleteTarget(meal)}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    Delete
+                  </Button>
+                </div>
               </div>
             </div>
           ))}

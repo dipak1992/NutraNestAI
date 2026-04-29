@@ -124,9 +124,9 @@ export function UpgradeModal({
       />
 
       {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-50 flex items-end justify-center p-3 sm:items-center sm:p-4">
         <div
-          className="relative w-full max-w-md rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in-95 fade-in-0 duration-200"
+          className="relative max-h-[calc(100dvh-1.5rem)] w-full max-w-md overflow-hidden rounded-3xl shadow-2xl animate-in fade-in-0 zoom-in-95 duration-200"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Background */}
@@ -141,7 +141,7 @@ export function UpgradeModal({
           />
 
           {/* Content */}
-          <div className="relative z-10 p-6 sm:p-8">
+          <div className="relative z-10 max-h-[calc(100dvh-1.5rem)] overflow-y-auto p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:p-8">
             {/* Close button */}
             <button
               onClick={() => onOpenChange(false)}
@@ -165,9 +165,9 @@ export function UpgradeModal({
             </div>
 
             {/* Benefits */}
-            <ul className="space-y-2 mb-5">
+            <ul className="mb-5 grid grid-cols-1 gap-2 min-[380px]:grid-cols-2 sm:block sm:space-y-2">
               {QUICK_BENEFITS.map((b) => (
-                <li key={b} className="flex items-center gap-2.5 text-sm text-neutral-300">
+                <li key={b} className="flex items-start gap-2.5 text-xs text-neutral-300 sm:text-sm">
                   <Check className="h-4 w-4 text-emerald-400 shrink-0" />
                   {b}
                 </li>

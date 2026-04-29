@@ -4,7 +4,6 @@ import { GroceryListPanel } from '@/components/grocery/GroceryListPanel'
 import { ProPaywallCard } from '@/components/paywall/ProPaywallCard'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 import { ShoppingCart, Lock } from 'lucide-react'
-import Link from 'next/link'
 
 export default function GroceryListPage() {
   const { status, loading } = usePaywallStatus()
@@ -24,7 +23,7 @@ export default function GroceryListPage() {
           </div>
           <p className="text-lg font-bold text-foreground">Your personalized grocery list lives here</p>
           <p className="text-sm text-muted-foreground mt-1 max-w-sm">
-            Generate your weekly meal plan, then upgrade to Plus to unlock your auto-built grocery list with quantities and pantry deductions.
+            Generate 3 days to preview your shopping needs. Plus turns the full week into a grocery list with quantities and pantry deductions.
           </p>
         </div>
 

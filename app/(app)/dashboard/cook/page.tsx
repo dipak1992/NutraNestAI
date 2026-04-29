@@ -291,7 +291,7 @@ export default function CookPillarPage() {
         </div>
 
         {/* Mode chips */}
-        <div className="flex flex-wrap gap-2 mb-6">
+        <div className="-mx-5 mb-6 flex gap-2 overflow-x-auto px-5 pb-1 scrollbar-hide">
           {COOK_CHIPS.map((chip) => {
               const locked = !hasAccess(status.tier, chip.requiredTier)
               const isActive = activeChip === chip.id
@@ -302,9 +302,9 @@ export default function CookPillarPage() {
                   whileTap={{ scale: 0.95 }}
                   onClick={() => handleChipSelect(chip.id)}
                   className={cn(
-                    'relative inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all border',
+                    'relative inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all border',
                     isActive ? 'bg-emerald-600 text-white border-emerald-600 shadow-md'
-                      : locked ? 'bg-gray-50 text-gray-400 border-gray-200/60'
+                      : locked ? 'bg-white text-gray-500 border-amber-200 ring-1 ring-amber-100'
                       : 'bg-white text-foreground border-border/60 hover:border-emerald-400/40 hover:shadow-sm',
                   )}
                 >
@@ -314,7 +314,12 @@ export default function CookPillarPage() {
                     </span>
                   )}
                   {chip.emoji} {chip.label}
-                  {locked && <Crown className="h-3 w-3 text-amber-400" />}
+                  {locked && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold text-amber-700">
+                      <Crown className="h-3 w-3" />
+                      Plus
+                    </span>
+                  )}
                 </motion.button>
               )
             })}
@@ -478,6 +483,7 @@ export default function CookPillarPage() {
       <PaywallDialog
         open={paywallOpen}
         onOpenChange={setPaywallOpen}
+        feature="scan"
         title="Unlock Snap & Cook Plus tools"
         description="Upgrade to access Pantry Meals and Smart Leftovers — plus unlimited Snap & Cook scans."
         isAuthenticated={status.isAuthenticated}

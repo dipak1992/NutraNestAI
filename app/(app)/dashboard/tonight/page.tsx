@@ -2,7 +2,6 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ArrowLeft,
@@ -274,7 +273,7 @@ export default function TonightPillarPage() {
         </div>
 
         {/* Quick chips */}
-        <div className="flex flex-wrap gap-2 mb-6">
+        <div className="-mx-5 mb-6 flex gap-2 overflow-x-auto px-5 pb-1 scrollbar-hide">
           {TONIGHT_CHIPS.map((chip) => {
             const locked = !hasAccess(status.tier, chip.requiredTier)
             const isActive = activeChip === chip.id
@@ -284,16 +283,21 @@ export default function TonightPillarPage() {
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleChipSelect(chip.id)}
                 className={cn(
-                  'inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all border',
+                  'inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all border',
                   isActive
                     ? 'bg-primary text-white border-primary shadow-md'
                     : locked
-                      ? 'bg-gray-50 text-gray-400 border-gray-200/60'
+                      ? 'bg-white text-gray-500 border-amber-200 ring-1 ring-amber-100'
                       : 'bg-white text-foreground border-border/60 hover:border-primary/40 hover:shadow-sm',
                 )}
               >
                 {chip.emoji} {chip.label}
-                {locked && <Crown className="h-3 w-3 text-amber-400" />}
+                {locked && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold text-amber-700">
+                    <Crown className="h-3 w-3" />
+                    Plus
+                  </span>
+                )}
               </motion.button>
             )
           })}
@@ -435,6 +439,7 @@ export default function TonightPillarPage() {
       <PaywallDialog
         open={paywallOpen}
         onOpenChange={setPaywallOpen}
+        feature="guided_cooking"
         title="Unlock this mode"
         description="Upgrade to access Budget, Date Night, Kids, and Guest modes — plus unlimited meal ideas."
         isAuthenticated={status.isAuthenticated}

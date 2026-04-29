@@ -120,7 +120,7 @@ export function LeftoversClient({ initialLeftovers, initialInsights, isPlusMembe
               </p>
               {filter === 'all' && (
               <p className="text-xs text-slate-400 max-w-[220px]">
-                  Cook a meal and track your leftovers to reduce waste
+                  Cook a meal to create leftovers, then MealEase will help you use them before they expire.
                 </p>
               )}
             </motion.div>

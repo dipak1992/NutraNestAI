@@ -107,13 +107,13 @@ export function WeekPlanStrip() {
     ? 'Your week is ready'
     : hasPlan
       ? 'Your next 3 days are ready'
-      : 'Your first 3 days free'
+      : 'Weekly Autopilot preview'
 
   const subtext = isPlusMember
     ? 'Full 7-day planning powered by MealEase.'
     : hasPlan
-      ? 'Tap any day to view meals.'
-      : 'Try MealEase weekly planning before upgrading.'
+      ? 'Tap a day, then unlock the full week and grocery preview with Plus.'
+      : 'Generate 3 days to unlock a grocery preview.'
 
   const primaryCta = isPlusMember
     ? hasPlan ? 'Refresh Week' : 'Generate Week'
@@ -322,11 +322,9 @@ export function WeekPlanStrip() {
   ])
 
   const upgradeBenefits = useMemo(() => [
-    'all 7 days unlocked',
+    'all 7 dinners unlocked',
+    'grocery list preview',
     'unlimited swaps',
-    'personalized plans',
-    'Cook This recipes',
-    'grocery planning',
   ], [])
 
   return (
@@ -341,7 +339,7 @@ export function WeekPlanStrip() {
               <div className="mb-1 flex items-center gap-2">
                 <span aria-hidden>📅</span>
                 <p className="text-[11px] font-bold uppercase tracking-wide text-[#D97757]">
-                  This Week
+                  Weekly Autopilot
                 </p>
               </div>
               <h2 className="font-serif text-xl font-bold text-neutral-950 dark:text-neutral-50">
@@ -444,7 +442,7 @@ export function WeekPlanStrip() {
               <p className="mt-1 text-xs leading-relaxed text-neutral-600">
                 {isPlusMember
                   ? 'Generate Week fills every day and keeps this section usable from the dashboard.'
-                  : 'Generate My 3 Days, then tap Mon, Tue, or Wed to save meals, add groceries, or swap within your free limit.'}
+                  : 'Generate My 3 Days, then tap Mon, Tue, or Wed. Plus unlocks Thu-Sun and the weekly grocery preview.'}
               </p>
             </div>
           )}
@@ -458,7 +456,7 @@ export function WeekPlanStrip() {
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-bold">Unlock your full week with Plus</p>
                   <p className="mt-1 text-xs text-white/60">
-                    Get all 7 days, Cook This recipes, unlimited swaps, and grocery planning.
+                    Unlock Thu-Sun, grocery planning, unlimited swaps, and Cook This recipes.
                   </p>
                 </div>
                 <button

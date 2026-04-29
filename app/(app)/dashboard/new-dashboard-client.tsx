@@ -15,6 +15,7 @@ import { LeftoversCard } from '@/components/dashboard/LeftoversCard'
 import { WeekPlanStrip } from '@/components/dashboard/WeekPlanStrip'
 import { QuickActions } from '@/components/dashboard/QuickActions'
 import { ContextualNudge } from '@/components/dashboard/ContextualNudge'
+import { RetentionEngineCard } from '@/components/dashboard/RetentionEngineCard'
 import { hapticTap } from '@/lib/scan/haptics'
 import type { DashboardPayload } from '@/lib/dashboard/types'
 
@@ -28,6 +29,7 @@ export function NewDashboardClient({ initial }: { initial: DashboardPayload }) {
   const tonight = useDashboardStore((s) => s.tonight)
   const leftovers = useDashboardStore((s) => s.leftovers)
   const budget = useDashboardStore((s) => s.budget)
+  const retention = useDashboardStore((s) => s.retention)
   const error = useDashboardStore((s) => s.error)
   const openScan = useScanStore((s) => s.open)
 
@@ -71,6 +73,7 @@ export function NewDashboardClient({ initial }: { initial: DashboardPayload }) {
   const displayUser = user ?? initial.user
   const displayTonight = tonight ?? initial.tonight
   const displayLeftovers = leftovers ?? initial.leftovers
+  const displayRetention = retention ?? initial.retention
 
   return (
     <>
@@ -109,6 +112,52 @@ export function NewDashboardClient({ initial }: { initial: DashboardPayload }) {
           </div>
         </div>
 
+        {displayTonight.recipe && (
+          <section className="rounded-2xl bg-white p-4 ring-1 ring-emerald-100 dark:bg-neutral-900 dark:ring-neutral-800">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+                  <ReceiptText className="h-5 w-5" />
+                </span>
+                <div>
+                  <p className="text-sm font-bold text-neutral-950 dark:text-neutral-50">
+                    Tonight is about ${displayTonight.recipe.costPerServing.toFixed(2)} per serving
+                  </p>
+                  <p className="mt-0.5 text-xs text-neutral-500 dark:text-neutral-400">
+                    Budget Intelligence can find cheaper swaps before the grocery list grows.
+                  </p>
+                </div>
+              </div>
+              <Link
+                href={displayUser.plan === 'free' ? '/upgrade?feature=budget' : '/budget?tab=swaps'}
+                className="inline-flex min-h-10 items-center justify-center rounded-full bg-emerald-600 px-4 text-sm font-semibold text-white transition hover:bg-emerald-700"
+              >
+                {displayUser.plan === 'free' ? 'Preview savings' : 'See swaps'}
+              </Link>
+            </div>
+          </section>
+        )}
+
+        {displayUser.plan === 'free' && (
+          <section
+            aria-label="Free plan limits"
+            className="grid gap-2 rounded-2xl bg-neutral-950 p-3 text-white sm:grid-cols-3 sm:p-4"
+          >
+            <div className="rounded-xl bg-white/8 px-3 py-2">
+              <p className="text-xs font-bold">3 swaps/day</p>
+              <p className="text-[11px] text-white/60">Change tonight without guessing.</p>
+            </div>
+            <div className="rounded-xl bg-white/8 px-3 py-2">
+              <p className="text-xs font-bold">3-day plan preview</p>
+              <p className="text-[11px] text-white/60">Try the weekly rhythm first.</p>
+            </div>
+            <div className="rounded-xl bg-white/8 px-3 py-2">
+              <p className="text-xs font-bold">Basic Snap &amp; Cook</p>
+              <p className="text-[11px] text-white/60">Turn fridge photos into dinner.</p>
+            </div>
+          </section>
+        )}
+
         <section aria-label="Quick dinner helpers" className="grid grid-cols-2 gap-3">
           <button
             type="button"
@@ -143,31 +192,7 @@ export function NewDashboardClient({ initial }: { initial: DashboardPayload }) {
 
         <WeekPlanStrip />
 
-        {displayTonight.recipe && (
-          <section className="rounded-2xl bg-white p-4 ring-1 ring-emerald-100 dark:bg-neutral-900 dark:ring-neutral-800">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-start gap-3">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
-                  <ReceiptText className="h-5 w-5" />
-                </span>
-                <div>
-                  <p className="text-sm font-bold text-neutral-950 dark:text-neutral-50">
-                    Tonight is about ${displayTonight.recipe.costPerServing.toFixed(2)} per serving
-                  </p>
-                  <p className="mt-0.5 text-xs text-neutral-500 dark:text-neutral-400">
-                    Budget Intelligence can surface cheaper swaps before your grocery list grows.
-                  </p>
-                </div>
-              </div>
-              <Link
-                href={displayUser.plan === 'free' ? '/upgrade?feature=budget' : '/budget?tab=swaps'}
-                className="inline-flex min-h-10 items-center justify-center rounded-full bg-emerald-600 px-4 text-sm font-semibold text-white transition hover:bg-emerald-700"
-              >
-                {displayUser.plan === 'free' ? 'Unlock savings' : 'See swaps'}
-              </Link>
-            </div>
-          </section>
-        )}
+        <RetentionEngineCard retention={displayRetention} />
 
         <BudgetBar />
 

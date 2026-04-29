@@ -35,7 +35,7 @@ export function LeftoversCard({ state }: Props) {
             No leftovers to track
           </p>
           <p className="text-sm text-neutral-500 dark:text-neutral-400 max-w-xs">
-            Mark a meal as cooked and we&rsquo;ll help you use the leftovers tomorrow.
+            Cook a meal to create leftovers. We&rsquo;ll help you use them before they go to waste.
           </p>
         </div>
       </CardShell>

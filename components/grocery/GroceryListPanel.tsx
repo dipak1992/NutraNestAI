@@ -3,7 +3,7 @@
 import { useMemo, useState, useRef } from 'react'
 import { useWeeklyPlanStore } from '@/lib/planner/store'
 import { buildGroceryList } from '@/lib/planner/grocery'
-import { CATEGORY_ORDER, GROCERY_ICONS, WALMART_AISLES } from '@/lib/planner/types'
+import { CATEGORY_ORDER, GROCERY_ICONS } from '@/lib/planner/types'
 import type { GroceryLine, StoreFormat } from '@/lib/planner/types'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -16,7 +16,6 @@ import {
   Leaf,
   Store,
   Package,
-  Info,
   Trash2,
   X,
   Plus,
@@ -201,15 +200,15 @@ function GroceryItemRow({
           </span>
         )}
 
-        {/* Action buttons — visible on hover */}
-        <div className="flex items-center gap-0.5 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+        {/* Action buttons — always visible on touch screens, hover-revealed on larger screens. */}
+        <div className="flex flex-shrink-0 items-center gap-0.5 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100">
           {/* Edit */}
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger
                 type="button"
                 onClick={startEdit}
-                className="p-1 rounded-md text-muted-foreground hover:text-primary"
+                className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:text-primary sm:h-auto sm:w-auto sm:p-1"
               >
                 <Pencil className="h-3.5 w-3.5" />
               </TooltipTrigger>
@@ -224,7 +223,7 @@ function GroceryItemRow({
                 type="button"
                 onClick={() => setShowNote(!showNote)}
                 className={cn(
-                  'p-1 rounded-md',
+                  'flex h-8 w-8 items-center justify-center rounded-md sm:h-auto sm:w-auto sm:p-1',
                   item.note ? 'text-violet-600' : 'text-muted-foreground hover:text-violet-600',
                 )}
               >
@@ -243,7 +242,7 @@ function GroceryItemRow({
                 type="button"
                 onClick={() => onTogglePantry(item.id)}
                 className={cn(
-                  'p-1 rounded-md',
+                  'flex h-8 w-8 items-center justify-center rounded-md sm:h-auto sm:w-auto sm:p-1',
                   item.isInPantry
                     ? 'text-emerald-600'
                     : 'text-muted-foreground hover:text-emerald-600',
@@ -263,7 +262,7 @@ function GroceryItemRow({
               <TooltipTrigger
                 type="button"
                 onClick={() => onDelete(item.id)}
-                className="p-1 rounded-md text-muted-foreground hover:text-red-600"
+                className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:text-red-600 sm:h-auto sm:w-auto sm:p-1"
               >
                 <X className="h-3.5 w-3.5" />
               </TooltipTrigger>
@@ -374,7 +373,6 @@ export function GroceryListPanel() {
     toggleChecked,
     checkAllInCategory,
     uncheckAll,
-    clearGrocery,
     addCustomItem,
     deleteItem,
     updateItem,
@@ -423,7 +421,7 @@ export function GroceryListPanel() {
           <ShoppingCart className="h-10 w-10 mx-auto mb-3 opacity-30" />
           <p className="font-semibold mb-1">No grocery list yet</p>
           <p className="text-sm">
-            Generate a weekly meal plan to auto-fill your list, or add items manually below.
+            Generate 3 days to unlock your grocery preview, or add items manually below.
           </p>
           {plan.days.some((day) => day.meal) && (
             <Button size="sm" className="mt-4" onClick={regenerateFromWeeklyPlan}>
@@ -792,7 +790,7 @@ export function GroceryListPanel() {
 
         {checkedCount === totalItems && totalItems > 0 && (
           <div className="mt-2 rounded-xl bg-emerald-50 border border-emerald-200 p-3 text-center text-sm text-emerald-700 font-medium">
-            🎉 You've got everything! Time to cook.
+            🎉 You&rsquo;ve got everything! Time to cook.
           </div>
         )}
       </div>

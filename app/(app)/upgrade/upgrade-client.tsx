@@ -6,18 +6,19 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { Check, Shield, Zap, ArrowLeft } from 'lucide-react'
 import { PRICING_TIERS, PRO_ANNUAL_SAVINGS } from '@/lib/paywall/config'
+import { getUpgradeFeatureCopy } from '@/lib/paywall/feature-copy'
 import { cn } from '@/lib/utils'
 import posthog from 'posthog-js'
 
 /* ─────────────────────── DATA ─────────────────────── */
 
 const BENEFITS = [
-  { icon: '🗓️', title: 'Weekly Autopilot', desc: '7 dinners planned in one tap' },
-  { icon: '🌙', title: 'Unlimited Swaps', desc: 'Never get stuck on a suggestion' },
-  { icon: '🍱', title: 'Leftovers AI', desc: 'Track & use before they expire' },
-  { icon: '💰', title: 'Budget Intelligence', desc: 'Weekly spend tracking & alerts' },
-  { icon: '🛒', title: 'Smart Grocery List', desc: 'Auto-generated from your plan' },
-  { icon: '👨‍👩‍👧‍👦', title: 'Up to 6 Profiles', desc: 'Personalized for every eater' },
+  { icon: '🗓️', title: 'Weekly Autopilot', desc: '7 dinners planned around real life' },
+  { icon: '🌙', title: 'Tonight swaps', desc: 'Change dinner without starting over' },
+  { icon: '🍱', title: 'Leftovers AI', desc: 'Use food before it expires' },
+  { icon: '💰', title: 'Budget Intelligence', desc: 'Catch expensive weeks early' },
+  { icon: '🛒', title: 'Smart Grocery List', desc: 'Quantities plus pantry deductions' },
+  { icon: '👨‍👩‍👧‍👦', title: 'Household Memory', desc: 'Preferences remembered for everyone' },
 ]
 
 const TRUST_SIGNALS = [
@@ -43,6 +44,7 @@ export function UpgradeClient({ isAuthenticated }: Props) {
   const proMonthly = PRICING_TIERS.pro.monthlyPrice
   const proAnnual = PRICING_TIERS.pro.yearlyPrice
   const proAnnualMonthly = (proAnnual / 12).toFixed(2)
+  const featureCopy = getUpgradeFeatureCopy(feature)
 
   const handleCheckout = useCallback(async () => {
     if (!isAuthenticated) {
@@ -115,15 +117,14 @@ export function UpgradeClient({ isAuthenticated }: Props) {
       <section className="pt-8 pb-6 text-center px-4">
         <div className="inline-flex items-center gap-2 rounded-full bg-[#D97757]/10 text-[#D97757] text-xs font-bold px-4 py-1.5 mb-5 uppercase tracking-widest">
           <Zap className="h-3.5 w-3.5" />
-          Upgrade to Plus
+          {featureCopy.eyebrow}
         </div>
         <h1 className="font-serif text-3xl md:text-4xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50">
-          Unlock the full MealEase experience
+          {featureCopy.title}
         </h1>
         {feature && (
           <p className="mt-3 text-base text-neutral-600 dark:text-neutral-400 max-w-md mx-auto">
-            You tried to use a Plus feature.{' '}
-            <span className="font-medium text-[#D97757]">Upgrade now</span> to unlock it instantly.
+            {featureCopy.description}
           </p>
         )}
         {!feature && (
@@ -189,6 +190,16 @@ export function UpgradeClient({ isAuthenticated }: Props) {
               </div>
 
               {/* CTA Button */}
+              {feature && (
+                <div className="mb-5 grid gap-2">
+                  {featureCopy.bullets.map((item) => (
+                    <div key={item} className="flex items-center gap-2 rounded-xl bg-white/8 px-3 py-2 text-sm text-neutral-200">
+                      <Check className="h-4 w-4 text-emerald-400" />
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              )}
               <button
                 onClick={handleCheckout}
                 disabled={loading}

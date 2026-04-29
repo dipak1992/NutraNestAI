@@ -116,14 +116,14 @@ export function TonightCard({ state }: Props) {
     return (
       <CardShell
         ariaLabel="Tonight's dinner"
-        className="overflow-hidden min-h-[340px] md:min-h-[380px] flex flex-col items-center justify-center text-center"
+        className="overflow-hidden min-h-[280px] md:min-h-[380px] flex flex-col items-center justify-center text-center"
       >
         {/* Decorative gradient background */}
         <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-amber-50 to-rose-50 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-950" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(217,119,87,0.15),_transparent_60%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(251,191,36,0.1),_transparent_60%)]" />
-        <div className="relative z-10 p-8 md:p-10 flex flex-col items-center">
-          <div className="text-6xl mb-5 drop-shadow-sm" aria-hidden>🍽️</div>
+        <div className="absolute inset-0 hidden bg-[radial-gradient(ellipse_at_top_right,_rgba(217,119,87,0.15),_transparent_60%)] sm:block" />
+        <div className="absolute inset-0 hidden bg-[radial-gradient(ellipse_at_bottom_left,_rgba(251,191,36,0.1),_transparent_60%)] sm:block" />
+        <div className="relative z-10 p-6 md:p-10 flex flex-col items-center">
+          <div className="text-5xl mb-4 drop-shadow-sm md:text-6xl md:mb-5" aria-hidden>🍽️</div>
           <h2 className="font-serif text-2xl md:text-3xl font-bold text-neutral-900 dark:text-neutral-50 mb-2">
             Let&rsquo;s plan your first dinner
           </h2>
@@ -165,9 +165,9 @@ export function TonightCard({ state }: Props) {
   }
 
   return (
-    <CardShell ariaLabel="Tonight's dinner" className="flex flex-col min-h-[360px] md:min-h-[400px] overflow-visible sm:overflow-hidden">
+    <CardShell ariaLabel="Tonight's dinner" className="flex flex-col min-h-[300px] md:min-h-[400px] overflow-visible sm:overflow-hidden">
       {/* Hero banner — rich gradient with decorative elements */}
-      <div className="relative px-6 pt-6 pb-5 md:px-8 md:pt-8 md:pb-6 overflow-hidden">
+      <div className="relative px-5 pt-5 pb-4 md:px-8 md:pt-8 md:pb-6 overflow-hidden">
         {/* Layered gradient background */}
         <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-amber-50/60 to-rose-50 dark:from-[#2a1a0e] dark:via-[#1e1208] dark:to-neutral-900" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_100%_0%,_rgba(217,119,87,0.18),_transparent)]" />
@@ -175,7 +175,7 @@ export function TonightCard({ state }: Props) {
 
         {/* Decorative large emoji watermark */}
         <div
-          className="absolute right-4 top-1/2 -translate-y-1/2 text-[88px] leading-none select-none pointer-events-none opacity-[0.13] dark:opacity-[0.08]"
+          className="absolute right-4 top-1/2 hidden -translate-y-1/2 text-[88px] leading-none select-none pointer-events-none opacity-[0.13] dark:opacity-[0.08] sm:block"
           aria-hidden
         >
           {mealEmoji}
@@ -183,7 +183,7 @@ export function TonightCard({ state }: Props) {
 
         {/* Decorative dot pattern */}
         <div
-          className="absolute inset-0 opacity-[0.04] dark:opacity-[0.03]"
+          className="absolute inset-0 hidden opacity-[0.04] dark:opacity-[0.03] sm:block"
           style={{
             backgroundImage: 'radial-gradient(circle, #D97757 1px, transparent 1px)',
             backgroundSize: '20px 20px',
@@ -193,7 +193,7 @@ export function TonightCard({ state }: Props) {
         {/* Content */}
         <div className="relative z-10">
           {/* Top row: Tonight badge + context badges */}
-          <div className="flex flex-wrap items-center gap-2 mb-4">
+          <div className="mb-3 flex flex-wrap items-center gap-2 md:mb-4">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-[#D97757] text-white text-xs font-bold px-3 py-1.5 shadow-sm shadow-orange-300/40 dark:shadow-none">
               <Sparkles className="w-3 h-3" />
               {status.isPro || status.isFamily ? 'Tonight’s Smart Pick' : 'Tonight’s Pick'}
@@ -212,12 +212,12 @@ export function TonightCard({ state }: Props) {
           </div>
 
           {/* Meal name */}
-          <h2 className="font-serif text-2xl md:text-3xl font-bold text-neutral-900 dark:text-neutral-50 leading-tight pr-16">
+          <h2 className="font-serif text-xl md:text-3xl font-bold text-neutral-900 dark:text-neutral-50 leading-tight sm:pr-16">
             {recipe.name}
           </h2>
 
           {/* Meta row */}
-          <div className="flex flex-wrap items-center gap-3 mt-3">
+          <div className="flex flex-wrap items-center gap-2 mt-3 md:gap-3">
             <span className="inline-flex items-center gap-1.5 text-xs font-medium text-neutral-600 dark:text-neutral-400 bg-white/60 dark:bg-white/5 rounded-full px-2.5 py-1">
               <Clock className="w-3.5 h-3.5 text-[#D97757]" />
               {recipe.cookTimeMin} min
@@ -236,7 +236,7 @@ export function TonightCard({ state }: Props) {
 
           {/* Benefit tags */}
           {badges.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-3">
+            <div className="hidden flex-wrap gap-2 mt-3 sm:flex">
               {badges.map((badge, i) => {
                 const Icon = badge.icon
                 return (
@@ -279,18 +279,18 @@ export function TonightCard({ state }: Props) {
       <div className="h-px bg-gradient-to-r from-transparent via-orange-200/60 dark:via-orange-900/30 to-transparent" />
 
       {/* Body */}
-      <div className="flex-1 px-6 pb-6 md:px-8 md:pb-7 flex flex-col bg-white dark:bg-neutral-950">
+      <div className="flex-1 px-5 pb-5 md:px-8 md:pb-7 flex flex-col bg-white dark:bg-neutral-950">
         {/* Reason */}
-        <div className="mt-4 flex gap-2.5">
+        <div className="mt-3 flex gap-2.5 md:mt-4">
           <div className="shrink-0 w-1 rounded-full bg-gradient-to-b from-[#D97757] to-amber-400" />
-          <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
+          <p className="line-clamp-3 text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
             <span className="font-semibold text-neutral-800 dark:text-neutral-200">Why this? </span>
             {reason}
           </p>
         </div>
 
         {/* CTAs — Cook This + Show Another */}
-        <div className="-mx-6 mt-auto flex flex-col gap-2.5 border-t border-orange-100/70 bg-white/95 px-6 py-3 shadow-[0_-12px_30px_rgba(15,23,42,0.08)] backdrop-blur sm:mx-0 sm:flex-row sm:border-0 sm:bg-transparent sm:px-0 sm:pt-5 sm:pb-0 sm:shadow-none sm:backdrop-blur-0 sticky bottom-[calc(4.25rem+env(safe-area-inset-bottom))] z-20 sm:static">
+        <div className="tonight-sticky-actions -mx-5 mt-auto flex flex-col gap-2.5 border-t border-orange-100/70 bg-white/95 px-5 py-3 shadow-[0_-12px_30px_rgba(15,23,42,0.08)] backdrop-blur sm:mx-0 sm:flex-row sm:border-0 sm:bg-transparent sm:px-0 sm:pt-5 sm:pb-0 sm:shadow-none sm:backdrop-blur-0 sticky bottom-[calc(5rem+env(safe-area-inset-bottom))] z-20 sm:static">
           <button
             type="button"
             onClick={handleCookThis}
@@ -328,6 +328,7 @@ export function TonightCard({ state }: Props) {
       <PaywallDialog
         open={paywallOpen}
         onOpenChange={setPaywallOpen}
+        feature="guided_cooking"
         title={paywallCopy.title}
         description={paywallCopy.description}
         isAuthenticated={status.isAuthenticated}

@@ -33,18 +33,12 @@ export const FREE_KIDS_RECIPE_LIMIT = 3   // Free users: 3 kid recipe variations
 // ── Pro tier unlocks ─────────────────────────────────────────────────────
 
 export const PRO_UNLOCKS = [
-  '2 member profiles',
-  'Unlimited meal generations',
-  'Full 7-day weekly planner',
-  'Save preferences',
-  'Household memory (1 household)',
-  'Smart Menu Scan — order smarter at restaurants',
-  'Food Check — snap any food, see calories & fit',
-  'Budget meal mode',
-  'Healthy mode',
-  'Meal history',
-  'Unlimited regenerations',
-  'Faster AI responses',
+  'Full 7-day Weekly Autopilot',
+  'Unlimited Tonight swaps and fridge scans',
+  'Smart grocery lists with pantry deductions',
+  'Leftovers AI with use-before-expiry nudges',
+  'Budget Intelligence with cheaper meal swaps',
+  'Household memory for preferences and dislikes',
 ] as const
 
 // ── Kept for backward compat (same as PRO_UNLOCKS now) ──────────────────
@@ -68,5 +62,6 @@ export function isProTier(tier: SubscriptionTier | string | null | undefined): b
 }
 
 export function isFamilyTier(_tier: SubscriptionTier | string | null | undefined): boolean {
+  void _tier
   return false
 }

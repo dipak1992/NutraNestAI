@@ -1,12 +1,12 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { X, Zap, Shield, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { PRICING_TIERS, PRO_ANNUAL_SAVINGS } from '@/lib/paywall/config'
+import { getUpgradeFeatureCopy } from '@/lib/paywall/feature-copy'
 import posthog from 'posthog-js'
 
 /* ─────────────────────── TYPES ─────────────────────── */
@@ -27,12 +27,9 @@ interface UpgradeModalProps {
 /* ─────────────────────── BENEFITS ─────────────────────── */
 
 const QUICK_BENEFITS = [
-  'Unlimited Tonight swaps',
-  'Weekly Autopilot — 7 dinners, one tap',
-  'Leftovers AI — track & use leftovers',
-  'Budget Intelligence & alerts',
-  'Smart grocery list export',
-  'Up to 6 household profiles',
+  'Plan the full week in one tap',
+  'Turn meals into a grocery list',
+  'Connect leftovers, budget, and preferences',
 ]
 
 /* ─────────────────────── COMPONENT ─────────────────────── */
@@ -110,10 +107,10 @@ export function UpgradeModal({
 
   if (!open) return null
 
-  const displayTitle = title || 'Unlock this feature with Plus'
-  const displayDesc = description || (feature
-    ? `${feature} is a Plus feature. Upgrade to unlock it instantly.`
-    : 'Get unlimited access to all premium features.')
+  const featureCopy = getUpgradeFeatureCopy(feature)
+  const displayTitle = title || featureCopy.title
+  const displayDesc = description || featureCopy.description
+  const benefits = (feature ? featureCopy.bullets : QUICK_BENEFITS).slice(0, 3)
 
   return (
     <>
@@ -154,7 +151,7 @@ export function UpgradeModal({
             <div className="text-center mb-5">
               <div className="inline-flex items-center gap-1.5 rounded-full bg-[#D97757]/15 text-[#D97757] text-xs font-bold px-3 py-1 mb-3 uppercase tracking-wider">
                 <Zap className="h-3 w-3" />
-                Plus
+                {featureCopy.eyebrow}
               </div>
               <h2 className="font-serif text-xl sm:text-2xl font-bold text-white leading-tight">
                 {displayTitle}
@@ -165,8 +162,8 @@ export function UpgradeModal({
             </div>
 
             {/* Benefits */}
-            <ul className="mb-5 grid grid-cols-1 gap-2 min-[380px]:grid-cols-2 sm:block sm:space-y-2">
-              {QUICK_BENEFITS.map((b) => (
+            <ul className="mb-5 grid grid-cols-1 gap-2">
+              {benefits.map((b) => (
                 <li key={b} className="flex items-start gap-2.5 text-xs text-neutral-300 sm:text-sm">
                   <Check className="h-4 w-4 text-emerald-400 shrink-0" />
                   {b}
@@ -229,7 +226,7 @@ export function UpgradeModal({
               {loading ? (
                 <span className="animate-pulse">Processing…</span>
               ) : (
-                'Continue to Checkout →'
+                isAuthenticated ? 'Try Plus free →' : 'Create account →'
               )}
             </button>
 
@@ -243,17 +240,6 @@ export function UpgradeModal({
                 <Shield className="h-3 w-3 text-emerald-500" />
                 Cancel anytime
               </span>
-            </div>
-
-            {/* Compare link */}
-            <div className="mt-4 text-center">
-              <Link
-                href="/upgrade"
-                onClick={() => onOpenChange(false)}
-                className="text-xs text-neutral-500 hover:text-[#D97757] transition-colors underline underline-offset-2"
-              >
-                Open upgrade page
-              </Link>
             </div>
           </div>
         </div>

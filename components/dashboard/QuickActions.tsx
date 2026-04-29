@@ -4,9 +4,9 @@ import Link from 'next/link'
 import { Bookmark, Settings, ShoppingCart, Wallet } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-const UTILITIES = [
-  { href: '/saved', label: 'Saved', icon: Bookmark },
-  { href: '/grocery-list', label: 'Grocery', icon: ShoppingCart },
+const MEAL_TOOLS = [
+  { href: '/saved', label: 'Saved meals', icon: Bookmark },
+  { href: '/grocery-list', label: 'Grocery list', icon: ShoppingCart },
   { href: '/budget', label: 'Budget', icon: Wallet },
   { href: '/settings', label: 'Settings', icon: Settings },
 ]
@@ -18,11 +18,11 @@ export function QuickActions() {
         id="quick-actions-heading"
         className="text-sm font-bold uppercase tracking-wide text-neutral-500 dark:text-neutral-400"
       >
-        Utilities
+        Your meal tools
       </h2>
 
       <div className="grid grid-cols-4 gap-2 overflow-x-auto pb-1 sm:flex sm:gap-2.5">
-        {UTILITIES.map(({ href, label, icon: Icon }) => {
+        {MEAL_TOOLS.map(({ href, label, icon: Icon }) => {
           return (
             <Link
               key={href}

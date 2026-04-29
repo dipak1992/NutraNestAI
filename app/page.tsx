@@ -1,5 +1,6 @@
 import { Nav } from '@/components/landing/Nav'
 import { Hero } from '@/components/landing/Hero'
+import { ConversionStory } from '@/components/landing/ConversionStory'
 import { HowItWorks } from '@/components/landing/HowItWorks'
 import { FivePillarsSection } from '@/components/landing/FivePillarsSection'
 import { SocialProof } from '@/components/landing/SocialProof'
@@ -44,6 +45,7 @@ export default async function LandingPage() {
 
       <main id="main-content">
         <Hero />
+        <ConversionStory />
         <HowItWorks />
         <FivePillarsSection />
         <ComparisonTable />

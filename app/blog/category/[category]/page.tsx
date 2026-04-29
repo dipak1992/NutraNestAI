@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react'
 import { Nav } from '@/components/landing/Nav'
 import { Footer } from '@/components/landing/Footer'
 import { BlogCard } from '@/components/blog/BlogCard'
+import { BlogCTA } from '@/components/blog/BlogCTA'
 import { getPostsByCategory } from '@/lib/blog/mdx'
 import { CATEGORY_LABELS, type BlogCategory } from '@/lib/blog/types'
 
@@ -73,11 +74,16 @@ export default async function CategoryPage({
                 Nothing here yet — more posts coming soon.
               </p>
             ) : (
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {posts.map((post) => (
-                  <BlogCard key={post.slug} post={post} />
-                ))}
-              </div>
+              <>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {posts.map((post) => (
+                    <BlogCard key={post.slug} post={post} />
+                  ))}
+                </div>
+                <div className="mt-12">
+                  <BlogCTA variant="category" category={category as BlogCategory} />
+                </div>
+              </>
             )}
           </div>
         </section>

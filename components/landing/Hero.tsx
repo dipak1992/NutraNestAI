@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { CalendarDays, ChefHat, DollarSign, ShoppingCart, Sparkles } from 'lucide-react'
 import { Container } from './shared/Container'
 import { Button } from './shared/Button'
@@ -27,6 +28,25 @@ export function Hero() {
         aria-hidden
         className="absolute inset-0 -z-10 bg-gradient-to-b from-[#FDF6F1] via-white to-white dark:from-neutral-900 dark:via-neutral-950 dark:to-neutral-950"
       />
+      <div className="absolute inset-0 -z-10">
+        <Image
+          src="/landing/hero.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="hidden object-cover opacity-20 sm:block"
+        />
+        <Image
+          src="/mobile/hero-mobile.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover opacity-16 sm:hidden"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-white via-white/88 to-white/45 dark:from-neutral-950 dark:via-neutral-950/88 dark:to-neutral-950/56" />
+      </div>
 
       <Container wide>
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-16 items-center">

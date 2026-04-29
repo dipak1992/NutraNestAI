@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { BlogCard } from '@/components/blog/BlogCard'
+import { BlogCTA } from '@/components/blog/BlogCTA'
 import { NewsletterBlock } from '@/components/blog/NewsletterBlock'
 import { getAllPosts } from '@/lib/blog/mdx'
 import { CATEGORY_LABELS, type BlogCategory } from '@/lib/blog/types'
@@ -76,6 +77,12 @@ export default function BlogIndexPage() {
                 </div>
               </section>
             )}
+
+            <section className="py-8">
+              <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+                <BlogCTA variant="index" />
+              </div>
+            </section>
 
             {rest.length > 0 && (
               <section className="py-10 md:py-16">

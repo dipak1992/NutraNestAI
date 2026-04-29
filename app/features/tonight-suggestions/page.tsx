@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Nav } from '@/components/landing/Nav'
 import { Footer } from '@/components/landing/Footer'
 import { Container } from '@/components/landing/shared/Container'
+import { FeatureHero } from '@/components/features/FeatureHero'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -55,37 +56,18 @@ export default function TonightSuggestionsPage() {
     <>
       <Nav />
       <main id="main">
-        {/* Hero */}
-        <section className="relative overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(217,119,87,0.12),transparent_40%),linear-gradient(180deg,#fff7ed_0%,#fefce8_40%,#f8fafc_100%)] pt-20 pb-16 md:pt-28 md:pb-24">
-          <Container>
-            <div className="max-w-3xl mx-auto text-center">
-              <div className="inline-flex items-center gap-2 rounded-full bg-[#D97757]/10 border border-[#D97757]/20 px-4 py-1.5 text-sm font-medium text-[#D97757] mb-6">
-                🍽️ Tonight Suggestions
-              </div>
-              <h1 className="font-serif text-5xl md:text-6xl font-bold tracking-tight text-neutral-900 mb-6">
-                &ldquo;What&rsquo;s for dinner?&rdquo;{' '}
-                <span className="italic text-[#D97757]">Answered.</span>
-              </h1>
-              <p className="text-xl text-neutral-600 leading-relaxed mb-10 max-w-2xl mx-auto">
-                Stop staring at the fridge. MealEase gives you a personalized dinner suggestion in seconds — tailored to your household, your preferences, and what you already have.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Link
-                  href="/signup"
-                  className="inline-flex items-center justify-center rounded-xl bg-[#D97757] px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-[#D97757]/25 hover:bg-[#c4664a] transition-colors"
-                >
-                  Try free — no card needed
-                </Link>
-                <Link
-                  href="/pricing"
-                  className="inline-flex items-center justify-center rounded-xl border border-neutral-300 bg-white px-7 py-3.5 text-base font-semibold text-neutral-700 hover:bg-neutral-50 transition-colors"
-                >
-                  See pricing
-                </Link>
-              </div>
-            </div>
-          </Container>
-        </section>
+        <FeatureHero
+          eyebrow="Tonight Suggestions"
+          title={<>&ldquo;What&rsquo;s for dinner?&rdquo; <span className="italic text-[#F3B18E]">Answered.</span></>}
+          description="Stop staring at the fridge. MealEase gives you a personalized dinner suggestion in seconds — tailored to your household, your preferences, and what you already have."
+          primaryHref="/signup"
+          primaryLabel="Try free — no card needed"
+          secondaryHref="/pricing"
+          secondaryLabel="See pricing"
+          image="/landing/date-night.jpg"
+          mobileImage="/mobile/date-night-mobile.jpg"
+          mockup="tonight"
+        />
 
         {/* Problem → Solution */}
         <section className="py-16 md:py-20 bg-white">

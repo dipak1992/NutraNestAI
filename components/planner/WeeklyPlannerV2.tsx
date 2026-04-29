@@ -22,6 +22,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import {
   Sparkles,
   ShoppingCart,
+  DollarSign,
   Loader2,
   CalendarDays,
   RefreshCcw,
@@ -325,6 +326,10 @@ export function WeeklyPlannerV2() {
   }, [plan, mealsPlanned, status.isPro])
 
   const weekLabel = buildDateLabel(plan.weekStart)
+  const plannedTotal = plan.days.reduce((sum, day) => sum + (day.meal?.estimatedCost ?? 0), 0)
+  const budgetFriendlyCount = plan.days.filter((day) =>
+    day.meal?.tags?.some((tag) => tag.toLowerCase().includes('budget') || tag.toLowerCase().includes('lower-cost')),
+  ).length
   const lockedDayIndexes = !status.isPro && mealsPlanned > 0
     ? plan.days.slice(status.effectivePlanPreviewDays ?? 3).map((day) => day.dayIndex)
     : []
@@ -365,7 +370,7 @@ export function WeeklyPlannerV2() {
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Clear this week's plan?</AlertDialogTitle>
+                  <AlertDialogTitle>Clear this week&rsquo;s plan?</AlertDialogTitle>
                   <AlertDialogDescription>
                     This will remove all {mealsPlanned} planned meal{mealsPlanned !== 1 ? 's' : ''}. You can generate a new plan anytime.
                   </AlertDialogDescription>
@@ -421,6 +426,38 @@ export function WeeklyPlannerV2() {
         </div>
         </TooltipProvider>
       </div>
+
+      {mealsPlanned > 0 && (
+        <div className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white text-emerald-700 shadow-sm">
+                <DollarSign className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-slate-950">
+                  Estimated week so far: {plannedTotal > 0 ? `$${plannedTotal.toFixed(0)}` : 'calculating'}
+                </p>
+                <p className="mt-0.5 text-xs text-slate-600">
+                  {budgetFriendlyCount > 0
+                    ? `${budgetFriendlyCount} budget-friendly dinner${budgetFriendlyCount === 1 ? '' : 's'} already in this plan.`
+                    : 'Use Budget Intelligence to swap in lower-cost dinners before shopping.'}
+                </p>
+              </div>
+            </div>
+            {!status.isPro && (
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => setPaywallOpen(true)}
+                className="bg-emerald-600 text-white hover:bg-emerald-700"
+              >
+                Unlock budget swaps
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ── Planner grid ── */}
       <WeeklyPlannerGrid

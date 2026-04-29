@@ -108,7 +108,7 @@ export function BudgetClient({ initial }: { initial: BudgetPayload }) {
               Track spending, get cost estimates, and find cheaper meal swaps.
             </p>
             <Link
-              href="/pricing?intent=plus"
+              href="/upgrade?feature=budget"
               className="inline-flex items-center gap-1.5 text-sm font-medium text-[#D97757] hover:text-[#C86646] transition-colors"
             >
               Upgrade to Plus <ArrowRight className="w-3.5 h-3.5" />

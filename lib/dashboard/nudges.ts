@@ -82,7 +82,7 @@ export function buildNudgeCandidates(
       title: 'Use it tonight',
       body: `Your ${urgent.name.toLowerCase()} expires today. Want three quick meals that use it?`,
       ctaLabel: 'Show meals',
-      ctaHref: `/leftovers/${urgent.id}/use`,
+      ctaHref: '/leftovers',
       dismissible: true,
       variant: NUDGE_VARIANT.leftover_expiring_today,
     })
@@ -118,7 +118,7 @@ export function buildNudgeCandidates(
       title: "You're out of free scans this month",
       body: 'Unlimited fridge scans on Plus — plus leftovers and budget tracking.',
       ctaLabel: 'See Plus',
-      ctaHref: '/pricing',
+      ctaHref: '/upgrade?feature=scan',
       dismissible: true,
       variant: NUDGE_VARIANT.free_scan_limit,
     })
@@ -153,7 +153,7 @@ export function buildNudgeCandidates(
         title: 'Unlock the full kitchen',
         body: 'Budget tracking, unlimited scans, autopilot meal planning — all on Plus.',
         ctaLabel: 'Upgrade to Plus',
-        ctaHref: '/pricing',
+        ctaHref: '/upgrade',
         dismissible: true,
         variant: NUDGE_VARIANT.upgrade_prompt,
       })

@@ -478,7 +478,7 @@ export default function CookPillarPage() {
       <PaywallDialog
         open={paywallOpen}
         onOpenChange={setPaywallOpen}
-        title="Unlock Snap & Cook Pro Tools"
+        title="Unlock Snap & Cook Plus tools"
         description="Upgrade to access Pantry Meals and Smart Leftovers — plus unlimited Snap & Cook scans."
         isAuthenticated={status.isAuthenticated}
         redirectPath="/dashboard/cook"

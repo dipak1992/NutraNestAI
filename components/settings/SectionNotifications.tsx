@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Bell, Loader2 } from 'lucide-react'
 
 type NotifPrefs = {
+  dinner_reminders: boolean
   weekly_plan_ready: boolean
   grocery_reminders: boolean
   leftover_alerts: boolean
@@ -80,6 +81,7 @@ export function SectionNotifications({ prefs: initial }: Props) {
       </h2>
 
       <div className="divide-y divide-white/5">
+        <Toggle label="Dinner reminders"     description="A gentle evening nudge when it is time to decide dinner" checked={prefs.dinner_reminders} onChange={() => toggle('dinner_reminders')} />
         <Toggle label="Weekly plan ready"    description="Get notified when your meal plan is generated"  checked={prefs.weekly_plan_ready}  onChange={() => toggle('weekly_plan_ready')} />
         <Toggle label="Grocery reminders"    description="Reminders to check your grocery list"           checked={prefs.grocery_reminders}  onChange={() => toggle('grocery_reminders')} />
         <Toggle label="Leftover alerts"      description="Suggestions when leftovers are about to expire" checked={prefs.leftover_alerts}    onChange={() => toggle('leftover_alerts')} />

@@ -4,18 +4,23 @@ import { getUrgency, getDaysUntilExpiry } from '@/lib/leftovers/expiration-calcu
 
 function enrichLeftover(row: Record<string, unknown>): Leftover {
   const expiresAt = row.expires_at as string
+  const name =
+    (row.name as string | null) ??
+    (row.display_name as string | null) ??
+    (row.source_recipe_name as string | null) ??
+    'Cooked meal'
   return {
     id: row.id as string,
-    userId: row.user_id as string,
+    userId: (row.user_id as string | null) ?? '',
     householdId: (row.household_id as string | null) ?? null,
-    sourceRecipeId: (row.source_recipe_id as string | null) ?? null,
-    name: row.name as string,
+    sourceRecipeId: (row.source_recipe_id as string | null) ?? (row.source_meal_id as string | null) ?? null,
+    name,
     image: (row.image as string | null) ?? null,
     mainIngredients: (row.main_ingredients as MainIngredient[]) ?? [],
-    servingsRemaining: row.servings_remaining as number,
+    servingsRemaining: Number(row.servings_remaining ?? row.estimated_servings_remaining ?? 1),
     originalCostPerServing: (row.original_cost_per_serving as number | null) ?? null,
     notes: (row.notes as string | null) ?? null,
-    cookedAt: row.cooked_at as string,
+    cookedAt: (row.cooked_at as string | null) ?? (row.created_at as string),
     expiresAt,
     status: row.status as Leftover['status'],
     usedAt: (row.used_at as string | null) ?? null,
@@ -40,8 +45,11 @@ export async function getLeftoversPayload(userId: string): Promise<{
     .eq('status', 'active')
     .lt('expires_at', new Date().toISOString())
 
-  // Fetch all leftovers for this user
-  const { data: rows, error } = await supabase
+  let rows: Record<string, unknown>[] = []
+
+  // Fetch all leftovers for this user. Older schemas are household-scoped, so
+  // fall back to the user's household when user_id is not present.
+  const { data: userRows, error } = await supabase
     .from('leftovers')
     .select('*')
     .eq('user_id', userId)
@@ -49,11 +57,31 @@ export async function getLeftoversPayload(userId: string): Promise<{
     .limit(100)
 
   if (error) {
-    console.error('[leftovers loader]', error)
-    return { leftovers: [], insights: emptyInsights() }
+    const { data: household } = await supabase
+      .from('households')
+      .select('id')
+      .eq('owner_id', userId)
+      .maybeSingle()
+
+    if (household?.id) {
+      const { data: householdRows, error: householdError } = await supabase
+        .from('leftovers')
+        .select('*')
+        .eq('household_id', household.id)
+        .order('created_at', { ascending: false })
+        .limit(100)
+
+      if (householdError) {
+        console.error('[leftovers loader]', householdError)
+        return { leftovers: [], insights: emptyInsights() }
+      }
+      rows = (householdRows ?? []) as Record<string, unknown>[]
+    }
+  } else {
+    rows = (userRows ?? []) as Record<string, unknown>[]
   }
 
-  const leftovers = (rows ?? []).map(enrichLeftover)
+  const leftovers = rows.map(enrichLeftover)
 
   // Compute insights
   const active = leftovers.filter((l) => l.status === 'active')

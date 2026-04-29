@@ -5,6 +5,8 @@ import { getGreeting } from '@/lib/dashboard/greeting'
 import { calcBudget } from '@/lib/dashboard/budget'
 import { getTonightSuggestion } from '@/lib/dashboard/tonight-intelligence'
 import { buildNudgeCandidates, pickNudge } from '@/lib/dashboard/nudges'
+import { loadBudgetPayload } from '@/app/budget/loader'
+import { getDaysUntilExpiry, getUrgency } from '@/lib/leftovers/expiration-calculator'
 import type {
   DashboardPayload,
   Leftover,
@@ -76,15 +78,13 @@ export async function getDashboardPayload(
 
   const tonight = await getTonightSuggestion(supabase, userId, plan)
 
-  // --- Mock leftovers (replace with DB query) ---
-  const leftovers: Leftover[] = []
+  const leftovers = await loadDashboardLeftovers(userId)
 
-  // --- Mock week plan (replace with DB query) ---
   const days: DayPlan[] = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(
     (abbr, i) => ({
       id: `day_${i}`,
       dayAbbrev: abbr,
-      date: `${i + 2}`,
+      date: nextDate(i),
       recipe: null,
       status: 'empty' as const,
     })
@@ -97,12 +97,20 @@ export async function getDashboardPayload(
     estimatedTotalCost: 0,
   }
 
-  // --- Mock budget (replace with DB query) ---
-  const budget = calcBudget(null, 0)
+  let budget = calcBudget(null, 0)
+  try {
+    const budgetPayload = await loadBudgetPayload(userId, plan === 'free' ? 'free' : 'plus')
+    budget = calcBudget(
+      budgetPayload.settings.weeklyLimit,
+      budgetPayload.currentWeek.spent,
+    )
+  } catch {
+    // Honest fallback: no budget data connected yet.
+  }
 
   const household = { memberCount: 1, maxMembers: 6 }
   const scansLimit = plan === 'free' ? 5 : 999
-  const scansUsed = 0
+  const scansUsed = await loadScanCount(userId)
   const limits = {
     scansUsed,
     scansLimit,
@@ -146,4 +154,92 @@ export async function getDashboardPayload(
   base.nudge = pickNudge(nudges)
 
   return base
+}
+
+function nextDate(offset: number) {
+  const d = new Date()
+  d.setDate(d.getDate() + offset)
+  return d.toISOString().split('T')[0]
+}
+
+async function loadDashboardLeftovers(userId: string): Promise<Leftover[]> {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('leftovers')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('status', 'active')
+    .order('expires_at', { ascending: true })
+    .limit(10)
+
+  if (error) {
+    try {
+      const { data: household } = await supabase
+        .from('households')
+        .select('id')
+        .eq('owner_id', userId)
+        .maybeSingle()
+
+      if (!household?.id) return []
+
+      const { data: householdRows, error: householdError } = await supabase
+        .from('leftovers')
+        .select('*')
+        .eq('household_id', household.id)
+        .eq('status', 'active')
+        .order('expires_at', { ascending: true })
+        .limit(10)
+
+      if (householdError) return []
+      return (householdRows ?? []).map(toDashboardLeftover)
+    } catch {
+      return []
+    }
+  }
+
+  return (data ?? []).map(toDashboardLeftover)
+}
+
+function toDashboardLeftover(row: Record<string, unknown>): Leftover {
+  const expiresAt =
+    (row.expires_at as string | null) ??
+    new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString()
+  const name =
+    (row.name as string | null) ??
+    (row.display_name as string | null) ??
+    (row.source_recipe_name as string | null) ??
+    'Cooked meal'
+
+  return {
+    id: String(row.id),
+    name,
+    image: (row.image as string | null) ?? '/landing/family-dinner.jpg',
+    servingsRemaining:
+      Number(row.servings_remaining ?? row.estimated_servings_remaining ?? 1) || 1,
+    sourceRecipeId: String(row.source_recipe_id ?? row.source_meal_id ?? ''),
+    createdAt:
+      (row.created_at as string | null) ??
+      (row.cooked_at as string | null) ??
+      new Date().toISOString(),
+    expiresAt,
+    daysUntilExpiry: getDaysUntilExpiry(expiresAt),
+    urgency: getUrgency(expiresAt),
+  }
+}
+
+async function loadScanCount(userId: string): Promise<number> {
+  const supabase = await createClient()
+  const start = new Date()
+  start.setDate(1)
+  start.setHours(0, 0, 0, 0)
+
+  const { count, error } = await supabase
+    .from('scans')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .gte('created_at', start.toISOString())
+
+  if (error) return 0
+  return count ?? 0
 }

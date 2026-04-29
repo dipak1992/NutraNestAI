@@ -51,7 +51,7 @@ export default async function AdminPage() {
         <div className="glass-card rounded-xl border border-border/60 p-5 text-center">
           <p className="text-3xl font-bold text-amber-600">{proUsers}</p>
           <p className="text-sm text-muted-foreground mt-1 flex items-center justify-center gap-1">
-            <Crown className="h-3.5 w-3.5" /> Pro Users
+            <Crown className="h-3.5 w-3.5" /> Plus Users
           </p>
         </div>
         <div className="glass-card rounded-xl border border-border/60 p-5 text-center">

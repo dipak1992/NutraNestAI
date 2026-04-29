@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { Camera, Refrigerator } from 'lucide-react'
+import { Camera, ReceiptText, Refrigerator } from 'lucide-react'
 import { useDashboardStore } from '@/stores/dashboardStore'
 import { useBudgetStore } from '@/stores/budgetStore'
 import { useScanStore } from '@/stores/scanStore'
@@ -142,6 +142,32 @@ export function NewDashboardClient({ initial }: { initial: DashboardPayload }) {
         </div>
 
         <WeekPlanStrip />
+
+        {displayTonight.recipe && (
+          <section className="rounded-2xl bg-white p-4 ring-1 ring-emerald-100 dark:bg-neutral-900 dark:ring-neutral-800">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+                  <ReceiptText className="h-5 w-5" />
+                </span>
+                <div>
+                  <p className="text-sm font-bold text-neutral-950 dark:text-neutral-50">
+                    Tonight is about ${displayTonight.recipe.costPerServing.toFixed(2)} per serving
+                  </p>
+                  <p className="mt-0.5 text-xs text-neutral-500 dark:text-neutral-400">
+                    Budget Intelligence can surface cheaper swaps before your grocery list grows.
+                  </p>
+                </div>
+              </div>
+              <Link
+                href={displayUser.plan === 'free' ? '/upgrade?feature=budget' : '/budget?tab=swaps'}
+                className="inline-flex min-h-10 items-center justify-center rounded-full bg-emerald-600 px-4 text-sm font-semibold text-white transition hover:bg-emerald-700"
+              >
+                {displayUser.plan === 'free' ? 'Unlock savings' : 'See swaps'}
+              </Link>
+            </div>
+          </section>
+        )}
 
         <BudgetBar />
 

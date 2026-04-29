@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { AlertTriangle, UtensilsCrossed, Filter } from 'lucide-react'
+import { AlertTriangle, UtensilsCrossed } from 'lucide-react'
 import { useLeftoversStore } from '@/stores/leftoversStore'
 import { LeftoverCard } from '@/components/leftovers/LeftoverCard'
 import { LeftoverModal } from '@/components/leftovers/LeftoverModal'
@@ -45,12 +45,12 @@ export function LeftoversClient({ initialLeftovers, initialInsights, isPlusMembe
   )
 
   return (
-    <div className="min-h-screen bg-zinc-950 px-4 pb-24 pt-6 text-white">
-      <div className="mx-auto max-w-md space-y-5">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(217,119,87,0.14),transparent_34%),linear-gradient(180deg,#fff7ed_0%,#fefce8_28%,#f8fafc_100%)] px-4 pb-28 pt-6 text-slate-950">
+      <div className="mx-auto max-w-2xl space-y-5">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-bold text-white">Leftovers</h1>
-          <p className="mt-0.5 text-sm text-zinc-400">Track, use, and reduce food waste</p>
+          <h1 className="font-serif text-2xl font-bold text-slate-950">Leftovers</h1>
+          <p className="mt-0.5 text-sm text-slate-500">Track, use, and reduce food waste</p>
         </div>
 
         {/* Insights */}
@@ -63,16 +63,16 @@ export function LeftoversClient({ initialLeftovers, initialInsights, isPlusMembe
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
-              className="flex items-start gap-3 rounded-2xl bg-red-500/10 border border-red-500/30 p-3"
+              className="flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-3"
             >
-              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-red-400" />
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
               <div>
-                <p className="text-sm font-semibold text-red-300">
+                <p className="text-sm font-semibold text-red-800">
                   {urgentItems.length === 1
                     ? '1 item needs attention'
                     : `${urgentItems.length} items need attention`}
                 </p>
-                <p className="text-xs text-zinc-400 mt-0.5">
+                <p className="text-xs text-red-700/80 mt-0.5">
                   {urgentItems.map((l) => l.name).join(', ')} —{' '}
                   {urgentItems.some((l) => l.urgency === 'expired') ? 'expired or expiring today' : 'use today'}
                 </p>
@@ -89,8 +89,8 @@ export function LeftoversClient({ initialLeftovers, initialInsights, isPlusMembe
               onClick={() => setFilter(f)}
               className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors ${
                 filter === f
-                  ? 'bg-[#D97757] text-white'
-                  : 'bg-white/10 text-zinc-400 hover:bg-white/15 hover:text-white'
+                  ? 'bg-[#D97757] text-white shadow-sm'
+                  : 'bg-white text-slate-500 ring-1 ring-orange-100 hover:bg-orange-50 hover:text-slate-950'
               }`}
             >
               {FILTER_LABELS[f]}
@@ -108,8 +108,8 @@ export function LeftoversClient({ initialLeftovers, initialInsights, isPlusMembe
               exit={{ opacity: 0 }}
               className="flex flex-col items-center gap-3 py-16 text-center"
             >
-              <UtensilsCrossed className="h-10 w-10 text-zinc-700" />
-              <p className="text-sm font-medium text-zinc-500">
+              <UtensilsCrossed className="h-10 w-10 text-orange-200" />
+              <p className="text-sm font-medium text-slate-500">
                 {filter === 'all'
                   ? 'No leftovers yet'
                   : filter === 'expiring'
@@ -119,7 +119,7 @@ export function LeftoversClient({ initialLeftovers, initialInsights, isPlusMembe
                   : 'No active leftovers'}
               </p>
               {filter === 'all' && (
-                <p className="text-xs text-zinc-600 max-w-[200px]">
+              <p className="text-xs text-slate-400 max-w-[220px]">
                   Cook a meal and track your leftovers to reduce waste
                 </p>
               )}

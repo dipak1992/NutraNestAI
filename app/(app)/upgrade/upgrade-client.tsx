@@ -286,10 +286,10 @@ export function UpgradeClient({ isAuthenticated }: Props) {
       {/* Footer link */}
       <section className="px-4 pb-8 text-center">
         <Link
-          href="/pricing"
+          href="/upgrade"
           className="text-sm text-neutral-500 hover:text-[#D97757] transition-colors underline underline-offset-4"
         >
-          Compare all plans →
+          Back to upgrade →
         </Link>
       </section>
     </div>

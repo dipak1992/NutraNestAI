@@ -130,6 +130,21 @@ async function getPlusContext(supabase: SupabaseClient, userId: string): Promise
     ]).filter(Boolean)
   }
 
+  if (context.leftovers.length === 0) {
+    const { data: leftovers } = await supabase
+      .from('leftovers')
+      .select('name, source_recipe_name, main_ingredients')
+      .eq('user_id', userId)
+      .eq('status', 'active')
+      .limit(10)
+
+    context.leftovers = (leftovers ?? []).flatMap((item) => [
+      item.name,
+      item.source_recipe_name,
+      ...(Array.isArray(item.main_ingredients) ? item.main_ingredients : []),
+    ]).filter(Boolean)
+  }
+
   const { data: saved } = await supabase
     .from('saved_meals')
     .select('title')

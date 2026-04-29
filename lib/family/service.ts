@@ -3,7 +3,7 @@ import type { SubscriptionTier } from '@/types'
 import type { FamilyEngineOverrides, FamilyHouseholdSummary, FamilyMemberRecord } from '@/lib/family/types'
 
 // ── Tier-based member limits ──────────────────────────────────────────────
-// Free: 1 profile (yourself), Pro: up to 6 profiles
+// Free: 1 profile (yourself), Plus: up to 6 profiles
 const TIER_MEMBER_LIMITS: Record<SubscriptionTier, number> = {
   free: 1,
   pro: 6,
@@ -16,7 +16,7 @@ export function getMaxMembersForTier(tier: SubscriptionTier): number {
 export function getTierUpgradeMessage(tier: SubscriptionTier): string | null {
   switch (tier) {
     case 'free':
-      return 'Upgrade to Pro for up to 6 profiles.'
+      return 'Upgrade to Plus for up to 6 profiles.'
     case 'pro':
       return null
     default:

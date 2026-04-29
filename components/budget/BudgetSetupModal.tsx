@@ -122,7 +122,7 @@ export function BudgetSetupModal() {
                 </ul>
 
                 <Link
-                  href="/pricing?intent=plus"
+                  href="/upgrade?feature=budget"
                   onClick={handleClose}
                   className="flex items-center justify-center gap-2 w-full bg-[#D97757] hover:bg-[#C86646] text-white font-medium rounded-full px-5 py-3 min-h-[48px] transition-colors"
                 >

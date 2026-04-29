@@ -442,7 +442,7 @@ export default function HouseholdPillarPage() {
             className="mt-6"
           >
             <Link
-              href="/pricing?intent=pro&trigger=household-pillar"
+              href="/upgrade?feature=household"
               className="block rounded-2xl border border-amber-200/60 bg-gradient-to-r from-amber-50 to-orange-50/80 p-4 hover:shadow-md transition-all"
             >
               <div className="flex items-start gap-3">
@@ -454,7 +454,7 @@ export default function HouseholdPillarPage() {
                     Unlock Household Memory & more
                   </p>
                   <p className="text-xs text-amber-700 mt-0.5">
-                    Pro remembers your preferences. Family Plus adds profiles for everyone.
+                    Plus remembers your preferences and adds profiles for everyone.
                   </p>
                   <p className="text-xs font-medium text-amber-700 mt-1.5 flex items-center gap-1">
                     See plans <ChevronRight className="h-3 w-3" />

@@ -28,12 +28,12 @@ export function LeftoverInsights({ insights }: Props) {
   }
 
   return (
-    <div className="rounded-2xl bg-white/5 ring-1 ring-white/10 p-4 space-y-4">
+    <div className="rounded-2xl bg-white ring-1 ring-orange-100 p-4 space-y-4 shadow-sm">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-white">Your Impact</h3>
+        <h3 className="text-sm font-semibold text-slate-950">Your impact</h3>
         <button
           onClick={handleShare}
-          className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-zinc-400 hover:bg-white/10 hover:text-white transition-colors"
+          className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-slate-500 hover:bg-orange-50 hover:text-slate-950 transition-colors"
         >
           <Share2 className="h-3 w-3" />
           Share
@@ -42,35 +42,35 @@ export function LeftoverInsights({ insights }: Props) {
 
       {/* Stats row */}
       <div className="grid grid-cols-2 gap-2">
-        <div className="rounded-xl bg-emerald-500/10 p-3 space-y-0.5">
+        <div className="rounded-xl bg-emerald-50 p-3 space-y-0.5">
           <div className="flex items-center gap-1.5 text-emerald-400">
             <DollarSign className="h-4 w-4" />
             <span className="text-xs font-medium">Saved</span>
           </div>
-          <p className="text-xl font-bold text-white">${totalSaved.toFixed(2)}</p>
-          <p className="text-[10px] text-zinc-500">from leftovers used</p>
+          <p className="text-xl font-bold text-slate-950">${totalSaved.toFixed(2)}</p>
+          <p className="text-[10px] text-slate-500">from leftovers used</p>
         </div>
 
-        <div className="rounded-xl bg-red-500/10 p-3 space-y-0.5">
+        <div className="rounded-xl bg-red-50 p-3 space-y-0.5">
           <div className="flex items-center gap-1.5 text-red-400">
             <TrendingDown className="h-4 w-4" />
             <span className="text-xs font-medium">Wasted</span>
           </div>
-          <p className="text-xl font-bold text-white">${totalWasted.toFixed(2)}</p>
-          <p className="text-[10px] text-zinc-500">discarded / expired</p>
+          <p className="text-xl font-bold text-slate-950">${totalWasted.toFixed(2)}</p>
+          <p className="text-[10px] text-slate-500">discarded / expired</p>
         </div>
       </div>
 
       {/* Waste reduction bar */}
       <div className="space-y-1.5">
         <div className="flex items-center justify-between text-xs">
-          <span className="flex items-center gap-1 text-zinc-400">
+          <span className="flex items-center gap-1 text-slate-500">
             <Leaf className="h-3 w-3 text-emerald-400" />
             Waste reduction
           </span>
-          <span className="font-semibold text-white">{wasteReductionPercent}%</span>
+          <span className="font-semibold text-slate-950">{wasteReductionPercent}%</span>
         </div>
-        <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
+        <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${Math.min(wasteReductionPercent, 100)}%` }}
@@ -81,9 +81,9 @@ export function LeftoverInsights({ insights }: Props) {
       </div>
 
       {/* Quick stats */}
-      <div className="flex items-center gap-4 text-xs text-zinc-400 border-t border-white/10 pt-3">
+      <div className="flex items-center gap-4 text-xs text-slate-500 border-t border-orange-100 pt-3">
         <span>
-          <span className="font-semibold text-white">{activeCount}</span> active
+          <span className="font-semibold text-slate-950">{activeCount}</span> active
         </span>
         {expiringSoonCount > 0 && (
           <span className="text-amber-400">
@@ -91,7 +91,7 @@ export function LeftoverInsights({ insights }: Props) {
           </span>
         )}
         <span>
-          <span className="font-semibold text-white">{usedThisWeek}</span> used this week
+          <span className="font-semibold text-slate-950">{usedThisWeek}</span> used this week
         </span>
       </div>
     </div>

@@ -134,7 +134,7 @@ export function ScanError({ kind, message, onRetake, onClose }: ScanErrorProps) 
         break
       case 'upgrade':
         if (typeof window !== 'undefined') {
-          window.location.href = '/pricing'
+          window.location.href = '/upgrade?feature=scan'
         }
         onClose()
         break

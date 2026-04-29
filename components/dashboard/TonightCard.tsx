@@ -147,16 +147,8 @@ export function TonightCard({ state }: Props) {
   const mealEmoji = getMealEmoji(recipe.name)
 
   function handleCookThis() {
-    if (!status.isPro && !status.isFamily) {
-      setPaywallCopy({
-        title: 'Unlock full recipes with Plus',
-        description: 'Start Cooking is a Plus feature. Upgrade for guided recipes, unlimited swaps, smarter Tonight suggestions, and premium planning tools.',
-      })
-      setPaywallOpen(true)
-      return
-    }
     persistMealForRecipe(toSmartMeal(recipe, reason, state.isFromPantry), '/dashboard', 'tonight')
-    sessionStorage.setItem('recipe-open-cook', 'true')
+    sessionStorage.removeItem('recipe-open-cook')
     router.push('/tonight/recipe')
   }
 
@@ -164,7 +156,7 @@ export function TonightCard({ state }: Props) {
     if (!swaps.recordSwap()) {
       setPaywallCopy({
         title: 'You’ve used your free meal changes today',
-        description: 'Free includes 3 meal swaps per day. Upgrade to Plus for unlimited meal swaps, personalized picks, and full Cook This recipes.',
+        description: 'Free includes 3 meal swaps per day. Upgrade to Plus for unlimited meal swaps, personalized picks, and guided cooking.',
       })
       setPaywallOpen(true)
       return

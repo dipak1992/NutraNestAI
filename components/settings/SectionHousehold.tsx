@@ -161,7 +161,7 @@ export function SectionHousehold({ members: initialMembers, currentPlan }: Props
         <div className="rounded-2xl border border-orange-100 bg-white/82 px-4 py-3 text-sm text-slate-500">
           Member limit reached for your{' '}
           <span className="capitalize text-slate-600">{currentPlan}</span> plan.{' '}
-          <a href="/pricing" className="text-[#D97757] hover:underline">
+          <a href="/upgrade?feature=household" className="text-[#D97757] hover:underline">
             Upgrade to add more
           </a>
         </div>

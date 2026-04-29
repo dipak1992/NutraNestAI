@@ -287,7 +287,7 @@ export default function FamilySettingsPage() {
           </Badge>
         </div>
 
-        {/* Household name — only for Pro+ */}
+        {/* Household name — only for Plus */}
         {isPro && (
           <div className="mt-4 flex gap-2">
             <Input value={householdName} onChange={(e) => setHouseholdName(e.target.value)} placeholder="Household name" />
@@ -312,7 +312,7 @@ export default function FamilySettingsPage() {
             <p className="text-sm font-semibold text-amber-900">Want more profiles?</p>
             <p className="text-sm text-amber-800/80 mt-0.5">{upgradeMessage}</p>
             <Button asChild size="sm" className="mt-3 bg-gradient-to-r from-amber-500 to-orange-600 border-0 text-white hover:opacity-90">
-              <Link href={tier === 'free' ? '/pricing?intent=pro' : '/pricing?intent=family'}>
+              <Link href={tier === 'free' ? '/upgrade?feature=family' : '/upgrade?feature=family'}>
                 Upgrade now <ArrowRight className="h-3.5 w-3.5 ml-1" />
               </Link>
             </Button>
@@ -447,7 +447,7 @@ export default function FamilySettingsPage() {
                 Picky eater settings, cuisine preferences, portion sizes, lunchbox planning, and more.
               </p>
               <Button asChild size="sm" variant="outline" className="mt-2 border-amber-300 text-amber-700 hover:bg-amber-50">
-                <Link href="/pricing?intent=family">See Family Plus →</Link>
+                <Link href="/upgrade?feature=family">See Family Plus →</Link>
               </Button>
             </div>
           )}

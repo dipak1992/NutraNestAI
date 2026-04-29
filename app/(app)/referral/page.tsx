@@ -117,7 +117,7 @@ export default function ReferralPage() {
           },
           {
             icon: Crown,
-            label: 'Temp Pro',
+            label: 'Temp Plus',
             value: loading ? '—' : stats?.isTempPro ? 'Active' : 'Inactive',
             color: stats?.isTempPro ? 'text-emerald-600' : 'text-muted-foreground',
           },
@@ -130,12 +130,12 @@ export default function ReferralPage() {
         ))}
       </div>
 
-      {/* Temp Pro status */}
+      {/* Temp Plus status */}
       {stats?.isTempPro && tempProDate && (
         <div className="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
           <Crown className="h-5 w-5 flex-shrink-0" />
           <span>
-            <span className="font-semibold">Temp Pro active</span> — expires{' '}
+            <span className="font-semibold">Temp Plus active</span> — expires{' '}
             <span className="font-semibold">{tempProDate}</span>
           </span>
         </div>
@@ -172,14 +172,14 @@ export default function ReferralPage() {
             </div>
           </div>
 
-          {/* Temp Pro */}
+          {/* Temp Plus */}
           <div className="flex gap-3">
             <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-purple-100 text-purple-700">
               <Crown className="h-4 w-4" />
             </span>
             <div>
               <p className="text-sm font-medium">
-                Every {REFERRAL_TEMP_PRO_THRESHOLD} referrals → {REFERRAL_TEMP_PRO_DAYS}-day Temp Pro
+                Every {REFERRAL_TEMP_PRO_THRESHOLD} referrals → {REFERRAL_TEMP_PRO_DAYS}-day Temp Plus
               </p>
               <p className="text-xs text-muted-foreground">
                 Unlocks the full 7-day planner, grocery list, pantry, and insights.
@@ -197,7 +197,7 @@ export default function ReferralPage() {
                   {stats.nextTempProIn > 0 && (
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                       <ChevronRight className="h-3 w-3" />
-                      {stats.nextTempProIn} more referral{stats.nextTempProIn !== 1 ? 's' : ''} until next Temp Pro
+                      {stats.nextTempProIn} more referral{stats.nextTempProIn !== 1 ? 's' : ''} until next Temp Plus
                     </p>
                   )}
                 </div>

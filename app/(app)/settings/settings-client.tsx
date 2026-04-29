@@ -16,6 +16,7 @@ type HouseholdMember = {
 }
 
 type NotifPrefs = {
+  dinner_reminders: boolean
   weekly_plan_ready: boolean
   grocery_reminders: boolean
   leftover_alerts: boolean

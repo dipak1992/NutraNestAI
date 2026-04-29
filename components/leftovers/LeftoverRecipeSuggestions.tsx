@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -127,11 +127,11 @@ export function LeftoverRecipeSuggestions({ leftoverId, leftoverName }: Props) {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-white">AI Recipe Ideas</h3>
+        <h3 className="text-sm font-semibold text-slate-950">AI Recipe Ideas</h3>
         {state === 'ready' && (
           <button
             onClick={fetchSuggestions}
-            className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-zinc-400 hover:bg-white/10 hover:text-white"
+            className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-slate-500 hover:bg-orange-50 hover:text-slate-950"
           >
             <RefreshCw className="h-3 w-3" />
             Refresh
@@ -147,7 +147,7 @@ export function LeftoverRecipeSuggestions({ leftoverId, leftoverName }: Props) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={fetchSuggestions}
-            className="w-full rounded-xl border border-dashed border-white/20 py-4 text-sm text-zinc-400 hover:border-[#D97757]/50 hover:text-[#D97757] transition-colors"
+            className="w-full rounded-xl border border-dashed border-orange-200 py-4 text-sm text-slate-500 hover:border-[#D97757]/50 hover:text-[#D97757] transition-colors"
           >
             <ChefHat className="mx-auto mb-1.5 h-5 w-5" />
             Get AI recipe ideas for {leftoverName}
@@ -160,7 +160,7 @@ export function LeftoverRecipeSuggestions({ leftoverId, leftoverName }: Props) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="flex flex-col items-center gap-2 py-6 text-zinc-400"
+            className="flex flex-col items-center gap-2 py-6 text-slate-500"
           >
             <motion.div
               animate={{ rotate: 360 }}
@@ -181,12 +181,12 @@ export function LeftoverRecipeSuggestions({ leftoverId, leftoverName }: Props) {
             className="rounded-xl bg-[#B8935A]/10 border border-[#B8935A]/30 p-4 text-center space-y-2"
           >
             <Lock className="mx-auto h-5 w-5 text-[#B8935A]" />
-            <p className="text-sm font-semibold text-white">Weekly limit reached</p>
-            <p className="text-xs text-zinc-400">
+            <p className="text-sm font-semibold text-slate-950">Weekly limit reached</p>
+            <p className="text-xs text-slate-500">
               Free members get 2 AI recipe suggestions per week.
             </p>
             <a
-              href="/settings/billing"
+              href="/upgrade?feature=leftovers"
               className="inline-block mt-1 rounded-lg bg-[#B8935A] px-4 py-2 text-xs font-semibold text-white hover:bg-[#a07848]"
             >
               Upgrade to Plus
@@ -203,7 +203,7 @@ export function LeftoverRecipeSuggestions({ leftoverId, leftoverName }: Props) {
             className="flex flex-col items-center gap-2 py-4 text-center"
           >
             <AlertCircle className="h-5 w-5 text-red-400" />
-            <p className="text-xs text-zinc-400">{error}</p>
+            <p className="text-xs text-slate-500">{error}</p>
             <button
               onClick={fetchSuggestions}
               className="text-xs text-[#D97757] hover:underline"
@@ -230,22 +230,22 @@ export function LeftoverRecipeSuggestions({ leftoverId, leftoverName }: Props) {
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.06 }}
-                    className="rounded-xl bg-white/5 p-3 space-y-2"
+                    className="rounded-xl bg-orange-50/70 p-3 space-y-2"
                   >
                     <div className="flex items-start justify-between gap-2">
-                      <p className="text-sm font-semibold text-white leading-tight">{s.name}</p>
+                      <p className="text-sm font-semibold text-slate-950 leading-tight">{s.name}</p>
                       <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${
                         s.difficulty === 'easy'
-                          ? 'bg-emerald-500/20 text-emerald-300'
+                          ? 'bg-emerald-100 text-emerald-700'
                           : s.difficulty === 'medium'
-                          ? 'bg-amber-500/20 text-amber-300'
-                          : 'bg-red-500/20 text-red-300'
+                          ? 'bg-amber-100 text-amber-700'
+                          : 'bg-red-100 text-red-700'
                       }`}>
                         {s.difficulty}
                       </span>
                     </div>
-                    <p className="text-xs text-zinc-400 leading-relaxed">{s.description}</p>
-                    <div className="flex items-center gap-3 text-[10px] text-zinc-500">
+                    <p className="text-xs text-slate-500 leading-relaxed">{s.description}</p>
+                    <div className="flex items-center gap-3 text-[10px] text-slate-500">
                       <span className="flex items-center gap-1">
                         <Clock className="h-3 w-3" />
                         {s.cookTimeMin} min
@@ -256,8 +256,8 @@ export function LeftoverRecipeSuggestions({ leftoverId, leftoverName }: Props) {
                       <button onClick={() => cookMeal(meal)} className="rounded-lg bg-emerald-600 px-2 py-2 text-[11px] font-semibold text-white">
                         <ChefHat className="mx-auto h-3.5 w-3.5" />Cook
                       </button>
-                      <SaveMealButton meal={meal} source="leftovers" className="h-auto min-h-0 w-full rounded-lg bg-white/10 px-2 py-2 text-zinc-200 hover:bg-white/15" />
-                      <button onClick={() => addGroceries(meal)} className="rounded-lg bg-white/10 px-2 py-2 text-[11px] font-semibold text-zinc-200">
+                      <SaveMealButton meal={meal} source="leftovers" className="h-auto min-h-0 w-full rounded-lg bg-white px-2 py-2 text-slate-700 hover:bg-white" />
+                      <button onClick={() => addGroceries(meal)} className="rounded-lg bg-white px-2 py-2 text-[11px] font-semibold text-slate-700">
                         <ShoppingCart className="mx-auto h-3.5 w-3.5" />List
                       </button>
                     </div>

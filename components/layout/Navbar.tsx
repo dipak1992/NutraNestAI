@@ -146,7 +146,7 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
                 )}
                 <button
                   role="menuitem"
-                  onClick={() => { closeMenu(); router.push('/referrals') }}
+                  onClick={() => { closeMenu(); router.push('/referral') }}
                   className="flex w-full items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors"
                 >
                   <Gift className="h-4 w-4" />

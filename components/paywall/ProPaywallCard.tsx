@@ -104,7 +104,7 @@ export function ProPaywallCard({
               {!isStartingTrial && <ArrowRight className="h-4 w-4" />}
             </Button>
             <Button asChild variant="ghost" size="lg" className="text-muted-foreground">
-              <Link href="/pricing">Compare plans</Link>
+              <Link href="/upgrade">Upgrade</Link>
             </Button>
             <p className="text-center text-[11px] text-muted-foreground/70 sm:text-left sm:ml-1">
               No credit card · Cancel anytime
@@ -118,7 +118,7 @@ export function ProPaywallCard({
               </Link>
             </Button>
             <Button asChild variant="ghost" size="lg" className="text-muted-foreground">
-              <Link href="/pricing">See all plans</Link>
+              <Link href="/upgrade">Upgrade</Link>
             </Button>
             <p className="text-center text-xs text-muted-foreground/70 sm:text-left">
               Already have an account?{' '}

@@ -34,6 +34,7 @@ export default async function SettingsPage() {
   const stripeCustomerId = profile?.stripe_customer_id ?? null
 
   const notifPrefs = {
+    dinner_reminders: true,
     weekly_plan_ready: true,
     grocery_reminders: true,
     leftover_alerts: true,

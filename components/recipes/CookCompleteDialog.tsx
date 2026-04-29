@@ -31,6 +31,10 @@ export function CookCompleteDialog({ recipe, recipeId, onClose }: Props) {
           servingsCooked,
           leftoverServings,
           rating: rating > 0 ? rating : undefined,
+          recipeName: recipe.name,
+          recipeImage: recipe.image,
+          costPerServing: recipe.costPerServing,
+          mainIngredients: recipe.ingredients.slice(0, 5).map((item) => item.name),
         }),
       })
       if (!res.ok) throw new Error('Failed to save')

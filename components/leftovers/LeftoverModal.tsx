@@ -1,16 +1,16 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Trash2, CheckCircle, Clock, UtensilsCrossed } from 'lucide-react'
+import { X, Trash2, CheckCircle } from 'lucide-react'
 import { useLeftoversStore } from '@/stores/leftoversStore'
 import { LeftoverRecipeSuggestions } from './LeftoverRecipeSuggestions'
 import type { Urgency } from '@/lib/leftovers/types'
 
 const URGENCY_COLOR: Record<Urgency, string> = {
-  fresh: 'text-emerald-400',
-  soon: 'text-amber-400',
-  today: 'text-red-400',
-  expired: 'text-zinc-500',
+  fresh: 'text-emerald-700',
+  soon: 'text-amber-700',
+  today: 'text-red-700',
+  expired: 'text-slate-500',
 }
 
 const URGENCY_LABEL: Record<Urgency, string> = {
@@ -56,17 +56,17 @@ export function LeftoverModal({ isPlusMember }: Props) {
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-            className="fixed inset-x-0 bottom-0 z-50 mx-auto max-w-md rounded-t-3xl bg-zinc-900 shadow-2xl"
+            className="fixed inset-x-0 bottom-0 z-50 mx-auto max-w-md rounded-t-3xl bg-white shadow-2xl"
             style={{ maxHeight: '90dvh', overflowY: 'auto' }}
           >
             {/* Handle */}
-            <div className="sticky top-0 z-10 bg-zinc-900 px-5 pt-4 pb-2">
-              <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-white/20" />
+            <div className="sticky top-0 z-10 bg-white px-5 pt-4 pb-2">
+              <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-orange-200" />
               <div className="flex items-center justify-between">
-                <h2 className="text-base font-bold text-white truncate pr-4">{leftover.name}</h2>
+                <h2 className="text-base font-bold text-slate-950 truncate pr-4">{leftover.name}</h2>
                 <button
                   onClick={closeModal}
-                  className="shrink-0 rounded-full p-1.5 text-zinc-400 hover:bg-white/10 hover:text-white"
+                  className="shrink-0 rounded-full p-1.5 text-slate-400 hover:bg-orange-50 hover:text-slate-700"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -95,19 +95,19 @@ export function LeftoverModal({ isPlusMember }: Props) {
 
               {/* Meta */}
               <div className="grid grid-cols-3 gap-2">
-                <div className="rounded-xl bg-white/5 p-3 text-center">
-                  <p className="text-xs text-zinc-500">Servings</p>
-                  <p className="text-lg font-bold text-white">{leftover.servingsRemaining}</p>
+                <div className="rounded-xl bg-orange-50 p-3 text-center">
+                  <p className="text-xs text-slate-500">Servings</p>
+                  <p className="text-lg font-bold text-slate-950">{leftover.servingsRemaining}</p>
                 </div>
-                <div className="rounded-xl bg-white/5 p-3 text-center">
-                  <p className="text-xs text-zinc-500">Status</p>
+                <div className="rounded-xl bg-orange-50 p-3 text-center">
+                  <p className="text-xs text-slate-500">Status</p>
                   <p className={`text-sm font-bold ${URGENCY_COLOR[urgency]}`}>
                     {URGENCY_LABEL[urgency]}
                   </p>
                 </div>
-                <div className="rounded-xl bg-white/5 p-3 text-center">
-                  <p className="text-xs text-zinc-500">Days left</p>
-                  <p className="text-lg font-bold text-white">
+                <div className="rounded-xl bg-orange-50 p-3 text-center">
+                  <p className="text-xs text-slate-500">Days left</p>
+                  <p className="text-lg font-bold text-slate-950">
                     {leftover.daysUntilExpiry != null && leftover.daysUntilExpiry < 0
                       ? '—'
                       : leftover.daysUntilExpiry ?? '—'}
@@ -118,26 +118,29 @@ export function LeftoverModal({ isPlusMember }: Props) {
               {/* Ingredients */}
               {leftover.mainIngredients.length > 0 && (
                 <div>
-                  <p className="mb-2 text-xs font-semibold text-zinc-400 uppercase tracking-wide">
+                  <p className="mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wide">
                     Main Ingredients
                   </p>
                   <div className="flex flex-wrap gap-1.5">
-                    {leftover.mainIngredients.map((ing) => (
+                    {leftover.mainIngredients.map((ing) => {
+                      const name = typeof ing === 'string' ? ing : ing.name
+                      return (
                       <span
-                        key={ing.name}
-                        className="rounded-full bg-white/10 px-2.5 py-1 text-xs text-zinc-300"
+                        key={name}
+                        className="rounded-full bg-orange-50 px-2.5 py-1 text-xs text-slate-600"
                       >
-                        {ing.name}
+                        {name}
                       </span>
-                    ))}
+                      )
+                    })}
                   </div>
                 </div>
               )}
 
               {/* Notes */}
               {leftover.notes && (
-                <div className="rounded-xl bg-white/5 p-3">
-                  <p className="text-xs text-zinc-400">{leftover.notes}</p>
+                <div className="rounded-xl bg-orange-50 p-3">
+                  <p className="text-xs text-slate-500">{leftover.notes}</p>
                 </div>
               )}
 
@@ -154,7 +157,7 @@ export function LeftoverModal({ isPlusMember }: Props) {
                 <div className="flex gap-3 pt-2">
                   <button
                     onClick={() => markDiscarded(leftover.id)}
-                    className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-white/10 py-3 text-sm font-medium text-zinc-400 hover:bg-white/5 hover:text-red-400"
+                    className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-orange-100 py-3 text-sm font-medium text-slate-500 hover:bg-red-50 hover:text-red-600"
                   >
                     <Trash2 className="h-4 w-4" />
                     Discard
@@ -170,8 +173,8 @@ export function LeftoverModal({ isPlusMember }: Props) {
               )}
 
               {leftover.status !== 'active' && (
-                <div className="rounded-xl bg-white/5 p-3 text-center">
-                  <p className="text-sm text-zinc-400">
+                <div className="rounded-xl bg-orange-50 p-3 text-center">
+                  <p className="text-sm text-slate-500">
                     {leftover.status === 'used' ? '✅ Marked as used' : '🗑 Discarded'}
                   </p>
                 </div>

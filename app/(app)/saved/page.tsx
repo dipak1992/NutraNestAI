@@ -301,19 +301,19 @@ export default function SavedMealsPage() {
                     variant="default"
                     size="sm"
                     className="h-9 flex-1 gap-1.5"
-                    onClick={() => void handleCookAgain(meal)}
+                    onClick={() => void handleAddToWeek(meal)}
                   >
-                    <ChefHat className="h-3.5 w-3.5" />
-                    Cook again
+                    <PlusCircle className="h-3.5 w-3.5" />
+                    Add to week
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
                     className="h-9 flex-1 gap-1.5"
-                    onClick={() => void handleAddToWeek(meal)}
+                    onClick={() => void handleCookAgain(meal)}
                   >
-                    <PlusCircle className="h-3.5 w-3.5" />
-                    Week
+                    <ChefHat className="h-3.5 w-3.5" />
+                    Cook
                   </Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger
@@ -363,6 +363,15 @@ export default function SavedMealsPage() {
                     Edit
                   </Button>
                   <Button
+                    variant="default"
+                    size="sm"
+                    className="h-8 text-xs gap-1.5"
+                    onClick={() => void handleAddToWeek(meal)}
+                  >
+                    <PlusCircle className="h-3.5 w-3.5" />
+                    Add to this week
+                  </Button>
+                  <Button
                     variant="ghost"
                     size="sm"
                     className="h-8 text-xs gap-1.5"
@@ -370,15 +379,6 @@ export default function SavedMealsPage() {
                   >
                     <ChefHat className="h-3.5 w-3.5" />
                     Cook again
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 text-xs gap-1.5"
-                    onClick={() => void handleAddToWeek(meal)}
-                  >
-                    <PlusCircle className="h-3.5 w-3.5" />
-                    Add to week
                   </Button>
                   <Button
                     variant="ghost"

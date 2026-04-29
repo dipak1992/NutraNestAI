@@ -104,8 +104,8 @@ export default function TonightRecipePage() {
           setPaywallOpen(open)
           if (!open) setShowCookMode(false)
         }}
-        title="Unlock full recipes with Plus"
-        description="Start Cooking is a Plus feature. Upgrade for guided recipes, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning."
+        title="Unlock guided cooking with Plus"
+        description="The basic recipe is yours. Plus adds step-by-step Cook Mode, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning."
         isAuthenticated={status.isAuthenticated}
         redirectPath="/tonight/recipe"
       />
@@ -287,8 +287,8 @@ export default function TonightRecipePage() {
       <PaywallDialog
         open={paywallOpen}
         onOpenChange={setPaywallOpen}
-        title="Unlock full recipes with Plus"
-        description="Start Cooking is a Plus feature. Upgrade for guided recipes, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning."
+        title="Unlock guided cooking with Plus"
+        description="The basic recipe is yours. Plus adds step-by-step Cook Mode, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning."
         isAuthenticated={status.isAuthenticated}
         redirectPath="/tonight/recipe"
       />

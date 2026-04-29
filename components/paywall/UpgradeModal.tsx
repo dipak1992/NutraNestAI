@@ -248,11 +248,11 @@ export function UpgradeModal({
             {/* Compare link */}
             <div className="mt-4 text-center">
               <Link
-                href="/pricing"
+                href="/upgrade"
                 onClick={() => onOpenChange(false)}
                 className="text-xs text-neutral-500 hover:text-[#D97757] transition-colors underline underline-offset-2"
               >
-                Compare plans
+                Open upgrade page
               </Link>
             </div>
           </div>

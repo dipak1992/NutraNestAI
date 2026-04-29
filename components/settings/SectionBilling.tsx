@@ -80,7 +80,7 @@ export function SectionBilling({
       <div className="flex flex-wrap gap-3">
         {currentPlan === 'free' ? (
           <a
-            href="/pricing"
+            href="/upgrade"
             className="flex items-center gap-2 rounded-2xl bg-[#D97757] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#c4694a]"
           >
             Upgrade plan

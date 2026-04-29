@@ -17,12 +17,15 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ProPaywallCard } from '@/components/paywall/ProPaywallCard'
 import { PaywallDialog } from '@/components/paywall/PaywallDialog'
+import { getUpgradeFeatureCopy, type UpgradeFeature } from '@/lib/paywall/feature-copy'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import {
   Sparkles,
   ShoppingCart,
   DollarSign,
+  Brain,
+  Heart,
   Loader2,
   CalendarDays,
   RefreshCcw,
@@ -55,6 +58,7 @@ export function WeeklyPlannerV2() {
   const router = useRouter()
   const { status, loading: paywallLoading } = usePaywallStatus()
   const [paywallOpen, setPaywallOpen] = useState(false)
+  const [paywallFeature, setPaywallFeature] = useState<UpgradeFeature>('weekly_autopilot')
   const [showPlannerLock, setShowPlannerLock] = useState(false)
 
   const {
@@ -92,7 +96,12 @@ export function WeeklyPlannerV2() {
   // ── Personalized paywall copy ─────────────────────────────
   const memberCount = members?.length || (householdType === 'solo' ? 1 : householdType === 'couple' ? 2 : 3)
   const savedMeals = (feedbackHistory ?? []).filter((f: { action?: string }) => f.action === 'save').length
+  const likedMeals = (feedbackHistory ?? []).filter((f: { action?: string }) => f.action === 'like').length
+  const avoidedMeals = (feedbackHistory ?? []).filter((f: { action?: string }) => f.action === 'reject').length
   const explored = (feedbackHistory ?? []).length
+  const rememberedCuisine = (feedbackHistory ?? [])
+    .map((f: { cuisineType?: string }) => f.cuisineType)
+    .filter((v): v is string => Boolean(v))[0]
 
   const personalizedInlineTitle = memberCount > 1
     ? `Your free preview covers 3 dinners — but your family of ${memberCount} deserves the full week`
@@ -109,6 +118,9 @@ export function WeeklyPlannerV2() {
   const personalizedDialogDesc = explored > 0
     ? `You've explored ${explored} meal${explored !== 1 ? 's' : ''}${savedMeals > 0 ? ` and saved ${savedMeals}` : ''}. Unlock 7 days of personalized meals, a smart grocery list, and Pantry Magic — for less than one takeout order.`
     : 'Unlock 7 days of personalized meals, a smart grocery list, and Pantry Magic — for less than one takeout order.'
+  const activePaywallCopy = getUpgradeFeatureCopy(paywallFeature)
+  const paywallTitle = paywallFeature === 'weekly_autopilot' ? personalizedDialogTitle : activePaywallCopy.title
+  const paywallDescription = paywallFeature === 'weekly_autopilot' ? personalizedDialogDesc : activePaywallCopy.description
 
   useEffect(() => {
     if (!status.isPro && selectedDayIndex >= (status.effectivePlanPreviewDays ?? 3)) {
@@ -177,6 +189,7 @@ export function WeeklyPlannerV2() {
 
       if (data.isPreview) {
         setShowPlannerLock(true)
+        setPaywallFeature('weekly_autopilot')
         setPaywallOpen(true)
         toast.success('3-day preview ready!', {
           description: 'Upgrade to Plus to unlock the full week and grocery list.',
@@ -210,6 +223,7 @@ export function WeeklyPlannerV2() {
   const handleRegenerateDay = useCallback(
     async (dayIndex: number) => {
       if (!status.isPro && dayIndex >= (status.effectivePlanPreviewDays ?? 3)) {
+        setPaywallFeature('weekly_autopilot')
         setPaywallOpen(true)
         return
       }
@@ -274,6 +288,7 @@ export function WeeklyPlannerV2() {
   // ── "Get everything" → ensure grocery list then navigate ─
   const handleGetEverything = useCallback(async () => {
     if (!status.isPro) {
+      setPaywallFeature('grocery')
       setPaywallOpen(true)
       return
     }
@@ -297,6 +312,7 @@ export function WeeklyPlannerV2() {
   // ── Publish plan as public shareable link ─────────────────
   const handlePublishPlan = useCallback(async () => {
     if (!status.isPro) {
+      setPaywallFeature('weekly_autopilot')
       setPaywallOpen(true)
       return
     }
@@ -337,11 +353,12 @@ export function WeeklyPlannerV2() {
   return (
     <div className="space-y-6">
       {/* ── Header ── */}
+      <div className="rounded-3xl border border-orange-100 bg-white/88 p-5 shadow-sm backdrop-blur sm:p-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <CalendarDays className="h-5 w-5 text-primary" />
-            <h2 className="text-xl font-bold">Weekly Meal Plan</h2>
+            <CalendarDays className="h-5 w-5 text-[#D97757]" />
+            <h1 className="text-2xl font-bold tracking-tight text-slate-950">Planner &amp; Autopilot</h1>
           </div>
           <p className="text-muted-foreground text-sm">
             {weekLabel}
@@ -426,6 +443,38 @@ export function WeeklyPlannerV2() {
         </div>
         </TooltipProvider>
       </div>
+      </div>
+
+      <section className="rounded-2xl border border-orange-100 bg-white/88 p-4 shadow-sm">
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-orange-50 text-[#D97757]">
+            <Brain className="h-5 w-5" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-bold text-slate-950">MealEase remembers</p>
+            <div className="mt-2 flex flex-wrap gap-2 text-xs">
+              <span className="rounded-full bg-emerald-50 px-2.5 py-1 font-semibold text-emerald-700">
+                {savedMeals} saved meal{savedMeals === 1 ? '' : 's'}
+              </span>
+              <span className="rounded-full bg-rose-50 px-2.5 py-1 font-semibold text-rose-700">
+                {avoidedMeals} avoided pick{avoidedMeals === 1 ? '' : 's'}
+              </span>
+              <span className="rounded-full bg-orange-50 px-2.5 py-1 font-semibold text-[#9f4f32]">
+                {likedMeals} liked dinner{likedMeals === 1 ? '' : 's'}
+              </span>
+              {rememberedCuisine && (
+                <span className="rounded-full bg-sky-50 px-2.5 py-1 font-semibold capitalize text-sky-700">
+                  repeats {rememberedCuisine}
+                </span>
+              )}
+            </div>
+            <p className="mt-2 text-xs leading-relaxed text-slate-500">
+              Autopilot uses saved meals, dislikes, timing, and household preferences when it fills the week.
+            </p>
+          </div>
+          <Heart className="ml-auto hidden h-4 w-4 text-rose-400 sm:block" />
+        </div>
+      </section>
 
       {mealsPlanned > 0 && (
         <div className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4">
@@ -449,7 +498,10 @@ export function WeeklyPlannerV2() {
               <Button
                 type="button"
                 size="sm"
-                onClick={() => setPaywallOpen(true)}
+                onClick={() => {
+                  setPaywallFeature('budget')
+                  setPaywallOpen(true)
+                }}
                 className="bg-emerald-600 text-white hover:bg-emerald-700"
               >
                 Unlock budget swaps
@@ -466,7 +518,10 @@ export function WeeklyPlannerV2() {
         generatingDayIndex={generatingDayIndex}
         lockedDayIndexes={lockedDayIndexes}
         onSelectDay={setSelectedDayIndex}
-        onLockedDayClick={() => setPaywallOpen(true)}
+        onLockedDayClick={() => {
+          setPaywallFeature('weekly_autopilot')
+          setPaywallOpen(true)
+        }}
         onRegenerate={handleRegenerateDay}
       />
 
@@ -476,6 +531,7 @@ export function WeeklyPlannerV2() {
           description={personalizedInlineDesc}
           isAuthenticated={status.isAuthenticated}
           redirectPath="/planner"
+          feature="weekly_autopilot"
         />
       )}
 
@@ -493,8 +549,9 @@ export function WeeklyPlannerV2() {
       <PaywallDialog
         open={paywallOpen}
         onOpenChange={setPaywallOpen}
-        title={personalizedDialogTitle}
-        description={personalizedDialogDesc}
+        feature={paywallFeature}
+        title={paywallTitle}
+        description={paywallDescription}
         isAuthenticated={status.isAuthenticated}
         redirectPath="/planner"
       />

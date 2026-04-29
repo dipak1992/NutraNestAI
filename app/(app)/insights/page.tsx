@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { ProPaywallCard } from '@/components/paywall/ProPaywallCard'
 import { getPaywallStatus } from '@/lib/paywall/server'
 import { TrendingUp, Utensils, Users, Clock, Leaf, ShieldCheck, CalendarDays } from 'lucide-react'
-import { Button, buttonVariants } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
 import type { PlanDay } from '@/lib/planner/adapt'
 import type { SmartMealResult } from '@/lib/engine/types'
 
@@ -42,6 +42,7 @@ export default async function InsightsPage() {
           description="Track cuisine trends, cook-time patterns, and household personalization once you move beyond the free preview."
           isAuthenticated={status.isAuthenticated}
           redirectPath="/insights"
+          feature="insights"
         />
       </div>
     )

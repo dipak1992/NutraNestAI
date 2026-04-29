@@ -33,6 +33,7 @@ export default function GroceryListPage() {
             description="Upgrade to Plus to unlock auto-built grocery lists with quantities, pantry deduction, and store formatting — for all 7 days."
             isAuthenticated={status.isAuthenticated}
             redirectPath="/grocery-list"
+            feature="grocery"
           />
         </div>
       </div>

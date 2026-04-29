@@ -97,8 +97,9 @@ export function RecipeActions({ recipe, recipeId, hasActiveSession = false }: Pr
       <PaywallDialog
         open={paywallOpen}
         onOpenChange={setPaywallOpen}
-        title="Unlock full recipes with Plus"
-        description="Start Cooking is a Plus feature. Upgrade for guided recipes, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning."
+        feature="guided_cooking"
+        title="Unlock Cook Mode with Plus"
+        description="Cook step by step, log dinner when you finish, and let MealEase update leftovers and budget."
         isAuthenticated={status.isAuthenticated}
         redirectPath={`/recipes/${recipeId}`}
       />

@@ -99,6 +99,7 @@ export default function PantryPage() {
           description="Track what you already have, cut waste, and let MealEase prioritize pantry ingredients automatically with Plus."
           isAuthenticated={status.isAuthenticated}
           redirectPath="/pantry"
+          feature="grocery"
         />
       </div>
     )

@@ -8,6 +8,7 @@ import { Crown, Lock, CheckCircle2, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { PRO_UNLOCKS } from '@/lib/paywall/config'
+import { getUpgradeFeatureCopy, type UpgradeFeature } from '@/lib/paywall/feature-copy'
 import posthog from 'posthog-js'
 
 interface ProPaywallCardProps {
@@ -17,6 +18,7 @@ interface ProPaywallCardProps {
   redirectPath?: string
   compact?: boolean
   tier?: 'pro'
+  feature?: UpgradeFeature
 }
 
 export function ProPaywallCard({
@@ -25,11 +27,14 @@ export function ProPaywallCard({
   isAuthenticated,
   redirectPath = '/dashboard',
   compact = false,
+  feature,
 }: ProPaywallCardProps) {
   const signupHref = `/signup?redirect=${encodeURIComponent(redirectPath)}`
   const loginHref = `/login?redirect=${encodeURIComponent(redirectPath)}`
   const router = useRouter()
   const [isStartingTrial, setIsStartingTrial] = useState(false)
+  const featureCopy = getUpgradeFeatureCopy(feature)
+  const unlocks = feature ? featureCopy.bullets : PRO_UNLOCKS
 
   const handleStartTrial = useCallback(async () => {
     setIsStartingTrial(true)
@@ -69,7 +74,7 @@ export function ProPaywallCard({
         <div className="flex-1">
           <Badge className="mb-2.5 border-primary/20 bg-primary/8 text-primary text-[11px] font-semibold tracking-wide uppercase">
             <Lock className="mr-1.5 h-3 w-3" />
-            {isAuthenticated ? 'Plus Feature' : 'Account Required'}
+            {isAuthenticated ? featureCopy.eyebrow : 'Account Required'}
           </Badge>
           <h3 className="text-xl font-bold tracking-tight leading-snug">{title}</h3>
           <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed max-w-md">{description}</p>
@@ -78,7 +83,7 @@ export function ProPaywallCard({
 
       {!compact && (
         <div className="relative mt-6 grid gap-2 sm:grid-cols-2">
-          {PRO_UNLOCKS.map((item) => (
+          {unlocks.slice(0, 6).map((item) => (
             <div
               key={item}
               className="flex items-center gap-2.5 rounded-xl border border-primary/8 bg-white/80 px-3.5 py-2.5 text-[13px] font-medium"

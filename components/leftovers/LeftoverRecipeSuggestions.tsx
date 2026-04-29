@@ -271,8 +271,9 @@ export function LeftoverRecipeSuggestions({ leftoverId, leftoverName }: Props) {
       <PaywallDialog
         open={paywallOpen}
         onOpenChange={setPaywallOpen}
-        title="Unlock full recipes with Plus"
-        description="Cook leftover ideas with guided steps, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning."
+        feature="leftovers"
+        title="Turn leftovers into dinner with Plus"
+        description="Track what expires soon, get leftover-aware recipe ideas, and cook them with guided steps."
         isAuthenticated={status.isAuthenticated}
         redirectPath="/leftovers"
       />

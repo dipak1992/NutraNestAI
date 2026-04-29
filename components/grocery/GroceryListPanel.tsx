@@ -542,6 +542,7 @@ export function GroceryListPanel() {
   const toBuyItems = groceryList.items.filter((i) => !i.isInPantry)
   const toBuyCost = toBuyItems.reduce((sum, i) => sum + (i.isChecked ? 0 : i.estimatedCost), 0)
   const pantryValue = pantryItems.reduce((sum, i) => sum + i.estimatedCost, 0)
+  const progressPct = totalItems > 0 ? Math.round((checkedCount / totalItems) * 100) : 0
 
   return (
     <div className="space-y-4">
@@ -610,6 +611,30 @@ export function GroceryListPanel() {
           )}
         </div>
       </div>
+
+      <section className="grid gap-3 rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm sm:grid-cols-4">
+        <div className="sm:col-span-2">
+          <p className="text-xs font-bold uppercase tracking-wide text-emerald-700">Shopping progress</p>
+          <div className="mt-2 h-2 overflow-hidden rounded-full bg-emerald-50">
+            <div className="h-full rounded-full bg-emerald-500 transition-all" style={{ width: `${progressPct}%` }} />
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {checkedCount}/{totalItems} checked · {toBuyItems.length} to buy
+          </p>
+        </div>
+        <div className="rounded-xl bg-orange-50 px-3 py-2">
+          <p className="text-[11px] font-semibold text-orange-700">Pantry deducted</p>
+          <p className="text-lg font-bold text-slate-950">{pantryItems.length}</p>
+          <p className="text-[11px] text-muted-foreground">~${pantryValue.toFixed(2)} saved</p>
+        </div>
+        <div className="rounded-xl bg-slate-50 px-3 py-2">
+          <p className="text-[11px] font-semibold text-slate-600">Estimated cart</p>
+          <p className="text-lg font-bold text-slate-950">
+            ${toBuyCost > 0 ? toBuyCost.toFixed(2) : groceryList.totalEstimatedCost.toFixed(2)}
+          </p>
+          <p className="text-[11px] capitalize text-muted-foreground">{storeFormat} format</p>
+        </div>
+      </section>
 
       {/* ── Store format picker ── */}
       <div className="flex gap-1.5 p-1 rounded-xl bg-muted w-fit">

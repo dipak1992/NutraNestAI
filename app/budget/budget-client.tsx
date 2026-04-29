@@ -35,7 +35,6 @@ export function BudgetClient({ initial }: { initial: BudgetPayload }) {
   const weekSpent = useBudgetStore((s) => s.weekSpent)
   const weekEstimated = useBudgetStore((s) => s.weekEstimated)
   const mealsCooked = useBudgetStore((s) => s.mealsCooked)
-  const percentUsed = useBudgetStore((s) => s.percentUsed)
   const alertLevel = useBudgetStore((s) => s.alertLevel)
   const breakdown = useBudgetStore((s) => s.breakdown)
   const history = useBudgetStore((s) => s.history)
@@ -77,7 +76,8 @@ export function BudgetClient({ initial }: { initial: BudgetPayload }) {
 
   return (
     <>
-      <main className="max-w-2xl mx-auto px-4 py-6 pb-28 space-y-6">
+      <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.10),transparent_30%),linear-gradient(180deg,#f8fafc_0%,#ffffff_44%,#ffffff_100%)] px-4 py-6 pb-28">
+        <div className="mx-auto max-w-2xl space-y-6">
 
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -247,6 +247,7 @@ export function BudgetClient({ initial }: { initial: BudgetPayload }) {
             </motion.div>
           </>
         )}
+        </div>
       </main>
 
       {/* Modals */}
@@ -393,8 +394,9 @@ function SwapCard({ swap, onCook }: { swap: SwapSuggestion; onCook: (meal: Smart
       <PaywallDialog
         open={paywallOpen}
         onOpenChange={setPaywallOpen}
-        title="Unlock full recipes with Plus"
-        description="Cook budget swaps with guided steps, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning."
+        feature="budget"
+        title="Unlock cheaper weeks with Plus"
+        description="Cook lower-cost swaps, see estimated savings, and keep the weekly grocery total under control."
         isAuthenticated={status.isAuthenticated}
         redirectPath="/budget"
       />

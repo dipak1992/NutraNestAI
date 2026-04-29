@@ -13,7 +13,15 @@ export const faqs = [
   },
   {
     q: 'How does Autopilot work?',
-    a: "Tell us your household size, budget, and a few preferences. We plan seven dinners using what's in your fridge, what's on sale, and what you've loved before.",
+    a: "Planner gives free users a 3-day preview. Plus unlocks the full 7-day Weekly Autopilot, using household preferences, budget, pantry context, leftovers, and what you've loved before.",
+  },
+  {
+    q: 'What does the free plan include?',
+    a: 'Free includes Tonight Suggestions, 3 meal swaps per day, a 3-day Planner preview, basic Snap & Cook, and a basic grocery preview.',
+  },
+  {
+    q: 'What does Plus unlock?',
+    a: 'Plus unlocks the full connected system: 7-day Planner / Weekly Autopilot, unlimited swaps and scans, pantry-aware grocery lists, Budget Intelligence, Leftovers AI, household memory, and post-cook follow-ups.',
   },
   {
     q: 'Can I just use ChatGPT for meal ideas?',
@@ -33,6 +41,6 @@ export const faqs = [
   },
   {
     q: 'Do you work with grocery delivery?',
-    a: "Yes. One-tap export to Instacart, Amazon Fresh, and Walmart. More coming this year.",
+    a: 'Plus gives you a grocery workflow built for shopping: pantry deductions, estimated cost, store-friendly grouping, checked progress, and export-ready organization.',
   },
 ]

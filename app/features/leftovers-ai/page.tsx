@@ -21,18 +21,18 @@ export const metadata: Metadata = {
 const steps = [
   {
     n: '01',
-    title: 'Log what you cooked',
-    body: "After dinner, tap 'Save as leftover' in MealEase. We track what you have, how much, and when it expires.",
+    title: 'Mark dinner cooked',
+    body: "After dinner, tap 'Mark cooked'. MealEase can create leftovers, update budget, and start tomorrow's lunch idea.",
   },
   {
     n: '02',
-    title: 'Get transformation ideas',
-    body: "Open Leftovers AI and we'll suggest 3 ways to transform your leftovers into a completely different meal. No repetition.",
+    title: 'Track what remains',
+    body: "Tell MealEase how many servings are left. We remember what you have, how much, and when it should be used.",
   },
   {
     n: '03',
-    title: 'Cook something new',
-    body: 'Follow the recipe. Your leftover chicken becomes tacos. Your rice becomes fried rice. Nothing goes to waste.',
+    title: 'Turn it into the next meal',
+    body: 'Your leftover chicken becomes tacos, stir-fry, or lunch salad. Your budget and planner stay aware of what got used.',
   },
 ]
 
@@ -41,8 +41,8 @@ const benefits = [
   { icon: '🔄', title: 'Never eat the same thing twice', body: 'We transform leftovers into completely different meals — not just reheated versions.' },
   { icon: '⏰', title: 'Expiry tracking', body: 'We track when your leftovers expire and remind you before they go bad.' },
   { icon: '💡', title: 'Creative suggestions', body: 'Chicken becomes tacos, stir-fry, salad, or soup. We find the best use for what you have.' },
-  { icon: '💰', title: 'Save $100+/month', body: 'Using leftovers instead of buying new ingredients saves the average household $100–$150/month.' },
-  { icon: '🧠', title: 'AI-powered', body: 'Our AI understands flavor profiles and cooking techniques to make transformations that actually taste good.' },
+  { icon: '💰', title: 'Budget stays aware', body: 'Mark cooked can update weekly spend and show how leftovers reduce future grocery needs.' },
+  { icon: '🧠', title: 'MealEase remembers', body: 'The meals you finish, repeat, or skip make future leftover ideas more personal.' },
 ]
 
 const relatedFeatures = [
@@ -59,10 +59,10 @@ export default function LeftoversAIPage() {
         <FeatureHero
           eyebrow="Leftovers AI"
           title={<>Turn last night into <span className="italic text-[#F3B18E]">tonight.</span></>}
-          description="Cooked chicken last night? MealEase turns your leftovers into tacos, stir-fry, or a lunch salad — automatically. Stop throwing away food and money."
+          description="Mark dinner cooked, track what remains, update your budget, and turn leftovers into tomorrow's lunch or a fresh dinner idea."
           primaryHref="/signup"
           primaryLabel="Try free — no card needed"
-          secondaryHref="/upgrade"
+          secondaryHref="/upgrade?feature=leftovers"
           secondaryLabel="Upgrade to Plus"
           note={<>Leftovers AI is a Plus feature. <Link href="/pricing" className="text-[#FFD2BD] underline underline-offset-4">Compare plans →</Link></>}
           image="/landing/app-cooking.jpg"
@@ -84,9 +84,9 @@ export default function LeftoversAIPage() {
                 </div>
                 <div className="rounded-2xl bg-[#FDF6F1] border border-[#D97757]/20 p-7">
                   <p className="text-xs font-semibold uppercase tracking-widest text-[#D97757] mb-3">The solution</p>
-                  <h2 className="font-serif text-2xl font-bold text-neutral-900 mb-3">AI that transforms, not reheats</h2>
+                  <h2 className="font-serif text-2xl font-bold text-neutral-900 mb-3">Mark cooked starts the leftover loop</h2>
                   <p className="text-neutral-600 leading-relaxed">
-                    Leftovers AI doesn&rsquo;t just tell you to reheat last night&rsquo;s dinner. It transforms your ingredients into something completely new — so you actually want to eat it.
+                    Leftovers AI starts when dinner is done. MealEase logs what remains, keeps budget aware, and turns extra servings into something you actually want next.
                   </p>
                 </div>
               </div>
@@ -101,7 +101,7 @@ export default function LeftoversAIPage() {
               <h2 className="font-serif text-4xl font-bold tracking-tight text-neutral-900 mb-4">
                 How it works
               </h2>
-              <p className="text-lg text-neutral-600">Log it. Transform it. Eat it.</p>
+              <p className="text-lg text-neutral-600">Mark cooked. Track leftovers. Make tomorrow easier.</p>
             </div>
             <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
               {steps.map((s) => (
@@ -150,7 +150,7 @@ export default function LeftoversAIPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link
-                  href="/upgrade"
+                  href="/upgrade?feature=leftovers"
                   className="inline-flex items-center justify-center rounded-xl bg-[#D97757] px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-[#D97757]/25 hover:bg-[#c4664a] transition-colors"
                 >
                   Upgrade to Plus →
@@ -205,7 +205,7 @@ export default function LeftoversAIPage() {
                 Start free today
               </Link>
               <Link
-                href="/upgrade"
+                href="/upgrade?feature=leftovers"
                 className="inline-flex items-center justify-center rounded-xl border border-neutral-700 px-8 py-3.5 text-base font-semibold text-neutral-300 hover:border-neutral-500 hover:text-white transition-colors"
               >
                 Upgrade to Plus

@@ -13,10 +13,10 @@ const genericAi = [
 
 const mealease = [
   'Remembers preferences',
-  'Personalized tonight meals',
-  'Swaps instantly',
-  'Grocery ready',
-  'Weekly autopilot',
+  'Connects tonight to the week',
+  'Turns plans into grocery lists',
+  'Tracks leftovers after cooking',
+  'Keeps budget visible',
   'Built for households',
 ]
 

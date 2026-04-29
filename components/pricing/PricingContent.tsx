@@ -37,25 +37,27 @@ type FeatureItem = {
 }
 
 const FREE_FEATURES: FeatureItem[] = [
-  { icon: Moon, text: 'Tonight Suggestions (3/day)' },
-  { icon: Camera, text: 'Snap & Cook — fridge scan (3/week)' },
-  { icon: ShoppingCart, text: 'Basic grocery list' },
+  { icon: Moon, text: 'Tonight Suggestions for daily dinner help' },
+  { icon: Camera, text: 'Basic Snap & Cook' },
+  { icon: CalendarDays, text: '3-day Planner preview' },
+  { icon: ShoppingCart, text: 'Basic grocery preview' },
+  { icon: Zap, text: '3 meal swaps per day' },
   { icon: UserRound, text: '1 member profile' },
   { icon: Salad, text: 'Basic dietary filters' },
 ]
 
 const PLUS_FEATURES: FeatureItem[] = [
-  { icon: Sparkles, text: 'Everything in Free', highlight: false },
-  { icon: Moon, text: 'Unlimited Tonight Suggestions', highlight: true },
-  { icon: Camera, text: 'Unlimited Snap & Cook scans', highlight: false },
-  { icon: CalendarDays, text: 'Weekly Autopilot — 7 dinners, one tap', highlight: true },
-  { icon: Utensils, text: 'Leftovers AI — track & use leftovers', highlight: true },
-  { icon: DollarSign, text: 'Budget Intelligence — weekly spend tracking', highlight: true },
-  { icon: ShoppingCart, text: 'Smart grocery list export', highlight: false },
-  { icon: UsersRound, text: 'Up to 6 household members', highlight: false },
-  { icon: Brain, text: 'Household memory & preferences', highlight: false },
-  { icon: BookOpen, text: 'Meal history & saved favorites', highlight: false },
-  { icon: Zap, text: 'Faster AI responses', highlight: false },
+  { icon: Sparkles, text: 'Everything in Free, connected across your week', highlight: false },
+  { icon: CalendarDays, text: 'Plan all 7 dinners with full Weekly Autopilot', highlight: true },
+  { icon: ShoppingCart, text: 'Shop faster with pantry deductions and store-ready groups', highlight: true },
+  { icon: DollarSign, text: 'Catch expensive weeks before checkout', highlight: true },
+  { icon: Utensils, text: 'Turn cooked meals into tracked leftovers and tomorrow lunch', highlight: true },
+  { icon: Brain, text: 'MealEase remembers likes, dislikes, and repeat favorites', highlight: true },
+  { icon: Camera, text: 'Scan fridge and pantry without basic-plan limits', highlight: false },
+  { icon: Moon, text: 'Swap until dinner fits tonight', highlight: false },
+  { icon: UsersRound, text: 'Personalize meals for up to 6 household members', highlight: false },
+  { icon: BookOpen, text: 'Resurface saved meals and meal history', highlight: false },
+  { icon: Zap, text: 'Get faster planning when the week gets busy', highlight: false },
 ]
 
 const REASSURANCE = [
@@ -67,30 +69,30 @@ const REASSURANCE = [
 const PLUS_UNLOCKS = [
   {
     icon: CalendarDays,
-    title: 'Weekly Autopilot',
-    desc: 'One tap. Seven dinners planned, personalised to your household and budget.',
+    title: 'A full weekly rhythm',
+    desc: 'Move beyond a 3-day preview into seven dinners, smarter swaps, and a planning ritual that sticks.',
   },
   {
     icon: Utensils,
-    title: 'Leftovers AI',
-    desc: 'Track leftovers after cooking. Get reminders and recipes before they expire.',
+    title: 'Less food waste after cooking',
+    desc: 'Mark cooked, create leftovers, and get practical next-meal ideas before food disappears in the fridge.',
   },
   {
     icon: DollarSign,
-    title: 'Budget Intelligence',
-    desc: 'Set a weekly food budget. We track spend, warn you early, and suggest swaps.',
+    title: 'Budget decisions before checkout',
+    desc: 'See estimated costs from plans and grocery lists, then swap expensive meals before the cart gets painful.',
   },
   {
     icon: ShoppingCart,
-    title: 'Smart Grocery List',
-    desc: 'Auto-generated from your week plan. Export or share with one tap.',
+    title: 'A grocery workflow worth paying for',
+    desc: 'Pantry deductions, estimated cost, store format, checked progress, and export-ready organization.',
   },
 ]
 
 const FAQ = [
   {
     q: 'Is there a free version?',
-    a: "Yes. The free plan gives you Tonight Suggestions, up to 3 Snap & Cook scans per week, and a basic grocery list — enough to experience how MealEase thinks. When you're ready for Weekly Autopilot, Leftovers AI, or Budget Intelligence, upgrade anytime.",
+    a: "Yes. Free gives you useful dinner help: Tonight Suggestions, 3 swaps per day, a 3-day Planner preview, basic Snap & Cook, and a basic grocery preview. Plus unlocks the full connected system.",
   },
   {
     q: 'What is a household profile?',
@@ -98,11 +100,11 @@ const FAQ = [
   },
   {
     q: 'What is Weekly Autopilot?',
-    a: 'One tap, seven nights planned. Autopilot builds a full week of dinners tailored to your household — balancing variety, nutrition, prep time, and what you already have on hand. It generates a smart grocery list alongside it.',
+    a: 'Weekly Autopilot is the full Planner experience. Free users can preview 3 days; Plus unlocks all 7 dinners, budget-aware swaps, grocery impact, and household memory.',
   },
   {
     q: 'What is Leftovers AI?',
-    a: "After you cook, MealEase asks if you have leftovers. Say yes and we track them — what they are, when they expire, and how many servings remain. We'll remind you before they go bad and suggest recipes that use them up.",
+    a: "After you mark a meal cooked, MealEase can track leftovers, update your weekly budget, and suggest a practical next meal like tomorrow's lunch.",
   },
   {
     q: 'What is Budget Intelligence?',

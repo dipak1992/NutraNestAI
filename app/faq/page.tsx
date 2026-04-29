@@ -16,7 +16,7 @@ const faqCategories = [
       },
       {
         q: 'Is MealEase free to use?',
-        a: "Yes. MealEase has a generous free tier that includes daily dinner suggestions, the fridge scanner (3 scans/day), step-by-step cook mode, and basic dietary filters. MealEase Plus unlocks the full Weekly Autopilot, Leftovers AI, Budget Intelligence, unlimited scans, and more.",
+        a: 'Yes. MealEase has a useful free tier that includes Tonight Suggestions, 3 meal swaps per day, a 3-day Planner preview, basic Snap & Cook, basic grocery preview, cook mode, and basic dietary filters. Plus unlocks the full connected system.',
       },
       {
         q: 'Do I need to create an account?',
@@ -29,11 +29,11 @@ const faqCategories = [
     items: [
       {
         q: 'What does the free plan include?',
-        a: "The free plan includes: 1 personalized dinner suggestion per day, 3 fridge scans per day, step-by-step cook mode, basic dietary filters (vegetarian, gluten-free, etc.), and 3 recipe swaps per day. It's genuinely useful — not a crippled demo.",
+        a: "The free plan includes: Tonight Suggestions, 3 meal swaps per day, a 3-day Planner preview, basic Snap & Cook, basic grocery preview, step-by-step cook mode, and basic dietary filters. It's genuinely useful, not a crippled demo.",
       },
       {
         q: 'What does MealEase Plus unlock?',
-        a: "Plus unlocks: Weekly Autopilot (full 7-day meal planning), Leftovers AI (transform leftovers into new meals), Budget Intelligence (grocery cost tracking), unlimited fridge scans, unlimited recipe swaps, audio cook mode narration, AI taste learning, grocery list export to Instacart/Amazon Fresh/Walmart, and priority support.",
+        a: "Plus unlocks the full food operating system: 7-day Planner / Weekly Autopilot, unlimited swaps and Snap & Cook usage, pantry-aware grocery lists with estimated cost, Budget Intelligence, Leftovers AI, household memory, saved meal resurfacing, and post-cook follow-ups like leftovers and tomorrow's lunch.",
       },
       {
         q: 'How much does Plus cost?',
@@ -54,19 +54,19 @@ const faqCategories = [
       },
       {
         q: 'What is Weekly Autopilot?',
-        a: "Weekly Autopilot is a Plus feature that generates a full 7-day dinner plan in one tap. Tell us your household size, dietary restrictions, and budget once — and we plan the whole week automatically. You can swap any meal you don't want, then export the consolidated grocery list to your preferred delivery service.",
+        a: "Weekly Autopilot is the full Planner experience. Free users can preview 3 days; Plus unlocks the full 7-day plan with budget-aware swaps, grocery impact, household memory, and a consolidated shopping workflow.",
       },
       {
         q: 'How does Leftovers AI work?',
-        a: "After you cook a meal, tap 'Save as leftover' in MealEase. We track what you have, how much, and when it expires. Open Leftovers AI and we'll suggest 3 ways to transform your leftovers into a completely different meal — not just reheated versions. Chicken becomes tacos. Rice becomes fried rice. Nothing goes to waste.",
+        a: "After you cook a meal, tap 'Mark cooked'. MealEase can create tracked leftovers, update your budget, and suggest a next use like tomorrow's lunch. Leftovers AI then turns those extras into practical meals before they expire.",
       },
       {
         q: 'What is Budget Intelligence?',
-        a: "Budget Intelligence is a Plus feature that shows you the estimated grocery cost of your meal plan before you shop. Set a weekly budget, and we plan meals that stay under it. As you cook and shop, we track your actual spend vs. budget in real time. Households using Budget Intelligence save an average of $100–$200/month on groceries.",
+        a: 'Budget Intelligence is a Plus feature that shows estimated costs from your plan and grocery list before you shop. When you cook, MealEase can update your weekly spend so budget stays connected to real meals, not just estimates.',
       },
       {
         q: 'Does MealEase work with grocery delivery?',
-        a: "Yes. MealEase Plus includes one-tap grocery list export to Instacart, Amazon Fresh, and Walmart Grocery. Your full ingredient list — consolidated and de-duplicated — goes straight to your cart. More delivery integrations are coming.",
+        a: 'Plus includes a premium grocery workflow: pantry deductions, estimated cost, store-friendly grouping, checked progress, and export-ready organization. Delivery integrations may vary as we expand partners.',
       },
     ],
   },

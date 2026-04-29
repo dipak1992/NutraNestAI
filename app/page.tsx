@@ -3,6 +3,7 @@ import { Hero } from '@/components/landing/Hero'
 import { ConversionStory } from '@/components/landing/ConversionStory'
 import { HowItWorks } from '@/components/landing/HowItWorks'
 import { FivePillarsSection } from '@/components/landing/FivePillarsSection'
+import { ConnectedSystem } from '@/components/landing/ConnectedSystem'
 import { SocialProof } from '@/components/landing/SocialProof'
 import { ComparisonTable } from '@/components/landing/ComparisonTable'
 import { PricingTeaser } from '@/components/landing/PricingTeaser'
@@ -48,6 +49,7 @@ export default async function LandingPage() {
         <ConversionStory />
         <HowItWorks />
         <FivePillarsSection />
+        <ConnectedSystem />
         <ComparisonTable />
         <SocialProof />
         <PricingTeaser />

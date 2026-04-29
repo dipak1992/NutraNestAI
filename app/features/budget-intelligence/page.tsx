@@ -26,22 +26,22 @@ const steps = [
   },
   {
     n: '02',
-    title: 'See costs before you shop',
-    body: "Every meal plan shows an estimated grocery total. Swap expensive meals for budget-friendly alternatives with one tap.",
+    title: 'See plan and grocery costs',
+    body: "Every meal plan and grocery list shows an estimated total. Swap expensive meals before they become an expensive cart.",
   },
   {
     n: '03',
-    title: 'Track spending in real time',
-    body: 'As you cook and shop, we track your actual spend vs. budget. Get alerts before you go over — not after.',
+    title: 'Update spend after cooking',
+    body: 'When you mark dinner cooked, MealEase can update weekly spend and keep budget connected to real meals.',
   },
 ]
 
 const benefits = [
   { icon: '💰', title: 'See costs upfront', body: 'Know your grocery total before you shop. No more surprise bills at checkout.' },
-  { icon: '📊', title: 'Real-time tracking', body: 'Track spending as you go. Visual budget bar shows exactly where you stand.' },
+  { icon: '📊', title: 'Cooking updates the budget', body: 'Mark cooked can move estimated dinner cost into the weekly budget picture.' },
   { icon: '🔄', title: 'Budget-aware swaps', body: 'Swap any meal for a cheaper alternative that fits your remaining budget.' },
   { icon: '📉', title: 'Save $100+/month', body: 'Households using Budget Intelligence save an average of $100–$200/month on groceries.' },
-  { icon: '🛒', title: 'Smart grocery list', body: 'Consolidated ingredient list with estimated prices. Export to any grocery delivery service.' },
+  { icon: '🛒', title: 'Grocery list cost visibility', body: 'Consolidated ingredients, pantry deductions, and estimated prices help you shop intentionally.' },
   { icon: '📈', title: 'Monthly insights', body: 'See spending trends over time. Identify where your money goes and where to cut.' },
 ]
 
@@ -59,10 +59,10 @@ export default function BudgetIntelligencePage() {
         <FeatureHero
           eyebrow="Budget Intelligence"
           title={<>Eat well. <span className="italic text-[#F3B18E]">Spend less.</span></>}
-          description="See your weekly grocery total before you shop. Set a budget, stay under it, and save $100+ a month — without eating worse."
+          description="See estimated costs from your plan and grocery list before you shop. When dinner is cooked, MealEase keeps the weekly budget picture moving."
           primaryHref="/signup"
           primaryLabel="Try free — no card needed"
-          secondaryHref="/upgrade"
+          secondaryHref="/upgrade?feature=budget"
           secondaryLabel="Upgrade to Plus"
           note={<>Budget Intelligence is a Plus feature. <Link href="/pricing" className="text-[#FFD2BD] underline underline-offset-4">Compare plans →</Link></>}
           image="/landing/grocery.jpg"
@@ -84,9 +84,9 @@ export default function BudgetIntelligencePage() {
                 </div>
                 <div className="rounded-2xl bg-[#FDF6F1] border border-[#D97757]/20 p-7">
                   <p className="text-xs font-semibold uppercase tracking-widest text-[#D97757] mb-3">The solution</p>
-                  <h2 className="font-serif text-2xl font-bold text-neutral-900 mb-3">See costs before you commit</h2>
+                  <h2 className="font-serif text-2xl font-bold text-neutral-900 mb-3">Costs stay connected to the plan</h2>
                   <p className="text-neutral-600 leading-relaxed">
-                    Budget Intelligence shows you the estimated grocery cost of your meal plan before you shop. Set a limit, swap expensive meals, and stay on track automatically.
+                    Budget Intelligence uses the Planner, grocery list, and cooked meals together, so you can spot expensive weeks early and correct them with smarter swaps.
                   </p>
                 </div>
               </div>
@@ -101,7 +101,7 @@ export default function BudgetIntelligencePage() {
               <h2 className="font-serif text-4xl font-bold tracking-tight text-neutral-900 mb-4">
                 How it works
               </h2>
-              <p className="text-lg text-neutral-600">Set a budget. Stay under it. Save money.</p>
+              <p className="text-lg text-neutral-600">Plan, shop, cook, and keep the budget visible.</p>
             </div>
             <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
               {steps.map((s) => (
@@ -170,7 +170,7 @@ export default function BudgetIntelligencePage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link
-                  href="/upgrade"
+                  href="/upgrade?feature=budget"
                   className="inline-flex items-center justify-center rounded-xl bg-[#D97757] px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-[#D97757]/25 hover:bg-[#c4664a] transition-colors"
                 >
                   Upgrade to Plus →
@@ -225,7 +225,7 @@ export default function BudgetIntelligencePage() {
                 Start free today
               </Link>
               <Link
-                href="/upgrade"
+                href="/upgrade?feature=budget"
                 className="inline-flex items-center justify-center rounded-xl border border-neutral-700 px-8 py-3.5 text-base font-semibold text-neutral-300 hover:border-neutral-500 hover:text-white transition-colors"
               >
                 Upgrade to Plus

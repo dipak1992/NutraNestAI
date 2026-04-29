@@ -134,6 +134,38 @@ export default function SnapAndCookPage() {
           </Container>
         </section>
 
+        {/* Grocery workflow */}
+        <section className="py-16 md:py-20 bg-neutral-950 text-white">
+          <Container>
+            <div className="mx-auto max-w-3xl text-center">
+              <p className="text-xs font-semibold uppercase tracking-widest text-[#F3B18E] mb-4">
+                Grocery workflow
+              </p>
+              <h2 className="font-serif text-4xl font-bold tracking-tight mb-4">
+                Snap & Cook also improves the list.
+              </h2>
+              <p className="text-neutral-300 text-lg leading-relaxed">
+                Plus turns fridge and pantry context into smarter grocery planning:
+                deduct what you already have, estimate the remaining cost, organize
+                by store format, and track checked progress while you shop.
+              </p>
+            </div>
+            <div className="mx-auto mt-10 grid max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                { title: 'Pantry deduction', body: 'Avoid buying ingredients already on your shelf.' },
+                { title: 'Estimated cost', body: 'See the likely cart impact before checkout.' },
+                { title: 'Store format', body: 'Group items for produce, pantry, dairy, freezer, and more.' },
+                { title: 'Checked progress', body: 'Track what is done while the list stays organized.' },
+              ].map((item) => (
+                <div key={item.title} className="rounded-2xl border border-white/10 bg-white/[0.06] p-5">
+                  <p className="font-semibold text-white">{item.title}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-neutral-400">{item.body}</p>
+                </div>
+              ))}
+            </div>
+          </Container>
+        </section>
+
         {/* Free vs Plus */}
         <section className="py-16 md:py-20 bg-[#FDF6F1]">
           <Container>
@@ -143,7 +175,7 @@ export default function SnapAndCookPage() {
                 <div className="rounded-2xl bg-white border border-neutral-200 p-7">
                   <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500 mb-4">Free</p>
                   <ul className="space-y-3 text-sm text-neutral-700">
-                    {['3 fridge scans per day', 'Ingredient recognition', '3 recipe suggestions per scan', 'Manual ingredient editing'].map((f) => (
+                    {['Basic Snap & Cook', 'Ingredient recognition', '3 recipe suggestions per scan', 'Manual ingredient editing'].map((f) => (
                       <li key={f} className="flex items-start gap-2"><span className="text-green-500 mt-0.5">✓</span>{f}</li>
                     ))}
                   </ul>
@@ -151,12 +183,12 @@ export default function SnapAndCookPage() {
                 <div className="rounded-2xl bg-neutral-900 border border-[#D97757]/30 p-7">
                   <p className="text-xs font-semibold uppercase tracking-widest text-[#D97757] mb-4">Plus</p>
                   <ul className="space-y-3 text-sm text-neutral-300">
-                    {['Unlimited scans', 'Pantry + fridge combined', 'AI learns your ingredient preferences', 'Expiry date tracking', 'Auto-add to grocery list', 'Priority support'].map((f) => (
+                    {['Unlimited scans', 'Pantry + fridge combined', 'Ingredient preferences remembered', 'Pantry deductions for grocery lists', 'Estimated cost and store grouping', 'Checked shopping progress'].map((f) => (
                       <li key={f} className="flex items-start gap-2"><span className="text-[#D97757] mt-0.5">✓</span>{f}</li>
                     ))}
                   </ul>
                   <Link
-                    href="/upgrade"
+                    href="/upgrade?feature=scan"
                     className="mt-6 block text-center rounded-xl bg-[#D97757] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#c4664a] transition-colors"
                   >
                     Upgrade to Plus →
@@ -206,7 +238,7 @@ export default function SnapAndCookPage() {
                 Start free today
               </Link>
               <Link
-                href="/upgrade"
+                href="/upgrade?feature=scan"
                 className="inline-flex items-center justify-center rounded-xl border border-neutral-700 px-8 py-3.5 text-base font-semibold text-neutral-300 hover:border-neutral-500 hover:text-white transition-colors"
               >
                 Upgrade to Plus

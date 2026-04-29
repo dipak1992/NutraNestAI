@@ -13,12 +13,12 @@ import posthog from 'posthog-js'
 /* ─────────────────────── DATA ─────────────────────── */
 
 const BENEFITS = [
-  { icon: '🗓️', title: 'Weekly Autopilot', desc: '7 dinners planned around real life' },
-  { icon: '🌙', title: 'Tonight swaps', desc: 'Change dinner without starting over' },
-  { icon: '🍱', title: 'Leftovers AI', desc: 'Use food before it expires' },
-  { icon: '💰', title: 'Budget Intelligence', desc: 'Catch expensive weeks early' },
-  { icon: '🛒', title: 'Smart Grocery List', desc: 'Quantities plus pantry deductions' },
-  { icon: '👨‍👩‍👧‍👦', title: 'Household Memory', desc: 'Preferences remembered for everyone' },
+  { icon: '🗓️', title: 'Full Planner', desc: 'Seven dinners connected to groceries and budget' },
+  { icon: '🌙', title: 'Unlimited swaps', desc: 'Change dinner until tonight fits' },
+  { icon: '🍱', title: 'Post-cook loop', desc: 'Track leftovers and suggest the next meal' },
+  { icon: '💰', title: 'Budget clarity', desc: 'Catch expensive weeks before checkout' },
+  { icon: '🛒', title: 'Premium groceries', desc: 'Pantry deductions, cost, and store format' },
+  { icon: '👨‍👩‍👧‍👦', title: 'Household memory', desc: 'Likes and dislikes remembered everywhere' },
 ]
 
 const TRUST_SIGNALS = [
@@ -190,16 +190,14 @@ export function UpgradeClient({ isAuthenticated }: Props) {
               </div>
 
               {/* CTA Button */}
-              {feature && (
-                <div className="mb-5 grid gap-2">
-                  {featureCopy.bullets.map((item) => (
-                    <div key={item} className="flex items-center gap-2 rounded-xl bg-white/8 px-3 py-2 text-sm text-neutral-200">
-                      <Check className="h-4 w-4 text-emerald-400" />
-                      {item}
-                    </div>
-                  ))}
-                </div>
-              )}
+              <div className="mb-5 grid gap-2">
+                {featureCopy.bullets.map((item) => (
+                  <div key={item} className="flex items-center gap-2 rounded-xl bg-white/8 px-3 py-2 text-sm text-neutral-200">
+                    <Check className="h-4 w-4 text-emerald-400" />
+                    {item}
+                  </div>
+                ))}
+              </div>
               <button
                 onClick={handleCheckout}
                 disabled={loading}

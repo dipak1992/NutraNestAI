@@ -67,8 +67,8 @@ export function Hero() {
 
             <FadeIn delay={0.1}>
               <p className="mt-6 max-w-[310px] text-lg leading-relaxed text-neutral-600 dark:text-neutral-300 sm:max-w-xl md:text-xl">
-                MealEase plans your week, uses what&rsquo;s in your fridge,
-                saves your leftovers, and keeps you on budget. In 30 seconds.
+                MealEase connects tonight&rsquo;s dinner, weekly planning, groceries,
+                leftovers, and budget into one calm food system. In 30 seconds.
               </p>
             </FadeIn>
 

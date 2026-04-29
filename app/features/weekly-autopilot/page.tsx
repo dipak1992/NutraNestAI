@@ -6,13 +6,13 @@ import { FeatureHero } from '@/components/features/FeatureHero'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Weekly Autopilot — Your Whole Week of Dinners, Planned in One Tap | MealEase',
+  title: 'Planner / Weekly Autopilot — Your Whole Week of Dinners, Planned in One Tap | MealEase',
   description:
-    'Stop planning meals from scratch every week. MealEase Autopilot generates a full 7-day dinner plan based on your household, preferences, and budget — in one tap.',
+    'Preview 3 days free or unlock the full 7-day Planner / Weekly Autopilot based on your household, preferences, budget, pantry, and leftovers.',
   openGraph: {
-    title: 'Weekly Autopilot — Your Whole Week of Dinners, Planned in One Tap | MealEase',
+    title: 'Planner / Weekly Autopilot — Your Whole Week of Dinners, Planned in One Tap | MealEase',
     description:
-      'Stop planning meals from scratch every week. MealEase Autopilot generates a full 7-day dinner plan in one tap.',
+      'Preview 3 days free or unlock the full 7-day Planner / Weekly Autopilot.',
     type: 'website',
   },
   alternates: { canonical: 'https://mealeaseai.com/features/weekly-autopilot' },
@@ -26,23 +26,23 @@ const steps = [
   },
   {
     n: '02',
-    title: 'Tap "Generate Week"',
-    body: 'One tap. Seven dinners planned. We balance variety, nutrition, budget, and your household\'s taste profile automatically.',
+    title: 'Preview 3 days or unlock the week',
+    body: 'Free users can see how Planner thinks with a 3-day preview. Plus unlocks all seven dinners with Autopilot.',
   },
   {
     n: '03',
-    title: 'Cook, swap, or export',
-    body: 'Follow the plan, swap any meal you don\'t want, or export the full grocery list to Instacart, Amazon Fresh, or Walmart.',
+    title: 'Cook, swap, shop, and learn',
+    body: 'Follow the plan, swap any meal you don\'t want, send ingredients to grocery, then let cooked meals improve the next plan.',
   },
 ]
 
 const benefits = [
-  { icon: '📅', title: 'Full week in one tap', body: 'Seven dinners planned instantly. No spreadsheets, no Pinterest boards.' },
-  { icon: '💰', title: 'Budget-aware planning', body: 'Set a weekly budget. We plan meals that stay under it — automatically.' },
-  { icon: '🔄', title: 'Swap any meal', body: "Don't like Monday's dinner? Swap it. The rest of the week stays intact." },
-  { icon: '🛒', title: 'Auto grocery list', body: 'Every ingredient for every meal, consolidated into one smart shopping list.' },
-  { icon: '🧬', title: 'Learns over time', body: 'The more you use it, the better it gets. Ratings and swaps teach it your taste.' },
-  { icon: '👨‍👩‍👧', title: 'Household-aware', body: 'Plans for 1 person or 8. Adjusts servings, portions, and variety accordingly.' },
+  { icon: '📅', title: '3-day preview, 7-day Plus plan', body: 'Start with a focused preview, then unlock the full weekly rhythm when you are ready.' },
+  { icon: '💰', title: 'Budget-aware planning', body: 'Estimated costs stay visible so expensive weeks can be fixed before checkout.' },
+  { icon: '🔄', title: 'Swap without starting over', body: "Don't like Monday's dinner? Swap it while keeping the rest of the plan intact." },
+  { icon: '🛒', title: 'Grocery impact included', body: 'Each plan can become a consolidated grocery list with pantry deductions.' },
+  { icon: '🧬', title: 'Learns over time', body: 'Cooked meals, saves, repeats, and dislikes all teach future plans.' },
+  { icon: '👨‍👩‍👧', title: 'Household-aware', body: 'Plans around household size, preferences, dietary needs, and real-life routines.' },
 ]
 
 const relatedFeatures = [
@@ -57,14 +57,14 @@ export default function WeeklyAutopilotPage() {
       <Nav />
       <main id="main">
         <FeatureHero
-          eyebrow="Weekly Autopilot"
-          title={<>Seven dinners. <span className="italic text-[#F3B18E]">One tap.</span></>}
-          description="Stop planning meals from scratch every week. MealEase Autopilot generates a full 7-day dinner plan based on your household, preferences, and budget — instantly."
+          eyebrow="Planner / Weekly Autopilot"
+          title={<>Preview 3 days. <span className="italic text-[#F3B18E]">Unlock the week.</span></>}
+          description="Planner is the canonical weekly flow: preview 3 days free, then unlock the full 7-day Autopilot with grocery impact, budget-aware swaps, leftovers, and household memory."
           primaryHref="/signup"
           primaryLabel="Try free — no card needed"
-          secondaryHref="/upgrade"
+          secondaryHref="/upgrade?feature=planner"
           secondaryLabel="Upgrade to Plus"
-          note={<>Weekly Autopilot is a Plus feature. <Link href="/pricing" className="text-[#FFD2BD] underline underline-offset-4">Compare plans →</Link></>}
+          note={<>Free includes a 3-day Planner preview. Plus unlocks full Weekly Autopilot. <Link href="/pricing" className="text-[#FFD2BD] underline underline-offset-4">Compare plans →</Link></>}
           image="/landing/family-dinner.jpg"
           mobileImage="/mobile/family-mobile.jpg"
           mockup="weekly"
@@ -84,9 +84,9 @@ export default function WeeklyAutopilotPage() {
                 </div>
                 <div className="rounded-2xl bg-[#FDF6F1] border border-[#D97757]/20 p-7">
                   <p className="text-xs font-semibold uppercase tracking-widest text-[#D97757] mb-3">The solution</p>
-                  <h2 className="font-serif text-2xl font-bold text-neutral-900 mb-3">Autopilot does it for you</h2>
+                  <h2 className="font-serif text-2xl font-bold text-neutral-900 mb-3">Planner becomes your weekly command center</h2>
                   <p className="text-neutral-600 leading-relaxed">
-                    One tap generates a full week of dinners tailored to your household. Swap anything you don&rsquo;t want. Export your grocery list. Done in under a minute.
+                    Planner starts with a 3-day preview, then Plus turns it into a full 7-day Autopilot where meals, grocery impact, budget, and leftovers stay connected.
                   </p>
                 </div>
               </div>
@@ -101,7 +101,7 @@ export default function WeeklyAutopilotPage() {
               <h2 className="font-serif text-4xl font-bold tracking-tight text-neutral-900 mb-4">
                 How it works
               </h2>
-              <p className="text-lg text-neutral-600">Set it up once. Use it every week.</p>
+              <p className="text-lg text-neutral-600">Preview the rhythm. Unlock the full week.</p>
             </div>
             <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
               {steps.map((s) => (
@@ -143,14 +143,14 @@ export default function WeeklyAutopilotPage() {
                 Plus Feature
               </span>
               <h2 className="font-serif text-4xl font-bold mb-4">
-                Weekly Autopilot is included in MealEase Plus
+                Full Weekly Autopilot is included in MealEase Plus
               </h2>
               <p className="text-neutral-400 text-lg mb-8">
-                Unlock the full 7-day planner, unlimited swaps, grocery list export, and budget tracking — all for less than a single takeout order per month.
+                Unlock seven dinners, unlimited swaps, grocery impact, budget tracking, household memory, and post-cook learning.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link
-                  href="/upgrade"
+                  href="/upgrade?feature=planner"
                   className="inline-flex items-center justify-center rounded-xl bg-[#D97757] px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-[#D97757]/25 hover:bg-[#c4664a] transition-colors"
                 >
                   Upgrade to Plus →

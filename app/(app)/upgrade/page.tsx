@@ -4,7 +4,7 @@ import { UpgradeClient } from './upgrade-client'
 
 export const metadata = {
   title: 'Upgrade to Plus — MealEase',
-  description: 'Unlock Weekly Autopilot, Leftovers AI, Budget Intelligence, and more.',
+  description: 'Unlock the connected MealEase system: Planner, grocery, budget, leftovers, Cook Mode, and household memory.',
 }
 
 export default async function UpgradePage() {

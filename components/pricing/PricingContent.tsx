@@ -3,6 +3,25 @@
 import { useState, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import {
+  BookOpen,
+  Brain,
+  CalendarDays,
+  Camera,
+  CheckCircle2,
+  Clock,
+  DollarSign,
+  Moon,
+  Salad,
+  ShieldCheck,
+  ShoppingCart,
+  Sparkles,
+  UserRound,
+  UsersRound,
+  Utensils,
+  Zap,
+} from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 import { PRICING_TIERS, PRO_ANNUAL_SAVINGS } from '@/lib/paywall/config'
@@ -10,26 +29,61 @@ import { cn } from '@/lib/utils'
 
 /* ─────────────────────── DATA ─────────────────────── */
 
-const FREE_FEATURES = [
-  { icon: '🌙', text: 'Tonight Suggestions (3/day)' },
-  { icon: '📸', text: 'Snap & Cook — fridge scan (3/week)' },
-  { icon: '🛒', text: 'Basic grocery list' },
-  { icon: '👤', text: '1 member profile' },
-  { icon: '🥗', text: 'Basic dietary filters' },
+type FeatureItem = {
+  icon: LucideIcon
+  text: string
+  highlight?: boolean
+}
+
+const FREE_FEATURES: FeatureItem[] = [
+  { icon: Moon, text: 'Tonight Suggestions (3/day)' },
+  { icon: Camera, text: 'Snap & Cook — fridge scan (3/week)' },
+  { icon: ShoppingCart, text: 'Basic grocery list' },
+  { icon: UserRound, text: '1 member profile' },
+  { icon: Salad, text: 'Basic dietary filters' },
 ]
 
-const PLUS_FEATURES = [
-  { icon: '✨', text: 'Everything in Free', highlight: false },
-  { icon: '🌙', text: 'Unlimited Tonight Suggestions', highlight: true },
-  { icon: '📸', text: 'Unlimited Snap & Cook scans', highlight: false },
-  { icon: '🗓️', text: 'Weekly Autopilot — 7 dinners, one tap', highlight: true },
-  { icon: '🍱', text: 'Leftovers AI — track & use leftovers', highlight: true },
-  { icon: '💰', text: 'Budget Intelligence — weekly spend tracking', highlight: true },
-  { icon: '🛒', text: 'Smart grocery list export', highlight: false },
-  { icon: '👨‍👩‍👧‍👦', text: 'Up to 6 household members', highlight: false },
-  { icon: '🧠', text: 'Household memory & preferences', highlight: false },
-  { icon: '📖', text: 'Meal history & saved favorites', highlight: false },
-  { icon: '⚡', text: 'Faster AI responses', highlight: false },
+const PLUS_FEATURES: FeatureItem[] = [
+  { icon: Sparkles, text: 'Everything in Free', highlight: false },
+  { icon: Moon, text: 'Unlimited Tonight Suggestions', highlight: true },
+  { icon: Camera, text: 'Unlimited Snap & Cook scans', highlight: false },
+  { icon: CalendarDays, text: 'Weekly Autopilot — 7 dinners, one tap', highlight: true },
+  { icon: Utensils, text: 'Leftovers AI — track & use leftovers', highlight: true },
+  { icon: DollarSign, text: 'Budget Intelligence — weekly spend tracking', highlight: true },
+  { icon: ShoppingCart, text: 'Smart grocery list export', highlight: false },
+  { icon: UsersRound, text: 'Up to 6 household members', highlight: false },
+  { icon: Brain, text: 'Household memory & preferences', highlight: false },
+  { icon: BookOpen, text: 'Meal history & saved favorites', highlight: false },
+  { icon: Zap, text: 'Faster AI responses', highlight: false },
+]
+
+const REASSURANCE = [
+  { icon: Clock, text: '7-day trial' },
+  { icon: ShieldCheck, text: 'Cancel anytime' },
+  { icon: CheckCircle2, text: 'No card required' },
+]
+
+const PLUS_UNLOCKS = [
+  {
+    icon: CalendarDays,
+    title: 'Weekly Autopilot',
+    desc: 'One tap. Seven dinners planned, personalised to your household and budget.',
+  },
+  {
+    icon: Utensils,
+    title: 'Leftovers AI',
+    desc: 'Track leftovers after cooking. Get reminders and recipes before they expire.',
+  },
+  {
+    icon: DollarSign,
+    title: 'Budget Intelligence',
+    desc: 'Set a weekly food budget. We track spend, warn you early, and suggest swaps.',
+  },
+  {
+    icon: ShoppingCart,
+    title: 'Smart Grocery List',
+    desc: 'Auto-generated from your week plan. Export or share with one tap.',
+  },
 ]
 
 const FAQ = [
@@ -107,15 +161,18 @@ export function PricingContent() {
     <div className="min-h-screen bg-white dark:bg-neutral-950">
 
       {/* ── HERO ── */}
-      <section className="pt-16 pb-10 text-center px-4">
+      <section className="pt-16 pb-10 text-center px-4 overflow-hidden">
         <div className="inline-flex items-center gap-2 rounded-full bg-[#D97757]/10 text-[#D97757] text-xs font-bold px-4 py-1.5 mb-5 uppercase tracking-widest">
           ✦ Simple pricing
         </div>
-        <h1 className="font-serif text-4xl md:text-5xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50">
+        <h1 className="mx-auto max-w-[320px] font-serif text-4xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50 sm:max-w-4xl md:text-5xl">
           Stop stressing about dinner.{' '}
           <span className="italic text-[#D97757]">Start tonight.</span>
         </h1>
-        <p className="mt-4 text-lg text-neutral-600 dark:text-neutral-400 max-w-xl mx-auto">
+        <p
+          className="mx-auto mt-4 text-lg text-neutral-600 dark:text-neutral-400 sm:max-w-xl"
+          style={{ maxWidth: 'min(320px, calc(100vw - 40px))' }}
+        >
           Free forever. Upgrade when you want the full experience.
         </p>
       </section>
@@ -151,6 +208,25 @@ export function PricingContent() {
         </div>
       </section>
 
+      {/* ── TRUST ROW ── */}
+      <section className="px-4 pb-8">
+        <div className="flex w-[calc(100vw-40px)] max-w-[320px] flex-col items-start justify-center gap-3 rounded-2xl border border-neutral-200 bg-white px-5 py-3 text-sm font-medium text-neutral-600 shadow-sm shadow-neutral-900/5 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300 sm:mx-auto sm:w-auto sm:max-w-3xl sm:flex-row sm:flex-wrap sm:items-center">
+          {REASSURANCE.map((item, i) => {
+            const Icon = item.icon
+
+            return (
+              <span key={item.text} className="inline-flex items-center gap-2">
+                <Icon className="h-4 w-4 text-[#D97757]" aria-hidden />
+                <span>{item.text}</span>
+                {i < REASSURANCE.length - 1 && (
+                  <span className="hidden h-1 w-1 rounded-full bg-neutral-300 dark:bg-neutral-700 sm:inline-block" aria-hidden />
+                )}
+              </span>
+            )
+          })}
+        </div>
+      </section>
+
       {/* ── PRICING CARDS ── */}
       <section className="pb-16 px-4">
         <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
@@ -171,12 +247,18 @@ export function PricingContent() {
             </div>
 
             <ul className="flex-1 space-y-3 mb-8">
-              {FREE_FEATURES.map((f) => (
+              {FREE_FEATURES.map((f) => {
+                const Icon = f.icon
+
+                return (
                 <li key={f.text} className="flex items-center gap-2.5 text-sm">
-                  <span className="text-base shrink-0">{f.icon}</span>
-                  <span className="text-neutral-700 dark:text-neutral-300">{f.text}</span>
+                  <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white text-[#D97757] ring-1 ring-[#D97757]/15 dark:bg-neutral-800">
+                    <Icon className="h-4 w-4" aria-hidden />
+                  </span>
+                  <span className="min-w-0 text-neutral-700 dark:text-neutral-300">{f.text}</span>
                 </li>
-              ))}
+                )
+              })}
             </ul>
 
             <Link
@@ -237,10 +319,15 @@ export function PricingContent() {
               </div>
 
               <ul className="flex-1 space-y-2.5 mb-8">
-                {PLUS_FEATURES.map((f) => (
-                  <li key={f.text} className="flex items-center gap-2.5 text-sm">
-                    <span className="text-base shrink-0">{f.icon}</span>
-                    <span className={f.highlight ? 'text-white font-medium' : 'text-neutral-300'}>
+                {PLUS_FEATURES.map((f) => {
+                  const Icon = f.icon
+
+                  return (
+                  <li key={f.text} className="flex items-start gap-2.5 text-sm">
+                    <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/8 text-[#F3B18E] ring-1 ring-white/10">
+                      <Icon className="h-4 w-4" aria-hidden />
+                    </span>
+                    <span className={cn('min-w-0 leading-relaxed', f.highlight ? 'text-white font-medium' : 'text-neutral-300')}>
                       {f.text}
                     </span>
                     {f.highlight && (
@@ -249,7 +336,8 @@ export function PricingContent() {
                       </span>
                     )}
                   </li>
-                ))}
+                  )
+                })}
               </ul>
 
               <button
@@ -284,39 +372,24 @@ export function PricingContent() {
             What you unlock with Plus
           </h2>
           <div className="grid sm:grid-cols-2 gap-4">
-            {[
-              {
-                icon: '🗓️',
-                title: 'Weekly Autopilot',
-                desc: 'One tap. Seven dinners planned, personalised to your household and budget.',
-              },
-              {
-                icon: '🍱',
-                title: 'Leftovers AI',
-                desc: 'Track leftovers after cooking. Get reminders and recipes before they expire.',
-              },
-              {
-                icon: '💰',
-                title: 'Budget Intelligence',
-                desc: 'Set a weekly food budget. We track spend, warn you early, and suggest swaps.',
-              },
-              {
-                icon: '🛒',
-                title: 'Smart Grocery List',
-                desc: 'Auto-generated from your week plan. Export or share with one tap.',
-              },
-            ].map((item) => (
+            {PLUS_UNLOCKS.map((item) => {
+              const Icon = item.icon
+
+              return (
               <div
                 key={item.title}
                 className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-5 flex gap-4"
               >
-                <div className="shrink-0 text-2xl">{item.icon}</div>
+                <div className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#D97757]/10 text-[#D97757]">
+                  <Icon className="h-5 w-5" aria-hidden />
+                </div>
                 <div>
                   <p className="font-semibold text-neutral-900 dark:text-neutral-50 text-sm">{item.title}</p>
                   <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 leading-relaxed">{item.desc}</p>
                 </div>
               </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </section>

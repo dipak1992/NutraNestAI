@@ -32,6 +32,16 @@ const flow = [
   },
 ]
 
+function initials(name: string) {
+  return name
+    .split(/\s+/)
+    .map((part) => part[0])
+    .join('')
+    .replace('.', '')
+    .slice(0, 2)
+    .toUpperCase()
+}
+
 export function SocialProof() {
   return (
     <section
@@ -127,11 +137,12 @@ export function SocialProof() {
                   </p>
                 </blockquote>
                 <figcaption className="mt-6 flex items-center gap-3">
-                  {/* Avatar placeholder */}
                   <div
-                    className="w-10 h-10 rounded-full bg-gradient-to-br from-[#D97757] to-[#B8935A] flex-shrink-0"
+                    className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-white text-xs font-bold text-[#9B4F34] shadow-sm ring-1 ring-[#D97757]/20 dark:bg-neutral-800 dark:text-[#F3B18E] dark:ring-white/10"
                     aria-hidden
-                  />
+                  >
+                    {initials(t.name)}
+                  </div>
                   <div>
                     <div className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
                       {t.name}

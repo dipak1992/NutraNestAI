@@ -12,7 +12,6 @@ import type {
 } from '@/lib/dashboard/types'
 import { calcBudget } from '@/lib/dashboard/budget'
 import { parseMainIngredients } from '@/lib/leftovers/ingredient-parser'
-import { calculateExpirationDate } from '@/lib/leftovers/expiration-calculator'
 
 type DashboardStore = {
   // Core state
@@ -165,7 +164,6 @@ export const useDashboardStore = create<DashboardStore>()(
         if (cookedDay?.recipe) {
           const recipe = cookedDay.recipe
           const mainIngredients = parseMainIngredients({ name: recipe.name })
-          const expiresAt = calculateExpirationDate(mainIngredients)
           // Lazy import to avoid circular dependency
           import('@/stores/leftoversStore').then(({ useLeftoversStore }) => {
             useLeftoversStore.getState().openCookedPrompt({

@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { serverEnv } from '@/lib/env'
 import { stripe } from '@/lib/stripe/client'
 import { PLANS, type PlanId } from '@/lib/stripe/plans'
+import { isStripePriceId, normalizeStripePriceId } from '@/lib/stripe/price-id'
 
 // ─── POST /api/stripe/checkout ────────────────────────────────────────────────
 
@@ -13,7 +15,8 @@ export async function POST(req: Request) {
 
     const { planId } = await req.json() as { planId: PlanId }
     const plan = PLANS[planId]
-    if (!plan?.stripePriceId) {
+    const priceId = normalizeStripePriceId(plan?.stripePriceId)
+    if (!priceId || !isStripePriceId(priceId)) {
       return NextResponse.json({ error: 'Invalid plan' }, { status: 400 })
     }
 
@@ -43,12 +46,15 @@ export async function POST(req: Request) {
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: 'subscription',
-      line_items: [{ price: plan.stripePriceId, quantity: 1 }],
+      line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${origin}/dashboard?upgraded=1`,
       cancel_url: `${origin}/upgrade?cancelled=1`,
       metadata: { supabase_user_id: user.id, plan_id: planId },
       subscription_data: {
         metadata: { supabase_user_id: user.id, plan_id: planId },
+        ...(serverEnv.stripeTrialDays > 0
+          ? { trial_period_days: serverEnv.stripeTrialDays }
+          : {}),
       },
     })
 

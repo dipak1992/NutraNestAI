@@ -8,17 +8,13 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { serverEnv } from '@/lib/env'
 import { getSiteUrl } from '@/lib/seo'
+import { isStripePriceId, normalizeStripePriceId } from '@/lib/stripe/price-id'
 
 type Plan = 'pro_monthly' | 'pro_yearly'
 
 const PRICE_IDS: Record<Plan, string | undefined> = {
   pro_monthly: serverEnv.stripePricingTierPro.monthly,
   pro_yearly:  serverEnv.stripePricingTierPro.yearly,
-}
-
-const PLAN_DISPLAY_NAMES: Record<Plan, string> = {
-  pro_monthly: 'Pro',
-  pro_yearly:  'Pro',
 }
 
 const PLAN_TIERS: Record<Plan, 'pro'> = {
@@ -45,7 +41,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Invalid plan' }, { status: 400 })
     }
 
-    const priceId = PRICE_IDS[plan]
+    const priceId = normalizeStripePriceId(PRICE_IDS[plan])
     if (!priceId || !serverEnv.stripeSecretKey) {
       // Stripe not configured yet — gracefully tell the client
       return NextResponse.json(
@@ -53,6 +49,14 @@ export async function POST(req: Request) {
           error: 'billing_not_configured',
           message: 'Stripe checkout is not live yet. Email hello@mealeaseai.com to upgrade manually.',
         },
+        { status: 503 },
+      )
+    }
+
+    if (!isStripePriceId(priceId)) {
+      console.error('[checkout/session] Invalid Stripe price ID configured for plan:', plan)
+      return NextResponse.json(
+        { error: 'billing_not_configured', message: 'Stripe price ID is invalid.' },
         { status: 503 },
       )
     }
@@ -72,6 +76,9 @@ export async function POST(req: Request) {
     body.set('subscription_data[metadata][user_id]', user.id)
     body.set('subscription_data[metadata][plan]', plan)
     body.set('subscription_data[metadata][tier]', tier)
+    if (serverEnv.stripeTrialDays > 0) {
+      body.set('subscription_data[trial_period_days]', String(serverEnv.stripeTrialDays))
+    }
     // Pass email only if available (avoids conflict if customer already exists)
     if (user.email) {
       body.set('customer_email', user.email)

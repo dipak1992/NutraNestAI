@@ -80,6 +80,9 @@ export type ContextualNudgeType =
   | 'upgrade_prompt'
   | 'autopilot_education'
   | 'pantry_scan_reminder'
+  | 'sunday_plan_ritual'
+  | 'weekday_dinner_reminder'
+  | 'weekly_savings_recap'
   | 'referral'
 
 export type NudgeVariant = 'info' | 'warning' | 'danger' | 'success' | 'promo'

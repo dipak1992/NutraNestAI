@@ -9,6 +9,9 @@ export const NUDGE_PRIORITY: Record<Nudge['type'], number> = {
   upgrade_prompt: 75,
   autopilot_education: 60,
   pantry_scan_reminder: 55,
+  sunday_plan_ritual: 54,
+  weekday_dinner_reminder: 53,
+  weekly_savings_recap: 52,
   referral: 50,
 }
 
@@ -21,6 +24,9 @@ const NUDGE_VARIANT: Record<Nudge['type'], NudgeVariant> = {
   upgrade_prompt: 'promo',
   autopilot_education: 'info',
   pantry_scan_reminder: 'info',
+  sunday_plan_ritual: 'info',
+  weekday_dinner_reminder: 'info',
+  weekly_savings_recap: 'success',
   referral: 'success',
 }
 

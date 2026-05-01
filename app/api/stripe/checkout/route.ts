@@ -4,7 +4,6 @@ import { serverEnv } from '@/lib/env'
 import { stripe } from '@/lib/stripe/client'
 import { PLANS, type PlanId } from '@/lib/stripe/plans'
 import { isStripePriceId, normalizeStripePriceId } from '@/lib/stripe/price-id'
-import { getCurrentBrand } from '@/lib/stripe/brands'
 
 // ─── POST /api/stripe/checkout ────────────────────────────────────────────────
 
@@ -21,9 +20,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Invalid plan' }, { status: 400 })
     }
 
-    // Multi-brand: get current brand config
-    const brand = getCurrentBrand()
-
     // Get or create Stripe customer
     const { data: profile } = await supabase
       .from('profiles')
@@ -36,10 +32,7 @@ export async function POST(req: Request) {
     if (!customerId) {
       const customer = await stripe.customers.create({
         email: profile?.email ?? user.email ?? undefined,
-        metadata: {
-          supabase_user_id: user.id,
-          brand: brand.id,
-        },
+        metadata: { supabase_user_id: user.id },
       })
       customerId = customer.id
       await supabase
@@ -54,32 +47,14 @@ export async function POST(req: Request) {
       customer: customerId,
       mode: 'subscription',
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${origin}${brand.successUrlPattern}`,
-      cancel_url: `${origin}${brand.cancelUrlPattern}`,
-      // Multi-brand: per-session statement descriptor
-      payment_intent_data: {
-        statement_descriptor_suffix: brand.statementDescriptorSuffix,
-      },
-      metadata: {
-        supabase_user_id: user.id,
-        plan_id: planId,
-        brand: brand.id,
-      },
+      success_url: `${origin}/dashboard?upgraded=1`,
+      cancel_url: `${origin}/upgrade?cancelled=1`,
+      metadata: { supabase_user_id: user.id, plan_id: planId },
       subscription_data: {
-        metadata: {
-          supabase_user_id: user.id,
-          plan_id: planId,
-          brand: brand.id,
-        },
+        metadata: { supabase_user_id: user.id, plan_id: planId },
         ...(serverEnv.stripeTrialDays > 0
           ? { trial_period_days: serverEnv.stripeTrialDays }
           : {}),
-      },
-      // Multi-brand: custom branding for checkout page
-      custom_text: {
-        submit: {
-          message: `Subscribe to ${brand.displayName} Plus. Billed by DDS Supply LLC.`,
-        },
       },
     })
 

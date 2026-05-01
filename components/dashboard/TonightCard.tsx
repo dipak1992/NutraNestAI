@@ -13,6 +13,7 @@ import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 import { useDailySwapLimit } from '@/lib/paywall/use-daily-swap-limit'
 import { PaywallDialog } from '@/components/paywall/PaywallDialog'
 import { trackTonightEvent } from '@/lib/tonight/analytics'
+import { resolveTonightMealImage } from '@/lib/tonight/images'
 import type { Recipe, TonightState } from '@/lib/dashboard/types'
 import type { SmartMealResult } from '@/lib/engine/types'
 
@@ -112,6 +113,7 @@ export function TonightCard({ state }: Props) {
   const swaps = useDailySwapLimit(status, 'dashboard-tonight')
   const regenerate = useDashboardStore((s) => s.regenerateTonight)
   const isRegenerating = useDashboardStore((s) => s.isRegeneratingTonight)
+  const resolvedMealImage = state.recipe ? resolveTonightMealImage(state.recipe) : null
 
   // Track view
   useEffect(() => {
@@ -124,6 +126,12 @@ export function TonightCard({ state }: Props) {
       })
     }
   }, [state.recipe?.id]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !resolvedMealImage) return
+    const img = new window.Image()
+    img.src = resolvedMealImage
+  }, [resolvedMealImage])
 
   // --- EMPTY STATE ---
   if (!state.recipe) {
@@ -167,6 +175,7 @@ export function TonightCard({ state }: Props) {
   const { recipe, reason, usesLeftover } = state
   const badges = getTagBadges(recipe.tags)
   const mealEmoji = getMealEmoji(recipe.name)
+  const mealImage = resolvedMealImage ?? '/landing/family-dinner.jpg'
 
   function handleCookThis() {
     trackTonightEvent('cook_clicked', { meal_id: recipe.id, meal_name: recipe.name, plan: status.isPro ? 'plus' : 'free' })
@@ -195,11 +204,12 @@ export function TonightCard({ state }: Props) {
         {/* Food photo background */}
         <div className="absolute inset-0">
           <Image
-            src="/cards/tonight.jpg"
-            alt=""
+            key={mealImage}
+            src={mealImage}
+            alt={recipe.name}
             fill
             sizes="(min-width: 1280px) 900px, 100vw"
-            className="object-cover object-center"
+            className="object-cover object-center transition-opacity duration-300"
             priority
           />
           {/* Dual overlay: dark top for text + warm bottom tint */}

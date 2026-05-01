@@ -14,7 +14,6 @@ import {
   getPlusTonightSuggestion,
   getSwapSuggestion,
 } from '@/lib/tonight/engine'
-import { dailyHash } from '@/lib/tonight/catalog'
 
 /**
  * Main entry point for dashboard Tonight suggestion.
@@ -35,12 +34,10 @@ export async function getTonightSuggestion(
  * Get a rotating suggestion for swap/regenerate.
  * Called by /api/dashboard/tonight/regenerate route.
  */
-export function getRotatingTonightSuggestion(userId: string, plan: Plan, offset = 0): TonightState {
-  // Build exclude list from offset (simulate previously seen meals)
-  const excludeIds: string[] = []
-  for (let i = 0; i < offset; i++) {
-    const fakeId = `exclude-${dailyHash(`${userId}:${i}`)}`
-    excludeIds.push(fakeId)
-  }
+export function getRotatingTonightSuggestion(
+  userId: string,
+  plan: Plan,
+  excludeIds: string[] = [],
+): TonightState {
   return getSwapSuggestion(userId, excludeIds, plan)
 }

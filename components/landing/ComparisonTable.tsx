@@ -6,7 +6,7 @@ import { FadeIn } from './shared/FadeIn'
 const genericAi = [
   'Ask every night',
   'Forgets preferences',
-  'No grocery workflow',
+  'No grocery handoff',
   'No weekly system',
   'Generic answers',
 ]
@@ -34,12 +34,12 @@ export function ComparisonTable() {
               className="font-serif text-4xl md:text-5xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50"
             >
               Chatbots give ideas.{' '}
-              <span className="italic text-[#D97757]">MealEase gets dinner done.</span>
+              <span className="italic text-[#D97757]">MealEase gets groceries ready.</span>
             </h2>
             <p className="mt-4 text-lg text-neutral-600 dark:text-neutral-400">
               Generic AI can help when you know exactly what to ask. MealEase is built
               for the nightly reality of feeding a household: preferences, swaps,
-              grocery lists, weekly rhythms, and meals people will actually eat.
+              weekly rhythms, grocery lists, supported store handoff, and meals people will actually eat.
             </p>
           </div>
         </FadeIn>

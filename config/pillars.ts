@@ -49,4 +49,14 @@ export const pillars = [
       "See your week's grocery total before you shop. Set a budget, stay under it. Save $100+ a month.",
     badge: 'NEW',
   },
+  {
+    id: 'grocery',
+    icon: '🛒',
+    image: '/landing/grocery.jpg',
+    question: 'How do I buy everything?',
+    title: 'Grocery Commerce',
+    answer:
+      'Turn your weekly plan into a ready-to-shop grocery list with supported store handoff, copy, PDF, and local-store export.',
+    badge: 'NEW',
+  },
 ] as const

@@ -2,7 +2,6 @@ import Image from 'next/image'
 import { Container } from './shared/Container'
 import { FadeIn } from './shared/FadeIn'
 import { pillars } from '@/config/pillars'
-import { cn } from '@/lib/utils'
 
 export function FivePillarsSection() {
   return (
@@ -18,7 +17,7 @@ export function FivePillarsSection() {
               id="pillars-heading"
               className="font-serif text-4xl md:text-5xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50"
             >
-              Five questions. One app.{' '}
+              Six questions. One app.{' '}
               <span className="italic text-[#D97757]">Zero stress.</span>
             </h2>
             <p className="mt-4 text-lg text-neutral-600 dark:text-neutral-400">
@@ -27,17 +26,13 @@ export function FivePillarsSection() {
           </div>
         </FadeIn>
 
-        {/* 3 + 2 grid on desktop */}
+        {/* 3 + 3 grid on desktop */}
         <div className="grid grid-cols-1 md:grid-cols-6 gap-5 md:gap-6">
           {pillars.map((p, i) => (
             <FadeIn
               key={p.id}
               delay={i * 0.08}
-              className={cn(
-                'md:col-span-2',
-                i === 3 && 'md:col-start-2',
-                i === 4 && 'md:col-start-4'
-              )}
+              className="md:col-span-2"
             >
               <PillarCard pillar={p} index={i} />
             </FadeIn>

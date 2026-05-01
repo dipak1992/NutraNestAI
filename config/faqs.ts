@@ -21,7 +21,7 @@ export const faqs = [
   },
   {
     q: 'What does Plus unlock?',
-    a: 'Plus unlocks the full connected system: 7-day Planner / Weekly Autopilot, unlimited swaps and scans, pantry-aware grocery lists, Budget Intelligence, Leftovers AI, household memory, and post-cook follow-ups.',
+    a: 'Plus unlocks the full connected system: 7-day Planner / Weekly Autopilot, unlimited swaps and scans, pantry-aware grocery lists, supported grocery handoff tools, Budget Intelligence, Leftovers AI, household memory, and post-cook follow-ups.',
   },
   {
     q: 'Can I just use ChatGPT for meal ideas?',
@@ -41,6 +41,10 @@ export const faqs = [
   },
   {
     q: 'Do you work with grocery delivery?',
-    a: 'Plus gives you a grocery workflow built for shopping: pantry deductions, estimated cost, store-friendly grouping, checked progress, and export-ready organization.',
+    a: 'Plus gives you a grocery workflow built for shopping: pantry deductions, estimated cost, store-friendly grouping, checked progress, supported store handoff where available, copy, PDF, and local-store export.',
+  },
+  {
+    q: 'Can I shop at Walmart or Instacart?',
+    a: 'Where supported, MealEase can help hand off your grocery list to providers such as Walmart or Instacart. If those are not available in your region, you can still copy, download PDF, or use the list at your local store.',
   },
 ]

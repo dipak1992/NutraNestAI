@@ -95,6 +95,10 @@ export function Hero() {
             </FadeIn>
 
             <FadeIn delay={0.3}>
+              <p className="mt-3 text-sm font-semibold text-neutral-700 dark:text-neutral-300">
+                Plan your week. Get groceries ready in one tap.
+              </p>
+
               {/* Mobile: vertical stack; sm+: horizontal row */}
               <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-y-1.5 sm:gap-y-1.5 sm:gap-x-2.5 text-xs sm:text-sm font-medium text-neutral-500 dark:text-neutral-400">
                 {trustItems.map((item, i) => (

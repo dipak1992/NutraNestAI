@@ -32,7 +32,7 @@ const steps = [
   {
     n: '03',
     title: 'Cook, swap, shop, and learn',
-    body: 'Follow the plan, swap any meal you don\'t want, send ingredients to grocery, then let cooked meals improve the next plan.',
+    body: 'Follow the plan, swap any meal you don\'t want, send ingredients to grocery handoff tools where supported, then let cooked meals improve the next plan.',
   },
 ]
 
@@ -41,6 +41,7 @@ const benefits = [
   { icon: '💰', title: 'Budget-aware planning', body: 'Estimated costs stay visible so expensive weeks can be fixed before checkout.' },
   { icon: '🔄', title: 'Swap without starting over', body: "Don't like Monday's dinner? Swap it while keeping the rest of the plan intact." },
   { icon: '🛒', title: 'Grocery impact included', body: 'Each plan can become a consolidated grocery list with pantry deductions.' },
+  { icon: '🧾', title: 'Export-ready shopping', body: 'Edit the list, use supported store handoff, copy it, download PDF, or shop at your local store.' },
   { icon: '🧬', title: 'Learns over time', body: 'Cooked meals, saves, repeats, and dislikes all teach future plans.' },
   { icon: '👨‍👩‍👧', title: 'Household-aware', body: 'Plans around household size, preferences, dietary needs, and real-life routines.' },
 ]
@@ -131,6 +132,33 @@ export default function WeeklyAutopilotPage() {
                   <p className="text-sm text-neutral-600 leading-relaxed">{b.body}</p>
                 </div>
               ))}
+            </div>
+          </Container>
+        </section>
+
+        {/* Grocery Commerce flow */}
+        <section className="py-16 md:py-20 bg-[#FDF6F1]">
+          <Container>
+            <div className="mx-auto max-w-3xl rounded-3xl border border-[#D97757]/20 bg-white p-7 shadow-sm md:p-9">
+              <p className="text-xs font-semibold uppercase tracking-widest text-[#D97757] mb-3">
+                Grocery Commerce
+              </p>
+              <h2 className="font-serif text-3xl font-bold tracking-tight text-neutral-900 mb-3">
+                From meal plan to groceries in minutes.
+              </h2>
+              <p className="text-neutral-600 leading-relaxed">
+                Weekly Autopilot does not stop at dinner ideas. MealEase turns the plan into an editable grocery list, then helps you shop faster with supported store handoff tools in North America or copy, PDF, and local-store export everywhere else.
+              </p>
+              <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                {['Meals', 'Grocery List', 'Store Handoff'].map((label, index) => (
+                  <div key={label} className="rounded-2xl bg-neutral-50 p-4 text-center ring-1 ring-neutral-200">
+                    <div className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-[#D97757] text-sm font-bold text-white">
+                      {index + 1}
+                    </div>
+                    <p className="text-sm font-semibold text-neutral-900">{label}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </Container>
         </section>

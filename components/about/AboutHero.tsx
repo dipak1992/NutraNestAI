@@ -24,8 +24,8 @@ export function AboutHero() {
             </h1>
             <p className="mt-6 text-lg md:text-xl text-neutral-600 dark:text-neutral-300 leading-relaxed">
               MealEase is made by two parents of two little kids who burned out
-              on meal planning, grocery waste, and $280 takeout months — and
-              couldn&apos;t find a tool that actually solved it.
+              on meal planning, grocery waste, shopping friction, and $280 takeout
+              months — and couldn&apos;t find a tool that actually finished the job.
             </p>
           </div>
         </FadeIn>

@@ -40,7 +40,7 @@ const FREE_FEATURES: FeatureItem[] = [
   { icon: Moon, text: 'Tonight Suggestions for daily dinner help' },
   { icon: Camera, text: 'Basic Snap & Cook' },
   { icon: CalendarDays, text: '3-day Planner preview' },
-  { icon: ShoppingCart, text: 'Basic grocery preview' },
+  { icon: ShoppingCart, text: 'Manual grocery planning with basic preview' },
   { icon: Zap, text: '3 meal swaps per day' },
   { icon: UserRound, text: '1 member profile' },
   { icon: Salad, text: 'Basic dietary filters' },
@@ -48,8 +48,9 @@ const FREE_FEATURES: FeatureItem[] = [
 
 const PLUS_FEATURES: FeatureItem[] = [
   { icon: Sparkles, text: 'Everything in Free, connected across your week', highlight: false },
-  { icon: CalendarDays, text: 'Plan all 7 dinners with full Weekly Autopilot', highlight: true },
-  { icon: ShoppingCart, text: 'Shop faster with pantry deductions and store-ready groups', highlight: true },
+  { icon: CalendarDays, text: 'Smart weekly plans for all 7 dinners', highlight: true },
+  { icon: ShoppingCart, text: 'Auto grocery list + faster shopping workflow', highlight: true },
+  { icon: ShoppingCart, text: 'One-tap grocery exports where supported', highlight: true },
   { icon: DollarSign, text: 'Catch expensive weeks before checkout', highlight: true },
   { icon: Utensils, text: 'Turn cooked meals into tracked leftovers and tomorrow lunch', highlight: true },
   { icon: Brain, text: 'MealEase remembers likes, dislikes, and repeat favorites', highlight: true },
@@ -85,7 +86,7 @@ const PLUS_UNLOCKS = [
   {
     icon: ShoppingCart,
     title: 'A grocery workflow worth paying for',
-    desc: 'Pantry deductions, estimated cost, store format, checked progress, and export-ready organization.',
+    desc: 'Auto grocery lists, edit-before-you-shop controls, supported store handoff, copy, PDF, and local-store export.',
   },
 ]
 
@@ -101,6 +102,10 @@ const FAQ = [
   {
     q: 'What is Weekly Autopilot?',
     a: 'Weekly Autopilot is the full Planner experience. Free users can preview 3 days; Plus unlocks all 7 dinners, budget-aware swaps, grocery impact, and household memory.',
+  },
+  {
+    q: 'Can MealEase help with groceries?',
+    a: 'Yes. MealEase turns meal plans into ready-to-shop grocery lists and shopping handoff tools. In supported regions you can use store handoff for Walmart or Instacart; elsewhere you can copy, download PDF, or use the list at your local store.',
   },
   {
     q: 'What is Leftovers AI?',
@@ -348,7 +353,7 @@ export function PricingContent() {
                   <p className="mt-1 text-xs text-neutral-400">${proAnnual}/yr · billed annually</p>
                 )}
                 <p className="mt-2 text-sm text-neutral-400">
-                  Everything you need to end the dinner spiral.
+                  Everything you need to end the dinner spiral and get groceries ready faster.
                 </p>
               </div>
 
@@ -394,7 +399,22 @@ export function PricingContent() {
               <p className="text-center text-xs text-neutral-500 mt-3">
                 7-day free trial · No credit card required · Cancel anytime
               </p>
+              <p className="text-center text-xs font-semibold text-[#F3B18E] mt-2">
+                Many users upgrade for grocery convenience alone.
+              </p>
             </div>
+          </div>
+        </div>
+        <div className="mx-auto mt-5 grid max-w-3xl gap-3 rounded-2xl border border-neutral-200 bg-white p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900 sm:grid-cols-2">
+          <div className="rounded-xl bg-neutral-50 p-4 dark:bg-neutral-950">
+            <p className="text-xs font-bold uppercase tracking-widest text-neutral-500">Free</p>
+            <p className="mt-1 font-semibold text-neutral-900 dark:text-neutral-100">Manual grocery planning</p>
+            <p className="mt-1 text-xs leading-5 text-neutral-500 dark:text-neutral-400">Preview the basics and build from there.</p>
+          </div>
+          <div className="rounded-xl bg-[#FDF6F1] p-4 ring-1 ring-[#D97757]/20 dark:bg-neutral-950">
+            <p className="text-xs font-bold uppercase tracking-widest text-[#D97757]">Plus</p>
+            <p className="mt-1 font-semibold text-neutral-900 dark:text-neutral-100">Auto grocery list + faster shopping</p>
+            <p className="mt-1 text-xs leading-5 text-neutral-500 dark:text-neutral-400">Edit, export, and use supported store handoff tools.</p>
           </div>
         </div>
         <div className="mx-auto mt-8 max-w-3xl rounded-2xl border border-[#D97757]/20 bg-[#FDF6F1] p-5 text-center shadow-sm shadow-neutral-900/5 dark:border-[#D97757]/20 dark:bg-neutral-900">

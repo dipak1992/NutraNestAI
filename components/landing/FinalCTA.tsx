@@ -54,14 +54,13 @@ export function FinalCTA() {
               id="final-cta-heading"
               className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-white leading-[1.05] [text-shadow:0_2px_16px_rgba(0,0,0,0.55)]"
             >
-              Tonight&rsquo;s dinner is{' '}
-              <span className="italic text-[#D97757]">one tap away.</span>
+              Dinner + groceries are{' '}
+              <span className="italic text-[#D97757]">handled this week.</span>
             </h2>
 
             {/* Paragraph: brighter white for readability */}
             <p className="mt-5 text-lg md:text-xl text-white/85 leading-relaxed max-w-xl mx-auto font-medium">
-              Join 2,400+ households who stopped stressing about dinner.
-              Free forever. No card required.
+              Join 2,400+ households planning dinners, grocery lists, and shopping workflows in one calm place.
             </p>
 
             {/* Tighter gap between paragraph and CTA */}

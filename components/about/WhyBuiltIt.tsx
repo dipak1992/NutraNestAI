@@ -27,6 +27,11 @@ const PROBLEMS = [
     solution: 'Budget Intelligence',
     body: "See your week's grocery total before you shop. Stay under your number. Save $100+ a month, every month.",
   },
+  {
+    pain: 'The plan still had to become a grocery trip',
+    solution: 'Grocery Commerce',
+    body: 'MealEase now turns weekly plans into editable grocery lists with supported store handoff, copy, PDF, and local-store export.',
+  },
 ]
 
 export function WhyBuiltIt() {
@@ -36,13 +41,13 @@ export function WhyBuiltIt() {
         <FadeIn>
           <div className="max-w-2xl mx-auto text-center mb-14">
             <p className="text-sm font-medium text-[#D97757] uppercase tracking-wider mb-3">
-              Five real problems
+              Six real problems
             </p>
             <h2 className="font-serif text-3xl md:text-5xl font-bold text-neutral-900 dark:text-neutral-50 tracking-tight leading-tight">
               Every feature exists because we lived the problem.
             </h2>
             <p className="mt-5 text-neutral-600 dark:text-neutral-400">
-              We didn&apos;t start with features. We started with five questions we
+              We didn&apos;t start with features. We started with the questions we
               kept asking ourselves — and built the thing that answered them.
             </p>
           </div>

@@ -33,7 +33,7 @@ const faqCategories = [
       },
       {
         q: 'What does MealEase Plus unlock?',
-        a: "Plus unlocks the full food operating system: 7-day Planner / Weekly Autopilot, unlimited swaps and Snap & Cook usage, pantry-aware grocery lists with estimated cost, Budget Intelligence, Leftovers AI, household memory, saved meal resurfacing, and post-cook follow-ups like leftovers and tomorrow's lunch.",
+        a: "Plus unlocks the full food operating system: 7-day Planner / Weekly Autopilot, unlimited swaps and Snap & Cook usage, pantry-aware grocery lists with estimated cost, supported grocery handoff tools, Budget Intelligence, Leftovers AI, household memory, saved meal resurfacing, and post-cook follow-ups like leftovers and tomorrow's lunch.",
       },
       {
         q: 'How much does Plus cost?',
@@ -66,7 +66,27 @@ const faqCategories = [
       },
       {
         q: 'Does MealEase work with grocery delivery?',
-        a: 'Plus includes a premium grocery workflow: pantry deductions, estimated cost, store-friendly grouping, checked progress, and export-ready organization. Delivery integrations may vary as we expand partners.',
+        a: 'Plus includes a premium grocery workflow: pantry deductions, estimated cost, store-friendly grouping, checked progress, and export-ready organization. Store handoff availability varies by region and provider.',
+      },
+      {
+        q: 'How does Grocery Commerce work?',
+        a: 'MealEase turns your weekly plan into an organized grocery list. You can edit items first, then use supported store handoff tools where available, or export the list for any local store.',
+      },
+      {
+        q: 'Can I shop at Walmart or Instacart?',
+        a: 'Where supported, MealEase can help hand off your grocery list to providers such as Walmart or Instacart. Availability depends on region, provider coverage, and item matching.',
+      },
+      {
+        q: 'What if my country does not support those stores?',
+        a: 'You can still use Grocery Commerce globally. Copy your grocery list, download a PDF, or bring the organized list to your local store.',
+      },
+      {
+        q: 'Can I edit grocery lists first?',
+        a: 'Yes. You can review and edit grocery items before using a store handoff, copying the list, downloading PDF, or shopping locally.',
+      },
+      {
+        q: 'Is MealEase processing payments for groceries?',
+        a: 'No. MealEase does not process grocery payments. Checkout, fulfillment, substitutions, delivery, and pickup are handled by the supported store or provider you choose.',
       },
     ],
   },

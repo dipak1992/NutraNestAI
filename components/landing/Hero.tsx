@@ -23,29 +23,22 @@ export function Hero() {
       className="relative overflow-hidden pt-16 pb-20 md:pt-24 md:pb-32"
       aria-labelledby="hero-heading"
     >
-      {/* Soft background wash */}
+      {/* Soft background wash — mobile only */}
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-gradient-to-b from-[#FDF6F1] via-white to-white dark:from-neutral-900 dark:via-neutral-950 dark:to-neutral-950"
       />
-      <div className="absolute inset-0 -z-10">
+      {/* Mobile background image (subtle wash) */}
+      <div className="absolute inset-0 -z-10 sm:hidden">
         <Image
           src="/landing/heroSection.jpg"
           alt=""
           fill
           priority
           sizes="100vw"
-          className="hidden object-cover object-center opacity-25 sm:block"
+          className="object-cover object-center opacity-15"
         />
-        <Image
-          src="/landing/heroSection.jpg"
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-center opacity-18 sm:hidden"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-white via-white/88 to-white/45 dark:from-neutral-950 dark:via-neutral-950/88 dark:to-neutral-950/56" />
+        <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/88 to-white/70 dark:from-neutral-950/95 dark:via-neutral-950/88 dark:to-neutral-950/70" />
       </div>
 
       <Container wide>
@@ -125,28 +118,48 @@ export function Hero() {
             </FadeIn>
           </div>
 
-          {/* Right: phone mockup */}
+          {/* Right: hero image (desktop) + phone mockup overlay */}
           <div className="lg:col-span-6 relative flex justify-center">
             <FadeIn delay={0.2}>
-              <div
-                className="relative mx-auto md:max-w-[340px]"
-                style={{ width: 'min(280px, calc(100vw - 64px))' }}
-              >
-                {/* Phone frame */}
-                <div className="relative aspect-[9/19.5] rounded-[3rem] bg-neutral-900 p-3 shadow-2xl shadow-neutral-900/20 ring-1 ring-black/5">
-                  <div className="relative w-full h-full rounded-[2.3rem] overflow-hidden bg-[#FBFAF3]">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(16,185,129,0.14),transparent_34%),radial-gradient(circle_at_100%_20%,rgba(217,119,87,0.14),transparent_32%)]" />
-                    <LandingTonightPreview />
-                  </div>
-                  {/* Notch */}
-                  <div
-                    aria-hidden
-                    className="absolute top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-neutral-900 rounded-b-2xl"
+              {/* Desktop: hero image as prominent right-column visual */}
+              <div className="relative w-full">
+                {/* Hero image — desktop only, prominent */}
+                <div className="hidden lg:block relative w-full rounded-3xl overflow-hidden shadow-2xl shadow-neutral-900/15 ring-1 ring-black/5"
+                  style={{ aspectRatio: '16/10' }}
+                >
+                  <Image
+                    src="/landing/heroSection.jpg"
+                    alt="Family enjoying a home-cooked meal together"
+                    fill
+                    priority
+                    sizes="(min-width: 1024px) 50vw, 100vw"
+                    className="object-cover object-center"
                   />
+                  {/* Subtle warm vignette */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-neutral-900/20" />
                 </div>
 
-                {/* Floating "budget" card */}
-                <div className="hidden md:flex absolute -right-10 bottom-1/4 bg-white dark:bg-neutral-800 rounded-2xl shadow-xl p-4 items-center gap-3 ring-1 ring-black/5">
+                {/* Phone mockup — floats on top of image on desktop, standalone on mobile/tablet */}
+                <div
+                  className="lg:absolute lg:-bottom-6 lg:-left-8 lg:w-[200px] mx-auto md:max-w-[340px] lg:mx-0"
+                  style={{ width: 'min(280px, calc(100vw - 64px))' }}
+                >
+                  {/* Phone frame */}
+                  <div className="relative aspect-[9/19.5] rounded-[3rem] bg-neutral-900 p-3 shadow-2xl shadow-neutral-900/30 ring-1 ring-black/10">
+                    <div className="relative w-full h-full rounded-[2.3rem] overflow-hidden bg-[#FBFAF3]">
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(16,185,129,0.14),transparent_34%),radial-gradient(circle_at_100%_20%,rgba(217,119,87,0.14),transparent_32%)]" />
+                      <LandingTonightPreview />
+                    </div>
+                    {/* Notch */}
+                    <div
+                      aria-hidden
+                      className="absolute top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-neutral-900 rounded-b-2xl"
+                    />
+                  </div>
+                </div>
+
+                {/* Floating "budget" card — desktop only */}
+                <div className="hidden lg:flex absolute -right-4 top-1/3 bg-white dark:bg-neutral-800 rounded-2xl shadow-xl p-4 items-center gap-3 ring-1 ring-black/5">
                   <div className="text-2xl" aria-hidden>💰</div>
                   <div>
                     <div className="text-xs text-neutral-500 dark:text-neutral-400">This week</div>
@@ -161,4 +174,3 @@ export function Hero() {
     </section>
   )
 }
-

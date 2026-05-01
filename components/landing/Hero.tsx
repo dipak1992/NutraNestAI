@@ -67,18 +67,20 @@ export function Hero() {
             <FadeIn>
               <h1
                 id="hero-heading"
-                className="max-w-[280px] sm:max-w-xl font-serif text-[38px] leading-[1.05] sm:text-5xl md:text-6xl lg:text-[64px] font-bold tracking-tight text-neutral-900 dark:text-neutral-50"
+                className="font-serif text-[38px] leading-[1.05] sm:text-5xl md:text-6xl lg:text-[64px] font-bold tracking-tight text-neutral-900 dark:text-neutral-50"
               >
-                Never ask{' '}
+                Never ask
+                <br />
                 <span className="italic text-[#D97757]">
                   &ldquo;What&rsquo;s for dinner?&rdquo;
-                </span>{' '}
+                </span>
+                <br />
                 again.
               </h1>
             </FadeIn>
 
             <FadeIn delay={0.1}>
-              <p className="mt-4 sm:mt-6 max-w-[270px] sm:max-w-xl text-base sm:text-lg leading-relaxed text-neutral-600 dark:text-neutral-300 md:text-xl">
+              <p className="mt-4 sm:mt-6 max-w-[240px] sm:max-w-xl text-base sm:text-lg leading-relaxed text-neutral-600 dark:text-neutral-300 md:text-xl">
                 MealEase connects tonight&rsquo;s dinner, weekly planning, groceries,
                 leftovers, and budget into one calm food system. In 30 seconds.
               </p>
@@ -103,12 +105,14 @@ export function Hero() {
             </FadeIn>
 
             <FadeIn delay={0.3}>
-              <div className="mt-3 sm:mt-4 flex max-w-[270px] sm:max-w-xl flex-wrap items-center gap-x-2.5 gap-y-1.5 text-xs sm:text-sm font-medium text-neutral-500 dark:text-neutral-400">
+              {/* Mobile: vertical stack; sm+: horizontal row */}
+              <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-y-1 sm:gap-y-1.5 sm:gap-x-2.5 text-xs sm:text-sm font-medium text-neutral-500 dark:text-neutral-400">
                 {trustItems.map((item, i) => (
                   <span key={item} className="inline-flex items-center gap-2.5">
+                    <span className="inline-block h-1 w-1 rounded-full bg-[#D97757]/50 sm:hidden" aria-hidden />
                     <span>{item}</span>
                     {i < trustItems.length - 1 && (
-                      <span className="inline-block h-1 w-1 rounded-full bg-[#D97757]/40" aria-hidden />
+                      <span className="hidden sm:inline-block h-1 w-1 rounded-full bg-[#D97757]/40" aria-hidden />
                     )}
                   </span>
                 ))}
@@ -144,7 +148,7 @@ export function Hero() {
           </div>
 
           {/* Right: phone mockup — raised on mobile via negative margin */}
-          <div className="lg:col-span-6 relative flex justify-center -mt-4 sm:mt-0">
+          <div className="lg:col-span-6 relative flex justify-center -mt-6 sm:mt-0">
             <FadeIn delay={0.2}>
               <div
                 className="relative mx-auto md:max-w-[340px]"

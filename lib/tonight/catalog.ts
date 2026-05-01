@@ -339,7 +339,7 @@ export const TONIGHT_CATALOG: CuratedMeal[] = [
     difficulty: 'medium',
     tags: ['high-protein', 'date-night'],
     benefits: ['Restaurant Quality', '18 min', 'Impressive'],
-    image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&q=80&fit=crop',
+    image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=600&q=80&fit=crop',
     keyIngredients: ['steak', 'parsley', 'garlic', 'olive oil', 'red wine vinegar'],
   },
 

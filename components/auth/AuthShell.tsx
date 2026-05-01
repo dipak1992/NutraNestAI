@@ -52,29 +52,30 @@ export function AuthShell({
           </div>
         </div>
 
-        {/* Visual side — founders photo background */}
+        {/* Visual side — auth hero: family staring at takeout with full fridge */}
         <div className="hidden lg:flex flex-col justify-end px-12 xl:px-20 pb-16 relative overflow-hidden">
-          {/* Founders photo — next/image handles WebP/AVIF conversion + sizing */}
+          {/* Hero image — 146KB optimized JPEG, next/image serves WebP/AVIF at runtime */}
           <div className="absolute inset-0">
             <Image
-              src="/images/founders-family.jpg"
-              alt="Dipak and Suprabha, MealEase co-founders"
+              src="/images/auth_hero.jpg"
+              alt="Family with a full fridge still ordering takeout — the problem MealEase solves"
               fill
               sizes="50vw"
-              className="object-cover object-[center_20%]"
+              className="object-cover object-[30%_center]"
               priority
-              quality={85}
+              quality={90}
             />
           </div>
 
-          {/* Left-to-right gradient: dark on left for text, fades to transparent right */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/20" />
-          {/* Bottom-to-top gradient: darkens bottom for stats readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+          {/* Gradient layers for text readability over warm kitchen scene */}
+          {/* Left-side dark band where quote sits */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/40 to-transparent" />
+          {/* Bottom darkening for stats */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/15 to-transparent" />
 
-          {/* Content — positioned at bottom-left where gradient is darkest */}
+          {/* Content — bottom-left, darkest zone */}
           <div className="relative z-10 max-w-xs">
-            {/* Brand accent line */}
+            {/* Brand accent */}
             <div className="w-8 h-0.5 rounded-full bg-[#D97757] mb-5" />
 
             <blockquote className="text-white text-lg font-serif leading-relaxed mb-5 drop-shadow-sm">

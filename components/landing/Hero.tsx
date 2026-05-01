@@ -7,16 +7,6 @@ import { LandingTonightPreview } from './LandingTonightPreview'
 
 const trustItems = ['Free forever', 'No card required', 'Built for households']
 
-function initials(name: string) {
-  return name
-    .split(/\s+/)
-    .map((part) => part[0])
-    .join('')
-    .replace('.', '')
-    .slice(0, 2)
-    .toUpperCase()
-}
-
 export function Hero() {
   return (
     <section
@@ -122,15 +112,21 @@ export function Hero() {
             {/* Social proof row */}
             <FadeIn delay={0.4}>
               <div className="mt-6 sm:mt-8 flex max-w-[270px] sm:max-w-xl flex-row items-center gap-3 sm:gap-4">
-                {/* Avatar stack — tighter on mobile */}
+                {/* Avatar stack — real photos */}
                 <div className="flex -space-x-1.5 shrink-0" aria-hidden>
                   {socialProof.testimonials.slice(0, 5).map((t, i) => (
                     <div
                       key={t.name}
-                      className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-white text-[10px] sm:text-[11px] font-bold text-[#9B4F34] ring-2 ring-white shadow-sm shadow-neutral-900/10 dark:bg-neutral-800 dark:text-[#F3B18E] dark:ring-neutral-950"
+                      className="relative h-8 w-8 sm:h-9 sm:w-9 overflow-hidden rounded-full ring-2 ring-white dark:ring-neutral-950 shadow-sm"
                       style={{ transform: `translateY(${i % 2 === 0 ? 0 : 1}px)` }}
                     >
-                      {initials(t.name)}
+                      <Image
+                        src={t.photo}
+                        alt={t.name}
+                        fill
+                        sizes="36px"
+                        className="object-cover object-top"
+                      />
                     </div>
                   ))}
                 </div>

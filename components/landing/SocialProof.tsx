@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { ArrowRight, Check, Repeat2, ShoppingCart, Sparkles, Star } from 'lucide-react'
 import { Container } from './shared/Container'
 import { Button } from './shared/Button'
@@ -31,16 +32,6 @@ const flow = [
     icon: Check,
   },
 ]
-
-function initials(name: string) {
-  return name
-    .split(/\s+/)
-    .map((part) => part[0])
-    .join('')
-    .replace('.', '')
-    .slice(0, 2)
-    .toUpperCase()
-}
 
 export function SocialProof() {
   return (
@@ -137,11 +128,15 @@ export function SocialProof() {
                   </p>
                 </blockquote>
                 <figcaption className="mt-6 flex items-center gap-3">
-                  <div
-                    className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-white text-xs font-bold text-[#9B4F34] shadow-sm ring-1 ring-[#D97757]/20 dark:bg-neutral-800 dark:text-[#F3B18E] dark:ring-white/10"
-                    aria-hidden
-                  >
-                    {initials(t.name)}
+                  <div className="relative h-11 w-11 flex-shrink-0 overflow-hidden rounded-full ring-2 ring-[#D97757]/25 shadow-sm">
+                    <Image
+                      src={t.photo}
+                      alt={t.name}
+                      fill
+                      sizes="44px"
+                      loading={i < 3 ? 'eager' : 'lazy'}
+                      className="object-cover object-top"
+                    />
                   </div>
                   <div>
                     <div className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">

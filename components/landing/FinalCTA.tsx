@@ -19,8 +19,8 @@ export function FinalCTA() {
           sizes="100vw"
           className="object-cover object-center"
         />
-        {/* Desktop overlay */}
-        <div className="absolute inset-0 bg-neutral-900/72" />
+        {/* Desktop: stronger top-center scrim so headline text pops, lower half stays visible */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(10,8,6,0.82)_0%,rgba(10,8,6,0.72)_45%,rgba(10,8,6,0.38)_100%)]" />
         <div
           aria-hidden
           className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_120%,rgba(217,119,87,0.22),transparent)]"
@@ -37,8 +37,8 @@ export function FinalCTA() {
           sizes="100vw"
           className="object-cover object-center"
         />
-        {/* Mobile overlay: stronger gradient from bottom so text stays readable */}
-        <div className="absolute inset-0 bg-gradient-to-b from-neutral-900/55 via-neutral-900/70 to-neutral-900/88" />
+        {/* Mobile: strong top scrim for text, family scene visible in lower half */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(10,8,6,0.88)_0%,rgba(10,8,6,0.76)_50%,rgba(10,8,6,0.32)_100%)]" />
         {/* Warm radial glow */}
         <div
           aria-hidden
@@ -49,32 +49,35 @@ export function FinalCTA() {
       <Container className="relative z-10">
         <FadeIn>
           <div className="text-center max-w-3xl mx-auto">
+            {/* Headline: text-shadow for premium depth */}
             <h2
               id="final-cta-heading"
-              className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-white leading-[1.05]"
+              className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-white leading-[1.05] [text-shadow:0_2px_16px_rgba(0,0,0,0.55)]"
             >
               Tonight&rsquo;s dinner is{' '}
               <span className="italic text-[#D97757]">one tap away.</span>
             </h2>
 
-            <p className="mt-6 text-lg md:text-xl text-neutral-300 leading-relaxed max-w-xl mx-auto">
+            {/* Paragraph: brighter white for readability */}
+            <p className="mt-5 text-lg md:text-xl text-white/85 leading-relaxed max-w-xl mx-auto font-medium">
               Join 2,400+ households who stopped stressing about dinner.
               Free forever. No card required.
             </p>
 
-            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button href="/signup" className="text-lg px-8 min-h-[56px]">
+            {/* Tighter gap between paragraph and CTA */}
+            <div className="mt-7 flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Button href="/signup" className="text-lg px-8 min-h-[56px] shadow-lg shadow-[#D97757]/30">
                 Plan tonight&rsquo;s dinner — free
               </Button>
               <a
                 href="#how-it-works"
-                className="text-neutral-300 hover:text-white underline-offset-4 hover:underline text-sm font-medium transition-colors"
+                className="text-white/70 hover:text-white underline-offset-4 hover:underline text-sm font-medium transition-colors"
               >
                 See how it works ↑
               </a>
             </div>
 
-            <p className="mt-6 text-sm text-neutral-400">
+            <p className="mt-5 text-sm text-white/50">
               Free forever · No credit card · Cancel anytime
             </p>
           </div>

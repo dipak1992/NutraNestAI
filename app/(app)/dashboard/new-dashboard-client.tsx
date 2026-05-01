@@ -156,13 +156,13 @@ export function NewDashboardClient({ initial }: { initial: DashboardPayload }) {
                 alt=""
                 fill
                 sizes="(min-width: 1400px) 1400px, 100vw"
-                className="object-cover object-center"
+                className="object-cover object-center md:object-[center_58%]"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-neutral-950/92 via-neutral-950/85 to-neutral-950/70" />
+              <div className="absolute inset-0 bg-gradient-to-r from-neutral-950/92 via-neutral-950/85 to-neutral-950/70 md:from-neutral-950/90 md:via-neutral-950/74 md:to-neutral-950/28" />
             </div>
 
-            <div className="relative z-10 p-4 sm:p-5">
+            <div className="relative z-10 p-4 sm:p-5 md:p-6">
               {/* Header row */}
               <div className="flex items-center gap-2 mb-3">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-[#D97757]/20 border border-[#D97757]/30 text-[#E8895A] text-xs font-bold px-2.5 py-1">
@@ -210,7 +210,7 @@ export function NewDashboardClient({ initial }: { initial: DashboardPayload }) {
           <button
             type="button"
             onClick={() => { hapticTap(); openScan('auto') }}
-            className="group relative overflow-hidden flex min-h-[88px] items-end rounded-2xl text-left transition hover:-translate-y-0.5 hover:shadow-md"
+            className="group relative overflow-hidden flex min-h-[88px] items-end rounded-2xl text-left transition hover:-translate-y-0.5 hover:shadow-md md:min-h-[150px] md:rounded-3xl"
           >
             {/* Background image */}
             <div className="absolute inset-0">
@@ -218,26 +218,26 @@ export function NewDashboardClient({ initial }: { initial: DashboardPayload }) {
                 src="/cards/snap.jpg"
                 alt=""
                 fill
-                sizes="(min-width: 768px) 300px, 50vw"
-                className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                sizes="(min-width: 1280px) 640px, (min-width: 768px) 50vw, 50vw"
+                className="object-cover object-center transition-transform duration-500 group-hover:scale-105 md:object-[center_42%]"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/85 via-neutral-950/40 to-neutral-950/10" />
+              <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/85 via-neutral-950/40 to-neutral-950/10 md:from-neutral-950/88 md:via-neutral-950/34 md:to-transparent" />
             </div>
             {/* Content */}
-            <div className="relative z-10 p-3.5 w-full">
-              <span className="flex h-8 w-8 mb-1.5 items-center justify-center rounded-xl bg-white/15 backdrop-blur-sm ring-1 ring-white/20">
-                <Camera className="h-4 w-4 text-white" />
+            <div className="relative z-10 p-3.5 w-full md:p-5">
+              <span className="flex h-8 w-8 mb-1.5 items-center justify-center rounded-xl bg-white/15 backdrop-blur-sm ring-1 ring-white/20 md:h-10 md:w-10 md:mb-2">
+                <Camera className="h-4 w-4 text-white md:h-5 md:w-5" />
               </span>
-              <span className="block text-sm font-bold text-white [text-shadow:0_1px_6px_rgba(0,0,0,0.5)]">Snap fridge</span>
-              <span className="block text-[11px] text-white/70 mt-0.5">Cook what you have</span>
+              <span className="block text-sm font-bold text-white [text-shadow:0_1px_6px_rgba(0,0,0,0.5)] md:text-lg">Snap fridge</span>
+              <span className="block text-[11px] text-white/70 mt-0.5 md:text-sm md:text-white/78">Cook what you have</span>
             </div>
           </button>
 
           {/* Use leftovers card */}
           <Link
             href="/leftovers"
-            className="group relative overflow-hidden flex min-h-[88px] items-end rounded-2xl text-left transition hover:-translate-y-0.5 hover:shadow-md"
+            className="group relative overflow-hidden flex min-h-[88px] items-end rounded-2xl text-left transition hover:-translate-y-0.5 hover:shadow-md md:min-h-[150px] md:rounded-3xl"
           >
             {/* Background image */}
             <div className="absolute inset-0">
@@ -245,19 +245,19 @@ export function NewDashboardClient({ initial }: { initial: DashboardPayload }) {
                 src="/cards/leftover.jpg"
                 alt=""
                 fill
-                sizes="(min-width: 768px) 300px, 50vw"
-                className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                sizes="(min-width: 1280px) 640px, (min-width: 768px) 50vw, 50vw"
+                className="object-cover object-center transition-transform duration-500 group-hover:scale-105 md:object-[center_42%]"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/85 via-neutral-950/40 to-neutral-950/10" />
+              <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/85 via-neutral-950/40 to-neutral-950/10 md:from-neutral-950/88 md:via-neutral-950/34 md:to-transparent" />
             </div>
             {/* Content */}
-            <div className="relative z-10 p-3.5 w-full">
-              <span className="flex h-8 w-8 mb-1.5 items-center justify-center rounded-xl bg-white/15 backdrop-blur-sm ring-1 ring-white/20">
-                <Refrigerator className="h-4 w-4 text-white" />
+            <div className="relative z-10 p-3.5 w-full md:p-5">
+              <span className="flex h-8 w-8 mb-1.5 items-center justify-center rounded-xl bg-white/15 backdrop-blur-sm ring-1 ring-white/20 md:h-10 md:w-10 md:mb-2">
+                <Refrigerator className="h-4 w-4 text-white md:h-5 md:w-5" />
               </span>
-              <span className="block text-sm font-bold text-white [text-shadow:0_1px_6px_rgba(0,0,0,0.5)]">Use leftovers</span>
-              <span className="block text-[11px] text-white/70 mt-0.5">Turn extras into dinner</span>
+              <span className="block text-sm font-bold text-white [text-shadow:0_1px_6px_rgba(0,0,0,0.5)] md:text-lg">Use leftovers</span>
+              <span className="block text-[11px] text-white/70 mt-0.5 md:text-sm md:text-white/78">Turn extras into dinner</span>
             </div>
           </Link>
         </section>

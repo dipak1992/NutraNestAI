@@ -9,8 +9,8 @@ export function FinalCTA() {
       className="relative overflow-hidden py-24 md:py-32"
       aria-labelledby="final-cta-heading"
     >
-      {/* Background image */}
-      <div className="absolute inset-0 -z-10">
+      {/* Background image — desktop (landscape join_us.jpg) */}
+      <div className="absolute inset-0 -z-10 hidden sm:block">
         <Image
           src="/landing/join_us.jpg"
           alt=""
@@ -19,12 +19,30 @@ export function FinalCTA() {
           sizes="100vw"
           className="object-cover object-center"
         />
-        {/* Dark overlay for text readability */}
+        {/* Desktop overlay */}
         <div className="absolute inset-0 bg-neutral-900/72" />
-        {/* Subtle warm radial glow */}
         <div
           aria-hidden
           className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_120%,rgba(217,119,87,0.22),transparent)]"
+        />
+      </div>
+
+      {/* Background image — mobile only (portrait join_us.jpg) */}
+      <div className="absolute inset-0 -z-10 sm:hidden">
+        <Image
+          src="/mobile/join_us.jpg"
+          alt=""
+          fill
+          loading="lazy"
+          sizes="100vw"
+          className="object-cover object-center"
+        />
+        {/* Mobile overlay: stronger gradient from bottom so text stays readable */}
+        <div className="absolute inset-0 bg-gradient-to-b from-neutral-900/55 via-neutral-900/70 to-neutral-900/88" />
+        {/* Warm radial glow */}
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-[radial-gradient(ellipse_90%_50%_at_50%_110%,rgba(217,119,87,0.28),transparent)]"
         />
       </div>
 

@@ -2,6 +2,7 @@ export const pillars = [
   {
     id: 'tonight',
     icon: '🍽️',
+    image: '/cards/tonight.jpg',
     question: "What's for dinner?",
     title: 'Tonight Suggestions',
     answer:
@@ -11,6 +12,7 @@ export const pillars = [
   {
     id: 'snap',
     icon: '📸',
+    image: '/cards/snap.jpg',
     question: "What's in my fridge?",
     title: 'Snap & Cook',
     answer:
@@ -20,6 +22,7 @@ export const pillars = [
   {
     id: 'autopilot',
     icon: '📅',
+    image: '/cards/weekly.jpg',
     question: "What's this week?",
     title: 'Weekly Autopilot',
     answer:
@@ -29,6 +32,7 @@ export const pillars = [
   {
     id: 'leftovers',
     icon: '🍱',
+    image: '/cards/leftover.jpg',
     question: 'What do I do with leftovers?',
     title: 'Leftovers AI',
     answer:
@@ -38,6 +42,7 @@ export const pillars = [
   {
     id: 'budget',
     icon: '💰',
+    image: '/cards/budget.jpg',
     question: 'What will it cost me?',
     title: 'Budget Intelligence',
     answer:

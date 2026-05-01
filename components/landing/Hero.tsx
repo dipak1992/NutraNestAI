@@ -20,14 +20,15 @@ function initials(name: string) {
 export function Hero() {
   return (
     <section
-      className="relative overflow-hidden pt-16 pb-20 md:pt-24 md:pb-32"
+      className="relative overflow-hidden pt-14 pb-16 sm:pt-16 sm:pb-20 md:pt-24 md:pb-32"
       aria-labelledby="hero-heading"
     >
-      {/* Soft background wash */}
+      {/* Base warm gradient — always present */}
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-gradient-to-b from-[#FDF6F1] via-white to-white dark:from-neutral-900 dark:via-neutral-950 dark:to-neutral-950"
       />
+
       {/* Desktop background wash (sm+) — subtle heroSection.jpg */}
       <div className="absolute inset-0 -z-10 hidden sm:block">
         <Image
@@ -49,22 +50,24 @@ export function Hero() {
           fill
           priority
           sizes="100vw"
-          className="object-cover object-right-center"
+          className="object-cover object-right"
         />
-        {/* Left-heavy gradient keeps headline + CTA clean; right side shows image */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.96)_0%,rgba(255,255,255,0.88)_45%,rgba(255,255,255,0.55)_70%,rgba(255,255,255,0.18)_100%)] dark:bg-[linear-gradient(to_right,rgba(10,10,10,0.96)_0%,rgba(10,10,10,0.88)_45%,rgba(10,10,10,0.55)_70%,rgba(10,10,10,0.18)_100%)]" />
+        {/* Stronger left-heavy gradient: text zone is near-opaque, right edge reveals image */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.97)_0%,rgba(255,255,255,0.92)_40%,rgba(255,255,255,0.62)_65%,rgba(255,255,255,0.14)_100%)] dark:bg-[linear-gradient(to_right,rgba(10,10,10,0.97)_0%,rgba(10,10,10,0.92)_40%,rgba(10,10,10,0.62)_65%,rgba(10,10,10,0.14)_100%)]" />
         {/* Warm top fade for nav transition */}
-        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#FDF6F1]/80 to-transparent dark:from-neutral-950/80" />
+        <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#FDF6F1]/90 to-transparent dark:from-neutral-950/90" />
+        {/* Soft bottom fade so phone mockup blends in */}
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white/80 to-transparent dark:from-neutral-950/80" />
       </div>
 
       <Container wide>
-        <div className="grid lg:grid-cols-12 gap-10 lg:gap-16 items-center">
+        <div className="grid lg:grid-cols-12 gap-8 lg:gap-16 items-center">
           {/* Left: copy */}
           <div className="lg:col-span-6">
             <FadeIn>
               <h1
                 id="hero-heading"
-                className="max-w-[320px] sm:max-w-xl font-serif text-[40px] leading-[1.04] sm:text-5xl md:text-6xl lg:text-[64px] font-bold tracking-tight text-neutral-900 dark:text-neutral-50"
+                className="max-w-[280px] sm:max-w-xl font-serif text-[38px] leading-[1.05] sm:text-5xl md:text-6xl lg:text-[64px] font-bold tracking-tight text-neutral-900 dark:text-neutral-50"
               >
                 Never ask{' '}
                 <span className="italic text-[#D97757]">
@@ -75,20 +78,24 @@ export function Hero() {
             </FadeIn>
 
             <FadeIn delay={0.1}>
-              <p className="mt-6 max-w-[310px] text-lg leading-relaxed text-neutral-600 dark:text-neutral-300 sm:max-w-xl md:text-xl">
+              <p className="mt-4 sm:mt-6 max-w-[270px] sm:max-w-xl text-base sm:text-lg leading-relaxed text-neutral-600 dark:text-neutral-300 md:text-xl">
                 MealEase connects tonight&rsquo;s dinner, weekly planning, groceries,
                 leftovers, and budget into one calm food system. In 30 seconds.
               </p>
             </FadeIn>
 
             <FadeIn delay={0.2}>
-              <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                <Button href="/signup" className="max-w-full text-center">
+              <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+                {/* CTA with stronger shadow + tighter padding on mobile */}
+                <Button
+                  href="/signup"
+                  className="w-full sm:w-auto text-center shadow-lg shadow-[#D97757]/25 hover:shadow-xl hover:shadow-[#D97757]/30 transition-shadow duration-200"
+                >
                   Plan tonight&rsquo;s dinner — free
                 </Button>
                 <a
                   href="#how-it-works"
-                  className="text-neutral-700 dark:text-neutral-300 hover:text-[#D97757] underline-offset-4 hover:underline text-sm font-medium"
+                  className="text-neutral-600 dark:text-neutral-300 hover:text-[#D97757] underline-offset-4 hover:underline text-sm font-medium transition-colors"
                 >
                   See how it works ↓
                 </a>
@@ -96,12 +103,12 @@ export function Hero() {
             </FadeIn>
 
             <FadeIn delay={0.3}>
-              <div className="mt-4 flex max-w-[310px] flex-wrap items-center gap-x-3 gap-y-2 text-sm font-medium text-neutral-500 dark:text-neutral-400 sm:max-w-xl">
+              <div className="mt-3 sm:mt-4 flex max-w-[270px] sm:max-w-xl flex-wrap items-center gap-x-2.5 gap-y-1.5 text-xs sm:text-sm font-medium text-neutral-500 dark:text-neutral-400">
                 {trustItems.map((item, i) => (
-                  <span key={item} className="inline-flex items-center gap-3">
+                  <span key={item} className="inline-flex items-center gap-2.5">
                     <span>{item}</span>
                     {i < trustItems.length - 1 && (
-                      <span className="hidden sm:inline-block h-1 w-1 rounded-full bg-[#D97757]/50" aria-hidden />
+                      <span className="inline-block h-1 w-1 rounded-full bg-[#D97757]/40" aria-hidden />
                     )}
                   </span>
                 ))}
@@ -110,23 +117,25 @@ export function Hero() {
 
             {/* Social proof row */}
             <FadeIn delay={0.4}>
-              <div className="mt-8 flex max-w-[310px] flex-col items-start gap-4 sm:max-w-xl sm:flex-row sm:items-center">
-                <div className="flex -space-x-2" aria-hidden>
+              <div className="mt-6 sm:mt-8 flex max-w-[270px] sm:max-w-xl flex-row items-center gap-3 sm:gap-4">
+                {/* Avatar stack — tighter on mobile */}
+                <div className="flex -space-x-1.5 shrink-0" aria-hidden>
                   {socialProof.testimonials.slice(0, 5).map((t, i) => (
                     <div
                       key={t.name}
-                      className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-[11px] font-bold text-[#9B4F34] ring-2 ring-white shadow-sm shadow-neutral-900/10 dark:bg-neutral-800 dark:text-[#F3B18E] dark:ring-neutral-950"
-                      style={{ transform: `translateY(${i % 2 === 0 ? 0 : 2}px)` }}
+                      className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-white text-[10px] sm:text-[11px] font-bold text-[#9B4F34] ring-2 ring-white shadow-sm shadow-neutral-900/10 dark:bg-neutral-800 dark:text-[#F3B18E] dark:ring-neutral-950"
+                      style={{ transform: `translateY(${i % 2 === 0 ? 0 : 1}px)` }}
                     >
                       {initials(t.name)}
                     </div>
                   ))}
                 </div>
-                <div className="min-w-0 text-sm">
-                  <div className="font-medium text-neutral-900 dark:text-neutral-100">
-                    ★★★★★ {socialProof.rating}
+                <div className="min-w-0">
+                  <div className="text-xs sm:text-sm font-semibold text-neutral-900 dark:text-neutral-100 leading-tight">
+                    ★★★★★{' '}
+                    <span className="font-medium text-neutral-700 dark:text-neutral-300">{socialProof.rating}</span>
                   </div>
-                  <div className="text-neutral-500 dark:text-neutral-400">
+                  <div className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 leading-tight mt-0.5">
                     Trusted by {socialProof.householdCount} households
                   </div>
                 </div>
@@ -134,15 +143,15 @@ export function Hero() {
             </FadeIn>
           </div>
 
-          {/* Right: phone mockup */}
-          <div className="lg:col-span-6 relative flex justify-center">
+          {/* Right: phone mockup — raised on mobile via negative margin */}
+          <div className="lg:col-span-6 relative flex justify-center -mt-4 sm:mt-0">
             <FadeIn delay={0.2}>
               <div
                 className="relative mx-auto md:max-w-[340px]"
-                style={{ width: 'min(280px, calc(100vw - 64px))' }}
+                style={{ width: 'min(260px, calc(100vw - 80px))' }}
               >
                 {/* Phone frame */}
-                <div className="relative aspect-[9/19.5] rounded-[3rem] bg-neutral-900 p-3 shadow-2xl shadow-neutral-900/20 ring-1 ring-black/5">
+                <div className="relative aspect-[9/19.5] rounded-[3rem] bg-neutral-900 p-3 shadow-2xl shadow-neutral-900/25 ring-1 ring-black/8">
                   <div className="relative w-full h-full rounded-[2.3rem] overflow-hidden bg-[#FBFAF3]">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(16,185,129,0.14),transparent_34%),radial-gradient(circle_at_100%_20%,rgba(217,119,87,0.14),transparent_32%)]" />
                     <LandingTonightPreview />
@@ -170,4 +179,3 @@ export function Hero() {
     </section>
   )
 }
-

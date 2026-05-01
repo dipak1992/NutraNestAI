@@ -137,7 +137,6 @@ async function logEmail(params: {
 
 async function alertAdminEmailFailure(to: string, subject: string, error: string) {
   try {
-    const { createElement: h } = await import('react')
     await resend.emails.send({
       from: EMAIL_FROM,
       to: [EMAIL_ALERTS],

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import type { ContactPayload, ContactTopic } from '@/lib/contact/types'
+import { alertAdminContactForm, sendSupportConfirmationEmail } from '@/lib/email/triggers'
 
 export const runtime = 'nodejs'
 
@@ -84,7 +85,20 @@ export async function POST(req: Request) {
     )
   }
 
-  // TODO: send email notification to founders via Resend / Postmark / SES
+  const cleanName = name.trim()
+  const cleanEmail = email.trim().toLowerCase()
+  const cleanMessage = message.trim()
+
+  void sendSupportConfirmationEmail({
+    to: cleanEmail,
+    firstName: cleanName.split(' ')[0],
+  })
+
+  void alertAdminContactForm({
+    senderEmail: cleanEmail,
+    senderName: cleanName,
+    message: `[${topic}] ${cleanMessage}`,
+  })
 
   return NextResponse.json({ ok: true })
 }

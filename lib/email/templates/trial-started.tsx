@@ -16,7 +16,7 @@ export function TrialStartedEmail({ firstName, trialDays = 14, trialEndDate }: P
   return (
     <Html>
       <Head />
-      <Preview>{`Your ${trialDays}-day MealEase Pro trial has started — explore everything free.`}</Preview>
+      <Preview>{`Your ${trialDays}-day MealEase Plus trial has started — explore everything free.`}</Preview>
       <Body style={styles.body}>
         <Container style={styles.container}>
 
@@ -25,12 +25,12 @@ export function TrialStartedEmail({ firstName, trialDays = 14, trialEndDate }: P
           </Section>
 
           <Section style={styles.body_inner}>
-            <Heading style={styles.h1}>Your {trialDays}-day trial is live 🎉</Heading>
+            <Heading style={styles.h1}>Your {trialDays}-day Plus trial is live 🎉</Heading>
 
             <Text style={styles.p}>
-              Hi {name}, welcome to MealEase Pro. For the next {trialDays} days you have
-              full access — unlimited meal plans, smart grocery lists, pantry tracking,
-              and one-click reschedule.
+              Hi {name}, welcome to MealEase Plus. For the next {trialDays} days you have
+              full access to weekly planning, smart grocery lists, leftovers, budget context,
+              and household memory.
             </Text>
 
             <Text style={styles.p}>
@@ -54,7 +54,8 @@ export function TrialStartedEmail({ firstName, trialDays = 14, trialEndDate }: P
               {trialEndDate
                 ? `Your trial ends on ${trialEndDate}. `
                 : ''}
-              No charge until the trial ends — we&apos;ll send you a reminder before then.
+              We&apos;ll send you a reminder before the trial ends.
+              MealEase subscriptions are securely billed through DDS Supply LLC via Stripe.
               Questions? <Link href="mailto:hello@mealeaseai.com" style={{ color: colors.sage }}>hello@mealeaseai.com</Link>
             </Text>
           </Section>

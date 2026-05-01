@@ -20,6 +20,8 @@ interface ResendWebhookPayload {
 }
 
 export async function POST(request: NextRequest) {
+  const rawBody = await request.text()
+
   // ── Signature verification ───────────────────────────────────────────────
   const webhookSecret = process.env.RESEND_WEBHOOK_SECRET
   if (webhookSecret) {
@@ -34,8 +36,7 @@ export async function POST(request: NextRequest) {
     try {
       const { Webhook } = await import('svix')
       const wh = new Webhook(webhookSecret)
-      const body = await request.text()
-      wh.verify(body, {
+      wh.verify(rawBody, {
         'svix-id': msgId,
         'svix-timestamp': msgTs,
         'svix-signature': signature,
@@ -47,7 +48,7 @@ export async function POST(request: NextRequest) {
 
   let payload: ResendWebhookPayload
   try {
-    payload = await request.json()
+    payload = JSON.parse(rawBody) as ResendWebhookPayload
   } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
@@ -93,6 +94,26 @@ export async function POST(request: NextRequest) {
         .from('email_logs')
         .update({ status: 'complained' })
         .eq('resend_message_id', emailId)
+    } else if (type === 'email.failed') {
+      await supabase
+        .from('email_logs')
+        .update({ status: 'failed' })
+        .eq('resend_message_id', emailId)
+    }
+  }
+
+  if (type === 'email.bounced' || type === 'email.complained') {
+    const userId = await findUserIdByEmail(supabase, recipient)
+    if (userId) {
+      await supabase
+        .from('notification_preferences')
+        .update({
+          dinner_reminders: false,
+          weekly_reminders: false,
+          referral_emails: false,
+          product_updates: false,
+        })
+        .eq('user_id', userId)
     }
   }
 
@@ -127,4 +148,18 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json({ ok: true })
+}
+
+async function findUserIdByEmail(
+  supabase: ReturnType<typeof createSupabaseServiceClient>,
+  email: string,
+): Promise<string | null> {
+  const { data } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('email', email)
+    .maybeSingle()
+
+  const row = data as { id?: string } | null
+  return row?.id ?? null
 }

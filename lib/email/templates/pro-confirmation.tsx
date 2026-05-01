@@ -15,7 +15,7 @@ export function ProConfirmationEmail({ firstName, planName = 'Plus' }: Props) {
   return (
     <Html>
       <Head />
-      <Preview>You&apos;re now on MealEase Pro — welcome to the full experience.</Preview>
+      <Preview>You&apos;re now on MealEase Plus — welcome to the full experience.</Preview>
       <Body style={styles.body}>
         <Container style={styles.container}>
 
@@ -28,8 +28,8 @@ export function ProConfirmationEmail({ firstName, planName = 'Plus' }: Props) {
 
             <Text style={styles.p}>
               Hi {name}, your upgrade is confirmed. You now have full access to
-              everything MealEase has to offer — unlimited meal plans, smart
-              grocery lists, pantry tracking, and more.
+              the connected MealEase system: full weekly planning, smart
+              grocery lists, leftovers, budget context, and household memory.
             </Text>
 
             <Text style={styles.p}>
@@ -43,7 +43,8 @@ export function ProConfirmationEmail({ firstName, planName = 'Plus' }: Props) {
             <Hr style={styles.divider} />
 
             <Text style={styles.muted}>
-              Your subscription renews monthly. To manage or cancel, visit your{' '}
+              MealEase subscriptions are securely billed through DDS Supply LLC via Stripe.
+              To manage or cancel, visit your{' '}
               <Link href={`${SITE}/settings`} style={{ color: colors.sage }}>account settings</Link>.
               Questions? Write to{' '}
               <Link href="mailto:hello@mealeaseai.com" style={{ color: colors.sage }}>

@@ -1,6 +1,6 @@
 import {
   Body, Container, Head, Heading, Html, Link,
-  Preview, Section, Text, Hr, Row, Column,
+  Preview, Section, Text, Hr,
 } from '@react-email/components'
 import { styles, colors } from './shared'
 import { SITE_URL as SITE } from '../client'

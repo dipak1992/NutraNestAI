@@ -14,12 +14,62 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { serverEnv } from '@/lib/env'
 import { publicEnv } from '@/lib/env'
-import { mapPriceIdToTier, extractTierFromSubscription } from '@/lib/paywall/stripe-mapping'
+import { mapPriceIdToTier } from '@/lib/paywall/stripe-mapping'
 import type { SubscriptionTier } from '@/types'
+import {
+  alertAdminBillingEvent,
+  alertAdminFailedPayment,
+  alertAdminNewPro,
+  sendCancellationConfirmationEmail,
+  sendFailedPaymentEmail,
+  sendPaymentReceiptEmail,
+  sendProConfirmationEmail,
+  sendRefundConfirmationEmail,
+  sendTrialStartedEmail,
+} from '@/lib/email/triggers'
 
 // Use service-role client so we can update any user's profile (bypasses RLS)
 function adminSupabase() {
   return createClient(publicEnv.supabaseUrl, serverEnv.supabaseServiceRoleKey)
+}
+
+type AdminClient = ReturnType<typeof adminSupabase>
+
+type ProfileForEmail = {
+  id: string
+  email: string | null
+  full_name: string | null
+  subscription_tier?: string | null
+}
+
+function firstName(profile?: ProfileForEmail | null): string | undefined {
+  return profile?.full_name?.split(' ')[0] || undefined
+}
+
+function formatMoney(cents?: number | null, currency = 'usd'): string | undefined {
+  if (typeof cents !== 'number') return undefined
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: currency.toUpperCase(),
+  }).format(cents / 100)
+}
+
+async function getProfileById(supabase: AdminClient, userId: string): Promise<ProfileForEmail | null> {
+  const { data } = await supabase
+    .from('profiles')
+    .select('id, email, full_name, subscription_tier')
+    .eq('id', userId)
+    .maybeSingle()
+  return (data as ProfileForEmail | null) ?? null
+}
+
+async function getProfileByCustomer(supabase: AdminClient, customerId: string): Promise<ProfileForEmail | null> {
+  const { data } = await supabase
+    .from('profiles')
+    .select('id, email, full_name, subscription_tier')
+    .eq('stripe_customer_id', customerId)
+    .maybeSingle()
+  return (data as ProfileForEmail | null) ?? null
 }
 
 // ── Stripe signature verification (no SDK) ────────────────────────────────────
@@ -103,6 +153,21 @@ async function handleCheckoutCompleted(session: Record<string, unknown>) {
     console.error('[stripe-webhook] checkout update failed:', error.message)
   } else {
     console.log(`[stripe-webhook] upgraded user ${userId} to ${tier}`)
+    const profile = await getProfileById(supabase, userId)
+    const email = profile?.email ?? (session['customer_email'] as string | null)
+    if (email) {
+      void sendProConfirmationEmail({
+        to: email,
+        firstName: firstName(profile),
+        planName: 'Plus',
+        subscriptionId: subscriptionId ?? undefined,
+      })
+      void alertAdminNewPro({
+        userEmail: email,
+        userId,
+        planName: 'Plus',
+      })
+    }
   }
 }
 
@@ -126,8 +191,6 @@ async function handleSubscriptionUpserted(sub: Record<string, unknown>) {
   if (itemsData && itemsData.length > 0) {
     const price = itemsData[0]['price'] as Record<string, unknown> | undefined
     priceId = price?.['id'] as string | undefined
-    const interval = price?.['recurring'] as Record<string, unknown> | undefined
-    const intervalValue = interval?.['interval'] as string | undefined
 
     // Map price ID to tier
     if (priceId) {
@@ -162,6 +225,26 @@ async function handleSubscriptionUpserted(sub: Record<string, unknown>) {
     console.log(
       `[stripe-webhook] subscription synced → ${tier} (${billingInterval}) for customer: ${customerId}`,
     )
+    if (status === 'trialing') {
+      const profile = await getProfileByCustomer(supabase, customerId)
+      if (profile?.email) {
+        const trialEndSeconds = sub['trial_end'] as number | undefined
+        const trialEndDate = trialEndSeconds
+          ? new Date(trialEndSeconds * 1000).toLocaleDateString('en-US', {
+              month: 'long',
+              day: 'numeric',
+              year: 'numeric',
+            })
+          : undefined
+        void sendTrialStartedEmail({
+          to: profile.email,
+          firstName: firstName(profile),
+          trialDays: serverEnv.stripeTrialDays || 7,
+          trialEndDate,
+          subscriptionId: subscriptionId ?? undefined,
+        })
+      }
+    }
   }
 }
 
@@ -184,7 +267,104 @@ async function handleSubscriptionDeleted(sub: Record<string, unknown>) {
     console.error('[stripe-webhook] subscription delete failed:', error.message)
   } else {
     console.log('[stripe-webhook] downgraded to free for customer:', customerId)
+    const profile = await getProfileByCustomer(supabase, customerId)
+    if (profile?.email) {
+      void sendCancellationConfirmationEmail({
+        to: profile.email,
+        firstName: firstName(profile),
+        subscriptionId: (sub['id'] as string | undefined) ?? undefined,
+      })
+      void alertAdminBillingEvent({
+        title: 'Subscription cancelled',
+        userEmail: profile.email,
+        userId: profile.id,
+        event: 'customer.subscription.deleted',
+      })
+    }
   }
+}
+
+async function handleInvoicePaymentSucceeded(invoice: Record<string, unknown>) {
+  const customerId = invoice['customer'] as string | null
+  if (!customerId) return
+
+  const supabase = adminSupabase()
+  const profile = await getProfileByCustomer(supabase, customerId)
+  if (!profile?.email) return
+
+  const invoiceId = invoice['id'] as string | undefined
+  const amount = formatMoney(invoice['amount_paid'] as number | undefined, (invoice['currency'] as string | undefined) ?? 'usd')
+  const invoiceUrl = (invoice['hosted_invoice_url'] as string | undefined) ?? (invoice['invoice_pdf'] as string | undefined)
+  const created = invoice['created'] as number | undefined
+  const date = created
+    ? new Date(created * 1000).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+    : new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+
+  void sendPaymentReceiptEmail({
+    to: profile.email,
+    firstName: firstName(profile),
+    amount: amount ?? 'Paid',
+    date,
+    invoiceId,
+    invoiceUrl,
+    planName: 'Plus',
+  })
+}
+
+async function handleInvoicePaymentFailed(invoice: Record<string, unknown>) {
+  const customerId = invoice['customer'] as string | null
+  if (!customerId) return
+
+  const supabase = adminSupabase()
+  const profile = await getProfileByCustomer(supabase, customerId)
+  if (!profile?.email) return
+
+  const invoiceId = invoice['id'] as string | undefined
+  const amount = formatMoney(invoice['amount_due'] as number | undefined, (invoice['currency'] as string | undefined) ?? 'usd')
+  const invoiceUrl = invoice['hosted_invoice_url'] as string | undefined
+
+  void sendFailedPaymentEmail({
+    to: profile.email,
+    firstName: firstName(profile),
+    amount,
+    invoiceId,
+    invoiceUrl,
+  })
+  void alertAdminFailedPayment({
+    userEmail: profile.email,
+    userId: profile.id,
+    amount,
+    reason: 'Stripe invoice.payment_failed',
+  })
+}
+
+async function handleChargeRefunded(charge: Record<string, unknown>) {
+  const customerId = charge['customer'] as string | null
+  if (!customerId) return
+
+  const supabase = adminSupabase()
+  const profile = await getProfileByCustomer(supabase, customerId)
+  if (!profile?.email) return
+
+  const refundContainer = charge['refunds'] as Record<string, unknown> | undefined
+  const refunds = refundContainer?.['data'] as Array<Record<string, unknown>> | undefined
+  const refund = refunds?.[0]
+  const refundId = refund?.['id'] as string | undefined
+  const amount = formatMoney((refund?.['amount'] as number | undefined) ?? (charge['amount_refunded'] as number | undefined), (charge['currency'] as string | undefined) ?? 'usd')
+
+  void sendRefundConfirmationEmail({
+    to: profile.email,
+    firstName: firstName(profile),
+    amount,
+    refundId,
+  })
+  void alertAdminBillingEvent({
+    title: 'Refund processed',
+    userEmail: profile.email,
+    userId: profile.id,
+    event: 'charge.refunded',
+    amount,
+  })
 }
 
 // ── Main handler ──────────────────────────────────────────────────────────────
@@ -227,10 +407,15 @@ export async function POST(req: Request) {
         break
 
       case 'invoice.payment_failed':
-        console.warn(
-          '[stripe-webhook] payment_failed for customer:',
-          event.data.object['customer'],
-        )
+        await handleInvoicePaymentFailed(event.data.object)
+        break
+
+      case 'invoice.payment_succeeded':
+        await handleInvoicePaymentSucceeded(event.data.object)
+        break
+
+      case 'charge.refunded':
+        await handleChargeRefunded(event.data.object)
         break
 
       default:

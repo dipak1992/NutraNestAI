@@ -14,7 +14,7 @@ interface Props {
 
 export function TrialEndingSoonEmail({ firstName, daysLeft = 3, trialEndDate, upgradeUrl }: Props) {
   const name = firstName ?? 'there'
-  const ctaUrl = upgradeUrl ?? `${SITE}/settings/billing`
+  const ctaUrl = upgradeUrl ?? `${SITE}/upgrade`
   return (
     <Html>
       <Head />
@@ -35,7 +35,7 @@ export function TrialEndingSoonEmail({ firstName, daysLeft = 3, trialEndDate, up
               Hi {name}, your MealEase Plus trial
               {trialEndDate ? ` ends on ${trialEndDate}` : ` ends in ${daysLeft} day${daysLeft !== 1 ? 's' : ''}`}.
               After that, your account moves to the free plan and your current meal
-              plans and grocery lists will stay — but you won&apos;t be able to generate new ones.
+              plans and grocery lists will stay. Plus-only planning, grocery, leftovers, and budget features will pause.
             </Text>
 
             <Text style={styles.p}>
@@ -49,7 +49,7 @@ export function TrialEndingSoonEmail({ firstName, daysLeft = 3, trialEndDate, up
             <Hr style={styles.divider} />
 
             <Text style={styles.muted}>
-              If you don&apos;t upgrade, your account simply reverts to free — no charge,
+              If you don&apos;t upgrade, your account simply reverts to free — no surprise charge,
               no hassle. Changed your mind about the trial?{' '}
               <Link href="mailto:hello@mealeaseai.com" style={{ color: colors.sage }}>Let us know</Link>.
             </Text>

@@ -27,10 +27,6 @@
       "schedule": "0 0 * * *"
     },
     {
-      "path": "/api/email/reminders?type=weekend",
-      "schedule": "0 17 * * 5"
-    },
-    {
       "path": "/api/email/reminders?type=admin-summary",
       "schedule": "0 10 * * 1"
     },

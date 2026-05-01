@@ -15,12 +15,18 @@ import { TrialStartedEmail } from './templates/trial-started'
 import { TrialEndingSoonEmail } from './templates/trial-ending-soon'
 import { ReactivationEmail } from './templates/reactivation'
 import { ChurnWinbackEmail } from './templates/churn-winback'
+import {
+  CancellationConfirmationEmail,
+  FailedPaymentEmail,
+  RefundConfirmationEmail,
+} from './templates/billing-status'
 
 // Admin templates
 import {
   AdminNewUserEmail,
   AdminNewProEmail,
   AdminFailedPaymentEmail,
+  AdminBillingEventEmail,
   AdminContactFormEmail,
   AdminWeeklySummaryEmail,
 } from './templates/admin'
@@ -58,15 +64,18 @@ export async function sendProConfirmationEmail(params: {
   to: string
   firstName?: string
   planName?: string
+  subscriptionId?: string
 }) {
   return sendEmail({
     to: params.to,
-    subject: 'You\'re on MealEase Pro ✨',
+    subject: 'You\'re on MealEase Plus ✨',
     react: createElement(ProConfirmationEmail, {
       firstName: params.firstName,
-      planName: params.planName,
+      planName: params.planName ?? 'Plus',
     }),
-    idempotencyKey: `pro-confirm:${params.to}:${params.planName ?? 'Pro'}`,
+    idempotencyKey: params.subscriptionId
+      ? `plus-confirm:${params.subscriptionId}`
+      : `plus-confirm:${params.to}:${params.planName ?? 'Plus'}`,
   })
 }
 
@@ -76,6 +85,7 @@ export async function sendPaymentReceiptEmail(params: {
   amount: string
   date: string
   invoiceId?: string
+  invoiceUrl?: string
   planName?: string
 }) {
   return sendEmail({
@@ -149,6 +159,49 @@ export async function sendSupportConfirmationEmail(params: {
   })
 }
 
+export async function sendFailedPaymentEmail(params: {
+  to: string
+  firstName?: string
+  amount?: string
+  invoiceId?: string
+  invoiceUrl?: string
+}) {
+  return sendEmail({
+    to: params.to,
+    subject: 'Action needed: MealEase Plus billing',
+    react: createElement(FailedPaymentEmail, params),
+    idempotencyKey: params.invoiceId ? `failed-payment:${params.invoiceId}` : undefined,
+  })
+}
+
+export async function sendCancellationConfirmationEmail(params: {
+  to: string
+  firstName?: string
+  subscriptionId?: string
+  accessEndsAt?: string
+}) {
+  return sendEmail({
+    to: params.to,
+    subject: 'MealEase Plus cancellation confirmed',
+    react: createElement(CancellationConfirmationEmail, params),
+    idempotencyKey: params.subscriptionId ? `cancelled:${params.subscriptionId}` : undefined,
+  })
+}
+
+export async function sendRefundConfirmationEmail(params: {
+  to: string
+  firstName?: string
+  amount?: string
+  refundId?: string
+}) {
+  return sendEmail({
+    to: params.to,
+    subject: 'MealEase refund processed',
+    react: createElement(RefundConfirmationEmail, params),
+    idempotencyKey: params.refundId ? `refund:${params.refundId}` : undefined,
+  })
+}
+
 // ─── Admin triggers ─────────────────────────────────────────────────────────
 
 export async function alertAdminNewUser(params: {
@@ -193,6 +246,22 @@ export async function alertAdminFailedPayment(params: {
   })
 }
 
+export async function alertAdminBillingEvent(params: {
+  title: string
+  userEmail: string
+  userId: string
+  event: string
+  amount?: string
+  detail?: string
+}) {
+  return sendEmail({
+    to: EMAIL_ALERTS,
+    subject: `[MealEase] ${params.title} — ${params.userEmail}`,
+    react: createElement(AdminBillingEventEmail, params),
+    skipLog: true,
+  })
+}
+
 export async function alertAdminContactForm(params: {
   senderEmail: string
   senderName?: string
@@ -227,11 +296,15 @@ export async function sendTrialStartedEmail(params: {
   firstName?: string
   trialDays?: number
   trialEndDate?: string
+  subscriptionId?: string
 }) {
   return sendEmail({
     to: params.to,
-    subject: `Your ${params.trialDays ?? 14}-day MealEase Pro trial has started`,
+    subject: `Your ${params.trialDays ?? 7}-day MealEase Plus trial has started`,
     react: createElement(TrialStartedEmail, params),
+    idempotencyKey: params.subscriptionId
+      ? `trial-started:${params.subscriptionId}`
+      : `trial-started:${params.to}`,
   })
 }
 

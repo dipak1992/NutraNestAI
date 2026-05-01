@@ -1,12 +1,19 @@
 import { createHmac } from 'crypto'
 
-const SECRET = process.env.UNSUBSCRIBE_SECRET ?? process.env.CRON_SECRET ?? 'default-unsub-secret'
+function getSecret(): string {
+  const secret = process.env.UNSUBSCRIBE_SECRET ?? process.env.CRON_SECRET
+  if (!secret) {
+    throw new Error('[email] UNSUBSCRIBE_SECRET or CRON_SECRET must be set')
+  }
+  return secret
+}
 
 /**
  * Generate an HMAC-signed unsubscribe token for a user.
  */
 export function generateUnsubscribeToken(userId: string): string {
-  const hmac = createHmac('sha256', SECRET)
+  const secret = getSecret()
+  const hmac = createHmac('sha256', secret)
   hmac.update(userId)
   return `${userId}.${hmac.digest('hex')}`
 }
@@ -15,13 +22,14 @@ export function generateUnsubscribeToken(userId: string): string {
  * Verify and extract userId from an unsubscribe token.
  */
 export function verifyUnsubscribeToken(token: string): string | null {
+  const secret = getSecret()
   const dotIdx = token.indexOf('.')
   if (dotIdx === -1) return null
 
   const userId = token.slice(0, dotIdx)
   const sig = token.slice(dotIdx + 1)
 
-  const hmac = createHmac('sha256', SECRET)
+  const hmac = createHmac('sha256', secret)
   hmac.update(userId)
   const expected = hmac.digest('hex')
 

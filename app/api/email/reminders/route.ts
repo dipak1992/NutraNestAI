@@ -23,6 +23,9 @@ import { isDinnerReminderDue, isWeeklyReminderDue } from '@/lib/email/scheduler'
 export async function GET(request: NextRequest) {
   // Auth guard
   const cronSecret = process.env.CRON_SECRET
+  if (!cronSecret && process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'CRON_SECRET is required' }, { status: 500 })
+  }
   if (cronSecret) {
     const auth = request.headers.get('authorization')
     if (auth !== `Bearer ${cronSecret}`) {
@@ -46,7 +49,7 @@ export async function GET(request: NextRequest) {
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 type SupabaseClient = ReturnType<typeof createSupabaseServiceClient>
-type ProfileRow = { user_id: string; email: string; first_name: string | null; is_pro?: boolean }
+type ProfileRow = { id: string; email: string; full_name: string | null; subscription_tier?: string }
 
 /** Batch-fetch profiles for a list of user IDs. Returns a map keyed by user_id. */
 async function batchFetchProfiles(
@@ -55,9 +58,13 @@ async function batchFetchProfiles(
   includePro = false,
 ): Promise<Record<string, ProfileRow>> {
   if (!userIds.length) return {}
-  const select = includePro ? 'user_id, email, first_name, is_pro' : 'user_id, email, first_name'
-  const { data } = await supabase.from('profiles').select(select).in('user_id', userIds)
-  return Object.fromEntries(((data as unknown as ProfileRow[]) ?? []).map((p: ProfileRow) => [p.user_id, p]))
+  const select = includePro ? 'id, email, full_name, subscription_tier' : 'id, email, full_name'
+  const { data } = await supabase.from('profiles').select(select).in('id', userIds)
+  return Object.fromEntries(((data as unknown as ProfileRow[]) ?? []).map((p: ProfileRow) => [p.id, p]))
+}
+
+function getFirstName(profile: Pick<ProfileRow, 'full_name'>): string | undefined {
+  return profile.full_name?.split(' ')[0] || undefined
 }
 
 // ─── Dinner reminders ────────────────────────────────────────────────────────
@@ -102,7 +109,7 @@ async function handleDinnerReminders(supabase: SupabaseClient) {
 
     const result = await sendDinnerReminderEmail({
       to: profile.email,
-      firstName: profile.first_name ?? undefined,
+      firstName: getFirstName(profile),
     })
 
     if (result.success) {
@@ -157,7 +164,7 @@ async function handleWeeklyReminders(supabase: SupabaseClient) {
 
     const result = await sendWeeklyReminderEmail({
       to: profile.email,
-      firstName: profile.first_name ?? undefined,
+      firstName: getFirstName(profile),
     })
 
     if (result.success) {
@@ -186,7 +193,7 @@ async function handleAdminSummary(supabase: SupabaseClient) {
     { count: failures },
   ] = await Promise.all([
     supabase.from('profiles').select('*', { count: 'exact', head: true }).gte('created_at', weekStart),
-    supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('is_pro', true).gte('pro_activated_at', weekStart),
+    supabase.from('profiles').select('*', { count: 'exact', head: true }).in('subscription_tier', ['pro', 'family']).gte('updated_at', weekStart),
     supabase.from('profiles').select('*', { count: 'exact', head: true }),
     supabase.from('email_logs').select('*', { count: 'exact', head: true }).eq('status', 'sent').gte('created_at', weekStart),
     supabase.from('email_logs').select('*', { count: 'exact', head: true }).eq('status', 'failed').gte('created_at', weekStart),
@@ -272,7 +279,7 @@ async function handleReactivationEmails(supabase: SupabaseClient) {
   // Users inactive for 7–30 days (not so far gone they need winback) — cap at 100 per run
   const { data: profiles, error } = await supabase
     .from('profiles')
-    .select('user_id, email, first_name, last_active_at')
+    .select('id, email, full_name, last_active_at')
     .not('email', 'is', null)
     .lte('last_active_at', sevenDaysAgo)
     .gte('last_active_at', thirtyDaysAgo)
@@ -284,8 +291,14 @@ async function handleReactivationEmails(supabase: SupabaseClient) {
 
   let sent = 0
 
-  for (const profile of (profiles ?? []) as Array<{ user_id: string; email: string; first_name: string | null; last_active_at: string | null }>) {
+  const eligibleUserIds = await getUsersOptedIntoProductUpdates(
+    supabase,
+    ((profiles ?? []) as Array<{ id: string }>).map((profile) => profile.id),
+  )
+
+  for (const profile of (profiles ?? []) as Array<{ id: string; email: string; full_name: string | null; last_active_at: string | null }>) {
     if (!profile.email) continue
+    if (!eligibleUserIds.has(profile.id)) continue
 
     const lastActiveDate = profile.last_active_at
       ? new Date(profile.last_active_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
@@ -293,9 +306,9 @@ async function handleReactivationEmails(supabase: SupabaseClient) {
 
     const result = await sendReactivationEmail({
       to: profile.email,
-      firstName: profile.first_name ?? undefined,
+      firstName: profile.full_name?.split(' ')[0] || undefined,
       lastActiveDate,
-      userId: profile.user_id,
+      userId: profile.id,
     })
 
     if (result.success) sent++
@@ -312,7 +325,7 @@ async function handleWinbackEmails(supabase: SupabaseClient) {
   // Users inactive for 30+ days — cap at 50 per run to stay within Resend free tier
   const { data: profiles, error } = await supabase
     .from('profiles')
-    .select('user_id, email, first_name, last_active_at')
+    .select('id, email, full_name, last_active_at')
     .not('email', 'is', null)
     .lte('last_active_at', thirtyDaysAgo)
     .limit(50)
@@ -323,8 +336,14 @@ async function handleWinbackEmails(supabase: SupabaseClient) {
 
   let sent = 0
 
-  for (const profile of (profiles ?? []) as Array<{ user_id: string; email: string; first_name: string | null; last_active_at: string | null }>) {
+  const eligibleUserIds = await getUsersOptedIntoProductUpdates(
+    supabase,
+    ((profiles ?? []) as Array<{ id: string }>).map((profile) => profile.id),
+  )
+
+  for (const profile of (profiles ?? []) as Array<{ id: string; email: string; full_name: string | null; last_active_at: string | null }>) {
     if (!profile.email) continue
+    if (!eligibleUserIds.has(profile.id)) continue
 
     const daysSince = profile.last_active_at
       ? Math.floor((Date.now() - new Date(profile.last_active_at).getTime()) / (1000 * 60 * 60 * 24))
@@ -332,9 +351,9 @@ async function handleWinbackEmails(supabase: SupabaseClient) {
 
     const result = await sendChurnWinbackEmail({
       to: profile.email,
-      firstName: profile.first_name ?? undefined,
+      firstName: profile.full_name?.split(' ')[0] || undefined,
       daysSince,
-      userId: profile.user_id,
+      userId: profile.id,
     })
 
     if (result.success) sent++
@@ -343,3 +362,28 @@ async function handleWinbackEmails(supabase: SupabaseClient) {
   return NextResponse.json({ ok: true, sent })
 }
 
+async function getUsersOptedIntoProductUpdates(
+  supabase: SupabaseClient,
+  userIds: string[],
+): Promise<Set<string>> {
+  if (!userIds.length) return new Set()
+
+  const { data, error } = await supabase
+    .from('notification_preferences')
+    .select('user_id, product_updates')
+    .in('user_id', userIds)
+
+  if (error) {
+    console.error('[cron] product preference fetch error:', error.message)
+    return new Set()
+  }
+
+  const explicit = new Map(
+    ((data ?? []) as Array<{ user_id: string; product_updates: boolean }>).map((row) => [
+      row.user_id,
+      row.product_updates,
+    ]),
+  )
+
+  return new Set(userIds.filter((userId) => explicit.get(userId) !== false))
+}

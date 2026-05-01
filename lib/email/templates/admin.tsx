@@ -125,6 +125,52 @@ export function AdminFailedPaymentEmail({
   )
 }
 
+export function AdminBillingEventEmail({
+  title,
+  userEmail,
+  userId,
+  event,
+  amount,
+  detail,
+}: {
+  title: string
+  userEmail: string
+  userId: string
+  event: string
+  amount?: string
+  detail?: string
+}) {
+  return (
+    <Html>
+      <Head />
+      <Preview>[MealEase] {title} — {userEmail}</Preview>
+      <Body style={styles.body}>
+        <Container style={styles.container}>
+          <Section style={styles.header}>
+            <Link href={SITE} style={styles.logo}>MealEase Admin</Link>
+          </Section>
+          <Section style={styles.body_inner}>
+            <Heading style={styles.h1}>{title}</Heading>
+            <table width="100%" cellPadding="0" cellSpacing="0">
+              <tbody>
+                <AdminRow label="Email" value={userEmail} />
+                <AdminRow label="User ID" value={userId} />
+                <AdminRow label="Event" value={event} />
+                {amount && <AdminRow label="Amount" value={amount} />}
+                {detail && <AdminRow label="Detail" value={detail} />}
+                <AdminRow label="At" value={new Date().toISOString()} />
+              </tbody>
+            </table>
+          </Section>
+          <Section style={styles.footer}>
+            <Text style={styles.footerText}>MealEase · Internal billing alert</Text>
+          </Section>
+        </Container>
+      </Body>
+    </Html>
+  )
+}
+
 export function AdminReferralEmail({
   referrerEmail,
   referrerId,

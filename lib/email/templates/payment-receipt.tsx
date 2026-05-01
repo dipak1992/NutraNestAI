@@ -1,6 +1,6 @@
 import {
   Body, Container, Head, Heading, Html, Link,
-  Preview, Section, Text, Hr, Row, Column,
+  Preview, Section, Text, Hr,
 } from '@react-email/components'
 import { styles, colors } from './shared'
 import { SITE_URL as SITE } from '../client'
@@ -10,6 +10,7 @@ interface Props {
   amount: string
   date: string
   invoiceId?: string
+  invoiceUrl?: string
   planName?: string
 }
 
@@ -18,6 +19,7 @@ export function PaymentReceiptEmail({
   amount,
   date,
   invoiceId,
+  invoiceUrl,
   planName = 'Plus',
 }: Props) {
   const name = firstName ?? 'there'
@@ -71,6 +73,14 @@ export function PaymentReceiptEmail({
             <Hr style={styles.divider} />
 
             <Text style={styles.muted}>
+              MealEase subscriptions are securely billed through DDS Supply LLC via Stripe.
+              {invoiceUrl ? (
+                <>
+                  {' '}You can also{' '}
+                  <Link href={invoiceUrl} style={{ color: colors.sage }}>view your Stripe receipt</Link>.
+                </>
+              ) : null}
+              <br />
               Manage your subscription in{' '}
               <Link href={`${SITE}/settings`} style={{ color: colors.sage }}>settings</Link>.
               Questions? Write to{' '}

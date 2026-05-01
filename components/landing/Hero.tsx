@@ -30,20 +30,20 @@ export function Hero() {
       />
       <div className="absolute inset-0 -z-10">
         <Image
-          src="/landing/hero.jpg"
+          src="/landing/heroSection.jpg"
           alt=""
           fill
           priority
           sizes="100vw"
-          className="hidden object-cover opacity-20 sm:block"
+          className="hidden object-cover object-center opacity-25 sm:block"
         />
         <Image
-          src="/mobile/hero-mobile.jpg"
+          src="/landing/heroSection.jpg"
           alt=""
           fill
           priority
           sizes="100vw"
-          className="object-cover opacity-16 sm:hidden"
+          className="object-cover object-center opacity-18 sm:hidden"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-white via-white/88 to-white/45 dark:from-neutral-950 dark:via-neutral-950/88 dark:to-neutral-950/56" />
       </div>

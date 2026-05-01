@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { Copy, Check, Gift, Users, Zap, Crown, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 import {
@@ -11,6 +10,7 @@ import {
   REFERRAL_MAX_BONUS_DAYS,
   REFERRAL_TEMP_PRO_THRESHOLD,
   REFERRAL_TEMP_PRO_DAYS,
+  REFERRAL_REWARDS,
 } from '@/lib/referral/config'
 
 interface ReferralStats {
@@ -48,7 +48,7 @@ export default function ReferralPage() {
   const [origin, setOrigin] = useState('')
 
   useEffect(() => {
-    setOrigin(window.location.origin)
+    Promise.resolve().then(() => setOrigin(window.location.origin))
     fetch('/api/referral/me')
       .then((r) => r.json())
       .then((data) => { setStats(data); setLoading(false) })
@@ -76,7 +76,7 @@ export default function ReferralPage() {
           Refer Friends, Earn Rewards
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Share your link. When a friend signs up, you both benefit.
+          Invite 1 friend for Plus trial days. Invite 3 to unlock Smart Menu Scan.
         </p>
       </div>
 
@@ -146,6 +146,18 @@ export default function ReferralPage() {
         <p className="text-sm font-semibold">How rewards work</p>
 
         <div className="space-y-3">
+          <div className="grid gap-2 sm:grid-cols-2">
+            {REFERRAL_REWARDS.map((reward) => (
+              <div key={reward.label} className="rounded-lg border border-border bg-muted/30 p-3">
+                <p className="text-xs font-semibold text-muted-foreground">
+                  Invite {reward.referrals}
+                </p>
+                <p className="mt-1 text-sm font-semibold">{reward.label}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{reward.description}</p>
+              </div>
+            ))}
+          </div>
+
           {/* Bonus days */}
           <div className="flex gap-3">
             <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-700">

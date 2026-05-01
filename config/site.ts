@@ -3,6 +3,8 @@ export const site = {
   tagline: "Never ask 'What's for dinner?' again.",
   url: 'https://mealease.ai',
   nav: [
+    { label: 'Free tools', href: '/tools' },
+    { label: 'Blog', href: '/blog' },
     { label: 'How it works', href: '/#how-it-works' },
     { label: 'About', href: '/about' },
     { label: 'Pricing', href: '/pricing' },

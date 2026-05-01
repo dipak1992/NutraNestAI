@@ -35,6 +35,14 @@ export const Analytics = {
   // Landing hero daily meal
   HERO_MEAL_SUGGESTION_VIEWED:  'hero_meal_suggestion_viewed',
   HERO_MEAL_SUGGESTION_CLICKED: 'hero_meal_suggestion_clicked',
+  ORGANIC_CLUSTER_VIEW:  'organic_cluster_view',
+  PROGRAMMATIC_PAGE_VIEW: 'programmatic_page_view',
+  TOOL_START: 'tool_start',
+  TOOL_COMPLETION: 'tool_completion',
+  TOOL_TO_SIGNUP_CLICK: 'tool_to_signup_click',
+  SHARE_CARD_CREATED: 'share_card_created',
+  PINTEREST_PIN_GENERATED: 'pinterest_pin_generated',
+  REFERRAL_INVITE_SENT: 'referral_invite_sent',
 } as const
 
 export type AnalyticsEvent = (typeof Analytics)[keyof typeof Analytics]
@@ -45,10 +53,14 @@ export function trackEvent(event: AnalyticsEvent | string, properties?: Record<s
   if (typeof window === 'undefined') return
 
   try {
-    // @ts-expect-error — posthog is loaded by PostHogProvider
-    if (window.posthog) {
-      // @ts-expect-error
-      window.posthog.capture(event, properties)
+    const posthog = (window as Window & {
+      posthog?: {
+        capture: (event: string, properties?: Record<string, unknown>) => void
+      }
+    }).posthog
+
+    if (posthog) {
+      posthog.capture(event, properties)
     }
   } catch {
     // Non-fatal — analytics must never break the app

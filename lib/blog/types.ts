@@ -2,6 +2,9 @@ export type BlogCategory =
   | 'tonight'
   | 'leftovers'
   | 'budget'
+  | 'weekly'
+  | 'pantry'
+  | 'commercial'
   | 'autopilot'
   | 'snap'
   | 'household'
@@ -10,6 +13,9 @@ export const CATEGORY_LABELS: Record<BlogCategory, string> = {
   tonight: 'Tonight',
   leftovers: 'Leftovers',
   budget: 'Budget',
+  weekly: 'Weekly Planning',
+  pantry: 'Pantry & Fridge',
+  commercial: 'Meal Planning Apps',
   autopilot: 'Autopilot',
   snap: 'Snap & Cook',
   household: 'Household',

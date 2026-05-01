@@ -33,6 +33,7 @@ export async function getTonightSuggestion(
 /**
  * Get a rotating suggestion for swap/regenerate.
  * Called by /api/dashboard/tonight/regenerate route.
+ * @deprecated Use getSwapSuggestion directly from engine for personalized swaps.
  */
 export function getRotatingTonightSuggestion(
   userId: string,

@@ -3,6 +3,7 @@ import { getAllBlogPosts } from '@/lib/content/blog'
 import { getPublicMeals } from '@/lib/content/public'
 import { absoluteUrl } from '@/lib/seo'
 import { growthPages, growthTools } from '@/lib/growth/content'
+import { getAllPosts as getAllMdxPosts } from '@/lib/blog/mdx'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -27,7 +28,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: path === '/' ? 1 : 0.7,
   }))
 
-  const blogRoutes: MetadataRoute.Sitemap = getAllBlogPosts().map((post) => ({
+  const blogPostMap = new Map(
+    [
+      ...getAllBlogPosts().map((post) => ({
+        slug: post.slug,
+        updatedAt: post.updatedAt,
+        publishedAt: post.publishedAt,
+      })),
+      ...getAllMdxPosts().map((post) => ({
+        slug: post.slug,
+        updatedAt: post.updatedAt,
+        publishedAt: post.publishedAt,
+      })),
+    ].map((post) => [post.slug, post]),
+  )
+
+  const blogRoutes: MetadataRoute.Sitemap = Array.from(blogPostMap.values()).map((post) => ({
     url: absoluteUrl(`/blog/${post.slug}`),
     lastModified: new Date(post.updatedAt ?? post.publishedAt),
     changeFrequency: 'monthly',

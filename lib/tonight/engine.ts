@@ -18,6 +18,7 @@ import {
   getMealImage,
   dailyHash,
   pickDailyMeal,
+  getMealDayOfWeek,
 } from './catalog'
 
 // ─── LANDING PAGE ENGINE ────────────────────────────────────────────────────────
@@ -39,7 +40,8 @@ export type LandingTonightMeal = {
  * Changes at midnight based on weekday theme.
  */
 export function getLandingTonightMeal(): LandingTonightMeal {
-  const { theme, label } = WEEKDAY_THEMES[new Date().getDay()]
+  const day = getMealDayOfWeek()
+  const { theme, label } = WEEKDAY_THEMES[day]
   const themed = getMealsByTheme(theme)
   const meal = pickDailyMeal(themed, 'landing-public')
 
@@ -95,7 +97,7 @@ function toTonightState(meal: CuratedMeal, reason: string, extras?: Partial<Toni
  * Deterministic per user per day. Themed by weekday.
  */
 export function getFreeTonightSuggestion(userId: string): TonightState {
-  const day = new Date().getDay()
+  const day = getMealDayOfWeek()
   const { theme, reason } = WEEKDAY_THEMES[day]
   const themed = getMealsByTheme(theme)
   const meal = pickDailyMeal(themed, `free:${userId}`)
@@ -111,7 +113,7 @@ export async function getPlusTonightSuggestion(
   supabase: SupabaseClient,
   userId: string,
 ): Promise<TonightState> {
-  const day = new Date().getDay()
+  const day = getMealDayOfWeek()
   const { theme } = WEEKDAY_THEMES[day]
 
   try {
@@ -140,7 +142,7 @@ export async function getPlusTonightSuggestion(
  * Returns a different meal from the same theme, excluding already-seen IDs.
  */
 export function getSwapSuggestion(userId: string, excludeIds: string[], plan: Plan): TonightState {
-  const day = new Date().getDay()
+  const day = getMealDayOfWeek()
   const { theme, reason } = WEEKDAY_THEMES[day]
   const themed = getMealsByTheme(theme)
 

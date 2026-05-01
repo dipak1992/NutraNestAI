@@ -14,6 +14,10 @@ import { FinalCTA } from '@/components/landing/FinalCTA'
 import { Footer } from '@/components/landing/Footer'
 import { softwareAppSchema, faqSchema } from '@/lib/schema'
 
+// Revalidate every 30 minutes so the "Tonight's meal" rotates at 7am CT
+// ISR ensures the page is regenerated after the meal day boundary
+export const revalidate = 1800
+
 export const metadata = {
   title: 'MealEase — AI Meal Planning for Real Households',
   description:

@@ -451,21 +451,63 @@ export function getMealsByTheme(theme: WeekdayTheme): CuratedMeal[] {
   return TONIGHT_CATALOG.filter((m) => m.weekdayTheme === theme)
 }
 
-/** Get today's theme based on day of week */
+/** Get today's theme based on day of week (uses 7am CT rotation) */
 export function getTodayTheme(): { theme: WeekdayTheme; label: string; reason: string } {
-  const day = new Date().getDay()
+  const day = getMealDayOfWeek()
   return WEEKDAY_THEMES[day]
 }
 
-/** Deterministic daily hash — same meal all day for same seed */
+/**
+ * Deterministic daily hash — same meal all day for same seed.
+ * Rotates at 7:00 AM Central Time (America/Chicago) each day.
+ * This means the "day" for meal selection starts at 7am CT, not midnight UTC.
+ */
 export function dailyHash(seed: string): number {
-  const dateStr = new Date().toISOString().slice(0, 10) // YYYY-MM-DD
+  const dateStr = getMealDay()
   const input = `${seed}:${dateStr}`
   let h = 0
   for (let i = 0; i < input.length; i++) {
     h = Math.imul(31, h) + input.charCodeAt(i) | 0
   }
   return Math.abs(h)
+}
+
+/**
+ * Get the "meal day" string — changes at 7:00 AM Central Time.
+ * Before 7am CT, we still consider it "yesterday" for meal rotation.
+ * This ensures users see a new meal when they wake up, not at midnight.
+ */
+export function getMealDay(): string {
+  // Get current time in Central Time
+  const now = new Date()
+  // Convert to CT by using timezone offset
+  // CT is UTC-6 (CST) or UTC-5 (CDT)
+  const ctString = now.toLocaleString('en-US', { timeZone: 'America/Chicago' })
+  const ctDate = new Date(ctString)
+
+  // If before 7am CT, use yesterday's date
+  if (ctDate.getHours() < 7) {
+    ctDate.setDate(ctDate.getDate() - 1)
+  }
+
+  // Return YYYY-MM-DD in CT
+  return ctDate.toISOString().slice(0, 10)
+}
+
+/**
+ * Get the weekday (0=Sun..6=Sat) based on the meal day rotation.
+ * Uses the same 7am CT boundary as getMealDay().
+ */
+export function getMealDayOfWeek(): number {
+  const now = new Date()
+  const ctString = now.toLocaleString('en-US', { timeZone: 'America/Chicago' })
+  const ctDate = new Date(ctString)
+
+  if (ctDate.getHours() < 7) {
+    ctDate.setDate(ctDate.getDate() - 1)
+  }
+
+  return ctDate.getDay()
 }
 
 /** Pick one meal deterministically for today (stable per day) */

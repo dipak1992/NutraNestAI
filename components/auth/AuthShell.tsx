@@ -22,7 +22,7 @@ export function AuthShell({
     <div className="min-h-screen flex flex-col">
       <div className="flex-1 grid lg:grid-cols-2">
         {/* Form side — mobile: image bg + glass card; desktop: clean white */}
-        <div className="relative flex flex-col justify-center px-4 py-8 lg:px-12 xl:px-20">
+        <div className="relative flex flex-col justify-center px-4 py-6 lg:px-12 xl:px-20 lg:py-12">
           {/* Mobile-only background image (hidden on lg+) */}
           <div className="absolute inset-0 lg:hidden">
             <Image
@@ -34,8 +34,8 @@ export function AuthShell({
               priority
               quality={85}
             />
-            {/* Darker overlay so glass card pops */}
-            <div className="absolute inset-0 bg-neutral-900/55 dark:bg-neutral-950/70" />
+            {/* Fix 4: stronger overlay + slight blur boost so card pops cleanly */}
+            <div className="absolute inset-0 bg-neutral-900/65 dark:bg-neutral-950/78" />
           </div>
 
           {/* Mobile: glassmorphism card wrapping the form; desktop: plain container */}

@@ -99,7 +99,7 @@ export function EmailAuthForm({ mode, next = '/dashboard' }: Props) {
       <button
         type="submit"
         disabled={loading || !email}
-        className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#D97757] text-white px-4 py-3.5 text-sm font-semibold tracking-wide shadow-lg shadow-[#D97757]/35 hover:bg-[#C86646] active:scale-[0.98] active:shadow-md transition-all duration-150 disabled:opacity-55 disabled:cursor-not-allowed"
+        className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#D97757] to-[#E8895A] text-white px-4 py-3.5 text-sm font-semibold tracking-wide shadow-lg shadow-[#D97757]/40 hover:from-[#C86646] hover:to-[#D97757] hover:shadow-[#D97757]/50 active:scale-[0.98] active:shadow-md transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
       >
         {loading ? (
           <Loader2 className="h-4 w-4 animate-spin" />

@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import {
   Brain,
   CalendarDays,
@@ -106,28 +107,45 @@ export function ConnectedSystem() {
 
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
           <FadeIn delay={0.18}>
-            <article className="h-full rounded-3xl border border-white/10 bg-white/[0.06] p-6 md:p-8">
-              <div className="flex items-start gap-4">
-                <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#FDF6F1] text-[#D97757]">
-                  <Brain className="h-6 w-6" aria-hidden />
-                </span>
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#F3B18E]">
-                    MealEase remembers
-                  </p>
-                  <h3 className="mt-2 font-serif text-3xl font-bold">
-                    The plan gets less generic every time you cook.
-                  </h3>
+            <article className="relative h-full overflow-hidden rounded-3xl border border-white/10 shadow-2xl shadow-black/40">
+              {/* Background image */}
+              <Image
+                src="/landing/memory.jpg"
+                alt=""
+                fill
+                loading="lazy"
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="object-cover object-center"
+              />
+              {/* Dark gradient overlay — top lighter, bottom denser for text safety */}
+              <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(5,10,20,0.42)_0%,rgba(5,10,20,0.65)_100%)]" />
+              {/* Subtle warm tint at bottom */}
+              <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#0d0a08]/60 to-transparent" />
+
+              {/* Content */}
+              <div className="relative z-10 p-6 md:p-8">
+                <div className="flex items-start gap-4">
+                  <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm ring-1 ring-white/20 text-[#F3B18E]">
+                    <Brain className="h-6 w-6" aria-hidden />
+                  </span>
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#F3B18E] drop-shadow-sm">
+                      MealEase remembers
+                    </p>
+                    <h3 className="mt-2 font-serif text-3xl font-bold text-white drop-shadow-sm">
+                      The plan gets less generic every time you cook.
+                    </h3>
+                  </div>
                 </div>
+                <ul className="mt-7 grid gap-3 sm:grid-cols-2">
+                  {memoryItems.map((item) => (
+                    <li key={item} className="flex gap-3 text-sm text-neutral-200">
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400 drop-shadow-sm" aria-hidden />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <ul className="mt-7 grid gap-3 sm:grid-cols-2">
-                {memoryItems.map((item) => (
-                  <li key={item} className="flex gap-3 text-sm text-neutral-300">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" aria-hidden />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
             </article>
           </FadeIn>
 

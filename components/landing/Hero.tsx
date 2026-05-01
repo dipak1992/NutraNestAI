@@ -28,24 +28,33 @@ export function Hero() {
         aria-hidden
         className="absolute inset-0 -z-10 bg-gradient-to-b from-[#FDF6F1] via-white to-white dark:from-neutral-900 dark:via-neutral-950 dark:to-neutral-950"
       />
-      <div className="absolute inset-0 -z-10">
+      {/* Desktop background wash (sm+) — subtle heroSection.jpg */}
+      <div className="absolute inset-0 -z-10 hidden sm:block">
         <Image
           src="/landing/heroSection.jpg"
           alt=""
           fill
           priority
           sizes="100vw"
-          className="hidden object-cover object-center opacity-25 sm:block"
-        />
-        <Image
-          src="/landing/heroSection.jpg"
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-center opacity-18 sm:hidden"
+          className="object-cover object-center opacity-25"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-white via-white/88 to-white/45 dark:from-neutral-950 dark:via-neutral-950/88 dark:to-neutral-950/56" />
+      </div>
+
+      {/* Mobile background (< sm) — portrait hero_section.jpg, right-anchored */}
+      <div className="absolute inset-0 -z-10 sm:hidden">
+        <Image
+          src="/mobile/hero_section.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-right-center"
+        />
+        {/* Left-heavy gradient keeps headline + CTA clean; right side shows image */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.96)_0%,rgba(255,255,255,0.88)_45%,rgba(255,255,255,0.55)_70%,rgba(255,255,255,0.18)_100%)] dark:bg-[linear-gradient(to_right,rgba(10,10,10,0.96)_0%,rgba(10,10,10,0.88)_45%,rgba(10,10,10,0.55)_70%,rgba(10,10,10,0.18)_100%)]" />
+        {/* Warm top fade for nav transition */}
+        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#FDF6F1]/80 to-transparent dark:from-neutral-950/80" />
       </div>
 
       <Container wide>

@@ -39,11 +39,23 @@ export type SwapCandidate = {
   withinBudget: boolean
 }
 
+export type MealComplexity = 'quick' | 'balanced' | 'adventurous'
+export type LeftoverPriority = 'high' | 'normal' | 'low'
+
+export type AutopilotPreferences = {
+  cuisinePreferences: string[]
+  mealComplexity: MealComplexity
+  leftoverPriority: LeftoverPriority
+  lowEnergyMode: boolean
+}
+
 export type AutopilotOptions = {
   respectLocked: boolean
   overwriteEmptyOnly: boolean
   budgetCap?: number
   mealType?: 'breakfast' | 'lunch' | 'dinner'
+  // Enhanced preferences
+  preferences?: AutopilotPreferences
 }
 
 export type AutopilotResult = {
@@ -53,5 +65,29 @@ export type AutopilotResult = {
     estimatedTotalCost: number
     leftoversUsed: number
     uniqueProteins: number
+    // Enhanced summary fields
+    cuisineSpread: string[]
+    avgCookTime: number
+    seasonalMeals: number
+    pantryItemsUsed: number
+    budgetSavings: number | null  // how much under budget (null if no budget)
   }
+}
+
+// ─── Autopilot history (for learning) ─────────────────────────────────────────
+
+export type AutopilotFeedback = {
+  planId: string
+  dayIndex: number
+  action: 'accepted' | 'swapped' | 'cleared' | 'cooked'
+  timestamp: string
+}
+
+export type AutopilotStats = {
+  totalPlansGenerated: number
+  acceptanceRate: number       // 0..1
+  avgDaysKept: number
+  topCuisines: string[]
+  topProteins: string[]
+  avgBudgetUtilization: number // 0..1
 }

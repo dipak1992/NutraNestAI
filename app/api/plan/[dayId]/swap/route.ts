@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { loadWeekPlan } from '@/app/plan/loader'
 import { getActiveLeftoverIngredients } from '@/app/api/leftovers/route'
-import { scoreRecipe, getRecentProteins } from '@/lib/plan/scoring'
+import { scoreRecipe, getRecentProteins, getRecentCuisines, getDayType, getCurrentSeason } from '@/lib/plan/scoring'
 import type { SwapCandidate } from '@/lib/plan/types'
 import type { Recipe } from '@/lib/dashboard/types'
 
@@ -99,11 +99,24 @@ export async function GET(
     }
 
     // ── Score and rank candidates ────────────────────────────────────────────
+    const recentCuisines = getRecentCuisines(
+      currentPlan.days.map((d) => ({
+        recipe: d.recipe ? { name: d.recipe.name, tags: d.recipe.tags } : null,
+        dayIndex: d.dayIndex,
+      })),
+      dayIndex,
+    )
+
     const scoringCtx = {
       activeLeftoverIngredients,
       budgetPerMeal,
       household,
       recentlyPlannedProteins,
+      recentCuisines,
+      pantryItems: [] as string[],
+      season: getCurrentSeason(),
+      dayType: getDayType(dayIndex),
+      leftoverPriority: 'normal' as const,
     }
 
     const scored: SwapCandidate[] = recipeRows

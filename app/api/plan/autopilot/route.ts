@@ -4,8 +4,9 @@ import OpenAI from 'openai'
 import { loadWeekPlan, getCurrentWeekStart } from '@/app/plan/loader'
 import { getActiveLeftoverIngredients } from '@/app/api/leftovers/route'
 import { AUTOPILOT_SYSTEM_PROMPT, buildAutopilotPrompt } from '@/lib/plan/autopilot-prompt'
-import type { AutopilotOptions, AutopilotResult } from '@/lib/plan/types'
+import type { AutopilotOptions, AutopilotResult, AutopilotPreferences } from '@/lib/plan/types'
 import type { Recipe } from '@/lib/dashboard/types'
+import { detectCuisine, detectProtein } from '@/lib/plan/scoring'
 
 // ─── POST /api/plan/autopilot ─────────────────────────────────────────────────
 
@@ -31,6 +32,14 @@ export async function POST(req: NextRequest) {
     overwriteEmptyOnly: options.overwriteEmptyOnly ?? true,
     budgetCap: options.budgetCap,
     mealType: options.mealType,
+    preferences: options.preferences,
+  }
+
+  const preferences: AutopilotPreferences = autopilotOptions.preferences ?? {
+    cuisinePreferences: [],
+    mealComplexity: 'balanced',
+    leftoverPriority: 'normal',
+    lowEnergyMode: false,
   }
 
   try {
@@ -104,7 +113,18 @@ export async function POST(req: NextRequest) {
 
     const pantryItems = (pantryRows ?? []).map((r) => r.name as string)
 
-    // ── 6. Determine locked vs days to fill ──────────────────────────────────
+    // ── 6. Load cuisine preferences from user profile (if not passed) ────────
+    let cuisinePreferences = preferences.cuisinePreferences
+    if (cuisinePreferences.length === 0) {
+      const { data: prefRow } = await supabase
+        .from('user_dietary_preferences')
+        .select('cuisine_preferences')
+        .eq('user_id', user.id)
+        .maybeSingle()
+      cuisinePreferences = (prefRow?.cuisine_preferences as string[]) ?? []
+    }
+
+    // ── 7. Determine locked vs days to fill ──────────────────────────────────
     const lockedDays = currentPlan.days
       .filter((d) => d.locked && d.recipe)
       .map((d) => ({ dayAbbrev: d.dayAbbrev, recipeName: d.recipe!.name }))
@@ -124,7 +144,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // ── 7. Build prompt & call AI ────────────────────────────────────────────
+    // ── 8. Build prompt & call AI ────────────────────────────────────────────
     const userPrompt = buildAutopilotPrompt({
       household,
       budget,
@@ -132,6 +152,10 @@ export async function POST(req: NextRequest) {
       pantryItems,
       lockedDays,
       daysToFill,
+      cuisinePreferences,
+      mealComplexity: preferences.mealComplexity,
+      leftoverPriority: preferences.leftoverPriority,
+      lowEnergyMode: preferences.lowEnergyMode,
       options: autopilotOptions,
     })
 
@@ -153,10 +177,17 @@ export async function POST(req: NextRequest) {
         recipe: Recipe & { ingredients?: string[] }
         reason: string
         usesLeftoverId: string | null
+        cuisineType?: string
       }>
+      weekSummary?: {
+        cuisineSpread?: string[]
+        proteinVariety?: string[]
+        avgCookTime?: number
+        leftoverMealsCount?: number
+      }
     }
 
-    // ── 8. Upsert day rows into DB ───────────────────────────────────────────
+    // ── 9. Upsert day rows into DB ───────────────────────────────────────────
     const planRow = await ensurePlanRow(supabase, user.id, weekStart)
 
     for (const aiDay of parsed.days ?? []) {
@@ -202,27 +233,89 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // ── 9. Mark plan as autopilot ────────────────────────────────────────────
+    // ── 10. Mark plan as autopilot ───────────────────────────────────────────
     await supabase
       .from('week_plans')
       .update({ is_autopilot: true })
       .eq('id', planRow.id)
 
-    // ── 10. Reload and return full plan ──────────────────────────────────────
+    // ── 11. Record autopilot run for analytics ───────────────────────────────
+    try {
+      await supabase.from('autopilot_runs').insert({
+        user_id: user.id,
+        plan_id: planRow.id,
+        week_start: weekStart,
+        days_generated: parsed.days?.length ?? 0,
+        preferences: preferences,
+        created_at: new Date().toISOString(),
+      })
+    } catch {
+      // Ignore analytics errors — table may not exist yet
+    }
+
+    // ── 12. Reload and compute enhanced summary ──────────────────────────────
     const updatedPlan = await loadWeekPlan(user.id, weekStart)
 
     const daysGenerated = parsed.days?.length ?? 0
     const estimatedTotalCost = updatedPlan.stats.totalEstimatedCost
     const leftoversUsed = (parsed.days ?? []).filter((d) => d.usesLeftoverId).length
-    const uniqueProteins = new Set(
+
+    // Compute cuisine spread
+    const cuisineSpread = Array.from(new Set(
       (parsed.days ?? [])
         .map((d) => {
-          const text = (d.recipe?.name ?? '').toLowerCase()
-          const proteins = ['chicken', 'beef', 'pork', 'turkey', 'salmon', 'tuna', 'shrimp', 'tofu', 'lentil']
-          return proteins.find((p) => text.includes(p)) ?? null
+          if (d.cuisineType) return d.cuisineType
+          const text = [d.recipe?.name ?? '', ...(d.recipe?.tags ?? [])].join(' ').toLowerCase()
+          return detectCuisine(text) ?? 'other'
         })
         .filter(Boolean),
-    ).size
+    ))
+
+    // Compute unique proteins
+    const proteinSet = new Set(
+      (parsed.days ?? [])
+        .map((d) => {
+          const text = [d.recipe?.name ?? '', ...(d.recipe?.ingredients ?? [])].join(' ').toLowerCase()
+          return detectProtein(text) ?? null
+        })
+        .filter(Boolean),
+    )
+
+    // Compute avg cook time
+    const cookTimes = (parsed.days ?? [])
+      .map((d) => d.recipe?.cookTimeMin ?? 30)
+      .filter((t) => t > 0)
+    const avgCookTime = cookTimes.length > 0
+      ? Math.round(cookTimes.reduce((a, b) => a + b, 0) / cookTimes.length)
+      : 30
+
+    // Compute pantry items used
+    const pantryItemsUsed = pantryItems.filter((p) =>
+      (parsed.days ?? []).some((d) =>
+        (d.recipe?.ingredients ?? []).some((ing) =>
+          ing.toLowerCase().includes(p.toLowerCase()),
+        ),
+      ),
+    ).length
+
+    // Compute budget savings
+    const budgetSavings = budget.weeklyLimit != null
+      ? Math.max(0, budget.weeklyLimit - budget.spentThisWeek - estimatedTotalCost)
+      : null
+
+    // Seasonal meals count
+    const month = new Date().getMonth()
+    const seasonTags = month >= 11 || month <= 1
+      ? ['soup', 'stew', 'roast', 'comfort']
+      : month >= 5 && month <= 7
+      ? ['grill', 'salad', 'light', 'cold']
+      : month >= 2 && month <= 4
+      ? ['fresh', 'light', 'spring']
+      : ['harvest', 'squash', 'warm', 'bowl']
+    const seasonalMeals = (parsed.days ?? []).filter((d) => {
+      const text = [d.recipe?.name ?? '', ...(d.recipe?.tags ?? [])].join(' ').toLowerCase()
+      return seasonTags.some((t) => text.includes(t))
+    }).length
 
     const result: AutopilotResult = {
       weekPlan: updatedPlan,
@@ -230,7 +323,12 @@ export async function POST(req: NextRequest) {
         daysGenerated,
         estimatedTotalCost,
         leftoversUsed,
-        uniqueProteins,
+        uniqueProteins: proteinSet.size,
+        cuisineSpread,
+        avgCookTime,
+        seasonalMeals,
+        pantryItemsUsed,
+        budgetSavings,
       },
     }
 

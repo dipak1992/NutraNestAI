@@ -1,13 +1,16 @@
 /**
  * Curated Tonight Meals Catalog
- * 
+ *
  * Single source of truth for all Tonight meal suggestions.
  * Used by both landing page (public rotation) and dashboard (free/plus).
- * 
+ *
  * Image rules:
- * - Tier 1: Exact meal image (when available in /public/meals/)
+ * - Tier 1: Exact meal image (Unsplash CDN, meal-specific)
  * - Tier 2: Category fallback from /public/landing/
  * - Tier 3: null (component renders premium no-image card)
+ *
+ * Every meal now has a unique, accurate Unsplash photo.
+ * images.unsplash.com is already in next.config.ts remotePatterns.
  */
 
 export type MealCategory =
@@ -45,7 +48,7 @@ export type CuratedMeal = {
   tags: string[]
   /** Key benefits shown as quick chips */
   benefits: string[]
-  /** Image path relative to /public, or null for no-image card */
+  /** Image URL (Unsplash CDN) or local path, or null for no-image card */
   image: string | null
   /** Ingredients that trigger pantry matching */
   keyIngredients: string[]
@@ -65,7 +68,7 @@ export const WEEKDAY_THEMES: Record<number, { theme: WeekdayTheme; label: string
 
 // ─── IMAGE MAPPING SYSTEM ───────────────────────────────────────────────────────
 
-/** Category → fallback image path */
+/** Category → fallback image path (used only when meal.image is null) */
 const CATEGORY_IMAGES: Record<MealCategory, string> = {
   chicken: '/landing/family-dinner.jpg',
   pasta: '/landing/app-cooking.jpg',
@@ -81,7 +84,7 @@ const CATEGORY_IMAGES: Record<MealCategory, string> = {
 
 /** Get the best available image for a meal */
 export function getMealImage(meal: CuratedMeal): string {
-  // Tier 1: Exact meal image
+  // Tier 1: Exact meal image (Unsplash CDN or local)
   if (meal.image) return meal.image
   // Tier 2: Category fallback
   return CATEGORY_IMAGES[meal.category] ?? '/landing/family-dinner.jpg'
@@ -104,7 +107,7 @@ export const TONIGHT_CATALOG: CuratedMeal[] = [
     difficulty: 'easy',
     tags: ['quick', 'high-protein', 'family-friendly'],
     benefits: ['25 min', 'High Protein', 'Easy Cleanup'],
-    image: null,
+    image: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=600&q=80&fit=crop',
     keyIngredients: ['chicken', 'bell pepper', 'rice', 'lime'],
   },
   {
@@ -120,7 +123,7 @@ export const TONIGHT_CATALOG: CuratedMeal[] = [
     difficulty: 'easy',
     tags: ['quick', 'high-protein'],
     benefits: ['18 min', 'One Pan', 'Impressive'],
-    image: null,
+    image: 'https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=600&q=80&fit=crop',
     keyIngredients: ['shrimp', 'pasta', 'garlic', 'butter', 'lemon'],
   },
   {
@@ -136,7 +139,7 @@ export const TONIGHT_CATALOG: CuratedMeal[] = [
     difficulty: 'easy',
     tags: ['quick', 'family-friendly', 'high-protein'],
     benefits: ['22 min', 'Kid-Approved', 'Budget'],
-    image: null,
+    image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&q=80&fit=crop',
     keyIngredients: ['chicken', 'rice', 'soy sauce', 'broccoli'],
   },
 
@@ -154,7 +157,7 @@ export const TONIGHT_CATALOG: CuratedMeal[] = [
     difficulty: 'easy',
     tags: ['budget', 'vegetarian', 'high-protein'],
     benefits: ['$2.25/serving', 'Plant Protein', 'Filling'],
-    image: null,
+    image: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=600&q=80&fit=crop',
     keyIngredients: ['lentils', 'rice', 'tomato', 'cumin', 'avocado'],
   },
   {
@@ -170,7 +173,7 @@ export const TONIGHT_CATALOG: CuratedMeal[] = [
     difficulty: 'easy',
     tags: ['budget', 'quick', 'pantry'],
     benefits: ['$1.75/serving', '15 min', 'Pantry Staples'],
-    image: null,
+    image: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=600&q=80&fit=crop',
     keyIngredients: ['rice', 'eggs', 'soy sauce', 'vegetables', 'sesame oil'],
   },
   {
@@ -186,7 +189,7 @@ export const TONIGHT_CATALOG: CuratedMeal[] = [
     difficulty: 'easy',
     tags: ['budget', 'quick', 'vegetarian'],
     benefits: ['$1.90/serving', '12 min', 'Kid Favorite'],
-    image: null,
+    image: 'https://images.unsplash.com/photo-1618040996337-56904b7850b9?w=600&q=80&fit=crop',
     keyIngredients: ['tortillas', 'black beans', 'cheese', 'salsa'],
   },
 
@@ -204,7 +207,7 @@ export const TONIGHT_CATALOG: CuratedMeal[] = [
     difficulty: 'easy',
     tags: ['family-friendly', 'comfort', 'quick'],
     benefits: ['One Pot', 'Kid Approved', '20 min'],
-    image: null,
+    image: 'https://images.unsplash.com/photo-1543339308-43e59d6b73a6?w=600&q=80&fit=crop',
     keyIngredients: ['pasta', 'cheese', 'milk', 'butter'],
   },
   {
@@ -220,7 +223,7 @@ export const TONIGHT_CATALOG: CuratedMeal[] = [
     difficulty: 'easy',
     tags: ['family-friendly', 'high-protein'],
     benefits: ['25 min', 'Crowd Pleaser', 'High Protein'],
-    image: null,
+    image: 'https://images.unsplash.com/photo-1598103442097-8b74394b95c3?w=600&q=80&fit=crop',
     keyIngredients: ['chicken thighs', 'honey', 'garlic', 'soy sauce', 'rice'],
   },
   {
@@ -236,7 +239,7 @@ export const TONIGHT_CATALOG: CuratedMeal[] = [
     difficulty: 'easy',
     tags: ['family-friendly', 'high-protein'],
     benefits: ['Sheet Pan', 'Easy Cleanup', 'Hearty'],
-    image: null,
+    image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80&fit=crop',
     keyIngredients: ['sausage', 'potatoes', 'bell peppers', 'onion', 'olive oil'],
   },
 
@@ -254,7 +257,7 @@ export const TONIGHT_CATALOG: CuratedMeal[] = [
     difficulty: 'easy',
     tags: ['pantry', 'quick', 'budget', 'vegetarian'],
     benefits: ['5 Ingredients', '15 min', '$1.50/serving'],
-    image: null,
+    image: 'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=600&q=80&fit=crop',
     keyIngredients: ['spaghetti', 'garlic', 'olive oil', 'chili flakes', 'parsley'],
   },
   {
@@ -270,7 +273,7 @@ export const TONIGHT_CATALOG: CuratedMeal[] = [
     difficulty: 'easy',
     tags: ['pantry', 'quick', 'high-protein'],
     benefits: ['Pantry Staples', '12 min', 'No Shopping'],
-    image: null,
+    image: 'https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=600&q=80&fit=crop',
     keyIngredients: ['canned tuna', 'rice', 'soy sauce', 'sriracha', 'avocado'],
   },
   {
@@ -286,7 +289,7 @@ export const TONIGHT_CATALOG: CuratedMeal[] = [
     difficulty: 'easy',
     tags: ['pantry', 'vegetarian', 'budget'],
     benefits: ['All Pantry', 'Vegan Option', '20 min'],
-    image: null,
+    image: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=600&q=80&fit=crop',
     keyIngredients: ['chickpeas', 'coconut milk', 'curry paste', 'rice', 'spinach'],
   },
 
@@ -304,7 +307,7 @@ export const TONIGHT_CATALOG: CuratedMeal[] = [
     difficulty: 'medium',
     tags: ['healthy', 'high-protein', 'date-night'],
     benefits: ['Omega-3 Rich', 'Impressive', '22 min'],
-    image: null,
+    image: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=600&q=80&fit=crop',
     keyIngredients: ['salmon', 'lemon', 'quinoa', 'asparagus', 'dill'],
   },
   {
@@ -320,7 +323,7 @@ export const TONIGHT_CATALOG: CuratedMeal[] = [
     difficulty: 'easy',
     tags: ['fun', 'family-friendly'],
     benefits: ['Customizable', 'Fun Activity', 'Fresh'],
-    image: null,
+    image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600&q=80&fit=crop',
     keyIngredients: ['flatbread', 'mozzarella', 'tomato sauce', 'basil', 'toppings'],
   },
   {
@@ -336,7 +339,7 @@ export const TONIGHT_CATALOG: CuratedMeal[] = [
     difficulty: 'medium',
     tags: ['high-protein', 'date-night'],
     benefits: ['Restaurant Quality', '18 min', 'Impressive'],
-    image: null,
+    image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&q=80&fit=crop',
     keyIngredients: ['steak', 'parsley', 'garlic', 'olive oil', 'red wine vinegar'],
   },
 
@@ -354,7 +357,7 @@ export const TONIGHT_CATALOG: CuratedMeal[] = [
     difficulty: 'easy',
     tags: ['comfort', 'family-friendly', 'vegetarian'],
     benefits: ['Cozy', 'Kid Favorite', 'Vegetarian'],
-    image: null,
+    image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=600&q=80&fit=crop',
     keyIngredients: ['canned tomatoes', 'cream', 'bread', 'butter', 'cheese'],
   },
   {
@@ -370,7 +373,7 @@ export const TONIGHT_CATALOG: CuratedMeal[] = [
     difficulty: 'easy',
     tags: ['comfort', 'high-protein', 'family-friendly'],
     benefits: ['Feeds a Crowd', 'Leftovers Ready', 'Hearty'],
-    image: null,
+    image: 'https://images.unsplash.com/photo-1574484284002-952d92456975?w=600&q=80&fit=crop',
     keyIngredients: ['beef', 'potatoes', 'carrots', 'onion', 'broth'],
   },
   {
@@ -386,7 +389,7 @@ export const TONIGHT_CATALOG: CuratedMeal[] = [
     difficulty: 'easy',
     tags: ['comfort', 'family-friendly', 'budget'],
     benefits: ['Customizable', 'Budget', 'Satisfying'],
-    image: null,
+    image: 'https://images.unsplash.com/photo-1553163147-622ab57be1c7?w=600&q=80&fit=crop',
     keyIngredients: ['potatoes', 'cheese', 'sour cream', 'bacon', 'chives'],
   },
 
@@ -404,7 +407,7 @@ export const TONIGHT_CATALOG: CuratedMeal[] = [
     difficulty: 'easy',
     tags: ['healthy', 'vegetarian', 'reset'],
     benefits: ['Meal Prep Ready', 'Light', 'Nutritious'],
-    image: null,
+    image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&q=80&fit=crop',
     keyIngredients: ['quinoa', 'cucumber', 'tomato', 'feta', 'olive oil', 'lemon'],
   },
   {
@@ -420,7 +423,7 @@ export const TONIGHT_CATALOG: CuratedMeal[] = [
     difficulty: 'easy',
     tags: ['healthy', 'family-friendly', 'reset'],
     benefits: ['Batch Cook', 'Freezer Friendly', 'Nourishing'],
-    image: null,
+    image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=600&q=80&fit=crop',
     keyIngredients: ['chicken', 'carrots', 'celery', 'onion', 'broth', 'noodles'],
   },
   {
@@ -436,7 +439,7 @@ export const TONIGHT_CATALOG: CuratedMeal[] = [
     difficulty: 'easy',
     tags: ['healthy', 'vegetarian', 'reset'],
     benefits: ['Nutrient Dense', 'Colorful', 'Prep Ahead'],
-    image: null,
+    image: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=600&q=80&fit=crop',
     keyIngredients: ['sweet potato', 'chickpeas', 'kale', 'tahini', 'quinoa'],
   },
 ]

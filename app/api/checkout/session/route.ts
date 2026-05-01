@@ -1,6 +1,6 @@
 // ============================================================
 // API: POST /api/checkout/session
-// Creates a Stripe Checkout Session for MealEaseAI Pro.
+// Creates a Stripe Checkout Session with multi-brand support.
 // Uses direct Stripe REST API (no SDK dependency).
 // ============================================================
 
@@ -9,6 +9,7 @@ import { createClient } from '@/lib/supabase/server'
 import { serverEnv } from '@/lib/env'
 import { getSiteUrl } from '@/lib/seo'
 import { isStripePriceId, normalizeStripePriceId } from '@/lib/stripe/price-id'
+import { getCurrentBrand } from '@/lib/stripe/brands'
 
 type Plan = 'pro_monthly' | 'pro_yearly'
 
@@ -61,6 +62,8 @@ export async function POST(req: Request) {
       )
     }
 
+    // Multi-brand: get current brand config
+    const brand = getCurrentBrand()
     const site = getSiteUrl().replace(/\/$/, '')
     const tier = PLAN_TIERS[plan]
 
@@ -69,13 +72,25 @@ export async function POST(req: Request) {
     body.set('mode', 'subscription')
     body.set('line_items[0][price]', priceId)
     body.set('line_items[0][quantity]', '1')
-    body.set('success_url', `${site}/dashboard?welcome=${plan}&session_id={CHECKOUT_SESSION_ID}`)
-    body.set('cancel_url', `${site}/upgrade?cancelled=1`)
+    body.set('success_url', `${site}${brand.successUrlPattern}&session_id={CHECKOUT_SESSION_ID}`)
+    body.set('cancel_url', `${site}${brand.cancelUrlPattern}`)
     body.set('client_reference_id', user.id)
-    // Metadata for webhook to extract tier (backup if price ID lookup fails)
+
+    // Multi-brand: statement descriptor suffix
+    // Customer sees: "DDS SUPPLY* MEALEASE" on their bank statement
+    body.set('payment_intent_data[statement_descriptor_suffix]', brand.statementDescriptorSuffix)
+
+    // Multi-brand: custom text on checkout page
+    body.set('custom_text[submit][message]', `Subscribe to ${brand.displayName} Plus. Billed by DDS Supply LLC.`)
+
+    // Metadata for webhook to extract tier + brand
     body.set('subscription_data[metadata][user_id]', user.id)
     body.set('subscription_data[metadata][plan]', plan)
     body.set('subscription_data[metadata][tier]', tier)
+    body.set('subscription_data[metadata][brand]', brand.id)
+    body.set('metadata[brand]', brand.id)
+    body.set('metadata[user_id]', user.id)
+
     if (serverEnv.stripeTrialDays > 0) {
       body.set('subscription_data[trial_period_days]', String(serverEnv.stripeTrialDays))
     }

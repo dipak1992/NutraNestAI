@@ -80,7 +80,7 @@ export function Hero() {
             </FadeIn>
 
             <FadeIn delay={0.1}>
-              <p className="mt-4 sm:mt-6 max-w-[240px] sm:max-w-xl text-base sm:text-lg leading-relaxed text-neutral-600 dark:text-neutral-300 md:text-xl">
+              <p className="mt-4 sm:mt-6 max-w-[230px] sm:max-w-xl text-base sm:text-lg leading-[1.6] text-neutral-600 dark:text-neutral-300 md:text-xl">
                 MealEase connects tonight&rsquo;s dinner, weekly planning, groceries,
                 leftovers, and budget into one calm food system. In 30 seconds.
               </p>
@@ -88,10 +88,10 @@ export function Hero() {
 
             <FadeIn delay={0.2}>
               <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
-                {/* CTA with stronger shadow + tighter padding on mobile */}
+                {/* CTA: slightly narrower on mobile, premium shadow, active press state */}
                 <Button
                   href="/signup"
-                  className="w-full sm:w-auto text-center shadow-lg shadow-[#D97757]/25 hover:shadow-xl hover:shadow-[#D97757]/30 transition-shadow duration-200"
+                  className="w-[88%] sm:w-auto text-center shadow-md shadow-[#D97757]/20 hover:shadow-lg hover:shadow-[#D97757]/28 active:shadow-sm active:scale-[0.98] transition-all duration-150"
                 >
                   Plan tonight&rsquo;s dinner — free
                 </Button>
@@ -106,11 +106,11 @@ export function Hero() {
 
             <FadeIn delay={0.3}>
               {/* Mobile: vertical stack; sm+: horizontal row */}
-              <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-y-1 sm:gap-y-1.5 sm:gap-x-2.5 text-xs sm:text-sm font-medium text-neutral-500 dark:text-neutral-400">
+              <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-y-1.5 sm:gap-y-1.5 sm:gap-x-2.5 text-xs sm:text-sm font-medium text-neutral-500 dark:text-neutral-400">
                 {trustItems.map((item, i) => (
-                  <span key={item} className="inline-flex items-center gap-2.5">
-                    <span className="inline-block h-1 w-1 rounded-full bg-[#D97757]/50 sm:hidden" aria-hidden />
-                    <span>{item}</span>
+                  <span key={item} className="inline-flex items-center gap-2">
+                    <span className="inline-block h-[5px] w-[5px] rounded-full bg-[#D97757]/60 sm:hidden shrink-0" aria-hidden />
+                    <span className="text-neutral-600 dark:text-neutral-400">{item}</span>
                     {i < trustItems.length - 1 && (
                       <span className="hidden sm:inline-block h-1 w-1 rounded-full bg-[#D97757]/40" aria-hidden />
                     )}
@@ -136,10 +136,10 @@ export function Hero() {
                 </div>
                 <div className="min-w-0">
                   <div className="text-xs sm:text-sm font-semibold text-neutral-900 dark:text-neutral-100 leading-tight">
-                    ★★★★★{' '}
+                    <span className="text-amber-500">★★★★★</span>{' '}
                     <span className="font-medium text-neutral-700 dark:text-neutral-300">{socialProof.rating}</span>
                   </div>
-                  <div className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 leading-tight mt-0.5">
+                  <div className="text-xs sm:text-sm font-medium text-neutral-600 dark:text-neutral-400 leading-tight mt-0.5">
                     Trusted by {socialProof.householdCount} households
                   </div>
                 </div>
@@ -148,7 +148,7 @@ export function Hero() {
           </div>
 
           {/* Right: phone mockup — raised on mobile via negative margin */}
-          <div className="lg:col-span-6 relative flex justify-center -mt-6 sm:mt-0">
+          <div className="lg:col-span-6 relative flex justify-center -mt-8 sm:mt-0">
             <FadeIn delay={0.2}>
               <div
                 className="relative mx-auto md:max-w-[340px]"

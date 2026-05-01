@@ -119,6 +119,10 @@ const faqCategories = [
         a: "Absolutely. Cancel in two taps from your account page — no retention calls, no guilt trips, no hidden fees. If you cancel, you keep Plus access until the end of your current billing period.",
       },
       {
+        q: 'Who operates MealEase billing?',
+        a: 'MealEase is a product of DDS Supply LLC. MealEase subscriptions are securely billed through DDS Supply LLC via Stripe.',
+      },
+      {
         q: 'What happens to my data if I cancel?',
         a: "Your account and data remain intact if you cancel Plus — you just revert to the free tier. If you want to fully delete your account and all data, you can do that from account settings at any time.",
       },

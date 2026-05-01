@@ -399,6 +399,9 @@ export function PricingContent() {
               <p className="text-center text-xs text-neutral-500 mt-3">
                 7-day free trial · No credit card required · Cancel anytime
               </p>
+              <p className="text-center text-[11px] leading-relaxed text-neutral-500 mt-2">
+                MealEase subscriptions are securely billed through DDS Supply LLC via Stripe.
+              </p>
               <p className="text-center text-xs font-semibold text-[#F3B18E] mt-2">
                 Many users upgrade for grocery convenience alone.
               </p>

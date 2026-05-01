@@ -241,6 +241,9 @@ export function UpgradeModal({
                 Cancel anytime
               </span>
             </div>
+            <p className="mx-auto mt-2 max-w-[18rem] text-center text-[10px] leading-relaxed text-neutral-500">
+              MealEase subscriptions are securely billed through DDS Supply LLC via Stripe.
+            </p>
           </div>
         </div>
       </div>

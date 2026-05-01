@@ -46,6 +46,9 @@ export function Footer() {
             <p className="mt-3 text-sm leading-relaxed">
               AI-powered meal planning for real households.
             </p>
+            <p className="mt-3 text-xs leading-relaxed text-neutral-500">
+              MealEase is a product of DDS Supply LLC.
+            </p>
           </div>
 
           {/* Nav columns */}
@@ -72,7 +75,7 @@ export function Footer() {
 
         {/* Bottom bar */}
         <div className="border-t border-neutral-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-600">
-          <p suppressHydrationWarning>© {new Date().getFullYear()} MealEase, Inc. All rights reserved.</p>
+          <p suppressHydrationWarning>© {new Date().getFullYear()} DDS Supply LLC. All rights reserved.</p>
           <p>Made with ♥ for households everywhere.</p>
         </div>
       </Container>

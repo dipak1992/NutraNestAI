@@ -8,6 +8,10 @@ export const faqs = [
     a: "Absolutely. Cancel in two taps from your account page. No retention calls, no guilt trips.",
   },
   {
+    q: 'Who operates MealEase billing?',
+    a: 'MealEase is a product of DDS Supply LLC. MealEase subscriptions are securely billed through DDS Supply LLC via Stripe.',
+  },
+  {
     q: 'Does it work for my diet?',
     a: "Vegetarian, vegan, gluten-free, dairy-free, keto, halal, kosher, low-FODMAP — we support them all. Set it once, we remember forever.",
   },

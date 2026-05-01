@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Clock, Users, ChevronRight, Recycle, Sparkles, Leaf, DollarSign, Heart, RefreshCw } from 'lucide-react'
@@ -188,13 +189,30 @@ export function TonightCard({ state }: Props) {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_100%_0%,_rgba(217,119,87,0.18),_transparent)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_0%_100%,_rgba(251,191,36,0.12),_transparent)]" />
 
-        {/* Decorative large emoji watermark */}
-        <div
-          className="absolute right-4 top-1/2 hidden -translate-y-1/2 text-[88px] leading-none select-none pointer-events-none opacity-[0.13] dark:opacity-[0.08] sm:block"
-          aria-hidden
-        >
-          {mealEmoji}
-        </div>
+        {/* Food photo — right side, fades into gradient */}
+        {recipe.image && (
+          <div className="absolute right-0 top-0 bottom-0 w-2/5 hidden sm:block overflow-hidden">
+            <Image
+              src={recipe.image}
+              alt={recipe.name}
+              fill
+              sizes="(max-width: 768px) 0px, 40vw"
+              className="object-cover object-center"
+              priority
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-50/95 via-orange-50/60 to-transparent dark:from-[#2a1a0e]/95 dark:via-[#2a1a0e]/60 dark:to-transparent" />
+          </div>
+        )}
+
+        {/* Decorative large emoji watermark (only when no image) */}
+        {!recipe.image && (
+          <div
+            className="absolute right-4 top-1/2 hidden -translate-y-1/2 text-[88px] leading-none select-none pointer-events-none opacity-[0.13] dark:opacity-[0.08] sm:block"
+            aria-hidden
+          >
+            {mealEmoji}
+          </div>
+        )}
 
         {/* Decorative dot pattern */}
         <div

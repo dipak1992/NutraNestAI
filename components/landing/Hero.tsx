@@ -4,7 +4,6 @@ import { Button } from './shared/Button'
 import { FadeIn } from './shared/FadeIn'
 import { socialProof } from '@/config/social-proof'
 import { LandingTonightPreview } from './LandingTonightPreview'
-import { getLandingTonightMeal } from '@/lib/tonight/engine'
 
 const trustItems = ['Free forever', 'No card required', 'Built for households']
 
@@ -146,9 +145,6 @@ export function Hero() {
                   />
                 </div>
 
-                {/* Floating "tonight" card — dynamic */}
-                <HeroFloatingTonight />
-
                 {/* Floating "budget" card */}
                 <div className="hidden md:flex absolute -right-10 bottom-1/4 bg-white dark:bg-neutral-800 rounded-2xl shadow-xl p-4 items-center gap-3 ring-1 ring-black/5">
                   <div className="text-2xl" aria-hidden>💰</div>
@@ -166,15 +162,3 @@ export function Hero() {
   )
 }
 
-function HeroFloatingTonight() {
-  const meal = getLandingTonightMeal()
-  return (
-    <div className="hidden md:flex absolute -left-14 top-1/4 bg-white dark:bg-neutral-800 rounded-2xl shadow-xl p-4 items-center gap-3 ring-1 ring-black/5">
-      <div className="text-2xl" aria-hidden>🍽️</div>
-      <div>
-        <div className="text-xs text-neutral-500 dark:text-neutral-400">Tonight</div>
-        <div className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">{meal.name}</div>
-      </div>
-    </div>
-  )
-}

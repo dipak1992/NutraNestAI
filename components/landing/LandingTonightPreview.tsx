@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { getLandingTonightMeal } from '@/lib/tonight/engine'
 import { Clock, Sparkles, ChefHat } from 'lucide-react'
 
@@ -27,7 +28,20 @@ export function LandingTonightPreview() {
       </div>
 
       {/* Meal card */}
-      <div className="mt-5 rounded-2xl bg-white/95 p-4 shadow-xl shadow-neutral-900/10 ring-1 ring-neutral-900/5">
+      <div className="mt-5 rounded-2xl bg-white/95 shadow-xl shadow-neutral-900/10 ring-1 ring-neutral-900/5 overflow-hidden">
+        {/* Food photo */}
+        <div className="relative w-full h-28">
+          <Image
+            src={meal.image}
+            alt={meal.name}
+            fill
+            sizes="280px"
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+        </div>
+        <div className="p-4">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-[#D97757]" aria-hidden />
@@ -65,6 +79,7 @@ export function LandingTonightPreview() {
             </div>
           ))}
         </div>
+        </div>{/* end p-4 */}
       </div>
 
       {/* Action hints */}

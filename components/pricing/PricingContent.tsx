@@ -164,45 +164,62 @@ export function PricingContent() {
     <div className="min-h-screen bg-white dark:bg-neutral-950">
 
       {/* ── HERO ── */}
-      <section className="relative overflow-hidden bg-neutral-950 px-4 py-16 text-center text-white md:py-24">
-        <Image
-          src="/landing/grocery.jpg"
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover opacity-38"
-        />
+      <section className="relative overflow-hidden bg-neutral-950 px-4 py-12 text-center text-white md:py-20">
+        {/* Desktop image (lg+) */}
+        <div className="absolute inset-0 hidden lg:block">
+          <Image
+            src="/pricing/pricing_desktop.jpg"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center"
+          />
+        </div>
+        {/* Mobile image (< lg) */}
+        <div className="absolute inset-0 lg:hidden">
+          <Image
+            src="/pricing/pricing_mobile.jpg"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-top"
+          />
+        </div>
+        {/* Overlay: strong top scrim for text, warmth visible below */}
         <div
           aria-hidden
-          className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,10,10,0.72),rgba(10,10,10,0.78)),radial-gradient(circle_at_50%_0%,rgba(217,119,87,0.38),transparent_34%)]"
+          className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.62)_0%,rgba(0,0,0,0.50)_60%,rgba(0,0,0,0.42)_100%)]"
+        />
+        {/* Warm radial accent */}
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_0%,rgba(217,119,87,0.28),transparent_55%)]"
         />
         <div className="relative z-10">
-        <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-[#FFD2BD] backdrop-blur">
-          Simple pricing
-        </div>
-        <h1 className="mx-auto mt-5 max-w-[320px] font-serif text-4xl font-bold tracking-tight text-white sm:max-w-4xl md:text-5xl">
-          Stop stressing about dinner.{' '}
-          <span className="italic text-[#D97757]">Start tonight.</span>
-        </h1>
-        <p
-          className="mx-auto mt-4 text-lg text-white/76 sm:max-w-xl"
-          style={{ maxWidth: 'min(320px, calc(100vw - 40px))' }}
-        >
-          Free forever. Upgrade when you want the full experience.
-        </p>
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-[#FFD2BD] backdrop-blur">
+            Simple pricing
+          </div>
+          <h1 className="mx-auto mt-4 max-w-[300px] font-serif text-4xl font-bold tracking-tight text-white [text-shadow:0_2px_12px_rgba(0,0,0,0.45)] sm:max-w-4xl md:text-5xl">
+            Stop stressing about dinner.{' '}
+            <span className="italic text-[#D97757]">Start tonight.</span>
+          </h1>
+          <p className="mx-auto mt-3 max-w-[280px] text-base text-white/82 sm:max-w-xl sm:text-lg">
+            Free forever. Upgrade when dinner gets easier.
+          </p>
         </div>
       </section>
 
       {/* ── BILLING TOGGLE ── */}
-      <section className="flex justify-center pb-8 px-4">
-        <div className="inline-flex items-center rounded-full border border-neutral-200 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-800 p-1">
+      <section className="flex justify-center pt-7 pb-5 px-4">
+        <div className="inline-flex items-center rounded-full border border-neutral-200 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-800 p-1 shadow-sm">
           <button
             onClick={() => setIsAnnual(false)}
             className={cn(
-              'text-sm font-semibold px-5 py-2 rounded-full transition-all',
+              'text-sm font-semibold px-5 py-2.5 rounded-full transition-all min-w-[88px]',
               !isAnnual
-                ? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-50 shadow-sm'
+                ? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-50 shadow-md'
                 : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200',
             )}
           >
@@ -211,14 +228,14 @@ export function PricingContent() {
           <button
             onClick={() => setIsAnnual(true)}
             className={cn(
-              'text-sm font-semibold px-5 py-2 rounded-full transition-all flex items-center gap-2',
+              'text-sm font-semibold px-5 py-2.5 rounded-full transition-all flex items-center gap-2 min-w-[88px]',
               isAnnual
-                ? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-50 shadow-sm'
+                ? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-50 shadow-md'
                 : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200',
             )}
           >
             Annual
-            <span className="bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+            <span className="bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
               SAVE {PRO_ANNUAL_SAVINGS}%
             </span>
           </button>
@@ -226,15 +243,15 @@ export function PricingContent() {
       </section>
 
       {/* ── TRUST ROW ── */}
-      <section className="px-4 pb-8">
-        <div className="flex w-[calc(100vw-40px)] max-w-[320px] flex-col items-start justify-center gap-3 rounded-2xl border border-neutral-200 bg-white px-5 py-3 text-sm font-medium text-neutral-600 shadow-sm shadow-neutral-900/5 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300 sm:mx-auto sm:w-auto sm:max-w-3xl sm:flex-row sm:flex-wrap sm:items-center">
+      <section className="px-4 pb-6">
+        <div className="flex w-full max-w-[320px] flex-row flex-wrap items-center justify-center gap-x-4 gap-y-2 rounded-2xl border border-neutral-200 bg-white px-5 py-3 text-sm font-medium text-neutral-600 shadow-sm shadow-neutral-900/5 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300 sm:mx-auto sm:max-w-3xl">
           {REASSURANCE.map((item, i) => {
             const Icon = item.icon
 
             return (
-              <span key={item.text} className="inline-flex items-center gap-2">
-                <Icon className="h-4 w-4 text-[#D97757]" aria-hidden />
-                <span>{item.text}</span>
+              <span key={item.text} className="inline-flex items-center gap-1.5">
+                <Icon className="h-4 w-4 shrink-0 text-[#D97757]" aria-hidden />
+                <span className="font-semibold text-neutral-700 dark:text-neutral-200">{item.text}</span>
                 {i < REASSURANCE.length - 1 && (
                   <span className="hidden h-1 w-1 rounded-full bg-neutral-300 dark:bg-neutral-700 sm:inline-block" aria-hidden />
                 )}

@@ -150,27 +150,44 @@ export function ConnectedSystem() {
           </FadeIn>
 
           <FadeIn delay={0.24}>
-            <article className="h-full rounded-3xl border border-[#D97757]/30 bg-[#D97757]/10 p-6 md:p-8">
-              <div className="flex items-start gap-4">
-                <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#D97757] text-white">
-                  <Sparkles className="h-6 w-6" aria-hidden />
-                </span>
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#F3B18E]">
-                    After dinner
-                  </p>
-                  <h3 className="mt-2 font-serif text-3xl font-bold">
-                    Mark cooked starts the next useful loop.
-                  </h3>
-                </div>
-              </div>
-              <div className="mt-7 grid gap-3 sm:grid-cols-4">
-                {postCookItems.map((item, index) => (
-                  <div key={item} className="rounded-2xl bg-neutral-950/55 p-4">
-                    <p className="text-xs font-bold text-[#F3B18E]">0{index + 1}</p>
-                    <p className="mt-2 text-sm font-semibold text-white">{item}</p>
+            <article className="relative h-full overflow-hidden rounded-3xl border border-white/10 shadow-2xl shadow-black/40">
+              {/* Background image */}
+              <Image
+                src="/landing/after_dinner.jpg"
+                alt=""
+                fill
+                loading="lazy"
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="object-cover object-center"
+              />
+              {/* Dark gradient overlay — top lighter, bottom denser for text safety */}
+              <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(10,5,2,0.40)_0%,rgba(10,5,2,0.68)_100%)]" />
+              {/* Subtle warm tint at bottom */}
+              <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#0d0805]/60 to-transparent" />
+
+              {/* Content */}
+              <div className="relative z-10 p-6 md:p-8">
+                <div className="flex items-start gap-4">
+                  <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm ring-1 ring-white/20 text-[#F3B18E]">
+                    <Sparkles className="h-6 w-6" aria-hidden />
+                  </span>
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#F3B18E] drop-shadow-sm">
+                      After dinner
+                    </p>
+                    <h3 className="mt-2 font-serif text-3xl font-bold text-white drop-shadow-sm">
+                      Mark cooked starts the next useful loop.
+                    </h3>
                   </div>
-                ))}
+                </div>
+                <div className="mt-7 grid gap-3 sm:grid-cols-4">
+                  {postCookItems.map((item, index) => (
+                    <div key={item} className="rounded-2xl bg-black/40 backdrop-blur-sm ring-1 ring-white/15 p-4">
+                      <p className="text-xs font-bold text-[#F3B18E]">0{index + 1}</p>
+                      <p className="mt-2 text-sm font-semibold text-white">{item}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </article>
           </FadeIn>

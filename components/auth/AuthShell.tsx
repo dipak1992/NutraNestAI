@@ -21,9 +21,23 @@ export function AuthShell({
   return (
     <div className="min-h-screen flex flex-col">
       <div className="flex-1 grid lg:grid-cols-2">
-        {/* Form side */}
-        <div className="flex flex-col justify-center px-6 py-12 lg:px-12 xl:px-20">
-          <div className="mx-auto w-full max-w-sm">
+        {/* Form side — mobile: subtle image background; desktop: clean white */}
+        <div className="relative flex flex-col justify-center px-6 py-12 lg:px-12 xl:px-20">
+          {/* Mobile-only background image (hidden on lg+) */}
+          <div className="absolute inset-0 lg:hidden">
+            <Image
+              src="/images/auth_hero_mobile.jpg"
+              alt=""
+              fill
+              sizes="100vw"
+              className="object-cover object-center"
+              priority
+              quality={85}
+            />
+            {/* Strong white overlay — keeps form fully readable */}
+            <div className="absolute inset-0 bg-white/88 dark:bg-neutral-950/90" />
+          </div>
+          <div className="relative z-10 mx-auto w-full max-w-sm">
             {/* Logo */}
             <Link href="/" aria-label="MealEase home" className="inline-flex items-center mb-8">
               <MealEaseLogo size="md" showBadge />

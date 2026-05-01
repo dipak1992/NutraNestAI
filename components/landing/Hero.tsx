@@ -1,9 +1,10 @@
 import Image from 'next/image'
-import { CalendarDays, ChefHat, DollarSign, ShoppingCart, Sparkles } from 'lucide-react'
 import { Container } from './shared/Container'
 import { Button } from './shared/Button'
 import { FadeIn } from './shared/FadeIn'
 import { socialProof } from '@/config/social-proof'
+import { LandingTonightPreview } from './LandingTonightPreview'
+import { getLandingTonightMeal } from '@/lib/tonight/engine'
 
 const trustItems = ['Free forever', 'No card required', 'Built for households']
 
@@ -136,56 +137,7 @@ export function Hero() {
                 <div className="relative aspect-[9/19.5] rounded-[3rem] bg-neutral-900 p-3 shadow-2xl shadow-neutral-900/20 ring-1 ring-black/5">
                   <div className="relative w-full h-full rounded-[2.3rem] overflow-hidden bg-[#FBFAF3]">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(16,185,129,0.14),transparent_34%),radial-gradient(circle_at_100%_20%,rgba(217,119,87,0.14),transparent_32%)]" />
-                    <div className="absolute inset-0 z-20 flex flex-col p-5">
-                      <div className="mt-7 flex items-center justify-between">
-                        <div>
-                          <p className="text-[11px] font-semibold uppercase tracking-wider text-[#D97757]">Tonight</p>
-                          <p className="mt-1 text-lg font-bold text-neutral-950">Honey garlic chicken</p>
-                        </div>
-                        <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#D97757] text-white shadow-lg shadow-[#D97757]/25">
-                          <ChefHat className="h-5 w-5" aria-hidden />
-                        </span>
-                      </div>
-
-                      <div className="mt-5 rounded-2xl bg-white/95 p-4 shadow-xl shadow-neutral-900/10 ring-1 ring-neutral-900/5">
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="flex items-center gap-2">
-                            <Sparkles className="h-4 w-4 text-[#D97757]" aria-hidden />
-                            <span className="text-sm font-semibold text-neutral-900">Ready in 25 min</span>
-                          </div>
-                          <span className="rounded-full bg-emerald-50 px-2 py-1 text-xs font-bold text-emerald-700">$12 for 4</span>
-                        </div>
-                        <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-                          {[
-                            ['Protein', '38g'],
-                            ['Prep', '8m'],
-                            ['Score', '96'],
-                          ].map(([label, value]) => (
-                            <div key={label} className="rounded-xl bg-neutral-50 px-2 py-2">
-                              <p className="text-[10px] text-neutral-500">{label}</p>
-                              <p className="text-sm font-bold text-neutral-900">{value}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="mt-auto space-y-2">
-                        {[
-                          { icon: CalendarDays, label: 'Add to weekly plan' },
-                          { icon: ShoppingCart, label: 'Send ingredients to grocery list' },
-                          { icon: DollarSign, label: 'Under weekly budget' },
-                        ].map((item) => {
-                          const Icon = item.icon
-
-                          return (
-                            <div key={item.label} className="flex items-center gap-2 rounded-xl bg-white/90 px-3 py-2 text-xs font-semibold text-neutral-700 shadow-sm ring-1 ring-neutral-900/5">
-                              <Icon className="h-4 w-4 text-[#D97757]" aria-hidden />
-                              <span>{item.label}</span>
-                            </div>
-                          )
-                        })}
-                      </div>
-                    </div>
+                    <LandingTonightPreview />
                   </div>
                   {/* Notch */}
                   <div
@@ -194,14 +146,8 @@ export function Hero() {
                   />
                 </div>
 
-                {/* Floating "tonight" card */}
-                <div className="hidden md:flex absolute -left-14 top-1/4 bg-white dark:bg-neutral-800 rounded-2xl shadow-xl p-4 items-center gap-3 ring-1 ring-black/5">
-                  <div className="text-2xl" aria-hidden>🍽️</div>
-                  <div>
-                    <div className="text-xs text-neutral-500 dark:text-neutral-400">Tonight</div>
-                    <div className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">Honey garlic chicken</div>
-                  </div>
-                </div>
+                {/* Floating "tonight" card — dynamic */}
+                <HeroFloatingTonight />
 
                 {/* Floating "budget" card */}
                 <div className="hidden md:flex absolute -right-10 bottom-1/4 bg-white dark:bg-neutral-800 rounded-2xl shadow-xl p-4 items-center gap-3 ring-1 ring-black/5">
@@ -217,5 +163,18 @@ export function Hero() {
         </div>
       </Container>
     </section>
+  )
+}
+
+function HeroFloatingTonight() {
+  const meal = getLandingTonightMeal()
+  return (
+    <div className="hidden md:flex absolute -left-14 top-1/4 bg-white dark:bg-neutral-800 rounded-2xl shadow-xl p-4 items-center gap-3 ring-1 ring-black/5">
+      <div className="text-2xl" aria-hidden>🍽️</div>
+      <div>
+        <div className="text-xs text-neutral-500 dark:text-neutral-400">Tonight</div>
+        <div className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">{meal.name}</div>
+      </div>
+    </div>
   )
 }

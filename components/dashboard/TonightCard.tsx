@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Clock, Users, ChevronRight, Recycle, Sparkles, Leaf, DollarSign, Heart, RefreshCw } from 'lucide-react'
@@ -11,6 +11,7 @@ import { persistMealForRecipe } from '@/lib/recipes/canonical'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 import { useDailySwapLimit } from '@/lib/paywall/use-daily-swap-limit'
 import { PaywallDialog } from '@/components/paywall/PaywallDialog'
+import { trackTonightEvent } from '@/lib/tonight/analytics'
 import type { Recipe, TonightState } from '@/lib/dashboard/types'
 import type { SmartMealResult } from '@/lib/engine/types'
 
@@ -111,6 +112,18 @@ export function TonightCard({ state }: Props) {
   const regenerate = useDashboardStore((s) => s.regenerateTonight)
   const isRegenerating = useDashboardStore((s) => s.isRegeneratingTonight)
 
+  // Track view
+  useEffect(() => {
+    if (state.recipe) {
+      trackTonightEvent('dashboard_tonight_viewed', {
+        meal_id: state.recipe.id,
+        meal_name: state.recipe.name,
+        is_personalized: status.isPro || status.isFamily,
+        plan: status.isPro ? 'plus' : 'free',
+      })
+    }
+  }, [state.recipe?.id]) // eslint-disable-line react-hooks/exhaustive-deps
+
   // --- EMPTY STATE ---
   if (!state.recipe) {
     return (
@@ -147,16 +160,18 @@ export function TonightCard({ state }: Props) {
   const mealEmoji = getMealEmoji(recipe.name)
 
   function handleCookThis() {
+    trackTonightEvent('cook_clicked', { meal_id: recipe.id, meal_name: recipe.name, plan: status.isPro ? 'plus' : 'free' })
     persistMealForRecipe(toSmartMeal(recipe, reason, state.isFromPantry), '/dashboard', 'tonight')
     sessionStorage.removeItem('recipe-open-cook')
     router.push('/tonight/recipe')
   }
 
   function handleRegenerate() {
+    trackTonightEvent('swap_clicked', { meal_id: recipe.id, meal_name: recipe.name, plan: status.isPro ? 'plus' : 'free' })
     if (!swaps.recordSwap()) {
       setPaywallCopy({
-        title: 'You’ve used your free meal changes today',
-        description: 'Free includes 3 meal swaps per day. Upgrade to Plus for unlimited meal swaps, personalized picks, and guided cooking.',
+        title: "You\u2019ve used your free meal changes today",
+        description: "Free includes 3 meal swaps per day. Upgrade to Plus for unlimited meal swaps, personalized picks, and guided cooking.",
       })
       setPaywallOpen(true)
       return

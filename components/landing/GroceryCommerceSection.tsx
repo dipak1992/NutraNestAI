@@ -109,59 +109,18 @@ export function GroceryCommerceSection() {
           <FadeIn delay={0.1}>
             <div className="relative">
               <div className="relative overflow-hidden rounded-[2rem] bg-neutral-950 shadow-2xl shadow-neutral-900/15 ring-1 ring-black/10 dark:ring-white/10">
-                <div className="relative aspect-[4/3] min-h-[360px]">
+                <div className="relative aspect-[16/10] min-h-[220px] md:aspect-[4/3] md:min-h-[360px]">
                   <Image
                     src="/landing/grocery.jpg"
                     alt="Fresh groceries ready for a MealEase weekly plan"
                     fill
                     sizes="(min-width: 1024px) 620px, 100vw"
-                    className="object-cover"
+                    className="object-cover object-center"
                   />
-                  <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(8,8,8,0.82)_0%,rgba(8,8,8,0.44)_45%,rgba(8,8,8,0.08)_100%)]" />
+                  <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(8,8,8,0.46)_0%,rgba(8,8,8,0.08)_52%,rgba(8,8,8,0)_100%)] md:bg-[linear-gradient(to_right,rgba(8,8,8,0.78)_0%,rgba(8,8,8,0.42)_45%,rgba(8,8,8,0.08)_100%)]" />
                 </div>
 
-                <div className="absolute inset-y-5 left-5 flex w-[min(360px,calc(100%-40px))] flex-col rounded-2xl bg-white/94 p-4 shadow-xl backdrop-blur-md ring-1 ring-white/80 dark:bg-neutral-950/90 dark:ring-white/10">
-                  <div className="flex items-center justify-between gap-3 border-b border-neutral-100 pb-3 dark:border-neutral-800">
-                    <div>
-                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#D97757]">
-                        Grocery list
-                      </p>
-                      <p className="mt-1 text-sm font-semibold text-neutral-900 dark:text-white">
-                        22 items for 7 dinners
-                      </p>
-                    </div>
-                    <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 ring-1 ring-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 dark:ring-emerald-800">
-                      $76 est.
-                    </span>
-                  </div>
-
-                  <div className="mt-3 space-y-2">
-                    {groceryItems.map((item) => (
-                      <div
-                        key={item.name}
-                        className="flex items-center justify-between gap-3 rounded-xl bg-neutral-50 px-3 py-2.5 ring-1 ring-neutral-200/70 dark:bg-neutral-900 dark:ring-neutral-800"
-                      >
-                        <div>
-                          <p className="text-sm font-semibold text-neutral-900 dark:text-white">{item.name}</p>
-                          <p className="text-xs text-neutral-500 dark:text-neutral-400">{item.detail}</p>
-                        </div>
-                        <span className="text-xs font-bold text-[#B85F43] dark:text-[#F3B18E]">
-                          {item.status}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="mt-auto pt-4">
-                    <button
-                      type="button"
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#D97757] px-4 py-3 text-sm font-bold text-white shadow-sm transition-colors hover:bg-[#C86646]"
-                    >
-                      <ShoppingCart className="h-4 w-4" aria-hidden />
-                      Review grocery handoff
-                    </button>
-                  </div>
-                </div>
+                <GroceryListCard className="m-3 md:absolute md:inset-y-5 md:left-5 md:m-0 md:w-[min(360px,calc(100%-40px))]" />
               </div>
 
               <div className="absolute -right-3 bottom-8 hidden rounded-2xl bg-white p-4 shadow-xl ring-1 ring-neutral-200/70 dark:bg-neutral-900 dark:ring-neutral-800 md:block">
@@ -256,5 +215,54 @@ export function GroceryCommerceSection() {
         </FadeIn>
       </Container>
     </section>
+  )
+}
+
+function GroceryListCard({ className = '' }: { className?: string }) {
+  return (
+    <div
+      className={`flex flex-col rounded-2xl bg-white/95 p-4 shadow-xl backdrop-blur-md ring-1 ring-white/80 dark:bg-neutral-950/90 dark:ring-white/10 ${className}`}
+    >
+      <div className="flex items-center justify-between gap-3 border-b border-neutral-100 pb-3 dark:border-neutral-800">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#D97757]">
+            Grocery list
+          </p>
+          <p className="mt-1 text-sm font-semibold text-neutral-900 dark:text-white">
+            22 items for 7 dinners
+          </p>
+        </div>
+        <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 ring-1 ring-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 dark:ring-emerald-800">
+          $76 est.
+        </span>
+      </div>
+
+      <div className="mt-3 space-y-2">
+        {groceryItems.map((item) => (
+          <div
+            key={item.name}
+            className="flex items-center justify-between gap-3 rounded-xl bg-neutral-50 px-3 py-2.5 ring-1 ring-neutral-200/70 dark:bg-neutral-900 dark:ring-neutral-800"
+          >
+            <div>
+              <p className="text-sm font-semibold text-neutral-900 dark:text-white">{item.name}</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">{item.detail}</p>
+            </div>
+            <span className="text-xs font-bold text-[#B85F43] dark:text-[#F3B18E]">
+              {item.status}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-auto pt-4">
+        <button
+          type="button"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#D97757] px-4 py-3 text-sm font-bold text-white shadow-sm transition-colors hover:bg-[#C86646]"
+        >
+          <ShoppingCart className="h-4 w-4" aria-hidden />
+          Review grocery handoff
+        </button>
+      </div>
+    </div>
   )
 }

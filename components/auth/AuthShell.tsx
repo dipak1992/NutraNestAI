@@ -21,8 +21,8 @@ export function AuthShell({
   return (
     <div className="min-h-screen flex flex-col">
       <div className="flex-1 grid lg:grid-cols-2">
-        {/* Form side — mobile: subtle image background; desktop: clean white */}
-        <div className="relative flex flex-col justify-center px-6 py-12 lg:px-12 xl:px-20">
+        {/* Form side — mobile: image bg + glass card; desktop: clean white */}
+        <div className="relative flex flex-col justify-center px-4 py-8 lg:px-12 xl:px-20">
           {/* Mobile-only background image (hidden on lg+) */}
           <div className="absolute inset-0 lg:hidden">
             <Image
@@ -34,35 +34,42 @@ export function AuthShell({
               priority
               quality={85}
             />
-            {/* Strong white overlay — keeps form fully readable */}
-            <div className="absolute inset-0 bg-white/88 dark:bg-neutral-950/90" />
+            {/* Darker overlay so glass card pops */}
+            <div className="absolute inset-0 bg-neutral-900/55 dark:bg-neutral-950/70" />
           </div>
+
+          {/* Mobile: glassmorphism card wrapping the form; desktop: plain container */}
           <div className="relative z-10 mx-auto w-full max-w-sm">
-            {/* Logo */}
-            <Link href="/" aria-label="MealEase home" className="inline-flex items-center mb-8">
-              <MealEaseLogo size="md" showBadge />
-            </Link>
+            <div className="lg:contents">
+              {/* Glass card — mobile only */}
+              <div className="rounded-3xl bg-white/92 dark:bg-neutral-900/92 backdrop-blur-xl shadow-2xl shadow-black/30 ring-1 ring-white/60 dark:ring-white/10 px-6 py-8 lg:bg-transparent lg:shadow-none lg:ring-0 lg:backdrop-blur-none lg:px-0 lg:py-0 lg:rounded-none">
+                {/* Logo */}
+                <Link href="/" aria-label="MealEase home" className="inline-flex items-center mb-6">
+                  <MealEaseLogo size="md" showBadge />
+                </Link>
 
-            <div className="mb-8">
-              <h1 className="font-serif text-3xl font-bold text-neutral-900 dark:text-neutral-50 mb-2">
-                {title}
-              </h1>
-              <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                {subtitle}
-              </p>
+                <div className="mb-6">
+                  <h1 className="font-serif text-3xl font-bold text-neutral-900 dark:text-neutral-50 mb-1.5">
+                    {title}
+                  </h1>
+                  <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                    {subtitle}
+                  </p>
+                </div>
+
+                {children}
+
+                <p className="mt-6 text-center text-sm text-neutral-500 dark:text-neutral-400">
+                  {footerText}{' '}
+                  <Link
+                    href={footerLink.href}
+                    className="font-medium text-[#D97757] hover:underline"
+                  >
+                    {footerLink.label}
+                  </Link>
+                </p>
+              </div>
             </div>
-
-            {children}
-
-            <p className="mt-8 text-center text-sm text-neutral-500 dark:text-neutral-400">
-              {footerText}{' '}
-              <Link
-                href={footerLink.href}
-                className="font-medium text-[#D97757] hover:underline"
-              >
-                {footerLink.label}
-              </Link>
-            </p>
           </div>
         </div>
 
@@ -110,8 +117,8 @@ export function AuthShell({
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="border-t border-neutral-200 dark:border-neutral-800 py-4 px-6">
+      {/* Footer — copyright hidden on mobile (auth page glass card fills viewport) */}
+      <footer className="hidden lg:block border-t border-neutral-200 dark:border-neutral-800 py-4 px-6">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-neutral-400">
           <span>© {new Date().getFullYear()} MealEase</span>
           <div className="flex items-center gap-4">

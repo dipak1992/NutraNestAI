@@ -52,50 +52,41 @@ export function AuthShell({
           </div>
         </div>
 
-        {/* Visual side — warm premium background */}
-        <div className="hidden lg:flex flex-col justify-center px-12 xl:px-20 relative overflow-hidden">
-          {/* Background: warm food photo with rich overlay */}
+        {/* Visual side — founders photo background */}
+        <div className="hidden lg:flex flex-col justify-end px-12 xl:px-20 pb-16 relative overflow-hidden">
+          {/* Founders photo — next/image handles WebP/AVIF conversion + sizing */}
           <div className="absolute inset-0">
             <Image
-              src="/landing/family-dinner.jpg"
-              alt=""
+              src="/images/founders-family.jpg"
+              alt="Dipak and Suprabha, MealEase co-founders"
               fill
               sizes="50vw"
-              className="object-cover object-center"
+              className="object-cover object-[center_20%]"
               priority
+              quality={85}
             />
-            {/* Multi-layer warm gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#7C2D12]/85 via-[#9A3412]/75 to-[#431407]/90" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
           </div>
 
-          {/* Subtle warm dot pattern */}
-          <div
-            className="absolute inset-0 opacity-[0.06]"
-            style={{
-              backgroundImage: 'radial-gradient(circle at 2px 2px, #FED7AA 1px, transparent 0)',
-              backgroundSize: '28px 28px',
-            }}
-          />
+          {/* Left-to-right gradient: dark on left for text, fades to transparent right */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/20" />
+          {/* Bottom-to-top gradient: darkens bottom for stats readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
-          {/* Warm glow accent */}
-          <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-[#D97757]/20 blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full bg-amber-500/15 blur-3xl" />
-
-          <div className="relative z-10 max-w-sm">
+          {/* Content — positioned at bottom-left where gradient is darkest */}
+          <div className="relative z-10 max-w-xs">
             {/* Brand accent line */}
-            <div className="w-10 h-1 rounded-full bg-[#D97757] mb-6" />
+            <div className="w-8 h-0.5 rounded-full bg-[#D97757] mb-5" />
 
-            <blockquote className="text-white text-xl font-serif leading-relaxed mb-6">
+            <blockquote className="text-white text-lg font-serif leading-relaxed mb-5 drop-shadow-sm">
               &ldquo;We had a fridge full of food and still ordered takeout three
               nights a week.&rdquo;
             </blockquote>
-            <div className="text-orange-200/80 text-sm">
+            <div className="text-white/75 text-sm">
               <p className="font-semibold text-white">— Dipak &amp; Suprabha</p>
-              <p>Co-founders. Parents of two. Former takeout enthusiasts.</p>
+              <p className="mt-0.5">Co-founders. Parents of two. Former takeout enthusiasts.</p>
             </div>
 
-            <div className="mt-10 grid grid-cols-3 gap-6">
+            <div className="mt-8 grid grid-cols-3 gap-5">
               <Stat label="Households" value="2,400+" />
               <Stat label="Meals planned" value="180k+" />
               <Stat label="Avg. saved/wk" value="$47" />
@@ -128,8 +119,8 @@ export function AuthShell({
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-xs text-orange-200/60 mb-1">{label}</p>
-      <p className="text-white font-semibold text-lg">{value}</p>
+      <p className="text-xs text-white/50 mb-1">{label}</p>
+      <p className="text-white font-semibold text-lg drop-shadow-sm">{value}</p>
     </div>
   )
 }

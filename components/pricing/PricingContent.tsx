@@ -187,10 +187,10 @@ export function PricingContent() {
             className="object-cover object-top"
           />
         </div>
-        {/* Overlay: strong top scrim for text, warmth visible below */}
+        {/* Overlay: stronger top scrim for text readability */}
         <div
           aria-hidden
-          className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.62)_0%,rgba(0,0,0,0.50)_60%,rgba(0,0,0,0.42)_100%)]"
+          className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.72)_0%,rgba(0,0,0,0.58)_55%,rgba(0,0,0,0.44)_100%)]"
         />
         {/* Warm radial accent */}
         <div
@@ -212,12 +212,12 @@ export function PricingContent() {
       </section>
 
       {/* ── BILLING TOGGLE ── */}
-      <section className="flex justify-center pt-7 pb-5 px-4">
+      <section className="flex justify-center pt-6 pb-4 px-4">
         <div className="inline-flex items-center rounded-full border border-neutral-200 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-800 p-1 shadow-sm">
           <button
             onClick={() => setIsAnnual(false)}
             className={cn(
-              'text-sm font-semibold px-5 py-2.5 rounded-full transition-all min-w-[88px]',
+              'text-sm font-semibold px-5 py-2 rounded-full transition-all min-w-[88px]',
               !isAnnual
                 ? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-50 shadow-md'
                 : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200',
@@ -228,7 +228,7 @@ export function PricingContent() {
           <button
             onClick={() => setIsAnnual(true)}
             className={cn(
-              'text-sm font-semibold px-5 py-2.5 rounded-full transition-all flex items-center gap-2 min-w-[88px]',
+              'text-sm font-semibold px-5 py-2 rounded-full transition-all flex items-center gap-2 min-w-[88px]',
               isAnnual
                 ? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-50 shadow-md'
                 : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200',
@@ -243,14 +243,14 @@ export function PricingContent() {
       </section>
 
       {/* ── TRUST ROW ── */}
-      <section className="px-4 pb-6">
-        <div className="flex w-full max-w-[320px] flex-row flex-wrap items-center justify-center gap-x-4 gap-y-2 rounded-2xl border border-neutral-200 bg-white px-5 py-3 text-sm font-medium text-neutral-600 shadow-sm shadow-neutral-900/5 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300 sm:mx-auto sm:max-w-3xl">
+      <section className="px-4 pb-4">
+        <div className="flex w-full max-w-[320px] flex-row flex-wrap items-center justify-center gap-x-3 gap-y-1.5 rounded-xl border border-neutral-200 bg-white px-4 py-2 text-xs font-medium text-neutral-600 shadow-sm shadow-neutral-900/5 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300 sm:mx-auto sm:max-w-3xl">
           {REASSURANCE.map((item, i) => {
             const Icon = item.icon
 
             return (
               <span key={item.text} className="inline-flex items-center gap-1.5">
-                <Icon className="h-4 w-4 shrink-0 text-[#D97757]" aria-hidden />
+                <Icon className="h-3.5 w-3.5 shrink-0 text-[#D97757]" aria-hidden />
                 <span className="font-semibold text-neutral-700 dark:text-neutral-200">{item.text}</span>
                 {i < REASSURANCE.length - 1 && (
                   <span className="hidden h-1 w-1 rounded-full bg-neutral-300 dark:bg-neutral-700 sm:inline-block" aria-hidden />
@@ -276,7 +276,7 @@ export function PricingContent() {
                 <span className="text-sm text-neutral-500">/ forever</span>
               </div>
               <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
-                For households just getting started.
+                Great for getting started.
               </p>
             </div>
 
@@ -318,10 +318,10 @@ export function PricingContent() {
               }}
             />
 
-            {/* Most popular badge */}
+            {/* Most Popular badge */}
             <div className="absolute -top-px left-1/2 -translate-x-1/2">
-              <span className="bg-[#D97757] text-white text-xs font-bold px-5 py-1 rounded-b-full whitespace-nowrap shadow-lg">
-                ✦ Most popular
+              <span className="bg-gradient-to-r from-[#D97757] to-[#E8895A] text-white text-xs font-bold px-5 py-1.5 rounded-b-full whitespace-nowrap shadow-lg shadow-[#D97757]/40 tracking-wide">
+                ✦ Most Popular
               </span>
             </div>
 

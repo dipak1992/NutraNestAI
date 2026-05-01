@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Clock, Users, ChevronRight, Recycle, Sparkles, Leaf, DollarSign, Heart, RefreshCw } from 'lucide-react'
@@ -131,21 +132,29 @@ export function TonightCard({ state }: Props) {
         ariaLabel="Tonight's dinner"
         className="overflow-hidden min-h-[280px] md:min-h-[380px] flex flex-col items-center justify-center text-center"
       >
-        {/* Decorative gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-amber-50 to-rose-50 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-950" />
-        <div className="absolute inset-0 hidden bg-[radial-gradient(ellipse_at_top_right,_rgba(217,119,87,0.15),_transparent_60%)] sm:block" />
-        <div className="absolute inset-0 hidden bg-[radial-gradient(ellipse_at_bottom_left,_rgba(251,191,36,0.1),_transparent_60%)] sm:block" />
+        {/* Premium food photo background */}
+        <div className="absolute inset-0">
+          <Image
+            src="/cards/tonight.jpg"
+            alt=""
+            fill
+            sizes="(min-width: 1280px) 900px, 100vw"
+            className="object-cover object-center"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-neutral-950/80 via-neutral-900/70 to-neutral-950/60" />
+        </div>
         <div className="relative z-10 p-6 md:p-10 flex flex-col items-center">
           <div className="text-5xl mb-4 drop-shadow-sm md:text-6xl md:mb-5" aria-hidden>🍽️</div>
-          <h2 className="font-serif text-2xl md:text-3xl font-bold text-neutral-900 dark:text-neutral-50 mb-2">
+          <h2 className="font-serif text-2xl md:text-3xl font-bold text-white mb-2 [text-shadow:0_2px_12px_rgba(0,0,0,0.5)]">
             Let&rsquo;s plan your first dinner
           </h2>
-          <p className="text-neutral-600 dark:text-neutral-400 max-w-sm mb-6">
+          <p className="text-white/75 max-w-sm mb-6">
             Tell us about your household and we&rsquo;ll have tonight&rsquo;s dinner ready in seconds.
           </p>
           <Link
             href="/onboarding"
-            className="inline-flex items-center gap-2 bg-[#D97757] hover:bg-[#C86646] text-white font-semibold rounded-full px-6 py-3 min-h-[48px] transition-colors shadow-md shadow-orange-200 dark:shadow-none"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-[#D97757] to-[#E8895A] hover:from-[#C86646] hover:to-[#D97757] text-white font-semibold rounded-full px-6 py-3 min-h-[48px] transition-all shadow-lg shadow-[#D97757]/40 active:scale-[0.98]"
           >
             Get started
             <ChevronRight className="w-4 h-4" />
@@ -181,70 +190,71 @@ export function TonightCard({ state }: Props) {
 
   return (
     <CardShell ariaLabel="Tonight's dinner" className="flex flex-col min-h-[300px] md:min-h-[400px] overflow-visible sm:overflow-hidden">
-      {/* Hero banner — rich gradient with decorative elements */}
-      <div className="relative px-5 pt-5 pb-4 md:px-8 md:pt-8 md:pb-6 overflow-hidden">
-        {/* Layered gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-amber-50/60 to-rose-50 dark:from-[#2a1a0e] dark:via-[#1e1208] dark:to-neutral-900" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_100%_0%,_rgba(217,119,87,0.18),_transparent)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_0%_100%,_rgba(251,191,36,0.12),_transparent)]" />
+      {/* Hero banner — premium food photo with overlay */}
+      <div className="relative px-5 pt-5 pb-4 md:px-8 md:pt-8 md:pb-6 overflow-hidden min-h-[200px] md:min-h-[240px]">
+        {/* Food photo background */}
+        <div className="absolute inset-0">
+          <Image
+            src="/cards/tonight.jpg"
+            alt=""
+            fill
+            sizes="(min-width: 1280px) 900px, 100vw"
+            className="object-cover object-center"
+            priority
+          />
+          {/* Dual overlay: dark top for text + warm bottom tint */}
+          <div className="absolute inset-0 bg-gradient-to-br from-neutral-950/82 via-neutral-900/72 to-[#3d1a08]/55" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_100%_0%,rgba(217,119,87,0.18),transparent)]" />
+        </div>
 
         {/* Decorative large emoji watermark */}
         <div
-          className="absolute right-4 top-1/2 hidden -translate-y-1/2 text-[88px] leading-none select-none pointer-events-none opacity-[0.13] dark:opacity-[0.08] sm:block"
+          className="absolute right-4 top-1/2 hidden -translate-y-1/2 text-[88px] leading-none select-none pointer-events-none opacity-[0.18] sm:block"
           aria-hidden
         >
           {mealEmoji}
         </div>
 
-        {/* Decorative dot pattern */}
-        <div
-          className="absolute inset-0 hidden opacity-[0.04] dark:opacity-[0.03] sm:block"
-          style={{
-            backgroundImage: 'radial-gradient(circle, #D97757 1px, transparent 1px)',
-            backgroundSize: '20px 20px',
-          }}
-        />
-
         {/* Content */}
         <div className="relative z-10">
           {/* Top row: Tonight badge + context badges */}
           <div className="mb-3 flex flex-wrap items-center gap-2 md:mb-4">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#D97757] text-white text-xs font-bold px-3 py-1.5 shadow-sm shadow-orange-300/40 dark:shadow-none">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#D97757] text-white text-xs font-bold px-3 py-1.5 shadow-sm shadow-orange-900/40">
               <Sparkles className="w-3 h-3" />
-              {status.isPro || status.isFamily ? 'Tonight’s Smart Pick' : 'Tonight’s Pick'}
+              {status.isPro || status.isFamily ? 'Tonight\u2019s Smart Pick' : 'Tonight\u2019s Pick'}
             </span>
             {usesLeftover && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 text-xs font-semibold px-3 py-1.5 border border-emerald-200 dark:border-emerald-800">
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-900/60 text-emerald-300 text-xs font-semibold px-3 py-1.5 border border-emerald-700/50 backdrop-blur-sm">
                 <Recycle className="w-3 h-3" />
                 Uses {usesLeftover.leftoverName}
               </span>
             )}
             {state.isFromPantry && !usesLeftover && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-300 text-xs font-semibold px-3 py-1.5 border border-sky-200 dark:border-sky-800">
+              <span className="inline-flex items-center gap-1 rounded-full bg-sky-900/60 text-sky-300 text-xs font-semibold px-3 py-1.5 border border-sky-700/50 backdrop-blur-sm">
                 From your fridge
               </span>
             )}
           </div>
 
           {/* Meal name */}
-          <h2 className="font-serif text-xl md:text-3xl font-bold text-neutral-900 dark:text-neutral-50 leading-tight sm:pr-16">
+          <h2 className="font-serif text-xl md:text-3xl font-bold text-white leading-tight sm:pr-16 [text-shadow:0_2px_12px_rgba(0,0,0,0.5)]">
             {recipe.name}
           </h2>
 
           {/* Meta row */}
           <div className="flex flex-wrap items-center gap-2 mt-3 md:gap-3">
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-neutral-600 dark:text-neutral-400 bg-white/60 dark:bg-white/5 rounded-full px-2.5 py-1">
-              <Clock className="w-3.5 h-3.5 text-[#D97757]" />
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-white/80 bg-black/30 backdrop-blur-sm rounded-full px-2.5 py-1">
+              <Clock className="w-3.5 h-3.5 text-[#E8895A]" />
               {recipe.cookTimeMin} min
             </span>
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-neutral-600 dark:text-neutral-400 bg-white/60 dark:bg-white/5 rounded-full px-2.5 py-1">
-              <Users className="w-3.5 h-3.5 text-[#D97757]" />
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-white/80 bg-black/30 backdrop-blur-sm rounded-full px-2.5 py-1">
+              <Users className="w-3.5 h-3.5 text-[#E8895A]" />
               {recipe.servings} servings
             </span>
-            <span className="inline-flex items-center gap-1 text-xs font-medium text-neutral-600 dark:text-neutral-400 bg-white/60 dark:bg-white/5 rounded-full px-2.5 py-1 capitalize">
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-white/80 bg-black/30 backdrop-blur-sm rounded-full px-2.5 py-1 capitalize">
               {recipe.difficulty}
             </span>
-            <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 rounded-full px-2.5 py-1">
+            <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-300 bg-emerald-900/50 backdrop-blur-sm rounded-full px-2.5 py-1">
               ~${recipe.costPerServing.toFixed(2)}/serving
             </span>
           </div>
@@ -257,10 +267,7 @@ export function TonightCard({ state }: Props) {
                 return (
                   <span
                     key={i}
-                    className={cn(
-                      'inline-flex items-center gap-1 rounded-full text-xs font-semibold px-2.5 py-1 border border-black/5 dark:border-white/10',
-                      badge.color
-                    )}
+                    className="inline-flex items-center gap-1 rounded-full text-xs font-semibold px-2.5 py-1 bg-black/30 backdrop-blur-sm text-white/85 border border-white/15"
                   >
                     <Icon className="w-3 h-3" />
                     {badge.label}
@@ -272,7 +279,7 @@ export function TonightCard({ state }: Props) {
         </div>
 
         {!status.isPro && !status.isFamily && (
-          <p className="relative z-10 mt-3 text-xs font-medium text-neutral-600 dark:text-neutral-400">
+          <p className="relative z-10 mt-3 text-xs font-medium text-white/60">
             {swaps.remaining > 0
               ? `${swaps.remaining} swap${swaps.remaining === 1 ? '' : 's'} left today`
               : 'Free swaps used today'}
@@ -281,7 +288,7 @@ export function TonightCard({ state }: Props) {
 
         {/* Regenerating overlay */}
         {isRegenerating && (
-          <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/70 dark:bg-neutral-950/70 backdrop-blur-sm">
+          <div className="absolute inset-0 z-20 flex items-center justify-center bg-neutral-950/70 backdrop-blur-sm">
             <div className="flex items-center gap-2.5 bg-white dark:bg-neutral-900 px-5 py-2.5 rounded-full shadow-xl border border-neutral-100 dark:border-neutral-800">
               <RefreshCw className="w-4 h-4 text-[#D97757] animate-spin" />
               <span className="text-sm font-semibold text-neutral-800 dark:text-neutral-200">Finding another…</span>
@@ -309,7 +316,7 @@ export function TonightCard({ state }: Props) {
           <button
             type="button"
             onClick={handleCookThis}
-            className="flex-1 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#D97757] to-[#E8895A] hover:from-[#C86646] hover:to-[#D97757] text-white font-semibold rounded-full px-5 py-3 min-h-[48px] transition-all shadow-md shadow-orange-200/50 dark:shadow-none"
+            className="flex-1 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#D97757] to-[#E8895A] hover:from-[#C86646] hover:to-[#D97757] text-white font-semibold rounded-full px-5 py-3 min-h-[48px] transition-all shadow-md shadow-orange-200/50 dark:shadow-none active:scale-[0.98]"
           >
             Cook this
             <ChevronRight className="w-4 h-4" />

@@ -64,7 +64,7 @@ export default function SnapAndCookPage() {
           primaryLabel="Try free — no card needed"
           secondaryHref="/pricing"
           secondaryLabel="See pricing"
-          image="/landing/pantry.jpg"
+          image="/features/snap-hero.jpg"
           mobileImage="/features/snap-hero-mobile.jpg"
           mockup="snap"
         />

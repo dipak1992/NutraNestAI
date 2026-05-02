@@ -64,7 +64,7 @@ export default function TonightSuggestionsPage() {
           primaryLabel="Try free — no card needed"
           secondaryHref="/pricing"
           secondaryLabel="See pricing"
-          image="/landing/date-night.jpg"
+          image="/features/tonight-hero.jpg"
           mobileImage="/features/tonight-hero-mobile.jpg"
           mockup="tonight"
         />

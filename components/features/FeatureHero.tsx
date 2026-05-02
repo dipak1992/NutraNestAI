@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { ProductMockup } from './ProductMockup'
@@ -16,8 +15,6 @@ type FeatureHeroProps = {
   secondaryHref: string
   secondaryLabel: string
   note?: ReactNode
-  image: string
-  mobileImage?: string
   mockup: MockupVariant
   align?: 'center' | 'split'
 }
@@ -31,34 +28,18 @@ export function FeatureHero({
   secondaryHref,
   secondaryLabel,
   note,
-  image,
-  mobileImage,
   mockup,
   align = 'split',
 }: FeatureHeroProps) {
   return (
-    <section className="relative isolate overflow-hidden bg-neutral-950 py-16 text-white md:py-24">
-      <Image
-        src={image}
-        alt=""
-        fill
-        priority
-        sizes="100vw"
-        className={cn('object-cover opacity-55', mobileImage && 'hidden sm:block')}
-      />
-      {mobileImage && (
-        <Image
-          src={mobileImage}
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover opacity-55 sm:hidden"
-        />
-      )}
+    <section className="relative isolate overflow-hidden bg-[#17110f] py-16 text-white md:py-24">
       <div
         aria-hidden
-        className="absolute inset-0 bg-[linear-gradient(90deg,rgba(10,10,10,0.88),rgba(10,10,10,0.64)_48%,rgba(10,10,10,0.34)),radial-gradient(circle_at_80%_15%,rgba(217,119,87,0.34),transparent_32%)]"
+        className="absolute inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(217,119,87,0.22),transparent_28%),radial-gradient(circle_at_82%_26%,rgba(16,185,129,0.12),transparent_30%),linear-gradient(135deg,rgba(23,17,15,1),rgba(10,10,10,0.96)_54%,rgba(37,25,20,1))]"
+      />
+      <div
+        aria-hidden
+        className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"
       />
       <Container className="relative z-10 max-w-full">
         <div
@@ -95,7 +76,13 @@ export function FeatureHero({
           </div>
 
           <div className="min-w-0 lg:col-span-6">
-            <ProductMockup variant={mockup} />
+            <div className="relative mx-auto max-w-[380px] rounded-[2rem] border border-white/10 bg-white/[0.045] p-4 shadow-2xl shadow-black/30 backdrop-blur-sm sm:p-6 lg:mr-0">
+              <div
+                aria-hidden
+                className="absolute inset-0 rounded-[2rem] bg-[linear-gradient(145deg,rgba(255,255,255,0.12),transparent_48%),radial-gradient(circle_at_50%_0%,rgba(217,119,87,0.22),transparent_54%)]"
+              />
+              <ProductMockup variant={mockup} className="relative" />
+            </div>
           </div>
         </div>
       </Container>

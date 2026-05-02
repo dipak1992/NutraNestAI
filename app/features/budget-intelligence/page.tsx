@@ -65,8 +65,6 @@ export default function BudgetIntelligencePage() {
           secondaryHref="/upgrade?feature=budget"
           secondaryLabel="Upgrade to Plus"
           note={<>Budget Intelligence is a Plus feature. <Link href="/pricing" className="text-[#FFD2BD] underline underline-offset-4">Compare plans →</Link></>}
-          image="/features/budget-hero.jpg"
-          mobileImage="/features/budget-hero-mobile.jpg"
           mockup="budget"
         />
 

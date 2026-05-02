@@ -65,7 +65,7 @@ export default function SnapAndCookPage() {
           secondaryHref="/pricing"
           secondaryLabel="See pricing"
           image="/landing/pantry.jpg"
-          mobileImage="/mobile/hero-mobile.jpg"
+          mobileImage="/features/snap-hero-mobile.jpg"
           mockup="snap"
         />
 

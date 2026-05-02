@@ -9,6 +9,8 @@ const APP_SHELL = [
   '/signup',
   OFFLINE_URL,
   '/manifest.webmanifest',
+  '/icons/favicon-96.png',
+  '/icons/favicon-48.png',
   '/icons/favicon-32.png',
   '/icons/icon-192.png',
   '/icons/icon-512.png',

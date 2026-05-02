@@ -33,12 +33,15 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
+      { url: '/icons/favicon-96.png', type: 'image/png', sizes: '96x96' },
+      { url: '/icons/favicon-48.png', type: 'image/png', sizes: '48x48' },
       { url: '/icons/favicon-32.png', type: 'image/png', sizes: '32x32' },
+      { url: '/icons/icon-192.png', type: 'image/png', sizes: '192x192' },
     ],
     apple: [
       { url: '/icons/apple-touch-icon-180.png', type: 'image/png', sizes: '180x180' },
     ],
-    shortcut: '/icons/favicon-32.png',
+    shortcut: '/icons/favicon-96.png',
   },
   openGraph: {
     title: 'MealEase – Family-First AI Meal Prep Planner',

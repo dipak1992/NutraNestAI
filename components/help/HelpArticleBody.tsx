@@ -74,6 +74,20 @@ export function HelpArticleBody({ article }: { article: HelpArticle }) {
   )
 }
 
+/**
+ * Sanitize a URL to prevent javascript:/data:/vbscript: injection.
+ * Only http: and https: protocols are allowed; anything else returns '#'.
+ */
+function sanitizeUrl(url: string): string {
+  try {
+    const parsed = new URL(url, 'https://mealeaseai.com')
+    if (!['http:', 'https:'].includes(parsed.protocol)) return '#'
+    return parsed.href
+  } catch {
+    return '#'
+  }
+}
+
 function renderInline(text: string): string {
   // Bold **text**
   let out = text.replace(
@@ -82,10 +96,11 @@ function renderInline(text: string): string {
   )
   // Italic *text*
   out = out.replace(/\*(.+?)\*/g, '<em>$1</em>')
-  // Inline links [text](url)
+  // Inline links [text](url) — URL is sanitized to block javascript: and data: protocols
   out = out.replace(
     /\[([^\]]+)\]\(([^)]+)\)/g,
-    '<a href="$2" class="text-[#D97757] underline underline-offset-2 hover:text-[#C86646]">$1</a>'
+    (_, linkText: string, rawUrl: string) =>
+      `<a href="${sanitizeUrl(rawUrl)}" rel="noopener noreferrer" class="text-[#D97757] underline underline-offset-2 hover:text-[#C86646]">${linkText}</a>`
   )
   // Newlines → <br>
   out = out.replace(/\n/g, '<br />')

@@ -98,6 +98,15 @@ export async function POST(req: NextRequest) {
   const rl = await rateLimit({ key: rateLimitKeyFromRequest(req), limit: 20, windowMs: 60_000 })
   if (!rl.success) return apiRateLimited(rl.reset)
 
+  // Require authentication — this endpoint calls paid AI APIs (Anthropic/OpenAI)
+  // and must not be accessible to unauthenticated users to prevent cost abuse.
+  const { createClient } = await import('@/lib/supabase/server')
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+  }
+
   try {
     const body = await req.json()
     const { image, mimeType } = body as { image?: string; mimeType?: string }

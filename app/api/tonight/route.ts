@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getRandomTonightMeal, TONIGHT_MEALS } from '@/lib/tonight-meals'
 import { createClient } from '@/lib/supabase/server'
 import { getUserDietaryPrefs } from '@/lib/meal-engine/preferences'
+import { rateLimit, rateLimitKeyFromRequest } from '@/lib/rate-limit'
+import { apiRateLimited } from '@/lib/api-response'
 import type { TonightMeal } from '@/lib/tonight-meals'
 
 // Eating styles that indicate no meat — used to filter pre-built static meals by tags
@@ -31,6 +33,9 @@ function pickPreferenceMeal(
 }
 
 export async function GET(req: NextRequest) {
+  const rl = await rateLimit({ key: rateLimitKeyFromRequest(req), limit: 30, windowMs: 60_000 })
+  if (!rl.success) return apiRateLimited(rl.reset)
+
   const mode = req.nextUrl.searchParams.get('mode') as 'quick' | 'tired' | 'pantry' | null
 
   if (!mode || !['quick', 'tired', 'pantry'].includes(mode)) {

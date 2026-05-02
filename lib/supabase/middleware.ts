@@ -20,7 +20,10 @@ export async function updateSession(request: NextRequest) {
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, {
               ...options,
-              maxAge: 60 * 60 * 24 * 400, // ~13 months — keep user logged in
+              maxAge: 60 * 60 * 24 * 7, // 7 days — reduced from 13 months for security
+              httpOnly: true,
+              secure: process.env.NODE_ENV === 'production',
+              sameSite: 'lax',
             })
           );
         },
@@ -37,7 +40,12 @@ export async function updateSession(request: NextRequest) {
   if (!user && isProtected) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = '/login';
-    redirectUrl.searchParams.set('redirect', request.nextUrl.pathname);
+    // Only store relative paths as redirect targets to prevent open redirect attacks.
+    // Paths starting with '//' could be protocol-relative URLs pointing to external sites.
+    const pathname = request.nextUrl.pathname;
+    if (pathname.startsWith('/') && !pathname.startsWith('//')) {
+      redirectUrl.searchParams.set('redirect', pathname);
+    }
     return NextResponse.redirect(redirectUrl);
   }
 

@@ -4,7 +4,9 @@ import { NextResponse, type NextRequest } from 'next/server'
 function buildCsp() {
   return [
     `default-src 'self'`,
-    `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.posthog.com https://*.sentry.io`,
+    // 'unsafe-inline' is required by Next.js 15 for its own injected scripts.
+    // 'unsafe-eval' has been removed — it is not required and enables code injection attacks.
+    `script-src 'self' 'unsafe-inline' https://*.posthog.com https://*.sentry.io`,
     `style-src 'self' 'unsafe-inline'`,
     `img-src 'self' data: blob: https:`,
     `font-src 'self' data:`,

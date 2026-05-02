@@ -26,6 +26,8 @@ const withMDX = createMDX({
 
 const nextConfig: NextConfig = {
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
+  // Disable source maps in production to prevent exposing application logic
+  productionBrowserSourceMaps: false,
   images: {
     remotePatterns: [
       {

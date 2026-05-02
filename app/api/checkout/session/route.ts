@@ -61,7 +61,18 @@ export async function POST(req: Request) {
       )
     }
 
-    const site = getSiteUrl().replace(/\/$/, '')
+    // Validate origin against allowlist to prevent post-payment redirect to phishing pages
+    const ALLOWED_ORIGINS = [
+      process.env.NEXT_PUBLIC_APP_URL,
+      process.env.NEXT_PUBLIC_SITE_URL,
+      'https://mealeaseai.com',
+      'https://www.mealeaseai.com',
+      'http://localhost:3000',
+    ].filter(Boolean) as string[]
+    const rawOrigin = req.headers.get('origin') ?? ''
+    const site = ALLOWED_ORIGINS.includes(rawOrigin)
+      ? rawOrigin.replace(/\/$/, '')
+      : getSiteUrl().replace(/\/$/, '')
     const tier = PLAN_TIERS[plan]
 
     // Stripe Checkout Session via REST API
@@ -112,6 +123,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ url: session.url, id: session.id })
   } catch (err) {
     console.error('[checkout/session] unexpected error:', err)
-    return NextResponse.json({ error: 'Unexpected error' }, { status: 500 })
+    return NextResponse.json({ error: 'Payment setup failed. Please try again.' }, { status: 500 })
   }
 }

@@ -4,12 +4,18 @@
 // One-time only per user.
 // ============================================================
 
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { sendTrialStartedEmail } from '@/lib/email/triggers'
 import { serverEnv } from '@/lib/env'
+import { rateLimit, rateLimitKeyFromRequest } from '@/lib/rate-limit'
+import { apiRateLimited } from '@/lib/api-response'
 
-export async function POST(_req: Request) {
+export async function POST(req: NextRequest) {
+  // 10 attempts per minute per IP — prevents trial farming via rapid account creation
+  const rl = await rateLimit({ key: rateLimitKeyFromRequest(req), limit: 10, windowMs: 60_000 })
+  if (!rl.success) return apiRateLimited(rl.reset)
+
   try {
     const supabase = await createClient()
     const {

@@ -1,0 +1,38 @@
+User-agent: *
+
+# Block all private app routes from indexing
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /plan
+Disallow: /leftovers
+Disallow: /budget
+Disallow: /pantry
+Disallow: /grocery-list
+Disallow: /onboarding
+Disallow: /meal/
+Disallow: /scan
+Disallow: /saved
+Disallow: /planner
+
+# Block all API routes
+Disallow: /api/
+
+# Block auth routes
+Disallow: /login
+Disallow: /signup
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /verify-email
+
+# Allow public pages
+Allow: /
+Allow: /pricing
+Allow: /blog/
+Allow: /help/
+Allow: /about
+Allow: /contact
+Allow: /privacy
+Allow: /terms
+Allow: /recipes/
+
+Sitemap: https://mealeaseai.com/sitemap.xml

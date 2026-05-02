@@ -1,7 +1,9 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import type { ContactPayload, ContactTopic } from '@/lib/contact/types'
 import { alertAdminContactForm, sendSupportConfirmationEmail } from '@/lib/email/triggers'
+import { rateLimit, rateLimitKeyFromRequest } from '@/lib/rate-limit'
+import { apiRateLimited } from '@/lib/api-response'
 
 export const runtime = 'nodejs'
 
@@ -14,32 +16,15 @@ const VALID_TOPICS: ContactTopic[] = [
   'feedback',
 ]
 
-// Simple in-memory rate limit (per instance). For production, swap to Upstash or similar.
-const hits = new Map<string, number[]>()
-const WINDOW_MS = 60 * 60 * 1000 // 1 hour
-const MAX_PER_WINDOW = 5
+export async function POST(req: NextRequest) {
+  // 5 messages per hour per IP — backed by Upstash Redis in production (survives cold starts)
+  const rl = await rateLimit({ key: rateLimitKeyFromRequest(req), limit: 5, windowMs: 60 * 60 * 1000 })
+  if (!rl.success) return apiRateLimited(rl.reset)
 
-function rateLimited(key: string) {
-  const now = Date.now()
-  const existing = (hits.get(key) ?? []).filter((t) => now - t < WINDOW_MS)
-  if (existing.length >= MAX_PER_WINDOW) return true
-  existing.push(now)
-  hits.set(key, existing)
-  return false
-}
-
-export async function POST(req: Request) {
   const ip =
     req.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
     req.headers.get('x-real-ip') ??
     'unknown'
-
-  if (rateLimited(ip)) {
-    return NextResponse.json(
-      { error: 'Too many messages. Please try again later.' },
-      { status: 429 }
-    )
-  }
 
   const body = (await req.json().catch(() => ({}))) as Partial<ContactPayload>
   const { name, email, topic, message } = body

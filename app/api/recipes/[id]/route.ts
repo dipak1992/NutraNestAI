@@ -1,11 +1,16 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { rateLimit, rateLimitKeyFromRequest } from '@/lib/rate-limit'
+import { apiRateLimited } from '@/lib/api-response'
 
 type Params = { params: Promise<{ id: string }> }
 
 // ─── GET /api/recipes/[id] ────────────────────────────────────────────────────
 
-export async function GET(_req: Request, { params }: Params) {
+export async function GET(req: NextRequest, { params }: Params) {
+  const rl = await rateLimit({ key: rateLimitKeyFromRequest(req), limit: 120, windowMs: 60_000 })
+  if (!rl.success) return apiRateLimited(rl.reset)
+
   try {
     const { id } = await params
     const supabase = await createClient()
@@ -21,8 +26,7 @@ export async function GET(_req: Request, { params }: Params) {
     }
 
     return NextResponse.json(data)
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Unknown error'
-    return NextResponse.json({ error: message }, { status: 500 })
+  } catch {
+    return NextResponse.json({ error: 'An unexpected error occurred' }, { status: 500 })
   }
 }

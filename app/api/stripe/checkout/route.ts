@@ -41,7 +41,18 @@ export async function POST(req: Request) {
         .eq('id', user.id)
     }
 
-    const origin = req.headers.get('origin') ?? process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+    // Validate origin against allowlist to prevent post-payment redirect to phishing pages
+    const ALLOWED_ORIGINS = [
+      process.env.NEXT_PUBLIC_APP_URL,
+      process.env.NEXT_PUBLIC_SITE_URL,
+      'https://mealeaseai.com',
+      'https://www.mealeaseai.com',
+      'http://localhost:3000',
+    ].filter(Boolean) as string[]
+    const rawOrigin = req.headers.get('origin') ?? ''
+    const origin = ALLOWED_ORIGINS.includes(rawOrigin)
+      ? rawOrigin
+      : (process.env.NEXT_PUBLIC_APP_URL ?? 'https://mealeaseai.com')
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -60,7 +71,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ url: session.url })
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Unknown error'
-    return NextResponse.json({ error: message }, { status: 500 })
+    console.error('[stripe/checkout] error:', err)
+    return NextResponse.json({ error: 'Payment setup failed. Please try again.' }, { status: 500 })
   }
 }

@@ -36,7 +36,7 @@ export async function GET(
       user_id: string
     }
     if (planMeta.user_id !== user.id) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      return NextResponse.json({ error: 'Day not found' }, { status: 404 })
     }
 
     const dayIndex = dayRow.day_index as number
@@ -189,7 +189,7 @@ export async function POST(
       week_start: string
     }
     if (planMeta.user_id !== user.id) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      return NextResponse.json({ error: 'Day not found' }, { status: 404 })
     }
 
     // Fetch recipe cost for estimated_cost
@@ -208,6 +208,7 @@ export async function POST(
         estimated_cost: (recipeRow?.cost_total as number | null) ?? null,
       })
       .eq('id', dayId)
+      .eq('plan_id', dayRow.plan_id as string)
 
     // Return the updated full plan
     const updatedPlan = await loadWeekPlan(user.id, planMeta.week_start)

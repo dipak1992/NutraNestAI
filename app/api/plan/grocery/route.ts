@@ -65,18 +65,46 @@ export async function POST(req: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await req.json()
-  const { recipeIds } = body as { recipeIds: string[]; weekStart?: string }
+  const { recipeIds, weekStart } = body as { recipeIds: string[]; weekStart?: string }
 
-  if (!recipeIds || recipeIds.length === 0) {
+  if (!recipeIds || recipeIds.length === 0 || !weekStart) {
     return NextResponse.json({ sections: [] })
   }
 
   try {
+    const { data: planRow } = await supabase
+      .from('week_plans')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('week_start', weekStart)
+      .maybeSingle()
+
+    if (!planRow?.id) {
+      return NextResponse.json({ sections: [] })
+    }
+
+    const requestedIds = Array.from(new Set(recipeIds.filter((id): id is string => typeof id === 'string')))
+    const { data: ownedDays } = await supabase
+      .from('week_plan_days')
+      .select('recipe_id')
+      .eq('plan_id', planRow.id)
+      .in('recipe_id', requestedIds)
+
+    const ownedRecipeIds = Array.from(new Set(
+      (ownedDays ?? [])
+        .map((row) => row.recipe_id)
+        .filter((id): id is string => typeof id === 'string'),
+    ))
+
+    if (ownedRecipeIds.length === 0) {
+      return NextResponse.json({ sections: [] })
+    }
+
     // Load recipes with their ingredients
     const { data: recipeRows } = await supabase
       .from('recipes')
       .select('id, name, ingredients')
-      .in('id', recipeIds)
+      .in('id', ownedRecipeIds)
 
     if (!recipeRows || recipeRows.length === 0) {
       return NextResponse.json({ sections: [] })

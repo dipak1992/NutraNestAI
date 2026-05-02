@@ -40,6 +40,7 @@ export const POST = withErrorHandler('plan/publish', async (req: Request) => {
     .from('weekly_plans')
     .update({ status: 'active', updated_at: new Date().toISOString() })
     .eq('id', planRow.id)
+    .eq('user_id', user.id)
 
   if (updateErr) return apiError('Failed to publish plan', 500)
 

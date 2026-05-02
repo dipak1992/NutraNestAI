@@ -2,6 +2,35 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getUserTier } from '@/lib/family/service'
 
+type MemberOwnership = {
+  id: string
+  household_id: string
+  household?: { owner_user_id: string } | Array<{ owner_user_id: string }> | null
+}
+
+function ownerIdFor(row: MemberOwnership): string | null {
+  const household = Array.isArray(row.household) ? row.household[0] : row.household
+  return household?.owner_user_id ?? null
+}
+
+async function loadOwnedMember(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  memberId: string,
+  userId: string,
+) {
+  const { data } = await supabase
+    .from('household_members')
+    .select('id, household_id, household:household_id(owner_user_id)')
+    .eq('id', memberId)
+    .maybeSingle()
+
+  if (!data) return { error: NextResponse.json({ error: 'Member not found' }, { status: 404 }) }
+  if (ownerIdFor(data as MemberOwnership) !== userId) {
+    return { error: NextResponse.json({ error: 'Member not found' }, { status: 404 }) }
+  }
+  return { error: null, householdId: (data as MemberOwnership).household_id }
+}
+
 function toStringArray(value: unknown): string[] {
   if (!Array.isArray(value)) return []
   return value.filter((v): v is string => typeof v === 'string').map((v) => v.trim()).filter(Boolean)
@@ -25,6 +54,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!body || typeof body !== 'object') {
     return NextResponse.json({ error: 'Invalid payload' }, { status: 400 })
   }
+  const ownership = await loadOwnedMember(supabase, id, user.id)
+  if (ownership.error) return ownership.error
 
   const patch: Record<string, unknown> = {}
   const allowed = [
@@ -66,7 +97,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     .from('household_members')
     .update(patch)
     .eq('id', id)
-    .eq('user_id', user.id)
+    .eq('household_id', ownership.householdId)
     .select('*')
     .single()
 
@@ -87,12 +118,14 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
       { status: 403 },
     )
   }
+  const ownership = await loadOwnedMember(supabase, id, user.id)
+  if (ownership.error) return ownership.error
 
   const { error } = await supabase
     .from('household_members')
     .delete()
     .eq('id', id)
-    .eq('user_id', user.id)
+    .eq('household_id', ownership.householdId)
 
   if (error) return NextResponse.json({ error: 'Failed to remove family member' }, { status: 500 })
   return NextResponse.json({ ok: true })

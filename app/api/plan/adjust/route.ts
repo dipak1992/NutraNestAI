@@ -132,6 +132,7 @@ export const POST = withErrorHandler('plan/adjust', async (req: Request) => {
     .from('weekly_plans')
     .update({ plan, updated_at: new Date().toISOString() })
     .eq('id', planRow.id)
+    .eq('user_id', user.id)
 
   if (updateErr) return apiError('Failed to update plan', 500)
 

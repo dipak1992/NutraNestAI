@@ -4,6 +4,7 @@ import { loadWeekPlan, getCurrentWeekStart } from '@/app/plan/loader'
 
 type PlanDayOwnership = {
   locked?: boolean
+  plan_id?: string
   plan?: { user_id: string } | Array<{ user_id: string }> | null
 }
 
@@ -26,7 +27,7 @@ async function loadOwnedPlanDay(
 
   if (!row) return { row: null, response: NextResponse.json({ error: 'Day not found' }, { status: 404 }) }
   if (planOwner(row as PlanDayOwnership) !== userId) {
-    return { row: null, response: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) }
+    return { row: null, response: NextResponse.json({ error: 'Day not found' }, { status: 404 }) }
   }
   return { row, response: null }
 }
@@ -114,6 +115,7 @@ export async function PATCH(req: NextRequest) {
               notes: source.notes,
             })
             .eq('id', target.id as string)
+            .eq('plan_id', planRow.id as string)
         })
 
         await Promise.all(updates.filter(Boolean))
@@ -128,7 +130,7 @@ export async function PATCH(req: NextRequest) {
           supabase,
           user.id,
           dayId,
-          'locked, plan:plan_id(user_id)',
+          'locked, plan_id, plan:plan_id(user_id)',
         )
         if (response) return response
 
@@ -136,6 +138,7 @@ export async function PATCH(req: NextRequest) {
           .from('week_plan_days')
           .update({ locked: !((row as PlanDayOwnership).locked as boolean) })
           .eq('id', dayId)
+          .eq('plan_id', (row as PlanDayOwnership).plan_id as string)
 
         return NextResponse.json({ ok: true })
       }
@@ -143,13 +146,14 @@ export async function PATCH(req: NextRequest) {
       // ── mark_cooked ─────────────────────────────────────────────────────────
       case 'mark_cooked': {
         const { dayId } = body as { dayId: string }
-        const { response } = await loadOwnedPlanDay(supabase, user.id, dayId)
+        const { row, response } = await loadOwnedPlanDay(supabase, user.id, dayId, 'plan_id, plan:plan_id(user_id)')
         if (response) return response
 
         await supabase
           .from('week_plan_days')
           .update({ status: 'cooked' })
           .eq('id', dayId)
+          .eq('plan_id', (row as PlanDayOwnership).plan_id as string)
 
         return NextResponse.json({ ok: true })
       }
@@ -157,7 +161,7 @@ export async function PATCH(req: NextRequest) {
       // ── clear ────────────────────────────────────────────────────────────────
       case 'clear': {
         const { dayId } = body as { dayId: string }
-        const { response } = await loadOwnedPlanDay(supabase, user.id, dayId)
+        const { row, response } = await loadOwnedPlanDay(supabase, user.id, dayId, 'plan_id, plan:plan_id(user_id)')
         if (response) return response
 
         await supabase
@@ -170,6 +174,7 @@ export async function PATCH(req: NextRequest) {
             notes: null,
           })
           .eq('id', dayId)
+          .eq('plan_id', (row as PlanDayOwnership).plan_id as string)
 
         return NextResponse.json({ ok: true })
       }

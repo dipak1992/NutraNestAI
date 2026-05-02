@@ -23,8 +23,8 @@ export async function DELETE(_req: Request, { params }: Params) {
 
     return NextResponse.json({ ok: true })
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Unknown error'
-    return NextResponse.json({ error: message }, { status: 500 })
+    console.error('[settings/household DELETE]', err)
+    return NextResponse.json({ error: 'Failed to delete household member' }, { status: 500 })
   }
 }
 
@@ -68,7 +68,7 @@ export async function PATCH(req: Request, { params }: Params) {
 
     return NextResponse.json({ ok: true })
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Unknown error'
-    return NextResponse.json({ error: message }, { status: 500 })
+    console.error('[settings/household PATCH]', err)
+    return NextResponse.json({ error: 'Failed to update household member' }, { status: 500 })
   }
 }

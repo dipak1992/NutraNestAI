@@ -253,6 +253,7 @@ export async function POST(req: NextRequest) {
       .from('week_plans')
       .update({ is_autopilot: true })
       .eq('id', planRow.id)
+      .eq('user_id', user.id)
 
     // ── 11. Record autopilot run for analytics ───────────────────────────────
     try {

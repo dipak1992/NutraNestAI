@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { ProductMockup } from './ProductMockup'
@@ -15,6 +16,9 @@ type FeatureHeroProps = {
   secondaryHref: string
   secondaryLabel: string
   note?: ReactNode
+  image: string
+  mobileImage: string
+  imageAlt?: string
   mockup: MockupVariant
   align?: 'center' | 'split'
 }
@@ -28,6 +32,9 @@ export function FeatureHero({
   secondaryHref,
   secondaryLabel,
   note,
+  image,
+  mobileImage,
+  imageAlt = '',
   mockup,
   align = 'split',
 }: FeatureHeroProps) {
@@ -75,13 +82,41 @@ export function FeatureHero({
             {note && <p className="mt-4 text-sm text-white/68">{note}</p>}
           </div>
 
-          <div className="min-w-0 lg:col-span-6">
-            <div className="relative mx-auto max-w-[380px] rounded-[2rem] border border-white/10 bg-white/[0.045] p-4 shadow-2xl shadow-black/30 backdrop-blur-sm sm:p-6 lg:mr-0">
+          <div className="min-w-0 pb-20 lg:col-span-6 lg:pb-16">
+            <div className="relative mx-auto max-w-[430px] lg:mr-0 lg:max-w-[560px]">
+              <div className="relative overflow-hidden rounded-[1.75rem] border border-white/12 bg-white/[0.045] shadow-2xl shadow-black/35 ring-1 ring-white/10">
+                <div className="relative aspect-[4/5] sm:hidden">
+                  <Image
+                    src={mobileImage}
+                    alt={imageAlt}
+                    fill
+                    priority
+                    sizes="(max-width: 640px) 92vw"
+                    className="object-cover"
+                  />
+                </div>
+                <div className="relative hidden aspect-[16/10] sm:block">
+                  <Image
+                    src={image}
+                    alt={imageAlt}
+                    fill
+                    priority
+                    sizes="(max-width: 1024px) 80vw, 560px"
+                    className="object-cover"
+                  />
+                </div>
+                <div
+                  aria-hidden
+                  className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,10,10,0.04),rgba(10,10,10,0.48)),radial-gradient(circle_at_22%_12%,rgba(255,255,255,0.24),transparent_28%)]"
+                />
+              </div>
+              <div className="absolute bottom-0 left-1/2 w-[min(78%,300px)] translate-y-1/2 -translate-x-1/2 sm:left-auto sm:right-5 sm:w-[270px] sm:translate-x-0 lg:w-[295px]">
+                <ProductMockup variant={mockup} />
+              </div>
               <div
                 aria-hidden
-                className="absolute inset-0 rounded-[2rem] bg-[linear-gradient(145deg,rgba(255,255,255,0.12),transparent_48%),radial-gradient(circle_at_50%_0%,rgba(217,119,87,0.22),transparent_54%)]"
+                className="absolute -inset-3 -z-10 rounded-[2rem] bg-[radial-gradient(circle_at_55%_12%,rgba(217,119,87,0.22),transparent_46%),linear-gradient(145deg,rgba(255,255,255,0.08),transparent_58%)]"
               />
-              <ProductMockup variant={mockup} className="relative" />
             </div>
           </div>
         </div>

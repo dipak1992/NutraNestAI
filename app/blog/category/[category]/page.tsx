@@ -7,6 +7,7 @@ import { BlogCard } from '@/components/blog/BlogCard'
 import { BlogCTA } from '@/components/blog/BlogCTA'
 import { getPostsByCategory } from '@/lib/blog/mdx'
 import { CATEGORY_LABELS, type BlogCategory } from '@/lib/blog/types'
+import { absoluteUrl } from '@/lib/seo'
 
 export function generateStaticParams() {
   return (Object.keys(CATEGORY_LABELS) as BlogCategory[]).map((category) => ({
@@ -21,9 +22,20 @@ export async function generateMetadata({
 }) {
   const { category } = await params
   const label = CATEGORY_LABELS[category as BlogCategory]
+  const path = `/blog/category/${category}`
   return {
-    title: label ? `${label} | MealEase Blog` : 'Not found',
-    description: `Posts on ${label ?? 'this topic'} from the MealEase blog.`,
+    title: label ? `${label} Meal Planning Guides | MealEase Blog` : 'Not found',
+    description: `MealEase guides on ${label ?? 'this topic'}: practical meal planning workflows, grocery lists, household cooking, and dinner decisions.`,
+    alternates: {
+      canonical: label ? path : '/blog',
+    },
+    openGraph: {
+      title: label ? `${label} Meal Planning Guides | MealEase` : 'MealEase Blog',
+      description: `Practical MealEase articles for ${label ?? 'meal planning'} workflows.`,
+      url: absoluteUrl(label ? path : '/blog'),
+      siteName: 'MealEase',
+      type: 'website',
+    },
   }
 }
 
@@ -37,11 +49,31 @@ export default async function CategoryPage({
   if (!label) notFound()
 
   const posts = getPostsByCategory(category)
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: `${label} Meal Planning Guides`,
+    description: `MealEase guides on ${label}: practical meal planning workflows, grocery lists, household cooking, and dinner decisions.`,
+    url: absoluteUrl(`/blog/category/${category}`),
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: posts.map((post, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        url: absoluteUrl(`/blog/${post.slug}`),
+        name: post.title,
+      })),
+    },
+  }
 
   return (
     <>
       <Nav />
       <main id="main">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <section className="relative pt-16 pb-10 md:pt-24 md:pb-14">
           <div
             aria-hidden

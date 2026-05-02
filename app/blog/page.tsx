@@ -6,21 +6,66 @@ import { getAllPosts } from '@/lib/blog/mdx'
 import { CATEGORY_LABELS, type BlogCategory } from '@/lib/blog/types'
 import { Nav } from '@/components/landing/Nav'
 import { Footer } from '@/components/landing/Footer'
+import { absoluteUrl } from '@/lib/seo'
 
 export const metadata = {
-  title: 'Blog | MealEase — Cooking, budgeting, and family meal ideas',
+  title: 'Meal Planning Blog | AI Dinner Ideas, Grocery Budgets, and Leftovers',
   description:
-    'Stories and tips on meal planning, leftovers, grocery budgets, and household cooking — from the team at MealEase.',
+    'Feature-led guides for AI meal planning, fridge scanning, grocery lists, budget dinners, leftovers, and household cooking from MealEase.',
+  keywords: [
+    'AI meal planning blog',
+    'family meal planning',
+    'grocery list meal planner',
+    'leftover recipe ideas',
+    'budget dinner ideas',
+  ],
+  alternates: {
+    canonical: '/blog',
+  },
+  openGraph: {
+    title: 'Meal Planning Blog | MealEase',
+    description:
+      'Guides for AI meal planning, fridge scanning, grocery lists, budget dinners, leftovers, and household cooking.',
+    url: absoluteUrl('/blog'),
+    siteName: 'MealEase',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Meal Planning Blog | MealEase',
+    description:
+      'Feature-led guides for AI meal planning, grocery lists, budget dinners, leftovers, and household cooking.',
+  },
 }
 
 export default function BlogIndexPage() {
   const posts = getAllPosts()
   const [featured, ...rest] = posts
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'MealEase Meal Planning Blog',
+    description: metadata.description,
+    url: absoluteUrl('/blog'),
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: posts.slice(0, 20).map((post, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        url: absoluteUrl(`/blog/${post.slug}`),
+        name: post.title,
+      })),
+    },
+  }
 
   return (
     <>
       <Nav />
       <main id="main">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <section className="relative pt-16 pb-10 md:pt-24 md:pb-14">
           <div
             aria-hidden

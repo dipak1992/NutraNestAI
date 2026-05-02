@@ -4,6 +4,7 @@ import { getPublicMeals } from '@/lib/content/public'
 import { absoluteUrl } from '@/lib/seo'
 import { growthPages, growthTools } from '@/lib/growth/content'
 import { getAllPosts as getAllMdxPosts } from '@/lib/blog/mdx'
+import { CATEGORY_LABELS, type BlogCategory } from '@/lib/blog/types'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -34,11 +35,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         slug: post.slug,
         updatedAt: post.updatedAt,
         publishedAt: post.publishedAt,
+        coverImage: undefined,
       })),
       ...getAllMdxPosts().map((post) => ({
         slug: post.slug,
         updatedAt: post.updatedAt,
         publishedAt: post.publishedAt,
+        coverImage: post.coverImage,
       })),
     ].map((post) => [post.slug, post]),
   )
@@ -48,7 +51,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: new Date(post.updatedAt ?? post.publishedAt),
     changeFrequency: 'monthly',
     priority: 0.8,
+    images: post.coverImage ? [absoluteUrl(post.coverImage)] : undefined,
   }))
+
+  const categoryRoutes: MetadataRoute.Sitemap = (Object.keys(CATEGORY_LABELS) as BlogCategory[]).map(
+    (category) => ({
+      url: absoluteUrl(`/blog/category/${category}`),
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.72,
+    }),
+  )
 
   const growthRoutes: MetadataRoute.Sitemap = growthPages.map((page) => ({
     url: absoluteUrl(`/${page.slug}`),
@@ -73,5 +86,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
-  return [...staticRoutes, ...growthRoutes, ...toolRoutes, ...blogRoutes, ...mealRoutes]
+  return [...staticRoutes, ...growthRoutes, ...toolRoutes, ...categoryRoutes, ...blogRoutes, ...mealRoutes]
 }

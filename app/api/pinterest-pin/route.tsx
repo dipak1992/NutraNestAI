@@ -1,12 +1,13 @@
 import { ImageResponse } from 'next/og'
 import { NextRequest } from 'next/server'
+import { safeSearchParam } from '@/lib/validation/input'
 
 export const runtime = 'edge'
 
 export async function GET(req: NextRequest) {
-  const title = req.nextUrl.searchParams.get('title') ?? 'Cheap weekly meal plan'
-  const subtitle = req.nextUrl.searchParams.get('subtitle') ?? 'Plan tonight, shop smarter, waste less'
-  const total = req.nextUrl.searchParams.get('total') ?? '$82'
+  const title = safeSearchParam(req.nextUrl.searchParams.get('title'), 'Cheap weekly meal plan', 90)
+  const subtitle = safeSearchParam(req.nextUrl.searchParams.get('subtitle'), 'Plan tonight, shop smarter, waste less', 120)
+  const total = safeSearchParam(req.nextUrl.searchParams.get('total'), '$82', 24)
 
   return new ImageResponse(
     (

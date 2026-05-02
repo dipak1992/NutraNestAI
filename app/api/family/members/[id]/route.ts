@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getUserTier } from '@/lib/family/service'
+import { cleanString, stringArraySchema, uuidSchema, validationError } from '@/lib/validation/input'
+import { z } from 'zod'
 
 type MemberOwnership = {
   id: string
@@ -31,13 +33,37 @@ async function loadOwnedMember(
   return { error: null, householdId: (data as MemberOwnership).household_id }
 }
 
-function toStringArray(value: unknown): string[] {
-  if (!Array.isArray(value)) return []
-  return value.filter((v): v is string => typeof v === 'string').map((v) => v.trim()).filter(Boolean)
-}
+const memberPatchSchema = z.object({
+  first_name: cleanString(80).optional(),
+  role: z.enum(['adult', 'teen', 'child', 'toddler', 'baby']).optional(),
+  age_years: z.coerce.number().int().min(0).max(120).nullable().optional(),
+  age_range: z.string().max(40).nullable().optional(),
+  dietary_type: z.string().max(80).nullable().optional(),
+  spice_tolerance: z.enum(['none', 'mild', 'medium', 'hot']).nullable().optional(),
+  picky_eater_level: z.coerce.number().int().min(0).max(5).optional(),
+  portion_size: z.enum(['small', 'medium', 'large']).nullable().optional(),
+  school_lunch_needed: z.coerce.boolean().optional(),
+  snack_frequency: z.enum(['low', 'normal', 'high']).nullable().optional(),
+  texture_sensitivity: z.string().max(80).nullable().optional(),
+  allergy_notes: z.string().transform((v) => v.trim().slice(0, 500)).nullable().optional(),
+  notes: z.string().transform((v) => v.trim().slice(0, 1000)).nullable().optional(),
+  is_primary_shopper: z.coerce.boolean().optional(),
+  is_primary_cook: z.coerce.boolean().optional(),
+  display_order: z.coerce.number().int().min(0).max(100).optional(),
+  allergies_json: stringArraySchema(30, 80).optional(),
+  foods_loved_json: stringArraySchema(60, 80).optional(),
+  foods_disliked_json: stringArraySchema(60, 80).optional(),
+  protein_preferences_json: stringArraySchema(40, 80).optional(),
+  cuisine_likes_json: stringArraySchema(40, 80).optional(),
+  foods_accepted_json: stringArraySchema(60, 80).optional(),
+  foods_rejected_json: stringArraySchema(60, 80).optional(),
+}).strict()
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
+  const rawParams = await params
+  const parsedId = uuidSchema.safeParse(rawParams.id)
+  if (!parsedId.success) return NextResponse.json({ error: 'Member not found' }, { status: 404 })
+  const id = parsedId.data
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -50,48 +76,18 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     )
   }
 
-  const body = await req.json().catch(() => null)
-  if (!body || typeof body !== 'object') {
-    return NextResponse.json({ error: 'Invalid payload' }, { status: 400 })
-  }
+  const parsedBody = memberPatchSchema.safeParse(await req.json().catch(() => null))
+  if (!parsedBody.success) return NextResponse.json({ error: validationError(parsedBody.error) }, { status: 400 })
+  const body = parsedBody.data
   const ownership = await loadOwnedMember(supabase, id, user.id)
   if (ownership.error) return ownership.error
 
   const patch: Record<string, unknown> = {}
-  const allowed = [
-    'first_name',
-    'role',
-    'age_years',
-    'age_range',
-    'dietary_type',
-    'spice_tolerance',
-    'picky_eater_level',
-    'portion_size',
-    'school_lunch_needed',
-    'snack_frequency',
-    'texture_sensitivity',
-    'allergy_notes',
-    'notes',
-    'is_primary_shopper',
-    'is_primary_cook',
-    'display_order',
-  ]
-
-  for (const key of allowed) {
-    if (key in body) patch[key] = (body as any)[key]
-  }
+  for (const [key, value] of Object.entries(body)) patch[key] = value
 
   if ('first_name' in patch && typeof patch.first_name === 'string') {
     patch.member_name = patch.first_name
   }
-
-  if ('allergies_json' in body) patch.allergies_json = toStringArray((body as any).allergies_json)
-  if ('foods_loved_json' in body) patch.foods_loved_json = toStringArray((body as any).foods_loved_json)
-  if ('foods_disliked_json' in body) patch.foods_disliked_json = toStringArray((body as any).foods_disliked_json)
-  if ('protein_preferences_json' in body) patch.protein_preferences_json = toStringArray((body as any).protein_preferences_json)
-  if ('cuisine_likes_json' in body) patch.cuisine_likes_json = toStringArray((body as any).cuisine_likes_json)
-  if ('foods_accepted_json' in body) patch.foods_accepted_json = toStringArray((body as any).foods_accepted_json)
-  if ('foods_rejected_json' in body) patch.foods_rejected_json = toStringArray((body as any).foods_rejected_json)
 
   const { data, error } = await supabase
     .from('household_members')
@@ -106,7 +102,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
+  const rawParams = await params
+  const parsedId = uuidSchema.safeParse(rawParams.id)
+  if (!parsedId.success) return NextResponse.json({ error: 'Member not found' }, { status: 404 })
+  const id = parsedId.data
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

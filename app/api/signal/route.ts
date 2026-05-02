@@ -4,32 +4,29 @@ import { rateLimit, rateLimitKeyFromRequest } from '@/lib/rate-limit'
 import { apiError, apiRateLimited, apiSuccess } from '@/lib/api-response'
 import { onSignal } from '@/lib/learning/learn'
 import logger from '@/lib/logger'
+import { cleanString, validationError } from '@/lib/validation/input'
+import { z } from 'zod'
 
 const VALID_SIGNALS = ['accepted', 'rejected', 'swapped', 'cooked', 'skipped', 'saved'] as const
 type Signal = typeof VALID_SIGNALS[number]
 
-interface SignalBody {
-  mealId: string
-  signal: Signal
-  context?: Record<string, unknown>
-}
+const signalSchema = z.object({
+  mealId: cleanString(120),
+  signal: z.enum(VALID_SIGNALS),
+  context: z.record(z.string().max(80), z.union([z.string().max(500), z.number(), z.boolean(), z.null()])).optional(),
+}).strict()
 
 export async function POST(req: NextRequest) {
   const rl = await rateLimit({ key: rateLimitKeyFromRequest(req), limit: 60, windowMs: 60_000 })
   if (!rl.success) return apiRateLimited(rl.reset)
 
-  let body: SignalBody
+  let body: z.infer<typeof signalSchema>
   try {
-    body = (await req.json()) as SignalBody
+    const parsed = signalSchema.safeParse(await req.json())
+    if (!parsed.success) return apiError(validationError(parsed.error), 400)
+    body = parsed.data
   } catch {
     return apiError('Invalid JSON', 400)
-  }
-
-  if (!body.mealId || typeof body.mealId !== 'string') {
-    return apiError('Missing mealId', 400)
-  }
-  if (!VALID_SIGNALS.includes(body.signal)) {
-    return apiError('Invalid signal', 400)
   }
 
   const supabase = await createClient()

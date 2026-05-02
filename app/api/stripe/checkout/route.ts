@@ -6,6 +6,13 @@ import { getSiteUrl } from '@/lib/seo'
 import { stripe } from '@/lib/stripe/client'
 import { PLANS, type PlanId } from '@/lib/stripe/plans'
 import { isStripePriceId, normalizeStripePriceId } from '@/lib/stripe/price-id'
+import { validationError } from '@/lib/validation/input'
+import { z } from 'zod'
+
+const checkoutSchema = z.object({
+  planId: z.enum(['plus']).optional(),
+  plan: z.enum(['pro_monthly', 'pro_yearly']).optional(),
+}).strict()
 
 // ─── POST /api/stripe/checkout ────────────────────────────────────────────────
 
@@ -15,10 +22,9 @@ export async function POST(req: Request) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const { planId, plan } = await req.json() as {
-      planId?: PlanId
-      plan?: 'pro_monthly' | 'pro_yearly'
-    }
+    const parsed = checkoutSchema.safeParse(await req.json())
+    if (!parsed.success) return NextResponse.json({ error: validationError(parsed.error) }, { status: 400 })
+    const { planId, plan } = parsed.data
     const validPlanId = typeof planId === 'string' && planId in PLANS
     const validLegacyPlan = plan === 'pro_monthly' || plan === 'pro_yearly'
     if (!validPlanId && !validLegacyPlan) {

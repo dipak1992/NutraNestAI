@@ -5,6 +5,7 @@ import { rateLimit, rateLimitKeyFromRequest } from '@/lib/rate-limit'
 import { apiError, apiRateLimited } from '@/lib/api-response'
 import { enforceFeatureQuota, incrementFeatureQuota } from '@/lib/usage/feature-quota'
 import logger from '@/lib/logger'
+import { aiGenerationRequestSchema, promptInjectionIssue, validationError } from '@/lib/validation/input'
 import type { AIGenerationRequest } from '@/types'
 
 const DAILY_PLAN_LIMIT = 10
@@ -26,11 +27,11 @@ export async function POST(req: NextRequest) {
   if (quotaResponse) return quotaResponse
 
   try {
-    const body = await req.json() as AIGenerationRequest
-
-    if (!body.household || !body.members || !body.week_start) {
-      return NextResponse.json({ error: 'Missing required fields: household, members, week_start' }, { status: 400 })
-    }
+    const parsed = aiGenerationRequestSchema.safeParse(await req.json())
+    if (!parsed.success) return NextResponse.json({ error: validationError(parsed.error) }, { status: 400 })
+    const injectionIssue = promptInjectionIssue(parsed.data)
+    if (injectionIssue) return NextResponse.json({ error: injectionIssue }, { status: 400 })
+    const body = parsed.data as unknown as AIGenerationRequest
 
     const plan = await generateMealPlan(body)
 

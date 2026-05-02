@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { validateScanImage } from '@/lib/scan/upload-validation'
+import { validateScanImageStrict } from '@/lib/scan/upload-validation'
 import type { ClassifyResponse } from '@/lib/scan/types'
 
 export async function POST(req: NextRequest) {
@@ -14,9 +14,10 @@ export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData()
     const image = formData.get('image') as File | null
-    const mode = (formData.get('mode') as string) ?? 'auto'
+    const rawMode = formData.get('mode')
+    const mode = rawMode === 'fridge' || rawMode === 'menu' || rawMode === 'food' ? rawMode : 'auto'
 
-    const imageError = validateScanImage(image)
+    const imageError = await validateScanImageStrict(image)
     if (imageError) return imageError
 
     // TODO: Replace with real AI classification (e.g., OpenAI Vision)

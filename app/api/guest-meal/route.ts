@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { generateSmartMeal } from '@/lib/engine/engine'
 import { rateLimit, rateLimitKeyFromRequest } from '@/lib/rate-limit'
 import { apiRateLimited } from '@/lib/api-response'
+import { stringArraySchema } from '@/lib/validation/input'
+import { z } from 'zod'
+
+const guestMealSchema = z.object({
+  excludeIds: stringArraySchema(20, 80).optional(),
+}).strict()
 
 /**
  * Guest meal endpoint — no auth required.
@@ -14,10 +20,8 @@ export async function POST(req: NextRequest) {
 
   let excludeIds: string[] = []
   try {
-    const body = await req.json()
-    if (Array.isArray(body?.excludeIds)) {
-      excludeIds = body.excludeIds.filter((id: unknown) => typeof id === 'string').slice(0, 20)
-    }
+    const parsed = guestMealSchema.safeParse(await req.json())
+    if (parsed.success) excludeIds = parsed.data.excludeIds ?? []
   } catch {
     // body is optional — continue with defaults
   }

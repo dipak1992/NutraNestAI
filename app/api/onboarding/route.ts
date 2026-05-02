@@ -1,5 +1,15 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { stringArraySchema, validationError } from '@/lib/validation/input'
+import { z } from 'zod'
+
+const onboardingSchema = z.object({
+  householdSize: z.coerce.number().int().min(1).max(20),
+  dietary: stringArraySchema(30, 80).default([]),
+  dislikes: stringArraySchema(60, 80).default([]),
+  skillLevel: z.enum(['beginner', 'intermediate', 'advanced']).default('intermediate'),
+  weeklyBudget: z.coerce.number().min(0).max(5000).nullable().optional(),
+}).strict()
 
 // ─── POST /api/onboarding ─────────────────────────────────────────────────────
 
@@ -9,13 +19,9 @@ export async function POST(req: Request) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const body = await req.json() as {
-      householdSize: number
-      dietary: string[]
-      dislikes: string[]
-      skillLevel: 'beginner' | 'intermediate' | 'advanced'
-      weeklyBudget: number | null
-    }
+    const parsed = onboardingSchema.safeParse(await req.json())
+    if (!parsed.success) return NextResponse.json({ error: validationError(parsed.error) }, { status: 400 })
+    const body = parsed.data
 
     // Check subscription tier to decide whether to persist preferences
     const { data: profile } = await supabase

@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { isoDateSchema, uuidSchema, validationError } from '@/lib/validation/input'
+import { z } from 'zod'
+
+const groceryRequestSchema = z.object({
+  recipeIds: z.array(uuidSchema).min(1).max(21),
+  weekStart: isoDateSchema,
+}).strict()
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -64,10 +71,16 @@ export async function POST(req: NextRequest) {
   } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const body = await req.json()
-  const { recipeIds, weekStart } = body as { recipeIds: string[]; weekStart?: string }
+  const parsed = groceryRequestSchema.safeParse(await req.json())
+  if (!parsed.success) {
+    if (parsed.error.issues.some((issue) => issue.path[0] === 'recipeIds')) {
+      return NextResponse.json({ sections: [] })
+    }
+    return NextResponse.json({ error: validationError(parsed.error) }, { status: 400 })
+  }
+  const { recipeIds, weekStart } = parsed.data
 
-  if (!recipeIds || recipeIds.length === 0 || !weekStart) {
+  if (recipeIds.length === 0) {
     return NextResponse.json({ sections: [] })
   }
 

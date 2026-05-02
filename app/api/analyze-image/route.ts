@@ -3,6 +3,7 @@ import { rateLimit, rateLimitKeyFromRequest } from '@/lib/rate-limit'
 import { apiError, apiRateLimited } from '@/lib/api-response'
 import { enforceFeatureQuota, incrementFeatureQuota } from '@/lib/usage/feature-quota'
 import logger from '@/lib/logger'
+import { base64ImagePayloadSchema, validationError } from '@/lib/validation/input'
 
 export const runtime = 'nodejs'
 
@@ -117,31 +118,9 @@ export async function POST(req: NextRequest) {
   if (quotaResponse) return quotaResponse
 
   try {
-    const body = await req.json()
-    const { image, mimeType } = body as { image?: string; mimeType?: string }
-
-    if (!image || !mimeType) {
-      return NextResponse.json(
-        { error: 'Missing image or mimeType' },
-        { status: 400 },
-      )
-    }
-
-    const MAX_BASE64_SIZE = 7_000_000 // ~5MB decoded
-    if (image.length > MAX_BASE64_SIZE) {
-      return NextResponse.json(
-        { error: 'Image too large. Maximum size is 5MB.' },
-        { status: 413 },
-      )
-    }
-
-    const ALLOWED_MIME = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
-    if (!ALLOWED_MIME.includes(mimeType)) {
-      return NextResponse.json(
-        { error: 'Unsupported image type. Use JPEG, PNG, GIF, or WebP.' },
-        { status: 400 },
-      )
-    }
+    const parsed = base64ImagePayloadSchema.safeParse(await req.json())
+    if (!parsed.success) return NextResponse.json({ error: validationError(parsed.error) }, { status: 400 })
+    const { image, mimeType } = parsed.data
 
     const castMime = mimeType as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp'
     let result: { parsed: ImageAnalysisResult; usage?: { prompt_tokens: number; completion_tokens: number } }

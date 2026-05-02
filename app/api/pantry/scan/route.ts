@@ -2,10 +2,17 @@ import { NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { rateLimit, rateLimitKeyFromRequest } from '@/lib/rate-limit'
 import { apiError, apiRateLimited, apiSuccess, withErrorHandler } from '@/lib/api-response'
+import { cleanString, validationError } from '@/lib/validation/input'
+import { z } from 'zod'
 
-interface ScanBody {
-  items: { name: string; category?: string; quantity?: number; unit?: string }[]
-}
+const scanBodySchema = z.object({
+  items: z.array(z.object({
+    name: cleanString(100),
+    category: cleanString(50).optional(),
+    quantity: z.coerce.number().min(0).max(999).optional(),
+    unit: cleanString(20).optional(),
+  }).strict()).min(1).max(50),
+}).strict()
 
 export const POST = withErrorHandler('pantry/scan', async (req: Request) => {
   const nextReq = req as unknown as NextRequest
@@ -16,19 +23,18 @@ export const POST = withErrorHandler('pantry/scan', async (req: Request) => {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return apiError('Authentication required', 401)
 
-  const body = (await req.json()) as ScanBody
-  if (!body.items?.length) return apiError('No items provided', 400)
+  const parsed = scanBodySchema.safeParse(await req.json())
+  if (!parsed.success) return apiError(validationError(parsed.error), 400)
+  const body = parsed.data
 
   // Validate and sanitize items
   const sanitized = body.items
-    .filter(item => item.name && typeof item.name === 'string')
-    .slice(0, 50) // cap at 50 items per scan
     .map(item => ({
       user_id: user.id,
-      name: item.name.trim().slice(0, 100),
-      category: item.category?.trim().slice(0, 50) ?? 'other',
-      quantity: Math.max(0, Math.min(item.quantity ?? 1, 999)),
-      unit: item.unit?.trim().slice(0, 20) ?? 'unit',
+      name: item.name,
+      category: item.category ?? 'other',
+      quantity: item.quantity ?? 1,
+      unit: item.unit ?? 'unit',
       added_via: 'receipt' as const,
     }))
 

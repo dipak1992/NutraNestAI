@@ -18,6 +18,8 @@ import type { SmartMealRequest } from '@/lib/engine/types'
 import type { LearnedBoosts } from '@/lib/learning/types'
 import type { StoreFormat } from '@/lib/planner/types'
 import { buildFamilyEngineOverrides, getFamilyMembers, mergeUnique } from '@/lib/family/service'
+import { isoDateSchema, promptInjectionIssue, smartMealRequestSchema, stringArraySchema, validationError } from '@/lib/validation/input'
+import { z } from 'zod'
 
 interface WeeklyPlanRequest {
   baseRequest: SmartMealRequest
@@ -26,6 +28,14 @@ interface WeeklyPlanRequest {
   weekStart: string
   pantryItems?: string[]
 }
+
+const weeklyPlanRequestSchema = z.object({
+  baseRequest: smartMealRequestSchema,
+  learnedBoosts: z.unknown().optional(),
+  storeFormat: z.enum(['standard', 'walmart', 'costco']).optional(),
+  weekStart: isoDateSchema,
+  pantryItems: stringArraySchema(80, 80).optional(),
+}).strict()
 
 const WEEKLY_PLAN_QUOTA = {
   key: 'weekly_plan_generation',
@@ -51,14 +61,11 @@ export async function POST(req: Request) {
       )
     }
 
-    const body = (await req.json()) as WeeklyPlanRequest
-
-    if (!body.baseRequest?.household) {
-      return NextResponse.json(
-        { error: 'Missing required field: baseRequest.household' },
-        { status: 400 },
-      )
-    }
+    const parsed = weeklyPlanRequestSchema.safeParse(await req.json())
+    if (!parsed.success) return NextResponse.json({ error: validationError(parsed.error) }, { status: 400 })
+    const injectionIssue = promptInjectionIssue(parsed.data)
+    if (injectionIssue) return NextResponse.json({ error: injectionIssue }, { status: 400 })
+    const body = parsed.data as WeeklyPlanRequest
 
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()

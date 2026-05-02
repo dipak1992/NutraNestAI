@@ -2,6 +2,15 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getPaywallStatus } from '@/lib/paywall/server'
 import { loadBudgetPayload } from '@/app/budget/loader'
+import { cleanString, validationError } from '@/lib/validation/input'
+import { z } from 'zod'
+
+const budgetPutSchema = z.object({
+  weeklyLimit: z.coerce.number().min(0).max(5000).nullable().optional(),
+  strictMode: z.coerce.boolean().optional(),
+  zipCode: z.string().trim().regex(/^[A-Za-z0-9 -]{3,12}$/).nullable().optional(),
+  preferredStore: cleanString(80).nullable().optional(),
+}).strict()
 
 // ─── GET /api/budget ──────────────────────────────────────────────────────────
 
@@ -39,8 +48,9 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: 'Plus plan required' }, { status: 403 })
   }
 
-  const body = await req.json()
-  const { weeklyLimit, strictMode, zipCode, preferredStore } = body
+  const parsed = budgetPutSchema.safeParse(await req.json())
+  if (!parsed.success) return NextResponse.json({ error: validationError(parsed.error) }, { status: 400 })
+  const { weeklyLimit, strictMode, zipCode, preferredStore } = parsed.data
 
   const { error } = await supabase.from('budgets').upsert(
     {

@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { rateLimit, rateLimitKeyFromRequest } from '@/lib/rate-limit'
 import { apiError, apiRateLimited, apiSuccess, withErrorHandler } from '@/lib/api-response'
 import { normalizeTier } from '@/lib/paywall/config'
+import { cleanText, dataUrlImageSchema, validationError } from '@/lib/validation/input'
 
 let _openai: OpenAI | null = null
 function getOpenAI() {
@@ -90,22 +91,9 @@ export const POST = withErrorHandler('pantry/vision', async (req: Request) => {
     }
   }
 
-  const body = await req.json()
-  const { image } = body as { image?: string }
-
-  if (!image || typeof image !== 'string') {
-    return apiError('Missing image data', 400)
-  }
-
-  // Validate base64 data URL format
-  if (!image.startsWith('data:image/')) {
-    return apiError('Invalid image format — expected a data URL', 400)
-  }
-
-  // Cap payload size (~10 MB base64)
-  if (image.length > 14_000_000) {
-    return apiError('Image too large — max 10 MB', 413)
-  }
+  const parsedImage = dataUrlImageSchema.safeParse(await req.json())
+  if (!parsedImage.success) return apiError(validationError(parsedImage.error), 400)
+  const { image } = parsedImage.data
 
   const completion = await getOpenAI().chat.completions.create({
     model: 'gpt-4o-mini',
@@ -135,7 +123,7 @@ export const POST = withErrorHandler('pantry/vision', async (req: Request) => {
     if (!Array.isArray(items)) throw new Error('not an array')
     items = items
       .filter((i): i is string => typeof i === 'string' && i.length > 0)
-      .map(i => i.toLowerCase().trim().slice(0, 100))
+      .map(i => cleanText(i.toLowerCase(), 100))
       .slice(0, 50)
   } catch {
     return apiError('Failed to parse vision response', 502)

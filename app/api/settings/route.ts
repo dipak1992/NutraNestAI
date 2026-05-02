@@ -1,6 +1,16 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createSupabaseServiceClient } from '@/lib/supabase/service'
+import { optionalCleanString, stringArraySchema, validationError } from '@/lib/validation/input'
+import { z } from 'zod'
+
+const settingsPatchSchema = z.object({
+  firstName: optionalCleanString(80),
+  full_name: optionalCleanString(120),
+  dietary: stringArraySchema(30, 80).optional(),
+  dislikes: stringArraySchema(60, 80).optional(),
+  notifications: z.record(z.string().max(60), z.boolean()).optional(),
+}).strict()
 
 // ─── PATCH /api/settings ──────────────────────────────────────────────────────
 
@@ -10,13 +20,9 @@ export async function PATCH(req: Request) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const body = await req.json() as {
-      firstName?: string
-      full_name?: string
-      dietary?: string[]
-      dislikes?: string[]
-      notifications?: Record<string, boolean>
-    }
+    const parsed = settingsPatchSchema.safeParse(await req.json())
+    if (!parsed.success) return NextResponse.json({ error: validationError(parsed.error) }, { status: 400 })
+    const body = parsed.data
 
     // Update profile fields
     const profileUpdate: Record<string, unknown> = { updated_at: new Date().toISOString() }
@@ -36,8 +42,8 @@ export async function PATCH(req: Request) {
 
     return NextResponse.json({ ok: true })
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Unknown error'
-    return NextResponse.json({ error: message }, { status: 500 })
+    console.error('[settings PATCH]', err)
+    return NextResponse.json({ error: 'Failed to update settings' }, { status: 500 })
   }
 }
 

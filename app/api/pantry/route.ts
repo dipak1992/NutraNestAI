@@ -1,6 +1,16 @@
 import { NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { apiError, apiSuccess, withErrorHandler } from '@/lib/api-response'
+import { cleanString, isoDateSchema, uuidSchema, validationError } from '@/lib/validation/input'
+import { z } from 'zod'
+
+const pantryItemSchema = z.object({
+  name: cleanString(100),
+  category: cleanString(50).optional(),
+  quantity: z.coerce.number().min(0).max(999).optional(),
+  unit: cleanString(20).optional(),
+  expires_at: isoDateSchema.nullable().optional(),
+}).strict()
 
 export const GET = withErrorHandler('pantry/GET', async () => {
   const supabase = await createClient()
@@ -22,20 +32,15 @@ export const POST = withErrorHandler('pantry/POST', async (req: Request) => {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return apiError('Unauthorized', 401)
 
-  const body = await req.json() as {
-    name: string
-    category?: string
-    quantity?: number
-    unit?: string
-    expires_at?: string
-  }
-  if (!body.name?.trim()) return apiError('name is required', 400)
+  const parsed = pantryItemSchema.safeParse(await req.json())
+  if (!parsed.success) return apiError(validationError(parsed.error), 400)
+  const body = parsed.data
 
   const { data, error } = await supabase
     .from('pantry_items')
     .insert({
       user_id: user.id,
-      name: body.name.trim(),
+      name: body.name,
       category: body.category ?? 'Other',
       quantity: body.quantity ?? 1,
       unit: body.unit ?? 'unit',
@@ -55,8 +60,9 @@ export const DELETE = withErrorHandler('pantry/DELETE', async (req: Request) => 
   if (!user) return apiError('Unauthorized', 401)
 
   const { searchParams } = new URL((req as NextRequest).url)
-  const id = searchParams.get('id')
-  if (!id) return apiError('id is required', 400)
+  const parsedId = uuidSchema.safeParse(searchParams.get('id'))
+  if (!parsedId.success) return apiError('id is required', 400)
+  const id = parsedId.data
 
   const { error } = await supabase
     .from('pantry_items')

@@ -5,6 +5,10 @@ import { getActiveLeftoverIngredients } from '@/app/api/leftovers/route'
 import { scoreRecipe, getRecentProteins, getRecentCuisines, getDayType, getCurrentSeason } from '@/lib/plan/scoring'
 import type { SwapCandidate } from '@/lib/plan/types'
 import type { Recipe } from '@/lib/dashboard/types'
+import { uuidSchema, validationError } from '@/lib/validation/input'
+import { z } from 'zod'
+
+const swapRequestSchema = z.object({ recipeId: uuidSchema }).strict()
 
 // ─── GET /api/plan/[dayId]/swap — load swap candidates ────────────────────────
 
@@ -18,7 +22,10 @@ export async function GET(
   } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { dayId } = await params
+  const rawParams = await params
+  const parsedDayId = uuidSchema.safeParse(rawParams.dayId)
+  if (!parsedDayId.success) return NextResponse.json({ error: 'Day not found' }, { status: 404 })
+  const dayId = parsedDayId.data
 
   try {
     // ── Find the day row ─────────────────────────────────────────────────────
@@ -166,12 +173,13 @@ export async function POST(
   } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { dayId } = await params
-  const { recipeId } = await req.json()
-
-  if (!recipeId) {
-    return NextResponse.json({ error: 'recipeId is required' }, { status: 400 })
-  }
+  const rawParams = await params
+  const parsedDayId = uuidSchema.safeParse(rawParams.dayId)
+  if (!parsedDayId.success) return NextResponse.json({ error: 'Day not found' }, { status: 404 })
+  const dayId = parsedDayId.data
+  const parsedBody = swapRequestSchema.safeParse(await req.json())
+  if (!parsedBody.success) return NextResponse.json({ error: validationError(parsedBody.error) }, { status: 400 })
+  const { recipeId } = parsedBody.data
 
   try {
     // Verify ownership

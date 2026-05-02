@@ -6,6 +6,7 @@ import { apiError, apiRateLimited } from '@/lib/api-response'
 import { generateText } from '@/lib/ai/service'
 import logger from '@/lib/logger'
 import { generateSlug } from '@/lib/content/types'
+import { promptInjectionIssue, smartMealRequestSchema, validationError } from '@/lib/validation/input'
 import type { SmartMealRequest, SmartMealResult } from '@/lib/engine/types'
 import type { LearnedBoosts } from '@/lib/learning/types'
 
@@ -57,14 +58,12 @@ export async function POST(req: NextRequest) {
   if (!user) return apiError('Unauthenticated', 401)
 
   try {
-    const body = (await req.json()) as SmartMealRequest & { learnedBoosts?: LearnedBoosts }
-
-    if (!body.household) {
-      return NextResponse.json(
-        { error: 'Missing required field: household' },
-        { status: 400 },
-      )
-    }
+    const rawBody = await req.json()
+    const parsed = smartMealRequestSchema.safeParse(rawBody)
+    if (!parsed.success) return NextResponse.json({ error: validationError(parsed.error) }, { status: 400 })
+    const injectionIssue = promptInjectionIssue(parsed.data)
+    if (injectionIssue) return NextResponse.json({ error: injectionIssue }, { status: 400 })
+    const body = { ...parsed.data, learnedBoosts: (rawBody as { learnedBoosts?: LearnedBoosts }).learnedBoosts } as SmartMealRequest & { learnedBoosts?: LearnedBoosts }
 
     const { adultsCount = 0, kidsCount = 0, toddlersCount = 0, babiesCount = 0 } = body.household
     if (adultsCount + kidsCount + toddlersCount + babiesCount === 0) {

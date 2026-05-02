@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { emailSchema, validationError } from '@/lib/validation/input'
+import { z } from 'zod'
+
+const inviteSchema = z.object({ email: emailSchema }).strict()
 
 // ─── POST /api/settings/household/invite ──────────────────────────────────────
 
@@ -9,8 +13,9 @@ export async function POST(req: Request) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const { email } = await req.json() as { email: string }
-    if (!email) return NextResponse.json({ error: 'Email required' }, { status: 400 })
+    const parsed = inviteSchema.safeParse(await req.json())
+    if (!parsed.success) return NextResponse.json({ error: validationError(parsed.error) }, { status: 400 })
+    const { email } = parsed.data
 
     // Insert into household_members
     const { data: member, error } = await supabase
@@ -29,7 +34,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ ok: true, member })
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Unknown error'
-    return NextResponse.json({ error: message }, { status: 500 })
+    console.error('[settings/household/invite]', err)
+    return NextResponse.json({ error: 'Failed to invite household member' }, { status: 500 })
   }
 }

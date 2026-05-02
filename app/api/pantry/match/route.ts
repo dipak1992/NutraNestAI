@@ -5,26 +5,31 @@ import { apiError, apiRateLimited, apiSuccess, withErrorHandler } from '@/lib/ap
 import { matchPantryMeals } from '@/lib/engine/decide'
 import type { SmartMealRequest } from '@/lib/engine/types'
 import type { LearnedBoosts } from '@/lib/learning/types'
+import { promptInjectionIssue, smartMealRequestSchema, stringArraySchema, validationError } from '@/lib/validation/input'
+import { z } from 'zod'
 
-interface PantryMatchBody {
-  pantryItems: string[]
-  household: SmartMealRequest['household']
-  allergies?: string[]
-  dietaryRestrictions?: string[]
-  budget?: 'low' | 'medium' | 'high'
-  maxCookTime?: number
-  learnedBoosts?: LearnedBoosts
-  limit?: number
-}
+const pantryMatchSchema = smartMealRequestSchema.pick({
+  household: true,
+  allergies: true,
+  dietaryRestrictions: true,
+  budget: true,
+  maxCookTime: true,
+}).extend({
+  pantryItems: stringArraySchema(80, 80),
+  learnedBoosts: z.unknown().optional(),
+  limit: z.coerce.number().int().min(1).max(3).optional(),
+}).strict()
 
 export const POST = withErrorHandler('pantry/match', async (req: Request) => {
   const nextReq = req as unknown as NextRequest
   const rl = await rateLimit({ key: rateLimitKeyFromRequest(nextReq), limit: 20, windowMs: 60_000 })
   if (!rl.success) return apiRateLimited(rl.reset)
 
-  const body = (await req.json()) as PantryMatchBody
-  if (!body.pantryItems?.length) return apiError('No pantry items provided', 400)
-  if (!body.household) return apiError('Missing household', 400)
+  const parsed = pantryMatchSchema.safeParse(await req.json())
+  if (!parsed.success) return apiError(validationError(parsed.error), 400)
+  const injectionIssue = promptInjectionIssue(parsed.data)
+  if (injectionIssue) return apiError(injectionIssue, 400)
+  const body = parsed.data as z.infer<typeof pantryMatchSchema> & { learnedBoosts?: LearnedBoosts }
 
   // Optionally pull server-side pantry items if user is authenticated
   const supabase = await createClient()

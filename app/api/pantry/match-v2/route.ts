@@ -10,38 +10,32 @@ import {
 } from '@/lib/pantry/constraint-engine'
 import type { SmartMealRequest } from '@/lib/engine/types'
 import type { PantryMatchResponse } from '@/lib/pantry/types'
+import { promptInjectionIssue, smartMealRequestSchema, stringArraySchema, validationError } from '@/lib/validation/input'
+import { z } from 'zod'
 
-interface PantryMatchV2Body {
-  // From vision scan or manual entry
-  confirmed: string[]            // High confidence
-  probable?: string[]            // Medium confidence (optional)
-  
-  // User preferences (all still apply)
-  household: SmartMealRequest['household']
-  allergies?: string[]
-  dietaryRestrictions?: string[]
-  budget?: 'low' | 'medium' | 'high'
-  maxCookTime?: number
-  
-  // Control behavior
-  includeProbable?: boolean      // If false, only use confirmed items
-  maxMissingForAlmostReady?: number // Default 1
-}
+const pantryMatchV2Schema = smartMealRequestSchema.pick({
+  household: true,
+  allergies: true,
+  dietaryRestrictions: true,
+  budget: true,
+  maxCookTime: true,
+}).extend({
+  confirmed: stringArraySchema(80, 80),
+  probable: stringArraySchema(80, 80).optional(),
+  includeProbable: z.coerce.boolean().optional(),
+  maxMissingForAlmostReady: z.coerce.number().int().min(0).max(5).optional(),
+}).strict()
 
 export const POST = withErrorHandler('pantry/match-v2', async (req: Request) => {
   const nextReq = req as unknown as NextRequest
   const rl = await rateLimit({ key: rateLimitKeyFromRequest(nextReq), limit: 20, windowMs: 60_000 })
   if (!rl.success) return apiRateLimited(rl.reset)
 
-  const body = (await req.json()) as PantryMatchV2Body
-  
-  // Validate required fields
-  if (!Array.isArray(body.confirmed) || body.confirmed.length === 0) {
-    return apiError('confirmed items array required and cannot be empty', 400)
-  }
-  if (!body.household) {
-    return apiError('household data required', 400)
-  }
+  const parsed = pantryMatchV2Schema.safeParse(await req.json())
+  if (!parsed.success) return apiError(validationError(parsed.error), 400)
+  const injectionIssue = promptInjectionIssue(parsed.data)
+  if (injectionIssue) return apiError(injectionIssue, 400)
+  const body = parsed.data
 
   // Build available pantry list
   // Confirmed items always included

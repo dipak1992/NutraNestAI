@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { loadWeekPlan, getCurrentWeekStart } from '@/app/plan/loader'
+import { isoDateSchema, uuidSchema, validationError } from '@/lib/validation/input'
+import { z } from 'zod'
 
 type PlanDayOwnership = {
   locked?: boolean
@@ -32,6 +34,17 @@ async function loadOwnedPlanDay(
   return { row, response: null }
 }
 
+const planPatchSchema = z.discriminatedUnion('action', [
+  z.object({
+    action: z.literal('reorder'),
+    weekStart: isoDateSchema,
+    orderedDayIds: z.array(uuidSchema).min(1).max(14),
+  }).strict(),
+  z.object({ action: z.literal('toggle_lock'), dayId: uuidSchema }).strict(),
+  z.object({ action: z.literal('mark_cooked'), dayId: uuidSchema }).strict(),
+  z.object({ action: z.literal('clear'), dayId: uuidSchema }).strict(),
+])
+
 // ─── GET /api/plan?weekStart=YYYY-MM-DD ───────────────────────────────────────
 
 export async function GET(req: NextRequest) {
@@ -42,7 +55,10 @@ export async function GET(req: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { searchParams } = new URL(req.url)
-  const weekStart = searchParams.get('weekStart') ?? getCurrentWeekStart()
+  const rawWeekStart = searchParams.get('weekStart') ?? getCurrentWeekStart()
+  const parsedWeekStart = isoDateSchema.safeParse(rawWeekStart)
+  if (!parsedWeekStart.success) return NextResponse.json({ error: 'Invalid weekStart' }, { status: 400 })
+  const weekStart = parsedWeekStart.data
 
   try {
     const plan = await loadWeekPlan(user.id, weekStart)
@@ -63,8 +79,10 @@ export async function PATCH(req: NextRequest) {
   } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const body = await req.json()
-  const { action } = body as { action: string }
+  const parsedBody = planPatchSchema.safeParse(await req.json())
+  if (!parsedBody.success) return NextResponse.json({ error: validationError(parsedBody.error) }, { status: 400 })
+  const body = parsedBody.data
+  const { action } = body
 
   try {
     switch (action) {

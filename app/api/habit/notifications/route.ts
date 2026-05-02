@@ -1,5 +1,12 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { validationError } from '@/lib/validation/input'
+import { z } from 'zod'
+
+const notificationPatchSchema = z.object({
+  enabled: z.boolean(),
+  preferred_hour: z.coerce.number().int().min(0).max(23).optional(),
+}).strict()
 
 // ── GET /api/habit/notifications ─────────────────────────────────────────────
 
@@ -36,15 +43,9 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const body = await req.json()
-    const { enabled, preferred_hour } = body ?? {}
-
-    if (typeof enabled !== 'boolean') {
-      return NextResponse.json({ error: 'Invalid payload' }, { status: 400 })
-    }
-    if (preferred_hour !== undefined && (preferred_hour < 0 || preferred_hour > 23)) {
-      return NextResponse.json({ error: 'preferred_hour must be 0–23' }, { status: 400 })
-    }
+    const parsed = notificationPatchSchema.safeParse(await req.json())
+    if (!parsed.success) return NextResponse.json({ error: validationError(parsed.error) }, { status: 400 })
+    const { enabled, preferred_hour } = parsed.data
 
     await supabase.from('notification_preferences').upsert({
       user_id: user.id,

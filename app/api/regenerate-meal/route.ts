@@ -5,7 +5,9 @@ import { rateLimit, rateLimitKeyFromRequest } from '@/lib/rate-limit'
 import { apiError, apiRateLimited } from '@/lib/api-response'
 import { enforceFeatureQuota, incrementFeatureQuota } from '@/lib/usage/feature-quota'
 import logger from '@/lib/logger'
+import { aiGenerationRequestSchema, cleanString, promptInjectionIssue, validationError } from '@/lib/validation/input'
 import type { AIGenerationRequest } from '@/types'
+import { z } from 'zod'
 
 const REGENERATE_QUOTA = {
   key: 'ai_meal_regeneration',
@@ -24,11 +26,16 @@ export async function POST(req: NextRequest) {
   if (quotaResponse) return quotaResponse
 
   try {
-    const body = await req.json() as { request: AIGenerationRequest; modifier: string; currentMealContext?: Record<string, unknown> }
-
-    if (!body.request || !body.modifier) {
-      return NextResponse.json({ error: 'Missing required fields: request, modifier' }, { status: 400 })
-    }
+    const requestSchema = z.object({
+      request: aiGenerationRequestSchema,
+      modifier: cleanString(160),
+      currentMealContext: z.record(z.string(), z.unknown()).optional(),
+    }).strict()
+    const parsed = requestSchema.safeParse(await req.json())
+    if (!parsed.success) return NextResponse.json({ error: validationError(parsed.error) }, { status: 400 })
+    const injectionIssue = promptInjectionIssue(parsed.data)
+    if (injectionIssue) return NextResponse.json({ error: injectionIssue }, { status: 400 })
+    const body = parsed.data as unknown as { request: AIGenerationRequest; modifier: string; currentMealContext?: Record<string, unknown> }
 
     const plan = await regenerateMeals(body.request, body.modifier, body.currentMealContext)
     await incrementFeatureQuota(supabase, REGENERATE_QUOTA)

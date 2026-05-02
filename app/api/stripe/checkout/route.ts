@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createSupabaseServiceClient } from '@/lib/supabase/service'
-import { serverEnv } from '@/lib/env'
+import { serverEnv } from '@/lib/server-env'
 import { getSiteUrl } from '@/lib/seo'
 import { stripe } from '@/lib/stripe/client'
 import { PLANS, type PlanId } from '@/lib/stripe/plans'

@@ -8,7 +8,7 @@ export function getResendClient(): Resend {
     if (!key) {
       console.warn('[email] RESEND_API_KEY is not set — emails will not be sent')
       // Return a dummy instance that will fail gracefully at call time
-      _resend = new Resend('re_placeholder_build_time_only')
+      _resend = new Resend('placeholder_build_time_only')
     } else {
       _resend = new Resend(key)
     }

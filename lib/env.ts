@@ -1,6 +1,7 @@
 /**
  * Centralised environment variable access.
- * Server-side vars are kept in a server-only object; public vars are safe to import anywhere.
+ * Only browser-safe variables live here. Do not add server secrets to this file:
+ * client components import it directly.
  */
 
 // ─── Public (browser-safe) ────────────────────────────────────────────────────
@@ -24,41 +25,13 @@ export const publicEnv = {
   webPushPublicKey: process.env.NEXT_PUBLIC_WEB_PUSH_PUBLIC_KEY ?? '',
 } as const
 
-// ─── Server-only ──────────────────────────────────────────────────────────────
-
-export const serverEnv = {
-  supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY ?? '',
-  anthropicApiKey: process.env.ANTHROPIC_API_KEY ?? '',
-  openaiApiKey: process.env.OPENAI_API_KEY ?? '',
-  resendApiKey: process.env.RESEND_API_KEY ?? '',
-  sentryDsn: process.env.SENTRY_DSN ?? '',
-  // Stripe server-side keys
-  stripeSecretKey: process.env.STRIPE_SECRET_KEY ?? '',
-  stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET ?? '',
-  // Stripe price IDs (server-side backup)
-  stripePricingTierPro: {
-    monthly: process.env.STRIPE_PRICE_PRO_MONTHLY ?? '',
-    yearly: process.env.STRIPE_PRICE_PRO_YEARLY ?? '',
-  },
-  stripePricingTierFamily: {
-    monthly: process.env.STRIPE_PRICE_FAMILY_MONTHLY ?? '',
-    yearly: process.env.STRIPE_PRICE_FAMILY_YEARLY ?? '',
-  },
-  // Trial configuration
-  stripeTrialDays: parseInt(process.env.STRIPE_TRIAL_DAYS ?? '7', 10),
-  adminEmail: process.env.ADMIN_EMAIL ?? '',
-  webPushPrivateKey: process.env.WEB_PUSH_PRIVATE_KEY ?? '',
-  webPushSubject: process.env.WEB_PUSH_SUBJECT ?? '',
-} as const
-
 // ─── Runtime validation (call once at startup for critical keys) ──────────────
 
 export function assertEnv(
-  keys: Array<keyof typeof serverEnv | keyof typeof publicEnv>,
+  keys: Array<keyof typeof publicEnv>,
   context = 'startup'
 ) {
-  const all = { ...publicEnv, ...serverEnv }
-  const missing = keys.filter((k) => !all[k])
+  const missing = keys.filter((k) => !publicEnv[k])
   if (missing.length > 0) {
     throw new Error(`[env] Missing required env vars in ${context}: ${missing.join(', ')}`)
   }

@@ -1,4 +1,5 @@
-import { publicEnv, serverEnv } from '@/lib/env'
+import { publicEnv } from '@/lib/env'
+import { serverEnv } from '@/lib/server-env'
 
 export function hasPushVapidConfig() {
   return Boolean(

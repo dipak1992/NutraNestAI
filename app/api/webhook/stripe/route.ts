@@ -12,8 +12,8 @@
 
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { serverEnv } from '@/lib/env'
 import { publicEnv } from '@/lib/env'
+import { serverEnv } from '@/lib/server-env'
 import { mapPriceIdToTier } from '@/lib/paywall/stripe-mapping'
 import type { SubscriptionTier } from '@/types'
 import {

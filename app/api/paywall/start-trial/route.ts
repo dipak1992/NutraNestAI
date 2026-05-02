@@ -8,7 +8,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createSupabaseServiceClient } from '@/lib/supabase/service'
 import { sendTrialStartedEmail } from '@/lib/email/triggers'
-import { serverEnv } from '@/lib/env'
+import { serverEnv } from '@/lib/server-env'
 import { rateLimit, rateLimitKeyFromRequest } from '@/lib/rate-limit'
 import { apiRateLimited } from '@/lib/api-response'
 

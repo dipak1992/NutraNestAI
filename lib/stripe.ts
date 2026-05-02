@@ -1,5 +1,5 @@
 import Stripe from 'stripe'
-import { serverEnv } from '@/lib/env'
+import { serverEnv } from '@/lib/server-env'
 
 let _stripe: Stripe | null = null
 

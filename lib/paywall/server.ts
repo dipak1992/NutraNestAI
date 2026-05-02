@@ -1,6 +1,7 @@
 import type { User } from '@supabase/supabase-js'
 import type { SubscriptionTier } from '@/types'
 import { createClient } from '@/lib/supabase/server'
+import { createSupabaseServiceClient } from '@/lib/supabase/service'
 import {
   FREE_PLAN_PREVIEW_DAYS,
   FREE_TONIGHT_SWIPE_LIMIT,
@@ -46,7 +47,8 @@ async function ensureProfile(user: User): Promise<{
   }
 
   const fallbackTier: SubscriptionTier = 'free'
-  await supabase.from('profiles').upsert(
+  const serviceClient = createSupabaseServiceClient()
+  await serviceClient.from('profiles').upsert(
     {
       id: user.id,
       email: user.email ?? null,

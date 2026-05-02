@@ -6,6 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createSupabaseServiceClient } from '@/lib/supabase/service'
 import { sendTrialStartedEmail } from '@/lib/email/triggers'
 import { serverEnv } from '@/lib/env'
 import { rateLimit, rateLimitKeyFromRequest } from '@/lib/rate-limit'
@@ -55,7 +56,8 @@ export async function POST(req: NextRequest) {
     const trialDays = serverEnv.stripeTrialDays || 7
     const trialEnd = new Date(now.getTime() + trialDays * 24 * 60 * 60 * 1000)
 
-    const { error: upsertError } = await supabase.from('profiles').upsert(
+    const serviceClient = createSupabaseServiceClient()
+    const { error: upsertError } = await serviceClient.from('profiles').upsert(
       {
         id: user.id,
         email: user.email ?? null,

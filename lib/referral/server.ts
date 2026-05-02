@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createSupabaseServiceClient } from '@/lib/supabase/service'
 import {
   REFERRAL_BONUS_DAYS_PER_INVITE,
   REFERRAL_MAX_BONUS_DAYS,
@@ -83,7 +84,6 @@ export async function getReferralStats(userId: string): Promise<ReferralStats> {
   const isTempPro = !!tempProUntil && new Date(tempProUntil) > new Date()
 
   // How many more referrals until the next Temp Pro milestone?
-  const completedCycles = Math.floor(totalReferrals / REFERRAL_TEMP_PRO_THRESHOLD)
   const positionInCycle = totalReferrals % REFERRAL_TEMP_PRO_THRESHOLD
   const nextTempProIn = positionInCycle === 0 && totalReferrals > 0
     ? REFERRAL_TEMP_PRO_THRESHOLD
@@ -181,7 +181,8 @@ export async function applyReferralCode(
   }
 
   if (Object.keys(updates).length > 0) {
-    await supabase.from('profiles').update(updates).eq('id', referrer.id)
+    const serviceClient = createSupabaseServiceClient()
+    await serviceClient.from('profiles').update(updates).eq('id', referrer.id)
   }
 
   return { ok: true, bonusDaysGranted, tempProGranted }

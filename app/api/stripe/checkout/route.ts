@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createSupabaseServiceClient } from '@/lib/supabase/service'
 import { serverEnv } from '@/lib/env'
 import { stripe } from '@/lib/stripe/client'
 import { PLANS, type PlanId } from '@/lib/stripe/plans'
@@ -35,7 +36,8 @@ export async function POST(req: Request) {
         metadata: { supabase_user_id: user.id },
       })
       customerId = customer.id
-      await supabase
+      const serviceClient = createSupabaseServiceClient()
+      await serviceClient
         .from('profiles')
         .update({ stripe_customer_id: customerId })
         .eq('id', user.id)

@@ -1,6 +1,36 @@
 import { updateSession } from '@/lib/supabase/middleware'
 import { NextResponse, type NextRequest } from 'next/server'
 import { isSuspiciousPath, isTrustedOrigin, logSecurityEvent, requestIp } from '@/lib/security'
+import { rateLimit } from '@/lib/rate-limit'
+
+const AI_ENDPOINTS = [
+  '/api/analyze-image',
+  '/api/generate-plan',
+  '/api/regenerate-meal',
+  '/api/smart-meal',
+  '/api/weekly-plan',
+  '/api/plan/autopilot',
+  '/api/dashboard/tonight/regenerate',
+  '/api/scan/',
+  '/api/pantry/vision',
+  '/api/pantry/vision-v2',
+]
+
+const PAYMENT_ENDPOINTS = [
+  '/api/stripe/',
+  '/api/webhook/stripe',
+  '/api/paywall/start-trial',
+]
+
+const AUTH_ENDPOINTS = [
+  '/api/auth/',
+  '/auth/callback',
+]
+
+const PUBLIC_READ_ENDPOINTS = [
+  '/api/recipes/',
+  '/api/content/',
+]
 
 function buildCsp() {
   return [
@@ -67,6 +97,11 @@ export async function middleware(request: NextRequest) {
     return response
   }
 
+  if (isApi) {
+    const abuseResponse = await enforceAbuseLimits(request, requestId)
+    if (abuseResponse) return abuseResponse
+  }
+
   try {
     const response = await updateSession(request)
     setCommonHeaders(response, requestId)
@@ -79,6 +114,117 @@ export async function middleware(request: NextRequest) {
     if (isApi) setCorsHeaders(response, origin)
     return response
   }
+}
+
+async function enforceAbuseLimits(request: NextRequest, requestId: string): Promise<NextResponse | null> {
+  const pathname = request.nextUrl.pathname
+  const ip = requestIp(request.headers)
+  const method = request.method.toUpperCase()
+  const userAgent = request.headers.get('user-agent') ?? ''
+
+  const automationUserAgent = isAutomationUserAgent(userAgent)
+  if (automationUserAgent) {
+    logSecurityEvent('automation_user_agent', {
+      requestId,
+      path: pathname,
+      method,
+      ip,
+      userAgent: userAgent || 'missing',
+    }, 'info')
+  }
+
+  const sensitiveEndpoint =
+    matchesEndpoint(pathname, AI_ENDPOINTS) ||
+    matchesEndpoint(pathname, PAYMENT_ENDPOINTS) ||
+    matchesEndpoint(pathname, AUTH_ENDPOINTS)
+
+  if (sensitiveEndpoint && automationUserAgent) {
+    logSecurityEvent('blocked_automation_user_agent', {
+      requestId,
+      path: pathname,
+      method,
+      ip,
+      userAgent: userAgent || 'missing',
+    })
+    return NextResponse.json(
+      { success: false, error: 'Forbidden' },
+      { status: 403, headers: { 'x-request-id': requestId } },
+    )
+  }
+
+  const limits = [
+    { name: 'api-global-minute', limit: 120, windowMs: 60_000 },
+    { name: 'api-global-hour', limit: 1_500, windowMs: 60 * 60_000 },
+  ]
+
+  if (matchesEndpoint(pathname, AUTH_ENDPOINTS)) {
+    limits.push(
+      { name: 'auth-minute', limit: 15, windowMs: 60_000 },
+      { name: 'auth-hour', limit: 80, windowMs: 60 * 60_000 },
+    )
+  }
+
+  if (matchesEndpoint(pathname, PAYMENT_ENDPOINTS)) {
+    limits.push(
+      { name: 'payment-minute', limit: 10, windowMs: 60_000 },
+      { name: 'payment-hour', limit: 60, windowMs: 60 * 60_000 },
+    )
+  }
+
+  if (matchesEndpoint(pathname, AI_ENDPOINTS)) {
+    limits.push(
+      { name: 'ai-minute', limit: 5, windowMs: 60_000 },
+      { name: 'ai-hour', limit: 40, windowMs: 60 * 60_000 },
+    )
+  }
+
+  if (matchesEndpoint(pathname, PUBLIC_READ_ENDPOINTS)) {
+    limits.push(
+      { name: 'public-read-minute', limit: 60, windowMs: 60_000 },
+      { name: 'public-read-hour', limit: 600, windowMs: 60 * 60_000 },
+    )
+  }
+
+  for (const limit of limits) {
+    const result = await rateLimit({
+      key: `${limit.name}:${ip}`,
+      limit: limit.limit,
+      windowMs: limit.windowMs,
+    })
+
+    if (!result.success) {
+      logSecurityEvent('rate_limited', {
+        requestId,
+        bucket: limit.name,
+        path: pathname,
+        method,
+        ip,
+        reset: result.reset,
+      })
+
+      return NextResponse.json(
+        { success: false, error: 'Too many requests. Please slow down.' },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': '60',
+            'X-RateLimit-Reset': String(Math.ceil(result.reset / 1000)),
+            'x-request-id': requestId,
+          },
+        },
+      )
+    }
+  }
+
+  return null
+}
+
+function matchesEndpoint(pathname: string, prefixes: string[]) {
+  return prefixes.some((prefix) => pathname === prefix || pathname.startsWith(prefix))
+}
+
+function isAutomationUserAgent(userAgent: string) {
+  return !userAgent || /\b(curl|wget|python-requests|httpclient|scrapy|aiohttp|libwww-perl)\b/i.test(userAgent)
 }
 
 function setCommonHeaders(response: NextResponse, requestId: string) {

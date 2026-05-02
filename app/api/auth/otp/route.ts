@@ -39,6 +39,20 @@ export async function POST(req: NextRequest) {
     return apiRateLimited(ipLimit.reset)
   }
 
+  if (mode === 'signup') {
+    const signupLimit = await rateLimit({
+      key: `auth-signup:${rateLimitKeyFromRequest(req)}`,
+      limit: 10,
+      windowMs: 60 * 60_000,
+    })
+    if (!signupLimit.success) {
+      logSecurityEvent('auth_signup_ip_rate_limited', {
+        ip: requestIp(req.headers),
+      })
+      return apiRateLimited(signupLimit.reset)
+    }
+  }
+
   if (email) {
     const emailHash = await hashForLog(email)
     const perEmailLimit = await rateLimit({

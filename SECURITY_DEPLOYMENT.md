@@ -67,11 +67,14 @@ boundary.
 
 Production logs are structured JSON through `lib/logger.ts`. Watch for:
 
+- `security.rate_limited`
 - `security.blocked_origin`
+- `security.blocked_automation_user_agent`
 - `security.suspicious_path`
 - `security.http_redirect`
 - `security.auth_otp_ip_rate_limited`
 - `security.auth_otp_email_rate_limited`
+- `security.auth_signup_ip_rate_limited`
 - `security.auth_reset_ip_rate_limited`
 - `security.auth_reset_email_rate_limited`
 - `security.auth_callback_exchange_failed`
@@ -94,3 +97,18 @@ Vary: Origin
 ```
 
 Never use `Access-Control-Allow-Origin: *` on authenticated API routes.
+
+## Abuse Protection
+
+All `/api/*` routes are protected by middleware-level IP rate limits. Sensitive
+routes have stricter buckets:
+
+- Auth endpoints: login, signup, OAuth, password reset, and callback
+- Payment endpoints: Stripe checkout, billing portal, Stripe webhook, trial start
+- AI/cost endpoints: plan generation, meal regeneration, image analysis, scan,
+  pantry vision, weekly plan, smart meal, and autopilot
+- Public read endpoints: recipes and published content APIs
+
+Production requires `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`.
+Without Upstash, production API requests fail closed instead of allowing
+unlimited abuse on serverless instances.

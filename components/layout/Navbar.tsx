@@ -62,7 +62,7 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
     : 'ME'
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background">
+    <header className="sticky top-0 z-[70] w-full border-b border-border/60 bg-background">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
         <Link href="/dashboard" className="flex items-center">
@@ -111,7 +111,7 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
             {menuOpen && (
               <div
                 role="menu"
-                className="absolute right-0 top-full mt-2 w-52 rounded-xl border border-border bg-background shadow-lg py-1 z-50"
+                className="fixed right-4 top-16 z-[80] w-52 rounded-xl border border-border bg-background py-1 shadow-lg sm:absolute sm:right-0 sm:top-full sm:mt-2"
               >
                 {userEmail && (
                   <div className="px-3 py-2 text-xs text-muted-foreground truncate border-b border-border">

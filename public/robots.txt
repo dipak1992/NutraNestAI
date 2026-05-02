@@ -2,6 +2,7 @@ User-agent: *
 
 # Block all private app routes from indexing
 Disallow: /dashboard
+Disallow: /admin
 Disallow: /settings
 Disallow: /plan
 Disallow: /leftovers
@@ -10,9 +11,13 @@ Disallow: /pantry
 Disallow: /grocery-list
 Disallow: /onboarding
 Disallow: /meal/
-Disallow: /scan
 Disallow: /saved
 Disallow: /planner
+Disallow: /family
+Disallow: /insights
+Disallow: /decide
+Disallow: /referral
+Disallow: /r/
 
 # Block all API routes
 Disallow: /api/

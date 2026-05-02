@@ -3,12 +3,36 @@ import { getSiteUrl } from '@/lib/seo'
 
 export default function robots(): MetadataRoute.Robots {
   const siteUrl = getSiteUrl()
+  const privateRoutes = [
+    '/admin',
+    '/api/',
+    '/budget',
+    '/dashboard',
+    '/decide',
+    '/family',
+    '/grocery-list',
+    '/insights',
+    '/leftovers',
+    '/login',
+    '/meal/',
+    '/onboarding',
+    '/pantry',
+    '/plan',
+    '/planner',
+    '/r/',
+    '/referral',
+    '/reset-password',
+    '/saved',
+    '/settings',
+    '/signup',
+    '/verify-email',
+  ]
 
   return {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/api/', '/dashboard', '/planner', '/settings', '/grocery-list', '/pantry'],
+      disallow: privateRoutes,
     },
     sitemap: `${siteUrl}/sitemap.xml`,
     host: siteUrl,

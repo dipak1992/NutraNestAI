@@ -1,7 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createSupabaseServiceClient } from '@/lib/supabase/service'
-import { serverEnv } from '@/lib/env'
 import { Badge } from '@/components/ui/badge'
 import { Users, Crown, Mail, AlertTriangle } from 'lucide-react'
 
@@ -9,8 +8,25 @@ export default async function AdminPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user || !serverEnv.adminEmail || user.email !== serverEnv.adminEmail) {
+  if (!user) {
     redirect('/dashboard')
+  }
+
+  const [{ data: profile }, { data: assurance }] = await Promise.all([
+    supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .maybeSingle(),
+    supabase.auth.mfa.getAuthenticatorAssuranceLevel(),
+  ])
+
+  if (profile?.role !== 'admin') {
+    redirect('/dashboard')
+  }
+
+  if (assurance?.currentLevel !== 'aal2') {
+    redirect('/settings?mfa=required')
   }
 
   const serviceClient = createSupabaseServiceClient()

@@ -5,11 +5,13 @@
 // ============================================================
 
 import { NextResponse } from 'next/server'
+import { apiRateLimited } from '@/lib/api-response'
 import { generateSmartMeal } from '@/lib/engine/engine'
 import { buildGroceryList } from '@/lib/planner/grocery'
 import { getPaywallStatus } from '@/lib/paywall/server'
 import { FREE_PLAN_PREVIEW_DAYS } from '@/lib/paywall/config'
 import { createClient } from '@/lib/supabase/server'
+import { rateLimit, rateLimitKeyFromRequest } from '@/lib/rate-limit'
 import { getUserDietaryPrefs, applyPrefsToEngineRequest } from '@/lib/meal-engine/preferences'
 import type { SmartMealRequest } from '@/lib/engine/types'
 import type { LearnedBoosts } from '@/lib/learning/types'
@@ -26,6 +28,13 @@ interface WeeklyPlanRequest {
 
 export async function POST(req: Request) {
   try {
+    const rl = await rateLimit({
+      key: `weekly-plan:${rateLimitKeyFromRequest(req)}`,
+      limit: 10,
+      windowMs: 60_000,
+    })
+    if (!rl.success) return apiRateLimited(rl.reset)
+
     const paywall = await getPaywallStatus()
 
     if (!paywall.isAuthenticated) {

@@ -19,6 +19,15 @@ interface ResendWebhookPayload {
   }
 }
 
+function escapeHtml(value: unknown): string {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
 export async function POST(request: NextRequest) {
   const rawBody = await request.text()
 
@@ -127,6 +136,11 @@ export async function POST(request: NextRequest) {
 
     const reason =
       data.bounce?.message ?? data.complaint?.userAgent ?? 'No detail provided'
+    const safeLabel = escapeHtml(label)
+    const safeEmailId = escapeHtml(emailId ?? 'N/A')
+    const safeRecipient = escapeHtml(recipient)
+    const safeReason = escapeHtml(reason)
+    const safeType = escapeHtml(type)
 
     try {
       await resend.emails.send({
@@ -134,11 +148,11 @@ export async function POST(request: NextRequest) {
         to: [EMAIL_ALERTS],
         subject: `[MealEase] ⚠️ ${label} — ${recipient}`,
         html: `
-          <p><strong>${label}</strong></p>
-          <p><strong>Email ID:</strong> ${emailId ?? 'N/A'}</p>
-          <p><strong>Recipient:</strong> ${recipient}</p>
-          <p><strong>Reason:</strong> ${reason}</p>
-          <p><strong>Event type:</strong> ${type}</p>
+          <p><strong>${safeLabel}</strong></p>
+          <p><strong>Email ID:</strong> ${safeEmailId}</p>
+          <p><strong>Recipient:</strong> ${safeRecipient}</p>
+          <p><strong>Reason:</strong> ${safeReason}</p>
+          <p><strong>Event type:</strong> ${safeType}</p>
           <p><em>${new Date().toISOString()}</em></p>
         `,
       })

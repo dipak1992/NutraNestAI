@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import type { HelpArticle } from '@/lib/help/types'
 
 /**
@@ -50,24 +51,17 @@ export function HelpArticleBody({ article }: { article: HelpArticle }) {
               }`}
             >
               {lines.map((l, j) => (
-                <li
-                  key={j}
-                  dangerouslySetInnerHTML={{
-                    __html: renderInline(
-                      l.replace(/^[-*]\s/, '').replace(/^\d+\.\s/, '')
-                    ),
-                  }}
-                />
+                <li key={j}>
+                  {renderInline(l.replace(/^[-*]\s/, '').replace(/^\d+\.\s/, ''))}
+                </li>
               ))}
             </Tag>
           )
         }
         return (
-          <p
-            key={i}
-            className="text-neutral-700 dark:text-neutral-300 text-sm leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: renderInline(block) }}
-          />
+          <p key={i} className="text-neutral-700 dark:text-neutral-300 text-sm leading-relaxed">
+            {renderInline(block)}
+          </p>
         )
       })}
     </div>
@@ -88,21 +82,42 @@ function sanitizeUrl(url: string): string {
   }
 }
 
-function renderInline(text: string): string {
-  // Bold **text**
-  let out = text.replace(
-    /\*\*(.+?)\*\*/g,
-    '<strong class="font-semibold text-neutral-900 dark:text-neutral-100">$1</strong>'
-  )
-  // Italic *text*
-  out = out.replace(/\*(.+?)\*/g, '<em>$1</em>')
-  // Inline links [text](url) — URL is sanitized to block javascript: and data: protocols
-  out = out.replace(
-    /\[([^\]]+)\]\(([^)]+)\)/g,
-    (_, linkText: string, rawUrl: string) =>
-      `<a href="${sanitizeUrl(rawUrl)}" rel="noopener noreferrer" class="text-[#D97757] underline underline-offset-2 hover:text-[#C86646]">${linkText}</a>`
-  )
-  // Newlines → <br>
-  out = out.replace(/\n/g, '<br />')
-  return out
+function renderInline(text: string): ReactNode[] {
+  const nodes: ReactNode[] = []
+  const pattern = /(\[([^\]]+)\]\(([^)]+)\)|\*\*(.+?)\*\*|\*(.+?)\*|\n)/g
+  let lastIndex = 0
+  let match: RegExpExecArray | null
+
+  while ((match = pattern.exec(text)) !== null) {
+    if (match.index > lastIndex) nodes.push(text.slice(lastIndex, match.index))
+
+    const key = nodes.length
+    if (match[1]?.startsWith('[')) {
+      nodes.push(
+        <a
+          key={key}
+          href={sanitizeUrl(match[3] ?? '')}
+          rel="noopener noreferrer"
+          className="text-[#D97757] underline underline-offset-2 hover:text-[#C86646]"
+        >
+          {match[2]}
+        </a>,
+      )
+    } else if (match[4]) {
+      nodes.push(
+        <strong key={key} className="font-semibold text-neutral-900 dark:text-neutral-100">
+          {match[4]}
+        </strong>,
+      )
+    } else if (match[5]) {
+      nodes.push(<em key={key}>{match[5]}</em>)
+    } else {
+      nodes.push(<br key={key} />)
+    }
+
+    lastIndex = pattern.lastIndex
+  }
+
+  if (lastIndex < text.length) nodes.push(text.slice(lastIndex))
+  return nodes
 }

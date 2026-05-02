@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { Loader2 } from 'lucide-react'
 
 type Props = {
@@ -13,29 +12,19 @@ export function AuthProviders({ next = '/dashboard' }: Props) {
 
   async function signInWithGoogle() {
     setLoading(true)
-    const supabase = createClient()
-    // Prefer the explicit NEXT_PUBLIC_SITE_URL so the redirectTo always
-    // matches the Supabase allowlist entry, even on preview deployments.
-    const origin =
-      process.env.NEXT_PUBLIC_SITE_URL ||
-      (typeof window !== 'undefined' ? window.location.origin : '')
-
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}`,
-        queryParams: {
-          access_type: 'offline',
-          prompt: 'consent',
-        },
-      },
+    const res = await fetch('/api/auth/oauth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ provider: 'google', next }),
     })
+    const data = await res.json().catch(() => ({})) as { url?: string }
 
-    if (error) {
-      console.error(error)
-      setLoading(false)
+    if (data.url) {
+      window.location.href = data.url
+      return
     }
-    // On success the browser redirects — no need to reset loading
+
+    setLoading(false)
   }
 
   return (

@@ -1,9 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { Loader2, Mail, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Turnstile } from './Turnstile'
 
 type Mode = 'login' | 'signup'
 
@@ -17,31 +17,30 @@ export function EmailAuthForm({ mode, next = '/dashboard' }: Props) {
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
     setError(null)
 
-    const supabase = createClient()
-    const origin = typeof window !== 'undefined' ? window.location.origin : ''
-
-    const { error: authError } = await supabase.auth.signInWithOtp({
-      email: email.trim(),
-      options: {
-        emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}`,
-        shouldCreateUser: mode === 'signup',
-      },
+    const res = await fetch('/api/auth/otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: email.trim(),
+        mode,
+        next,
+        captchaToken,
+      }),
     })
 
     setLoading(false)
 
-    if (authError) {
-      console.error('[auth] magic link error:', authError.message)
-      setSent(true)
+    if (!res.ok && res.status === 429) {
+      setError('Too many attempts. Please wait a minute and try again.')
       return
     }
-
     setSent(true)
   }
 
@@ -92,6 +91,8 @@ export function EmailAuthForm({ mode, next = '/dashboard' }: Props) {
       {error && (
         <p className="text-xs text-red-500 dark:text-red-400">{error}</p>
       )}
+
+      <Turnstile onToken={setCaptchaToken} />
 
       <button
         type="submit"

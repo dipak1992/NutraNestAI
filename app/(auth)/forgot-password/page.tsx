@@ -5,11 +5,11 @@ import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader2, ArrowLeft, MailCheck } from 'lucide-react'
+import { Turnstile } from '@/components/auth/Turnstile'
 
 const schema = z.object({
   email: z.string().email('Please enter a valid email'),
@@ -21,6 +21,7 @@ export default function ForgotPasswordPage() {
   const [sent, setSent] = useState(false)
   const [sentTo, setSentTo] = useState('')
   const [serverError, setServerError] = useState<string | null>(null)
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -30,15 +31,14 @@ export default function ForgotPasswordPage() {
     setLoading(true)
     setServerError(null)
 
-    const supabase = createClient()
-    const redirectTo = `${window.location.origin}/auth/callback?next=/reset-password`
-
-    const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
-      redirectTo,
+    const res = await fetch('/api/auth/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: values.email, captchaToken }),
     })
 
-    if (error) {
-      setServerError(error.message)
+    if (!res.ok && res.status === 429) {
+      setServerError('Too many reset attempts. Please wait and try again.')
       setLoading(false)
       return
     }
@@ -60,7 +60,7 @@ export default function ForgotPasswordPage() {
         </p>
         <p className="text-sm font-medium mb-6 break-all">{sentTo}</p>
         <p className="text-xs text-muted-foreground mb-6">
-          The link expires in 1 hour. If you don&apos;t see it, check your spam folder.
+          The link expires in 30 minutes. If you don&apos;t see it, check your spam folder.
         </p>
         <Button asChild variant="outline" className="w-full">
           <Link href="/login">
@@ -113,6 +113,7 @@ export default function ForgotPasswordPage() {
             <p className="text-xs text-destructive">{errors.email.message}</p>
           )}
         </div>
+        <Turnstile onToken={setCaptchaToken} />
         <Button type="submit" className="w-full" disabled={loading}>
           {loading ? (
             <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Sending link…</>

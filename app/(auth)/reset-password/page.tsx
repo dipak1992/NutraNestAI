@@ -13,7 +13,12 @@ import { Loader2, CheckCircle2, ShieldCheck } from 'lucide-react'
 import { toast } from 'sonner'
 
 const schema = z.object({
-  password: z.string().min(8, 'Password must be at least 8 characters'),
+  password: z.string()
+    .min(12, 'Password must be at least 12 characters')
+    .regex(/[a-z]/, 'Password must include a lowercase letter')
+    .regex(/[A-Z]/, 'Password must include an uppercase letter')
+    .regex(/[0-9]/, 'Password must include a number')
+    .regex(/[^A-Za-z0-9]/, 'Password must include a symbol'),
   confirmPassword: z.string(),
 }).refine((d) => d.password === d.confirmPassword, {
   message: 'Passwords do not match',
@@ -127,7 +132,7 @@ export default function ResetPasswordPage() {
           <Input
             id="password"
             type="password"
-            placeholder="Min. 8 characters"
+            placeholder="12+ characters, mixed case, number, symbol"
             autoComplete="new-password"
             autoFocus
             {...register('password')}

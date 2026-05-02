@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { rateLimit, rateLimitKeyFromRequest } from '@/lib/rate-limit'
 import { apiError, apiRateLimited } from '@/lib/api-response'
+import { enforceFeatureQuota, incrementFeatureQuota } from '@/lib/usage/feature-quota'
 import logger from '@/lib/logger'
 
 export const runtime = 'nodejs'
@@ -18,6 +19,12 @@ Respond ONLY with valid JSON in this exact format:
 {"type": "ingredients" | "inspiration" | "unknown", "result": "your comma-separated ingredients OR meal description OR empty string"}`
 
 type ImageAnalysisResult = { type: string; result: string }
+
+const IMAGE_ANALYSIS_QUOTA = {
+  key: 'ai_image_analysis',
+  limit: 20,
+  label: 'image analysis',
+}
 
 async function analyzeWithAnthropic(
   image: string,
@@ -106,6 +113,8 @@ export async function POST(req: NextRequest) {
   if (!user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
+  const quotaResponse = await enforceFeatureQuota(supabase, user.id, IMAGE_ANALYSIS_QUOTA)
+  if (quotaResponse) return quotaResponse
 
   try {
     const body = await req.json()
@@ -169,6 +178,7 @@ export async function POST(req: NextRequest) {
         completion_tokens: result.usage.completion_tokens,
       })
     }
+    await incrementFeatureQuota(supabase, IMAGE_ANALYSIS_QUOTA)
 
     return NextResponse.json({
       type: result.parsed.type,

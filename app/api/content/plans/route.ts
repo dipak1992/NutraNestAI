@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import { generateSlug } from '@/lib/content/types'
+import { sanitizePublicPlan } from '@/lib/content/sanitize-public'
 import type { WeeklyPlan } from '@/lib/planner/types'
 
 export async function POST(req: Request) {
@@ -21,6 +22,7 @@ export async function POST(req: Request) {
   const mealCount = plan.days.filter((d) => d.meal !== null).length
   const title = `${mealCount}-meal plan · Week of ${weekDate}`
   const slug = generateSlug(title)
+  const publicPlan = sanitizePublicPlan(plan)
 
   const { data, error } = await supabase
     .from('published_plans')
@@ -29,7 +31,7 @@ export async function POST(req: Request) {
       slug,
       title,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      plan_data: plan as any,
+      plan_data: publicPlan as any,
       is_public: true,
     })
     .select('id, slug')

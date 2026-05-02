@@ -12,6 +12,7 @@ import { getPaywallStatus } from '@/lib/paywall/server'
 import { FREE_PLAN_PREVIEW_DAYS } from '@/lib/paywall/config'
 import { createClient } from '@/lib/supabase/server'
 import { rateLimit, rateLimitKeyFromRequest } from '@/lib/rate-limit'
+import { enforceFeatureQuota, incrementFeatureQuota } from '@/lib/usage/feature-quota'
 import { getUserDietaryPrefs, applyPrefsToEngineRequest } from '@/lib/meal-engine/preferences'
 import type { SmartMealRequest } from '@/lib/engine/types'
 import type { LearnedBoosts } from '@/lib/learning/types'
@@ -24,6 +25,12 @@ interface WeeklyPlanRequest {
   storeFormat?: StoreFormat
   weekStart: string
   pantryItems?: string[]
+}
+
+const WEEKLY_PLAN_QUOTA = {
+  key: 'weekly_plan_generation',
+  limit: 20,
+  label: 'weekly plan generation',
 }
 
 export async function POST(req: Request) {
@@ -55,6 +62,11 @@ export async function POST(req: Request) {
 
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Login required to generate a weekly plan' }, { status: 401 })
+    }
+    const quotaResponse = await enforceFeatureQuota(supabase, user.id, WEEKLY_PLAN_QUOTA)
+    if (quotaResponse) return quotaResponse
     const prefs = user ? await getUserDietaryPrefs(user.id) : null
     const { baseRequest: rawBaseRequest, learnedBoosts, storeFormat = 'standard', weekStart, pantryItems = [] } = body
     const baseRequest = prefs ? applyPrefsToEngineRequest(rawBaseRequest, prefs) : rawBaseRequest
@@ -109,6 +121,7 @@ export async function POST(req: Request) {
 
     // Build grocery list from all 7 meals combined
     const groceryList = buildGroceryList(meals, pantryItems, storeFormat, weekStart)
+    await incrementFeatureQuota(supabase, WEEKLY_PLAN_QUOTA)
 
     if (!paywall.isPro) {
       const previewDays = paywall.effectivePlanPreviewDays ?? FREE_PLAN_PREVIEW_DAYS

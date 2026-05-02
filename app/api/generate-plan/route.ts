@@ -3,10 +3,16 @@ import { generateMealPlan } from '@/lib/ai/meal-generator'
 import { createClient } from '@/lib/supabase/server'
 import { rateLimit, rateLimitKeyFromRequest } from '@/lib/rate-limit'
 import { apiError, apiRateLimited } from '@/lib/api-response'
+import { enforceFeatureQuota, incrementFeatureQuota } from '@/lib/usage/feature-quota'
 import logger from '@/lib/logger'
 import type { AIGenerationRequest } from '@/types'
 
 const DAILY_PLAN_LIMIT = 10
+const AI_PLAN_QUOTA = {
+  key: 'ai_plan_generation',
+  limit: DAILY_PLAN_LIMIT,
+  label: 'AI plan generation',
+}
 
 export async function POST(req: NextRequest) {
   const rl = await rateLimit({ key: rateLimitKeyFromRequest(req), limit: 10, windowMs: 60_000 })
@@ -16,19 +22,8 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return apiError('Unauthenticated', 401)
 
-  // Daily AI budget guard
-  const today = new Date().toISOString().slice(0, 10)
-  const { data: usage } = await supabase
-    .from('feature_usage')
-    .select('usage_count')
-    .eq('user_id', user.id)
-    .eq('feature_key', 'ai_plan_generation')
-    .eq('usage_date', today)
-    .maybeSingle()
-
-  if (usage && usage.usage_count >= DAILY_PLAN_LIMIT) {
-    return apiError(`Daily AI generation limit (${DAILY_PLAN_LIMIT}) reached. Try again tomorrow.`, 429)
-  }
+  const quotaResponse = await enforceFeatureQuota(supabase, user.id, AI_PLAN_QUOTA)
+  if (quotaResponse) return quotaResponse
 
   try {
     const body = await req.json() as AIGenerationRequest
@@ -39,10 +34,7 @@ export async function POST(req: NextRequest) {
 
     const plan = await generateMealPlan(body)
 
-    // Increment daily usage counter
-    await supabase.rpc('increment_feature_usage', {
-      p_feature_key: 'ai_plan_generation',
-    }).then(() => {}, () => {})
+    await incrementFeatureQuota(supabase, AI_PLAN_QUOTA)
 
     // Track last meaningful activity for reactivation/winback emails
     supabase.from('profiles').update({ last_active_at: new Date().toISOString() }).eq('user_id', user.id).then(() => {}, () => {})

@@ -78,6 +78,10 @@ export async function rateLimit({ key, limit, windowMs }: RateLimitOptions): Pro
     const res = await rl.limit(key)
     return { success: res.success, remaining: res.remaining, reset: res.reset }
   }
+  if (process.env.NODE_ENV === 'production') {
+    console.error('[rate-limit] UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN are required in production')
+    return { success: false, remaining: 0, reset: Date.now() + windowMs }
+  }
   return memoryLimit(key, limit, windowMs)
 }
 

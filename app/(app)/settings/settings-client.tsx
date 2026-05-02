@@ -4,6 +4,7 @@ import { SectionProfile } from '@/components/settings/SectionProfile'
 import { SectionNotifications } from '@/components/settings/SectionNotifications'
 import { SectionHousehold } from '@/components/settings/SectionHousehold'
 import { SectionBilling } from '@/components/settings/SectionBilling'
+import { SectionSecurity } from '@/components/settings/SectionSecurity'
 import { SectionDangerZone } from '@/components/settings/SectionDangerZone'
 import type { PlanId } from '@/lib/stripe/plans'
 
@@ -52,6 +53,7 @@ export function SettingsClient({
       <SectionProfile firstName={firstName} email={email} />
       <SectionNotifications prefs={notifPrefs} />
       <SectionHousehold members={members} currentPlan={currentPlan} />
+      <SectionSecurity />
       <SectionBilling
         currentPlan={currentPlan}
         planStatus={planStatus}

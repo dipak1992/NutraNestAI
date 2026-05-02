@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { sanitizePublicMeal } from '@/lib/content/sanitize-public'
 
 type Params = Promise<{ id: string }>
 
@@ -47,6 +48,20 @@ export async function PATCH(req: Request, { params }: { params: Params }) {
   if (body.is_public !== undefined) {
     updates.is_public = Boolean(body.is_public)
     if (body.is_public) updates.published_at = new Date().toISOString()
+  }
+
+  if (body.is_public) {
+    const { data: mealRow } = await supabase
+      .from('saved_meals')
+      .select('meal_data')
+      .eq('id', id)
+      .eq('user_id', user.id)
+      .maybeSingle()
+
+    if (!mealRow?.meal_data) {
+      return NextResponse.json({ error: 'Not found' }, { status: 404 })
+    }
+    updates.meal_data = sanitizePublicMeal(mealRow.meal_data as Parameters<typeof sanitizePublicMeal>[0])
   }
 
   const { error } = await supabase

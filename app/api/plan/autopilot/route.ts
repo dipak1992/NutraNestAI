@@ -4,13 +4,25 @@ import OpenAI from 'openai'
 import { loadWeekPlan, getCurrentWeekStart } from '@/app/plan/loader'
 import { getActiveLeftoverIngredients } from '@/app/api/leftovers/route'
 import { AUTOPILOT_SYSTEM_PROMPT, buildAutopilotPrompt } from '@/lib/plan/autopilot-prompt'
+import { apiRateLimited } from '@/lib/api-response'
+import { rateLimit, rateLimitKeyFromRequest } from '@/lib/rate-limit'
+import { enforceFeatureQuota, incrementFeatureQuota } from '@/lib/usage/feature-quota'
 import type { AutopilotOptions, AutopilotResult, AutopilotPreferences } from '@/lib/plan/types'
 import type { Recipe } from '@/lib/dashboard/types'
 import { detectCuisine, detectProtein } from '@/lib/plan/scoring'
 
+const AUTOPILOT_QUOTA = {
+  key: 'ai_autopilot_plan',
+  limit: 5,
+  label: 'autopilot planning',
+}
+
 // ─── POST /api/plan/autopilot ─────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
+  const rl = await rateLimit({ key: rateLimitKeyFromRequest(req), limit: 10, windowMs: 60_000 })
+  if (!rl.success) return apiRateLimited(rl.reset)
+
   // Lazy-init so the key is read at request time, not build time
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
   const supabase = await createClient()
@@ -18,6 +30,8 @@ export async function POST(req: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const quotaResponse = await enforceFeatureQuota(supabase, user.id, AUTOPILOT_QUOTA)
+  if (quotaResponse) return quotaResponse
 
   const body = await req.json()
   const {
@@ -168,6 +182,7 @@ export async function POST(req: NextRequest) {
         { role: 'user', content: userPrompt },
       ],
     })
+    await incrementFeatureQuota(supabase, AUTOPILOT_QUOTA)
 
     const raw = completion.choices[0]?.message?.content ?? '{}'
     const parsed = JSON.parse(raw) as {

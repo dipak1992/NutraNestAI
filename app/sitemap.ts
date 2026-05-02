@@ -6,12 +6,22 @@ import { growthPages, growthTools } from '@/lib/growth/content'
 import { getAllPosts as getAllMdxPosts } from '@/lib/blog/mdx'
 import { CATEGORY_LABELS, type BlogCategory } from '@/lib/blog/types'
 import { comparePages } from '@/lib/seo-pages'
+import { HELP_ARTICLES, HELP_CATEGORIES } from '@/lib/help/articles'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
     '/',
     '/pricing',
     '/faq',
+    '/about',
+    '/contact',
+    '/press',
+    '/privacy',
+    '/terms',
+    '/cookie-policy',
+    '/status',
+    '/changelog',
+    '/help',
     '/tonight',
     '/meals',
     '/blog',
@@ -76,6 +86,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.76,
   }))
 
+  const helpCategoryRoutes: MetadataRoute.Sitemap = HELP_CATEGORIES.map((category) => ({
+    url: absoluteUrl(`/help/${category.id}`),
+    lastModified: new Date(),
+    changeFrequency: 'monthly',
+    priority: 0.64,
+  }))
+
+  const helpArticleRoutes: MetadataRoute.Sitemap = HELP_ARTICLES.map((article) => ({
+    url: absoluteUrl(`/help/${article.category}/${article.slug}`),
+    lastModified: new Date(article.updatedAt),
+    changeFrequency: 'monthly',
+    priority: 0.62,
+  }))
+
   const growthRoutes: MetadataRoute.Sitemap = growthPages.map((page) => ({
     url: absoluteUrl(`/${page.slug}`),
     lastModified: new Date(),
@@ -99,5 +123,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
-  return [...staticRoutes, ...growthRoutes, ...toolRoutes, ...categoryRoutes, ...compareRoutes, ...blogRoutes, ...mealRoutes]
+  return [
+    ...staticRoutes,
+    ...growthRoutes,
+    ...toolRoutes,
+    ...categoryRoutes,
+    ...compareRoutes,
+    ...helpCategoryRoutes,
+    ...helpArticleRoutes,
+    ...blogRoutes,
+    ...mealRoutes,
+  ]
 }

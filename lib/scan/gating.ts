@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createSupabaseServiceClient } from '@/lib/supabase/service'
 import type { ScanType, ScanGateReason } from './types'
 
 // Free tier limits
@@ -23,6 +23,10 @@ function getWindowStart(period: 'week' | 'month'): string {
   }
 }
 
+function gateReasonFor(type: ScanType): ScanGateReason {
+  return type === 'fridge' ? 'fridge_weekly_limit' : 'menu_monthly_limit'
+}
+
 /**
  * Check if the user is within their scan usage limit.
  * If within limit, increment the counter and return null (allowed).
@@ -42,7 +46,7 @@ export async function checkAndIncrementScanUsage(
   // Food scans are unlimited for everyone
   if (!limit) return null
 
-  const supabase = await createClient()
+  const supabase = createSupabaseServiceClient()
   const windowStart = getWindowStart(limit.period)
 
   // Count existing scans in the current window
@@ -55,14 +59,13 @@ export async function checkAndIncrementScanUsage(
 
   if (countError) {
     console.error('[scan/gating] count error:', countError)
-    // Fail open — allow the scan
-    return null
+    return gateReasonFor(type)
   }
 
   const used = count ?? 0
 
   if (used >= limit.count) {
-    return type === 'fridge' ? 'fridge_weekly_limit' : 'menu_monthly_limit'
+    return gateReasonFor(type)
   }
 
   // Increment usage
@@ -73,7 +76,7 @@ export async function checkAndIncrementScanUsage(
 
   if (insertError) {
     console.error('[scan/gating] insert error:', insertError)
-    // Fail open
+    return gateReasonFor(type)
   }
 
   return null

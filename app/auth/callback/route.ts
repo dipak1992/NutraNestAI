@@ -34,8 +34,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${origin}/login?error=missing_code`)
   }
 
-  // Protect against open redirects — only allow relative paths
-  const next = rawNext.startsWith('/') ? rawNext : '/dashboard'
+  // Protect against open redirects — only allow local relative paths
+  const next =
+    rawNext.startsWith('/') && !rawNext.startsWith('//') && !rawNext.includes('\\')
+      ? rawNext
+      : '/dashboard'
 
   const cookieStore = await cookies()
 

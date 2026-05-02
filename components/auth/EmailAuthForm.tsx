@@ -37,11 +37,8 @@ export function EmailAuthForm({ mode, next = '/dashboard' }: Props) {
     setLoading(false)
 
     if (authError) {
-      setError(
-        mode === 'login'
-          ? 'No account found with that email. Try signing up instead.'
-          : authError.message
-      )
+      console.error('[auth] magic link error:', authError.message)
+      setSent(true)
       return
     }
 
@@ -58,7 +55,7 @@ export function EmailAuthForm({ mode, next = '/dashboard' }: Props) {
           Check your email
         </p>
         <p className="text-sm text-neutral-500 dark:text-neutral-400">
-          We sent a magic link to <strong>{email}</strong>. Click it to{' '}
+          If this email is eligible, we&apos;ll send a magic link to <strong>{email}</strong>. Click it to{' '}
           {mode === 'login' ? 'sign in' : 'create your account'}.
         </p>
         <button

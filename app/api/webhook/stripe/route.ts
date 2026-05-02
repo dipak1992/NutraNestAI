@@ -121,10 +121,14 @@ async function verifyStripeSignature(
 // ── Event handlers ────────────────────────────────────────────────────────────
 
 async function handleCheckoutCompleted(session: Record<string, unknown>) {
-  const userId = session['client_reference_id'] as string | null
+  const metadata = session['metadata'] as Record<string, unknown> | null
+  const userId =
+    (session['client_reference_id'] as string | null) ??
+    (metadata?.supabase_user_id as string | undefined) ??
+    (metadata?.user_id as string | undefined) ??
+    null
   const customerId = session['customer'] as string | null
   const subscriptionId = session['subscription'] as string | null
-  const metadata = session['metadata'] as Record<string, unknown> | null
 
   if (!userId || !customerId) {
     console.error('[stripe-webhook] checkout.session.completed missing user/customer')
@@ -385,11 +389,30 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
   }
 
-  let event: { type: string; data: { object: Record<string, unknown> } }
+  let event: { id?: string; type: string; data: { object: Record<string, unknown> } }
   try {
     event = JSON.parse(payload)
   } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
+  }
+
+  if (!event.id) {
+    console.warn('[stripe-webhook] Missing event id')
+    return NextResponse.json({ error: 'Missing event id' }, { status: 400 })
+  }
+
+  const supabase = adminSupabase()
+  const { error: claimError } = await supabase
+    .from('stripe_webhook_events')
+    .insert({ id: event.id, event_type: event.type })
+
+  if (claimError) {
+    if (claimError.code === '23505') {
+      return NextResponse.json({ received: true, duplicate: true })
+    }
+
+    console.error('[stripe-webhook] idempotency claim error:', claimError)
+    return NextResponse.json({ error: 'Webhook persistence error' }, { status: 500 })
   }
 
   try {
@@ -424,6 +447,10 @@ export async function POST(req: Request) {
     }
   } catch (err) {
     console.error('[stripe-webhook] handler error:', err)
+    await supabase
+      .from('stripe_webhook_events')
+      .delete()
+      .eq('id', event.id)
     return NextResponse.json({ error: 'Handler error' }, { status: 500 })
   }
 

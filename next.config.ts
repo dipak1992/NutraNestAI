@@ -14,7 +14,7 @@ const securityHeaders = [
     key: 'Strict-Transport-Security',
     value: 'max-age=63072000; includeSubDomains; preload',
   },
-  // CSP is now handled dynamically by middleware.ts with per-request nonce
+  // CSP is handled by middleware.ts.
 ]
 
 const withMDX = createMDX({

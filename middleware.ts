@@ -4,6 +4,9 @@ import { NextResponse, type NextRequest } from 'next/server'
 function buildCsp() {
   return [
     `default-src 'self'`,
+    `base-uri 'self'`,
+    `form-action 'self'`,
+    `object-src 'none'`,
     // 'unsafe-inline' is required by Next.js 15 for its own injected scripts.
     // 'unsafe-eval' has been removed — it is not required and enables code injection attacks.
     `script-src 'self' 'unsafe-inline' https://*.posthog.com https://*.sentry.io`,
@@ -12,6 +15,7 @@ function buildCsp() {
     `font-src 'self' data:`,
     `connect-src 'self' https://*.supabase.co https://*.posthog.com https://*.sentry.io https://api.resend.com https://api.openai.com https://api.anthropic.com`,
     `frame-ancestors 'none'`,
+    `upgrade-insecure-requests`,
   ].join('; ')
 }
 

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createSupabaseServiceClient } from '@/lib/supabase/service'
 import { serverEnv } from '@/lib/env'
+import { getSiteUrl } from '@/lib/seo'
 import { stripe } from '@/lib/stripe/client'
 import { PLANS, type PlanId } from '@/lib/stripe/plans'
 import { isStripePriceId, normalizeStripePriceId } from '@/lib/stripe/price-id'
@@ -14,11 +15,33 @@ export async function POST(req: Request) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const { planId } = await req.json() as { planId: PlanId }
-    const plan = PLANS[planId]
-    const priceId = normalizeStripePriceId(plan?.stripePriceId)
-    if (!priceId || !isStripePriceId(priceId)) {
+    const { planId, plan } = await req.json() as {
+      planId?: PlanId
+      plan?: 'pro_monthly' | 'pro_yearly'
+    }
+    const validPlanId = typeof planId === 'string' && planId in PLANS
+    const validLegacyPlan = plan === 'pro_monthly' || plan === 'pro_yearly'
+    if (!validPlanId && !validLegacyPlan) {
       return NextResponse.json({ error: 'Invalid plan' }, { status: 400 })
+    }
+
+    const resolvedPlanId: PlanId = validPlanId ? planId as PlanId : 'plus'
+    const billingInterval = plan === 'pro_yearly' ? 'yearly' : 'monthly'
+    const selectedPlan = PLANS[resolvedPlanId]
+    const configuredPriceId = plan === 'pro_yearly'
+      ? serverEnv.stripePricingTierPro.yearly
+      : plan === 'pro_monthly'
+        ? serverEnv.stripePricingTierPro.monthly
+        : selectedPlan?.stripePriceId
+    const priceId = normalizeStripePriceId(configuredPriceId)
+    if (!priceId || !isStripePriceId(priceId)) {
+      return NextResponse.json(
+        {
+          error: 'billing_not_configured',
+          message: 'Stripe checkout is not live yet. Email hello@mealeaseai.com to upgrade manually.',
+        },
+        { status: 503 },
+      )
     }
 
     // Get or create Stripe customer
@@ -53,18 +76,27 @@ export async function POST(req: Request) {
     ].filter(Boolean) as string[]
     const rawOrigin = req.headers.get('origin') ?? ''
     const origin = ALLOWED_ORIGINS.includes(rawOrigin)
-      ? rawOrigin
-      : (process.env.NEXT_PUBLIC_APP_URL ?? 'https://mealeaseai.com')
+      ? rawOrigin.replace(/\/$/, '')
+      : getSiteUrl().replace(/\/$/, '')
+    const metadata = {
+      supabase_user_id: user.id,
+      user_id: user.id,
+      plan_id: resolvedPlanId,
+      plan: plan ?? resolvedPlanId,
+      tier: 'pro',
+      billing_interval: billingInterval,
+    }
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: 'subscription',
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${origin}/dashboard?upgraded=1`,
+      success_url: `${origin}/dashboard?upgraded=1&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/upgrade?cancelled=1`,
-      metadata: { supabase_user_id: user.id, plan_id: planId },
+      client_reference_id: user.id,
+      metadata,
       subscription_data: {
-        metadata: { supabase_user_id: user.id, plan_id: planId },
+        metadata,
         ...(serverEnv.stripeTrialDays > 0
           ? { trial_period_days: serverEnv.stripeTrialDays }
           : {}),

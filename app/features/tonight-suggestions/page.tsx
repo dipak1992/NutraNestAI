@@ -65,7 +65,7 @@ export default function TonightSuggestionsPage() {
           secondaryHref="/pricing"
           secondaryLabel="See pricing"
           image="/landing/date-night.jpg"
-          mobileImage="/mobile/date-night-mobile.jpg"
+          mobileImage="/features/tonight-hero-mobile.jpg"
           mockup="tonight"
         />
 

@@ -31,7 +31,7 @@ export function ConversionStory() {
             <div className="relative overflow-hidden rounded-[2rem] bg-neutral-950 p-5 text-white shadow-2xl shadow-neutral-950/10">
               <div className="absolute inset-0">
                 <Image
-                  src="/landing/family-dinner.jpg"
+                  src="/landing/conversion-story.jpg"
                   alt=""
                   fill
                   sizes="(max-width: 1024px) 100vw, 58vw"

@@ -66,7 +66,7 @@ export default function LeftoversAIPage() {
           secondaryLabel="Upgrade to Plus"
           note={<>Leftovers AI is a Plus feature. <Link href="/pricing" className="text-[#FFD2BD] underline underline-offset-4">Compare plans →</Link></>}
           image="/landing/app-cooking.jpg"
-          mobileImage="/mobile/date-night-mobile.jpg"
+          mobileImage="/features/leftovers-hero-mobile.jpg"
           mockup="leftovers"
         />
 

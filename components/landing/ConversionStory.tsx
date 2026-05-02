@@ -35,9 +35,9 @@ export function ConversionStory() {
                   alt=""
                   fill
                   sizes="(max-width: 1024px) 100vw, 58vw"
-                  className="object-cover opacity-45"
+                  className="object-cover opacity-65"
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-neutral-950/92 via-neutral-950/70 to-neutral-950/30" />
+                <div className="absolute inset-0 bg-gradient-to-r from-neutral-950/85 via-neutral-950/55 to-neutral-950/20" />
               </div>
               <div className="relative grid gap-4 sm:grid-cols-4">
                 {workflow.map((step, index) => {

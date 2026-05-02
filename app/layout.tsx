@@ -5,6 +5,7 @@ import { Providers } from '@/components/providers'
 import { Toaster } from '@/components/ui/sonner'
 import { PWAServiceWorkerRegister } from '@/components/pwa/PWAServiceWorkerRegister'
 import { getSiteUrl } from '@/lib/seo'
+import { organizationSchema } from '@/lib/schema'
 
 const inter = Inter({
   variable: '--font-inter',
@@ -21,12 +22,12 @@ const fraunces = Fraunces({
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   title: {
-    default: 'MealEase – Make family meals easy',
+    default: 'MealEase – Family-First AI Meal Prep Planner',
     template: '%s | MealEase',
   },
   description:
-    'MealEase helps you decide what to cook with simple, smart meal plans for your whole family. From one idea to a full meal plan in seconds.',
-  keywords: ['meal planning', 'family meals', 'meal planner', 'easy dinner ideas', 'family recipe planner'],
+    'MealEase is the family-first AI meal prep planner for busy households. Plan dinners, generate grocery lists, use leftovers, and shop smarter.',
+  keywords: ['meal prep app', 'meal planning app', 'AI meal prep planner', 'weekly meal prep with grocery list', 'meal prep for parents'],
   alternates: {
     canonical: '/',
   },
@@ -40,17 +41,17 @@ export const metadata: Metadata = {
     shortcut: '/icons/favicon-32.png',
   },
   openGraph: {
-    title: 'MealEase – Make family meals easy',
-    description: 'From one idea to a full meal plan for your whole family — in seconds.',
+    title: 'MealEase – Family-First AI Meal Prep Planner',
+    description: 'Plan dinners, generate grocery lists, use leftovers, and keep budget visible with MealEase.',
     type: 'website',
     url: '/',
     siteName: 'MealEase',
-    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'MealEase – Make family meals easy' }],
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'MealEase – Family-First AI Meal Prep Planner' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'MealEase – Make family meals easy',
-    description: 'From one idea to a full meal plan for your whole family — in seconds.',
+    title: 'MealEase – Family-First AI Meal Prep Planner',
+    description: 'Plan dinners, generate grocery lists, use leftovers, and keep budget visible with MealEase.',
     images: ['/twitter-image'],
   },
 }
@@ -77,16 +78,7 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'Organization',
-              name: 'MealEase',
-              url: getSiteUrl(),
-              logo: `${getSiteUrl()}/icons/logo-generated.png`,
-              description:
-                'MealEase helps you decide what to cook with simple, smart meal plans for your whole family.',
-              sameAs: [],
-            }),
+            __html: JSON.stringify(organizationSchema),
           }}
         />
         <Providers>

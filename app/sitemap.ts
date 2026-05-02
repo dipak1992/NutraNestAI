@@ -5,6 +5,7 @@ import { absoluteUrl } from '@/lib/seo'
 import { growthPages, growthTools } from '@/lib/growth/content'
 import { getAllPosts as getAllMdxPosts } from '@/lib/blog/mdx'
 import { CATEGORY_LABELS, type BlogCategory } from '@/lib/blog/types'
+import { comparePages } from '@/lib/seo-pages'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -14,6 +15,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/tonight',
     '/meals',
     '/blog',
+    '/compare',
+    '/meal-prep-app',
+    '/ai-meal-prep-planner',
+    '/weekly-meal-prep-with-grocery-list',
+    '/for-ai-assistants',
     '/tools',
     '/growth-dashboard',
     '/content-machine',
@@ -63,6 +69,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }),
   )
 
+  const compareRoutes: MetadataRoute.Sitemap = comparePages.map((page) => ({
+    url: absoluteUrl(`/compare/${page.slug}`),
+    lastModified: new Date(),
+    changeFrequency: 'monthly',
+    priority: 0.76,
+  }))
+
   const growthRoutes: MetadataRoute.Sitemap = growthPages.map((page) => ({
     url: absoluteUrl(`/${page.slug}`),
     lastModified: new Date(),
@@ -86,5 +99,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
-  return [...staticRoutes, ...growthRoutes, ...toolRoutes, ...categoryRoutes, ...blogRoutes, ...mealRoutes]
+  return [...staticRoutes, ...growthRoutes, ...toolRoutes, ...categoryRoutes, ...compareRoutes, ...blogRoutes, ...mealRoutes]
 }

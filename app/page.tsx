@@ -12,20 +12,20 @@ import { PricingTeaser } from '@/components/landing/PricingTeaser'
 import { FAQ } from '@/components/landing/FAQ'
 import { FinalCTA } from '@/components/landing/FinalCTA'
 import { Footer } from '@/components/landing/Footer'
-import { softwareAppSchema, faqSchema } from '@/lib/schema'
+import { organizationSchema, productSchema, softwareAppSchema, faqSchema } from '@/lib/schema'
 
 // Revalidate every 30 minutes so the "Tonight's meal" rotates at 7am CT
 // ISR ensures the page is regenerated after the meal day boundary
 export const revalidate = 1800
 
 export const metadata = {
-  title: 'MealEase — AI Meal Planning for Real Households',
+  title: 'MealEase — Family-First AI Meal Prep Planner',
   description:
-    "Never ask \"What's for dinner?\" again. MealEase plans your week, uses what's in your fridge, saves your leftovers, and keeps you on budget. In 30 seconds.",
+    'MealEase is the family-first AI meal prep planner for busy households. Plan dinners, generate grocery lists, scan your fridge, use leftovers, and keep budget visible.',
   openGraph: {
-    title: 'MealEase — AI Meal Planning for Real Households',
+    title: 'MealEase — Family-First AI Meal Prep Planner',
     description:
-      "Never ask \"What's for dinner?\" again. MealEase plans your week, uses what's in your fridge, saves your leftovers, and keeps you on budget.",
+      'Plan dinners, generate grocery lists, scan your fridge, use leftovers, and keep budget visible with MealEase.',
     type: 'website',
   },
 }
@@ -36,6 +36,14 @@ export default async function LandingPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareAppSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
       />
       <script
         type="application/ld+json"

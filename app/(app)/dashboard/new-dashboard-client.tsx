@@ -17,6 +17,7 @@ import { WeekPlanStrip } from '@/components/dashboard/WeekPlanStrip'
 import { QuickActions } from '@/components/dashboard/QuickActions'
 import { ContextualNudge } from '@/components/dashboard/ContextualNudge'
 import { RetentionEngineCard } from '@/components/dashboard/RetentionEngineCard'
+import { ReviewPromptCard } from '@/components/dashboard/ReviewPromptCard'
 import { hapticTap } from '@/lib/scan/haptics'
 import type { DashboardPayload } from '@/lib/dashboard/types'
 
@@ -269,6 +270,8 @@ export function NewDashboardClient({ initial }: { initial: DashboardPayload }) {
         <WeekPlanStrip />
 
         <RetentionEngineCard retention={displayRetention} />
+
+        <ReviewPromptCard user={displayUser} retention={displayRetention} />
 
         <BudgetBar />
 

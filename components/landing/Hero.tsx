@@ -59,20 +59,16 @@ export function Hero() {
                 id="hero-heading"
                 className="font-serif text-[38px] leading-[1.05] sm:text-5xl md:text-6xl lg:text-[64px] font-bold tracking-tight text-neutral-900 dark:text-neutral-50"
               >
-                Never ask
+                The <span className="italic text-[#D97757]">family-first AI meal prep planner</span>
                 <br />
-                <span className="italic text-[#D97757]">
-                  &ldquo;What&rsquo;s for dinner?&rdquo;
-                </span>
-                <br />
-                again.
+                for busy households.
               </h1>
             </FadeIn>
 
             <FadeIn delay={0.1}>
               <p className="mt-4 sm:mt-6 max-w-[230px] sm:max-w-xl text-base sm:text-lg leading-[1.6] text-neutral-600 dark:text-neutral-300 md:text-xl">
-                MealEase connects tonight&rsquo;s dinner, weekly planning, groceries,
-                leftovers, and budget into one calm food system. In 30 seconds.
+                MealEase connects dinner ideas, weekly meal prep, groceries,
+                leftovers, pantry scans, and budget-aware swaps into one calm family system.
               </p>
             </FadeIn>
 
@@ -83,7 +79,7 @@ export function Hero() {
                   href="/signup"
                   className="w-[88%] sm:w-auto text-center shadow-md shadow-[#D97757]/20 hover:shadow-lg hover:shadow-[#D97757]/28 active:shadow-sm active:scale-[0.98] transition-all duration-150"
                 >
-                  Plan tonight&rsquo;s dinner — free
+                  Start planning free
                 </Button>
                 <a
                   href="#how-it-works"
@@ -96,7 +92,7 @@ export function Hero() {
 
             <FadeIn delay={0.3}>
               <p className="mt-3 text-sm font-semibold text-neutral-700 dark:text-neutral-300">
-                Plan your week. Get groceries ready in one tap.
+                Plan the week. Get groceries ready. Stop repeating dinner decisions.
               </p>
 
               {/* Mobile: vertical stack; sm+: horizontal row */}

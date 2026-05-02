@@ -43,6 +43,8 @@ export const Analytics = {
   SHARE_CARD_CREATED: 'share_card_created',
   PINTEREST_PIN_GENERATED: 'pinterest_pin_generated',
   REFERRAL_INVITE_SENT: 'referral_invite_sent',
+  REVIEW_PROMPT_VIEWED: 'review_prompt_viewed',
+  REVIEW_PROMPT_CLICKED: 'review_prompt_clicked',
 } as const
 
 export type AnalyticsEvent = (typeof Analytics)[keyof typeof Analytics]

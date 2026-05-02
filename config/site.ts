@@ -1,8 +1,9 @@
 export const site = {
   name: 'MealEase',
-  tagline: "Never ask 'What's for dinner?' again.",
+  tagline: 'The family-first AI meal prep planner.',
   url: 'https://mealease.ai',
   nav: [
+    { label: 'Compare', href: '/compare' },
     { label: 'Free tools', href: '/tools' },
     { label: 'Blog', href: '/blog' },
     { label: 'How it works', href: '/#how-it-works' },

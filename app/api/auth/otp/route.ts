@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { apiRateLimited } from '@/lib/api-response'
 import { rateLimit, rateLimitKeyFromRequest } from '@/lib/rate-limit'
 import { authRedirectUrl, safeRelativePath } from '@/lib/auth/redirect'
+import { hashForLog, logSecurityEvent, requestIp } from '@/lib/security'
 
 type OtpBody = {
   email?: string
@@ -30,19 +31,37 @@ export async function POST(req: NextRequest) {
     limit: 5,
     windowMs: 60_000,
   })
-  if (!ipLimit.success) return apiRateLimited(ipLimit.reset)
+  if (!ipLimit.success) {
+    logSecurityEvent('auth_otp_ip_rate_limited', {
+      ip: requestIp(req.headers),
+      mode,
+    })
+    return apiRateLimited(ipLimit.reset)
+  }
 
   if (email) {
+    const emailHash = await hashForLog(email)
     const perEmailLimit = await rateLimit({
       key: `auth-otp-email:${await emailKey(email)}`,
       limit: 3,
       windowMs: 15 * 60_000,
     })
-    if (!perEmailLimit.success) return apiRateLimited(perEmailLimit.reset)
+    if (!perEmailLimit.success) {
+      logSecurityEvent('auth_otp_email_rate_limited', {
+        emailHash,
+        mode,
+        ip: requestIp(req.headers),
+      })
+      return apiRateLimited(perEmailLimit.reset)
+    }
   }
 
   // Keep response generic to avoid account enumeration.
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    logSecurityEvent('auth_otp_invalid_email', {
+      ip: requestIp(req.headers),
+      mode,
+    }, 'info')
     return NextResponse.json({ ok: true })
   }
 
@@ -58,7 +77,18 @@ export async function POST(req: NextRequest) {
   })
 
   if (error) {
-    console.error('[auth/otp] signInWithOtp failed:', error.message)
+    logSecurityEvent('auth_otp_provider_error', {
+      emailHash: await hashForLog(email),
+      mode,
+      error: error.message,
+      ip: requestIp(req.headers),
+    }, 'error')
+  } else {
+    logSecurityEvent('auth_otp_requested', {
+      emailHash: await hashForLog(email),
+      mode,
+      ip: requestIp(req.headers),
+    }, 'info')
   }
 
   return NextResponse.json({ ok: true })

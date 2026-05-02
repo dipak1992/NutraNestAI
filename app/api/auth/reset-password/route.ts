@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { apiRateLimited } from '@/lib/api-response'
 import { rateLimit, rateLimitKeyFromRequest } from '@/lib/rate-limit'
 import { authRedirectUrl } from '@/lib/auth/redirect'
+import { hashForLog, logSecurityEvent, requestIp } from '@/lib/security'
 
 type ResetBody = {
   email?: string
@@ -27,19 +28,34 @@ export async function POST(req: NextRequest) {
     limit: 5,
     windowMs: 60_000,
   })
-  if (!ipLimit.success) return apiRateLimited(ipLimit.reset)
+  if (!ipLimit.success) {
+    logSecurityEvent('auth_reset_ip_rate_limited', {
+      ip: requestIp(req.headers),
+    })
+    return apiRateLimited(ipLimit.reset)
+  }
 
   if (email) {
+    const emailHash = await hashForLog(email)
     const perEmailLimit = await rateLimit({
       key: `auth-reset-email:${await emailKey(email)}`,
       limit: 3,
       windowMs: 60 * 60_000,
     })
-    if (!perEmailLimit.success) return apiRateLimited(perEmailLimit.reset)
+    if (!perEmailLimit.success) {
+      logSecurityEvent('auth_reset_email_rate_limited', {
+        emailHash,
+        ip: requestIp(req.headers),
+      })
+      return apiRateLimited(perEmailLimit.reset)
+    }
   }
 
   // Keep response generic to avoid account enumeration.
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    logSecurityEvent('auth_reset_invalid_email', {
+      ip: requestIp(req.headers),
+    }, 'info')
     return NextResponse.json({ ok: true })
   }
 
@@ -50,7 +66,16 @@ export async function POST(req: NextRequest) {
   })
 
   if (error) {
-    console.error('[auth/reset-password] resetPasswordForEmail failed:', error.message)
+    logSecurityEvent('auth_reset_provider_error', {
+      emailHash: await hashForLog(email),
+      error: error.message,
+      ip: requestIp(req.headers),
+    }, 'error')
+  } else {
+    logSecurityEvent('auth_reset_requested', {
+      emailHash: await hashForLog(email),
+      ip: requestIp(req.headers),
+    }, 'info')
   }
 
   return NextResponse.json({ ok: true })

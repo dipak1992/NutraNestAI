@@ -8,11 +8,15 @@ export function apiSuccess<T>(data: T, status = 200) {
 
 /** Standard error envelope — never exposes internal details */
 export function apiError(message: string, status = 500) {
+  if (status >= 500) {
+    logger.error('api.error_response', { status, message })
+  }
   return NextResponse.json({ success: false, error: message }, { status })
 }
 
 /** Rate-limit exceeded response */
 export function apiRateLimited(reset?: number) {
+  logger.warn('api.rate_limited', { reset })
   const headers: Record<string, string> = { 'Retry-After': '60' }
   if (reset) headers['X-RateLimit-Reset'] = String(Math.ceil(reset / 1000))
   return NextResponse.json(

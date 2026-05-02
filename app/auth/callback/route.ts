@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { sendWelcomeEmail, alertAdminNewUser } from '@/lib/email/triggers'
+import { logSecurityEvent, requestIp } from '@/lib/security'
 
 /**
  * Supabase PKCE auth callback handler.
@@ -26,11 +27,18 @@ export async function GET(request: NextRequest) {
 
   // Surface provider-level errors (e.g. user denied OAuth consent)
   if (errorParam) {
+    logSecurityEvent('auth_callback_provider_error', {
+      error: errorParam,
+      ip: requestIp(request.headers),
+    }, 'info')
     const msg = encodeURIComponent(errorDescription ?? errorParam)
     return NextResponse.redirect(`${origin}/login?error=${msg}`)
   }
 
   if (!code) {
+    logSecurityEvent('auth_callback_missing_code', {
+      ip: requestIp(request.headers),
+    })
     return NextResponse.redirect(`${origin}/login?error=missing_code`)
   }
 
@@ -39,6 +47,12 @@ export async function GET(request: NextRequest) {
     rawNext.startsWith('/') && !rawNext.startsWith('//') && !rawNext.includes('\\')
       ? rawNext
       : '/dashboard'
+  if (next !== rawNext) {
+    logSecurityEvent('auth_callback_unsafe_next', {
+      rawNext,
+      ip: requestIp(request.headers),
+    })
+  }
 
   const cookieStore = await cookies()
 
@@ -62,6 +76,10 @@ export async function GET(request: NextRequest) {
   const { error } = await supabase.auth.exchangeCodeForSession(code)
 
   if (error) {
+    logSecurityEvent('auth_callback_exchange_failed', {
+      error: error.message,
+      ip: requestIp(request.headers),
+    })
     const msg = encodeURIComponent(error.message)
     return NextResponse.redirect(`${origin}/login?error=${msg}`)
   }
@@ -75,6 +93,11 @@ export async function GET(request: NextRequest) {
       void alertAdminNewUser({ userEmail: user.email, userId: user.id })
     }
   }
+
+  logSecurityEvent('auth_callback_success', {
+    next,
+    ip: requestIp(request.headers),
+  }, 'info')
 
   return NextResponse.redirect(`${origin}${next}`)
 }

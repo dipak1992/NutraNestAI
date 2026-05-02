@@ -66,9 +66,6 @@ export default function WeeklyAutopilotPage() {
           secondaryHref="/upgrade?feature=planner"
           secondaryLabel="Upgrade to Plus"
           note={<>Free includes a 3-day Planner preview. Plus unlocks full Weekly Autopilot. <Link href="/pricing" className="text-[#FFD2BD] underline underline-offset-4">Compare plans →</Link></>}
-          image="/features/weekly-autopilot-hero.jpg"
-          mobileImage="/features/weekly-autopilot-hero-mobile.jpg"
-          imageAlt="Weekly meal plan and grocery workflow prepared for the week"
           mockup="weekly"
         />
 

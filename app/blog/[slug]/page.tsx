@@ -8,6 +8,7 @@ import { BlogCard } from '@/components/blog/BlogCard'
 import { BlogCTA } from '@/components/blog/BlogCTA'
 import { ShareButtons } from '@/components/blog/ShareButtons'
 import { NewsletterBlock } from '@/components/blog/NewsletterBlock'
+import { BlogTrustBlocks } from '@/components/blog/BlogTrustBlocks'
 import { blogMDXComponents } from '@/lib/blog/mdx-components'
 import { getAllPostSlugs, getPostBySlug, getRelatedPosts } from '@/lib/blog/mdx'
 import { CATEGORY_LABELS } from '@/lib/blog/types'
@@ -189,6 +190,8 @@ export default async function BlogPostPage({
             <BlogCTA variant="post" category={post.category} />
 
             <hr className="my-12 border-0 h-px bg-neutral-200 dark:bg-neutral-800" />
+
+            <BlogTrustBlocks post={post} />
 
             <div className="flex items-center justify-between gap-4 flex-wrap">
               <div className="text-sm text-neutral-500">

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { validateScanImage } from '@/lib/scan/upload-validation'
 import type { ClassifyResponse } from '@/lib/scan/types'
 
 export async function POST(req: NextRequest) {
@@ -15,9 +16,8 @@ export async function POST(req: NextRequest) {
     const image = formData.get('image') as File | null
     const mode = (formData.get('mode') as string) ?? 'auto'
 
-    if (!image) {
-      return NextResponse.json({ error: 'No image provided' }, { status: 400 })
-    }
+    const imageError = validateScanImage(image)
+    if (imageError) return imageError
 
     // TODO: Replace with real AI classification (e.g., OpenAI Vision)
     // For now, return a mock classification based on mode hint

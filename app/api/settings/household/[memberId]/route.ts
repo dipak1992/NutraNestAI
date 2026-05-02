@@ -39,10 +39,28 @@ export async function PATCH(req: Request, { params }: Params) {
 
     const body = await req.json() as Record<string, unknown>
 
+    const allowed = [
+      'first_name',
+      'member_name',
+      'role',
+      'age_years',
+      'age_range',
+      'dietary_type',
+      'allergies_json',
+      'notes',
+    ]
+    const patch: Record<string, unknown> = { updated_at: new Date().toISOString() }
+    for (const key of allowed) {
+      if (key in body) patch[key] = body[key]
+    }
+    if ('first_name' in patch && typeof patch.first_name === 'string') {
+      patch.member_name = patch.first_name
+    }
+
     // Update only if this user is the household owner
     const { error } = await supabase
       .from('household_members')
-      .update({ ...body, updated_at: new Date().toISOString() })
+      .update(patch)
       .eq('id', memberId)
       .eq('household_owner_id', user.id)
 

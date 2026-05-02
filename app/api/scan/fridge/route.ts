@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { checkAndIncrementScanUsage } from '@/lib/scan/gating'
+import { validateScanImage } from '@/lib/scan/upload-validation'
 import type { FridgeResult } from '@/lib/scan/types'
 
 export async function POST(req: NextRequest) {
@@ -32,9 +33,8 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData()
     const image = formData.get('image') as File | null
 
-    if (!image) {
-      return NextResponse.json({ error: 'No image provided' }, { status: 400 })
-    }
+    const imageError = validateScanImage(image)
+    if (imageError) return imageError
 
     // TODO: Replace with real AI analysis (OpenAI Vision / Anthropic Claude)
     const result: FridgeResult = {

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createSupabaseServiceClient } from '@/lib/supabase/service'
 
 // ─── PATCH /api/settings ──────────────────────────────────────────────────────
 
@@ -48,13 +49,18 @@ export async function DELETE() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    // Delete user data (cascades via RLS/FK in Supabase)
-    const { error } = await supabase.auth.admin.deleteUser(user.id)
-    if (error) throw error
+    const admin = createSupabaseServiceClient()
+    const { error } = await admin.auth.admin.deleteUser(user.id)
+    if (error) {
+      console.error('[settings DELETE] account deletion failed:', error.message)
+      return NextResponse.json({ error: 'Account deletion failed' }, { status: 500 })
+    }
+
+    await supabase.auth.signOut()
 
     return NextResponse.json({ ok: true })
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Unknown error'
-    return NextResponse.json({ error: message }, { status: 500 })
+    console.error('[settings DELETE] unexpected error:', err)
+    return NextResponse.json({ error: 'Account deletion failed' }, { status: 500 })
   }
 }

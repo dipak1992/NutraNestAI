@@ -41,7 +41,6 @@ export async function POST(req: NextRequest) {
 
     // Increment daily usage counter
     await supabase.rpc('increment_feature_usage', {
-      p_user_id: user.id,
       p_feature_key: 'ai_plan_generation',
     }).then(() => {}, () => {})
 

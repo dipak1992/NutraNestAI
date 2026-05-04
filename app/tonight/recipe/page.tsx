@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { SaveMealButton } from '@/components/content/SaveMealButton'
 import { CookMode } from '@/components/recipes/CookMode'
+import { AllergenSafetyFooter } from '@/components/recipes/AllergenSafetyFooter'
 import { useWeeklyPlanStore } from '@/lib/planner/store'
 import { mealToRecipe, type MealPillar } from '@/lib/recipes/canonical'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
@@ -283,6 +284,11 @@ export default function TonightRecipePage() {
             </div>
           </section>
         )}
+
+        {/* Allergen Safety Footer */}
+        <AllergenSafetyFooter
+          variations={meal.variations}
+        />
       </div>
       <PaywallDialog
         open={paywallOpen}

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Badge } from '@/components/ui/badge'
 import { Clock, Users, ChefHat, ShieldCheck, ChevronLeft } from 'lucide-react'
+import { AllergenSafetyFooter } from '@/components/recipes/AllergenSafetyFooter'
 import type { SmartMealResult, SmartVariation } from '@/lib/engine/types'
 
 export const metadata = { title: 'Meal Detail' }
@@ -126,7 +127,7 @@ export default async function MealDetailPage({ params }: { params: Promise<{ id:
       )}
 
       {meal.variations && meal.variations.length > 0 && (
-        <section>
+        <section className="mb-8">
           <h2 className="text-xl font-semibold mb-4">Family Variations</h2>
           <p className="text-sm text-muted-foreground mb-4">Each family member gets their own safe, tailored version of this meal.</p>
           <div className="space-y-4">
@@ -134,6 +135,11 @@ export default async function MealDetailPage({ params }: { params: Promise<{ id:
           </div>
         </section>
       )}
+
+      {/* Allergen Safety Footer */}
+      <AllergenSafetyFooter
+        variations={meal.variations}
+      />
     </div>
   )
 }

@@ -41,7 +41,7 @@ export const faqs = [
   },
   {
     q: 'How accurate is the fridge scanner?',
-    a: "It recognizes the 500+ most common ingredients with around 94% accuracy. You can always tap to correct — and it learns from your corrections.",
+    a: 'It uses production vision AI to identify visible ingredients from fridge, pantry, and counter photos. Because lighting, packaging, and occlusion can affect results, you can always tap to correct the ingredient list before recipes are generated.',
   },
   {
     q: 'Do you work with grocery delivery?',

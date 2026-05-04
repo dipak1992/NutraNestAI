@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { checkAndIncrementScanUsage } from '@/lib/scan/gating'
 import { validateScanImageStrict } from '@/lib/scan/upload-validation'
-import type { FridgeResult } from '@/lib/scan/types'
+import { analyzeFridgeImage } from '@/lib/scan/openai-vision'
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
@@ -36,47 +36,7 @@ export async function POST(req: NextRequest) {
     const imageError = await validateScanImageStrict(image)
     if (imageError) return imageError
 
-    // TODO: Replace with real AI analysis (OpenAI Vision / Anthropic Claude)
-    const result: FridgeResult = {
-      ingredients: [
-        { id: '1', name: 'Eggs', quantity: '6', unit: '', emoji: '🥚' },
-        { id: '2', name: 'Milk', quantity: '1', unit: 'L', emoji: '🥛' },
-        { id: '3', name: 'Cheddar cheese', quantity: '200', unit: 'g', emoji: '🧀' },
-        { id: '4', name: 'Bell pepper', quantity: '2', unit: '', emoji: '🫑' },
-        { id: '5', name: 'Spinach', quantity: '1', unit: 'bag', emoji: '🥬' },
-        { id: '6', name: 'Butter', quantity: '100', unit: 'g', emoji: '🧈' },
-      ],
-      recipes: [
-        {
-          id: 'r1',
-          title: 'Cheesy Spinach Omelette',
-          cookTime: 15,
-          servings: 2,
-          estimatedCost: 4.50,
-          matchedIngredients: ['Eggs', 'Cheddar cheese', 'Spinach', 'Butter'],
-          missingIngredients: [],
-        },
-        {
-          id: 'r2',
-          title: 'Veggie Frittata',
-          cookTime: 25,
-          servings: 4,
-          estimatedCost: 6.00,
-          matchedIngredients: ['Eggs', 'Bell pepper', 'Spinach', 'Cheddar cheese'],
-          missingIngredients: ['Onion'],
-        },
-        {
-          id: 'r3',
-          title: 'Scrambled Eggs with Peppers',
-          cookTime: 10,
-          servings: 2,
-          estimatedCost: 3.00,
-          matchedIngredients: ['Eggs', 'Bell pepper', 'Butter'],
-          missingIngredients: [],
-        },
-      ],
-      savedToPantry: false,
-    }
+    const result = await analyzeFridgeImage(image!)
 
     return NextResponse.json(result)
   } catch (err) {

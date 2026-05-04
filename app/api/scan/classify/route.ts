@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { validateScanImageStrict } from '@/lib/scan/upload-validation'
-import type { ClassifyResponse } from '@/lib/scan/types'
+import { classifyScanImage } from '@/lib/scan/openai-vision'
 
 export async function POST(req: NextRequest) {
   // Auth check
@@ -20,20 +20,7 @@ export async function POST(req: NextRequest) {
     const imageError = await validateScanImageStrict(image)
     if (imageError) return imageError
 
-    // TODO: Replace with real AI classification (e.g., OpenAI Vision)
-    // For now, return a mock classification based on mode hint
-    let result: ClassifyResponse
-
-    if (mode === 'fridge') {
-      result = { type: 'fridge', confidence: 0.95 }
-    } else if (mode === 'menu') {
-      result = { type: 'menu', confidence: 0.95 }
-    } else if (mode === 'food') {
-      result = { type: 'food', confidence: 0.95 }
-    } else {
-      // Auto mode — mock a fridge detection with high confidence
-      result = { type: 'fridge', confidence: 0.88 }
-    }
+    const result = await classifyScanImage(image!, mode)
 
     return NextResponse.json(result)
   } catch (err) {

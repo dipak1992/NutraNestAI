@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { checkAndIncrementScanUsage } from '@/lib/scan/gating'
 import { validateScanImageStrict } from '@/lib/scan/upload-validation'
-import type { MenuResult } from '@/lib/scan/types'
+import { analyzeMenuImage } from '@/lib/scan/openai-vision'
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
@@ -36,42 +36,7 @@ export async function POST(req: NextRequest) {
     const imageError = await validateScanImageStrict(image)
     if (imageError) return imageError
 
-    // TODO: Replace with real AI analysis (OpenAI Vision / Anthropic Claude)
-    const result: MenuResult = {
-      restaurantName: 'Restaurant',
-      picks: [
-        {
-          id: 'p1',
-          name: 'Grilled Salmon',
-          description: 'Fresh Atlantic salmon with seasonal vegetables and lemon butter',
-          price: 24.99,
-          healthScore: 88,
-          calories: 420,
-          tags: ['High protein', 'Omega-3', 'Gluten-free'],
-          rank: 1,
-        },
-        {
-          id: 'p2',
-          name: 'Mediterranean Salad',
-          description: 'Mixed greens, feta, olives, cucumber, tomato with olive oil dressing',
-          price: 14.99,
-          healthScore: 82,
-          calories: 280,
-          tags: ['Low calorie', 'Vegetarian', 'High fiber'],
-          rank: 2,
-        },
-        {
-          id: 'p3',
-          name: 'Grilled Chicken Bowl',
-          description: 'Herb-marinated chicken breast with quinoa and roasted vegetables',
-          price: 18.99,
-          healthScore: 79,
-          calories: 520,
-          tags: ['High protein', 'Whole grain'],
-          rank: 3,
-        },
-      ],
-    }
+    const result = await analyzeMenuImage(image!)
 
     return NextResponse.json(result)
   } catch (err) {

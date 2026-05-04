@@ -27,7 +27,7 @@ const steps = [
   {
     n: '02',
     title: 'We identify everything',
-    body: 'Our AI recognizes 500+ common ingredients with ~94% accuracy. Review the list and tap to correct anything in seconds.',
+    body: 'OpenAI-powered vision identifies visible ingredients from the photo. Review the list and tap to correct anything in seconds.',
   },
   {
     n: '03',
@@ -37,7 +37,7 @@ const steps = [
 ]
 
 const benefits = [
-  { icon: '📸', title: '94% accuracy', body: 'Recognizes 500+ ingredients from a single photo. No manual entry.' },
+  { icon: '📸', title: 'AI vision scanner', body: 'Uses production vision AI to recognize visible fridge, pantry, and counter ingredients.' },
   { icon: '🛒', title: 'Skip the grocery run', body: 'Cook what you already have. Reduce waste and save money.' },
   { icon: '🍳', title: '3 recipes instantly', body: 'Three different meal options surfaced from your exact ingredients.' },
   { icon: '✏️', title: 'Easy corrections', body: 'Tap any ingredient to edit. The AI learns from your corrections.' },

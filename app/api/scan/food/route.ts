@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { validateScanImageStrict } from '@/lib/scan/upload-validation'
-import type { FoodResult } from '@/lib/scan/types'
+import { analyzeFoodImage } from '@/lib/scan/openai-vision'
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
@@ -19,27 +19,7 @@ export async function POST(req: NextRequest) {
     const imageError = await validateScanImageStrict(image)
     if (imageError) return imageError
 
-    // TODO: Replace with real AI analysis (OpenAI Vision / Anthropic Claude)
-    const result: FoodResult = {
-      name: 'Chicken Caesar Salad',
-      calories: 480,
-      protein: 38,
-      carbs: 22,
-      fat: 28,
-      fiber: 4,
-      sugar: 3,
-      sodium: 820,
-      servingSize: '1 large bowl (~400g)',
-      warnings: [
-        'High in sodium (820mg — 36% of daily value)',
-        'Caesar dressing adds significant saturated fat',
-      ],
-      positives: [
-        'Excellent source of protein (38g)',
-        'Good source of vitamin K from romaine',
-        'Moderate calorie count for a filling meal',
-      ],
-    }
+    const result = await analyzeFoodImage(image!)
 
     return NextResponse.json(result)
   } catch (err) {

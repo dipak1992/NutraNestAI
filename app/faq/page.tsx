@@ -50,7 +50,7 @@ const faqCategories = [
     items: [
       {
         q: 'How does Snap & Cook work?',
-        a: "Open the MealEase scanner, point your camera at your open fridge or pantry, and take a photo. Our AI identifies 500+ common ingredients with ~94% accuracy. You can tap to correct anything, then we surface 3 recipes you can make right now with what you have — no grocery run needed.",
+        a: "Open the MealEase scanner, point your camera at your open fridge or pantry, and take a photo. OpenAI-powered vision identifies visible ingredients, you can tap to correct anything, then we surface 3 recipes you can make right now with what you have — no grocery run needed.",
       },
       {
         q: 'What is Weekly Autopilot?',

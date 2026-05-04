@@ -30,6 +30,7 @@ import { useLearningStore } from '@/lib/learning/store'
 import { hasAccess, TIER_FEATURES, getFeatures } from '@/lib/pillars/config'
 import { cn } from '@/lib/utils'
 import type { FamilyMemberRecord } from '@/lib/family/types'
+import { InviteCoChef } from '@/components/household/InviteCoChef'
 
 // ── Section card component ────────────────────────────────────────────────────
 
@@ -374,6 +375,16 @@ export default function HouseholdPillarPage() {
               Profiles store preferences, allergies, and food goals — not separate logins.
             </p>
           </SectionCard>
+
+          {/* Invite Co-Chef CTA */}
+          {status.isAuthenticated && (
+            <InviteCoChef
+              compact
+              householdName={householdName || undefined}
+              memberCount={members.length}
+              maxMembers={6}
+            />
+          )}
 
           {/* 3. Household Memory */}
           <SectionCard

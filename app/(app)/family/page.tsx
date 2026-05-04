@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import posthog from 'posthog-js'
-import { Plus, Users, Crown, ChevronUp, ChevronDown, Trash2, Copy, Sparkles, Lock, ArrowRight } from 'lucide-react'
+import { Plus, Users, Crown, ChevronUp, ChevronDown, Trash2, Copy, Sparkles, Lock, ArrowRight, Send } from 'lucide-react'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import { PaywallDialog } from '@/components/paywall/PaywallDialog'
 import type { FamilyMemberRecord } from '@/lib/family/types'
 import { Analytics } from '@/lib/analytics'
+import { InviteCoChef } from '@/components/household/InviteCoChef'
 
 type MemberDraft = Partial<FamilyMemberRecord>
 type TierName = 'free' | 'pro' | 'family'
@@ -381,6 +382,16 @@ export default function FamilySettingsPage() {
           </div>
         ))}
       </div>
+
+      {/* ── Invite Co-Chef ── */}
+      {isPro && !editorOpen && (
+        <InviteCoChef
+          compact
+          householdName={householdName}
+          memberCount={members.length}
+          maxMembers={maxMembers}
+        />
+      )}
 
       {/* ── Editor form ── */}
       {editorOpen ? (

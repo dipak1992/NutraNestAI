@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Camera, ReceiptText, Refrigerator, Sparkles, ArrowRight } from 'lucide-react'
+import { Camera, ReceiptText, Refrigerator, Sparkles, ArrowRight, Users } from 'lucide-react'
 import { useDashboardStore } from '@/stores/dashboardStore'
 import { useBudgetStore } from '@/stores/budgetStore'
 import { useScanStore } from '@/stores/scanStore'
@@ -270,6 +270,23 @@ export function NewDashboardClient({ initial }: { initial: DashboardPayload }) {
         <WeekPlanStrip />
 
         <RetentionEngineCard retention={displayRetention} />
+
+        {/* Invite Co-Chef nudge — viral loop trigger */}
+        <Link
+          href="/dashboard/household"
+          className="group flex items-center gap-4 rounded-2xl border border-violet-200/60 bg-gradient-to-r from-violet-50/80 to-purple-50/60 p-4 transition-all hover:border-violet-300 hover:shadow-sm dark:border-violet-800/40 dark:from-violet-950/20 dark:to-purple-950/20"
+        >
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-violet-100 dark:bg-violet-900/40">
+            <Users className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-foreground">Invite a Co-Chef</p>
+            <p className="text-xs text-muted-foreground mt-0.5 truncate">
+              Plan meals together · Share grocery lists · Both get Plus perks
+            </p>
+          </div>
+          <ArrowRight className="h-4 w-4 text-violet-500 shrink-0 transition-transform group-hover:translate-x-0.5" />
+        </Link>
 
         <ReviewPromptCard user={displayUser} retention={displayRetention} />
 

@@ -37,6 +37,11 @@ export const site = {
       href: '/features/budget-intelligence',
       description: 'Stay under budget before you shop',
     },
+    {
+      label: '✨ Try the Scanner — Free',
+      href: '/demo/scan',
+      description: 'See AI meal ideas from a fridge photo — no signup',
+    },
   ],
   brand: {
     primary: '#D97757',

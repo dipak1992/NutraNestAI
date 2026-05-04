@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Clock, Users, ChevronRight, Recycle, Sparkles, Leaf, DollarSign, Heart, RefreshCw } from 'lucide-react'
+import { Clock, Users, ChevronRight, Recycle, Sparkles, Leaf, DollarSign, Heart, RefreshCw, ShieldCheck } from 'lucide-react'
 import { CardShell } from './shared/CardShell'
 import { useDashboardStore } from '@/stores/dashboardStore'
 import { cn } from '@/lib/utils'
@@ -99,6 +99,7 @@ function toSmartMeal(recipe: Recipe, reason: string, isFromPantry: boolean): Sma
       localityApplied: false,
       selectionReason: reason,
     },
+    chefVerified: recipe.chefVerified,
   }
 }
 
@@ -242,6 +243,12 @@ export function TonightCard({ state }: Props) {
             {state.isFromPantry && !usesLeftover && (
               <span className="inline-flex items-center gap-1 rounded-full bg-sky-900/60 text-sky-300 text-xs font-semibold px-3 py-1.5 border border-sky-700/50 backdrop-blur-sm">
                 From your fridge
+              </span>
+            )}
+            {recipe.chefVerified && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-teal-900/60 text-teal-300 text-xs font-semibold px-3 py-1.5 border border-teal-700/50 backdrop-blur-sm" title="Reviewed and verified by a professional chef">
+                <ShieldCheck className="w-3 h-3" />
+                Chef-Verified
               </span>
             )}
           </div>

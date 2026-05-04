@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Clock, ChefHat, RefreshCw, ShoppingCart, Flame, ChevronDown, ChevronUp, Leaf, ExternalLink } from 'lucide-react'
+import { Clock, ChefHat, RefreshCw, ShoppingCart, Flame, ChevronDown, ChevronUp, Leaf, ExternalLink, ShieldCheck } from 'lucide-react'
 import type { SmartMealResult } from '@/lib/engine/types'
 import { SaveMealButton } from '@/components/content/SaveMealButton'
 import { ShareMealButton } from '@/components/content/ShareMealButton'
@@ -104,6 +104,12 @@ export function MealCard({ meal, pantryMatch, swapping, onCook, onSwap, onOrder,
         <p className="text-sm text-foreground/70 mt-1 line-clamp-2">{meal.tagline ?? meal.description ?? ''}</p>
 
         <div className="mt-3 flex flex-wrap items-center gap-2">
+          {meal.chefVerified && (
+            <span className="inline-flex items-center gap-1 text-xs font-semibold bg-teal-50 text-teal-700 border border-teal-200 rounded-full px-2.5 py-0.5" title="Reviewed and verified by a professional chef">
+              <ShieldCheck className="h-3 w-3" />
+              Chef-Verified
+            </span>
+          )}
           <span className="inline-flex items-center gap-1 text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full px-2.5 py-0.5">
             <Clock className="h-3 w-3" />
             {formatTime(meal.totalTime ?? 0)}

@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { getLandingTonightMeal } from '@/lib/tonight/engine'
-import { Clock, Sparkles } from 'lucide-react'
+import { Clock, Sparkles, ShieldCheck } from 'lucide-react'
 
 /**
  * Landing page Tonight preview — shows inside the Hero phone mockup.
@@ -43,11 +43,15 @@ export function LandingTonightPreview() {
         {/* Gradient overlay for text legibility */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
-        {/* Tonight badge */}
-        <div className="absolute top-2.5 left-2.5">
+        {/* Tonight badge + Chef-Verified */}
+        <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
           <span className="inline-flex items-center gap-1 rounded-full bg-[#D97757] px-2.5 py-1 text-[10px] font-bold text-white shadow-md">
             <Sparkles className="h-2.5 w-2.5" aria-hidden />
             Tonight&rsquo;s Pick
+          </span>
+          <span className="inline-flex items-center gap-0.5 rounded-full bg-teal-600/90 px-2 py-1 text-[9px] font-bold text-white shadow-md backdrop-blur-sm">
+            <ShieldCheck className="h-2.5 w-2.5" aria-hidden />
+            Chef-Verified
           </span>
         </div>
 

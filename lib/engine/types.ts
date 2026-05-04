@@ -121,6 +121,8 @@ export interface SmartMealResult {
   leftoverTip: string | null
   shoppingList: SmartShoppingItem[]
   meta: EngineMeta
+  /** Whether this meal has been reviewed by a professional chef */
+  chefVerified?: boolean
 }
 
 // ── Internal / Meal Database ────────────────────────────────

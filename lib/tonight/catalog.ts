@@ -52,6 +52,8 @@ export type CuratedMeal = {
   image: string | null
   /** Ingredients that trigger pantry matching */
   keyIngredients: string[]
+  /** Whether this meal has been reviewed by a professional chef */
+  chefVerified?: boolean
 }
 
 // ─── WEEKDAY THEME MAP ──────────────────────────────────────────────────────────

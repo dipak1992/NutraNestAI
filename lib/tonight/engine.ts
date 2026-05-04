@@ -85,6 +85,7 @@ function toTonightState(meal: CuratedMeal, reason: string, extras?: Partial<Toni
     costTotal: Math.round(meal.costPerServing * meal.servings * 100) / 100,
     costPerServing: meal.costPerServing,
     tags: meal.tags,
+    chefVerified: meal.chefVerified ?? true, // All curated catalog meals are chef-verified
   }
 
   return {

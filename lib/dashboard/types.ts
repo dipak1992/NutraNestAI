@@ -18,6 +18,8 @@ export type Recipe = {
   costTotal: number
   costPerServing: number
   tags?: string[]
+  /** Whether this recipe has been reviewed by a professional chef */
+  chefVerified?: boolean
 }
 
 export type TonightState = {

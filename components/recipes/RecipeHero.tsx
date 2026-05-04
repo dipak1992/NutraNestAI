@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { Clock, Users, DollarSign, ChefHat } from 'lucide-react'
+import { Clock, Users, DollarSign, ChefHat, ShieldCheck } from 'lucide-react'
 import type { LoadedRecipe } from '@/app/recipes/[id]/loader'
 
 type Props = {
@@ -39,8 +39,14 @@ export function RecipeHero({ recipe }: Props) {
       {/* Content overlay */}
       <div className="absolute bottom-0 left-0 right-0 p-5">
         {/* Tags */}
-        {recipe.tags.length > 0 && (
+        {(recipe.tags.length > 0 || recipe.verifiedStatus !== 'unverified') && (
           <div className="mb-2 flex flex-wrap gap-1.5">
+            {recipe.verifiedStatus !== 'unverified' && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/90 px-2.5 py-0.5 text-xs font-semibold text-white backdrop-blur-sm">
+                <ShieldCheck className="h-3 w-3" />
+                {recipe.verifiedStatus === 'chef_verified' ? 'Chef-Verified' : 'Safety Reviewed'}
+              </span>
+            )}
             {recipe.tags.slice(0, 4).map((tag) => (
               <span
                 key={tag}

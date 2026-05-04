@@ -28,9 +28,10 @@ export function ScanModal() {
   const errorKind = useScanStore((s) => s.errorKind)
   const errorMessage = useScanStore((s) => s.errorMessage)
   const openedAt = useScanStore((s) => s.openedAt)
+  const isDemo = useScanStore((s) => s.isDemo)
 
   // Get actions via getState() to avoid subscribing to the entire store (React #185)
-  const { close, setMode, capture, retake, confirmType, setError, reset } = useScanStore.getState()
+  const { close, setMode, capture, retake, confirmType, setError } = useScanStore.getState()
 
   const overlayRef = useRef<HTMLDivElement>(null)
 
@@ -219,6 +220,7 @@ export function ScanModal() {
                     {resolvedType === 'fridge' && fridgeResult && (
                       <FridgeResults
                         result={fridgeResult}
+                        isDemo={isDemo}
                         onClose={handleClose}
                         onRetake={() => { trackScan('scan_retake'); retake() }}
                       />

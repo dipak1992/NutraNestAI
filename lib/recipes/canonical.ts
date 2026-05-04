@@ -1,5 +1,8 @@
 import type { LoadedRecipe } from '@/app/recipes/[id]/loader'
 import type { SmartMealResult } from '@/lib/engine/types'
+import { detectAllergens, buildSafetyNotes } from '@/lib/safety/allergen-detector'
+import { findRelevantCulinaryRules } from '@/lib/safety/culinary-rules'
+import { enrichStepsWithTimers } from '@/lib/recipes/timer-extractor'
 
 export type MealPillar =
   | 'tonight'
@@ -30,6 +33,18 @@ function difficultyForRecipe(value: SmartMealResult['difficulty']): LoadedRecipe
 }
 
 export function mealToRecipe(meal: SmartMealResult, source: MealPillar = 'tonight'): LoadedRecipe {
+  const ingredients = (meal.ingredients ?? []).map((ingredient) => ({
+    name: ingredient.name,
+    quantity: Number.parseFloat(String(ingredient.quantity)) || 1,
+    unit: ingredient.unit || 'unit',
+  }))
+  const steps = enrichStepsWithTimers((meal.steps ?? []).map((instruction, index) => ({
+    order: index + 1,
+    instruction,
+  })))
+  const ingredientNames = ingredients.map((ingredient) => ingredient.name)
+  const instructionTexts = steps.map((step) => step.instruction)
+
   return {
     id: meal.id,
     name: meal.title,
@@ -42,16 +57,19 @@ export function mealToRecipe(meal: SmartMealResult, source: MealPillar = 'tonigh
     costTotal: meal.estimatedCost || 0,
     costPerServing: meal.servings ? (meal.estimatedCost || 0) / meal.servings : 0,
     tags: [PILLAR_LABELS[source], ...(meal.tags ?? [])],
-    ingredients: (meal.ingredients ?? []).map((ingredient) => ({
-      name: ingredient.name,
-      quantity: Number.parseFloat(String(ingredient.quantity)) || 1,
-      unit: ingredient.unit || 'unit',
-    })),
-    steps: (meal.steps ?? []).map((instruction, index) => ({
-      order: index + 1,
-      instruction,
-    })),
+    ingredients,
+    steps,
     nutrition: undefined,
+    verifiedStatus: 'safety_reviewed',
+    verifiedBy: 'MealEase safety rules',
+    verifiedAt: null,
+    allergenWarnings: detectAllergens(ingredientNames),
+    safetyNotes: buildSafetyNotes({ ingredients: ingredientNames, instructions: instructionTexts }),
+    culinaryRules: findRelevantCulinaryRules({
+      ingredients: ingredientNames,
+      instructions: instructionTexts,
+      tags: meal.tags ?? [],
+    }),
   }
 }
 

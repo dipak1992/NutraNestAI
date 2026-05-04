@@ -44,11 +44,13 @@ interface ScanState {
 
   // Timing (for analytics)
   openedAt: number | null
+  isDemo: boolean
 }
 
 // ─── Actions Shape ────────────────────────────────────────────────────────
 interface ScanActions {
   open: (initialMode?: ScanMode) => void
+  openDemo: () => void
   close: () => void
   setMode: (mode: ScanMode) => void
   startCamera: () => void
@@ -82,6 +84,7 @@ const INITIAL_STATE: ScanState = {
   errorKind: null,
   errorMessage: null,
   openedAt: null,
+  isDemo: false,
 }
 
 // ─── Store ────────────────────────────────────────────────────────────────
@@ -95,6 +98,18 @@ export const useScanStore = create<ScanState & ScanActions>((set, get) => ({
       step: 'camera',
       mode: initialMode,
       openedAt: Date.now(),
+      isDemo: false,
+    })
+  },
+
+  openDemo: () => {
+    set({
+      ...INITIAL_STATE,
+      isOpen: true,
+      step: 'camera',
+      mode: 'fridge',
+      openedAt: Date.now(),
+      isDemo: true,
     })
   },
 
@@ -150,10 +165,16 @@ export const useScanStore = create<ScanState & ScanActions>((set, get) => ({
 
   // ── Internal: classify image ──────────────────────────────────────────
   _classify: async () => {
-    const { imageBlob, mode } = get()
+    const { imageBlob, mode, isDemo } = get()
     if (!imageBlob) return
 
     set({ step: 'classifying' })
+
+    if (isDemo) {
+      set({ classifyResult: { type: 'fridge', confidence: 0.96 }, resolvedType: 'fridge', step: 'processing' })
+      get()._process('fridge')
+      return
+    }
 
     try {
       const formData = new FormData()
@@ -190,12 +211,12 @@ export const useScanStore = create<ScanState & ScanActions>((set, get) => ({
 
   // ── Internal: process image for the resolved type ─────────────────────
   _process: async (type) => {
-    const { imageBlob } = get()
+    const { imageBlob, isDemo } = get()
     if (!imageBlob) return
 
     set({ step: 'processing' })
 
-    const endpoint = `/api/scan/${type}`
+    const endpoint = isDemo ? '/api/scan/demo' : `/api/scan/${type}`
 
     try {
       const formData = new FormData()

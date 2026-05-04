@@ -10,6 +10,7 @@ import type {
 import { DEMO_WEEKLY_PLAN } from '@/lib/demo-data';
 import { format, addDays } from 'date-fns';
 import logger from '@/lib/logger';
+import { formatRulesForPrompt, findRelevantCulinaryRules } from '@/lib/safety/culinary-rules';
 
 // ── Prompt Builder ──────────────────────────────────────────
 
@@ -91,6 +92,18 @@ OUTPUT: Return valid JSON only matching the AIGeneratedPlan schema — no markdo
 function buildUserPrompt(request: AIGenerationRequest): string {
   const household = buildHouseholdContext(request.household, request.members);
   const weekStart = format(new Date(request.week_start), 'MMMM d, yyyy');
+  const groundedRules = formatRulesForPrompt(findRelevantCulinaryRules({
+    ingredients: request.pantry_items ?? [],
+    tags: [
+      ...(request.household.preferred_proteins ?? []),
+      ...(request.household.cuisine_preferences ?? []),
+      ...request.members.flatMap((member) => [
+        member.stage,
+        ...(member.allergies?.map((allergy) => allergy.allergy) ?? []),
+        ...(member.disliked_foods ?? []),
+      ]),
+    ],
+  }))
   const pantryNote = request.pantry_items?.length
     ? `\nUse these pantry items first: ${request.pantry_items.join(', ')}`
     : '';
@@ -107,6 +120,9 @@ function buildUserPrompt(request: AIGenerationRequest): string {
 ${household}
 ${pantryNote}
 ${regenerateNote}
+
+GROUNDED SAFETY REFERENCES:
+${groundedRules}
 
 PLANNING STRATEGY:
 1. Pick 3-4 core proteins for the week and rotate them across meals

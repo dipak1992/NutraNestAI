@@ -157,6 +157,7 @@ export function buildFamilyEngineOverrides(members: FamilyMemberRecord[]): Famil
     active: members.some((m) => m.picky_eater_level >= 2),
     dislikedFoods: dislikedFoods.length > 0 ? dislikedFoods : undefined,
   }
+  const familyModeActive = kidsCount + toddlersCount + babiesCount > 0 || pickyEater.active
 
   return {
     household: {
@@ -171,6 +172,16 @@ export function buildFamilyEngineOverrides(members: FamilyMemberRecord[]): Famil
     preferredProteins,
     cuisinePreferences,
     pickyEater,
+    familyMode: {
+      active: familyModeActive,
+      guidance: familyModeActive
+        ? [
+            'Prefer mild seasoning and offer heat/spice on the side.',
+            'Provide deconstructed plating options for children and picky eaters.',
+            'Use familiar sides or dips when introducing new ingredients.',
+          ]
+        : [],
+    },
     memberCount: members.length,
   }
 }

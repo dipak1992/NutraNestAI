@@ -71,5 +71,9 @@ export interface FamilyEngineOverrides {
     active: boolean
     dislikedFoods?: string[]
   }
+  familyMode: {
+    active: boolean
+    guidance: string[]
+  }
   memberCount: number
 }

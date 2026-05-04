@@ -41,6 +41,14 @@
     {
       "path": "/api/email/reminders?type=winback",
       "schedule": "0 12 * * 1"
+    },
+    {
+      "path": "/api/cron/sunday-plan",
+      "schedule": "0 23 * * 0"
+    },
+    {
+      "path": "/api/cron/pantry-decay",
+      "schedule": "0 20 * * *"
     }
   ]
 }

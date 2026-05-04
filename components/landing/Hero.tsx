@@ -4,6 +4,7 @@ import { Button } from './shared/Button'
 import { FadeIn } from './shared/FadeIn'
 import { socialProof } from '@/config/social-proof'
 import { LandingTonightPreview } from './LandingTonightPreview'
+import { LandingScanDemoButton } from './LandingScanDemoButton'
 
 const trustItems = ['Free forever', 'No card required', 'Built for households']
 
@@ -81,6 +82,7 @@ export function Hero() {
                 >
                   Start planning free
                 </Button>
+                <LandingScanDemoButton />
                 <a
                   href="#how-it-works"
                   className="text-neutral-600 dark:text-neutral-300 hover:text-[#D97757] underline-offset-4 hover:underline text-sm font-medium transition-colors"

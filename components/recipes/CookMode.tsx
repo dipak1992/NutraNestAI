@@ -3,10 +3,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import {
   ChevronLeft, ChevronRight, X, Timer, Play, Pause, RotateCcw, CheckCircle2, Check,
+  ShieldCheck,
 } from 'lucide-react'
 import type { LoadedRecipe } from '@/app/recipes/[id]/loader'
 import { CookCompleteDialog } from './CookCompleteDialog'
 import { recipeSignature } from '@/lib/recipes/canonical'
+import { extractTimerSeconds } from '@/lib/recipes/timer-extractor'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -135,6 +137,8 @@ export function CookMode({ recipe, recipeId }: Props) {
   const [current, setCurrent] = useState(-1)
   const [completed, setCompleted] = useState<Set<number>>(new Set())
   const [showComplete, setShowComplete] = useState(false)
+  const [keepAwake, setKeepAwake] = useState(true)
+  const [wakeLockSupported, setWakeLockSupported] = useState(true)
   const wakeLockRef = useRef<WakeLockSentinel | null>(null)
   const signature = recipeSignature(recipe)
 
@@ -153,19 +157,28 @@ export function CookMode({ recipe, recipeId }: Props) {
   // ── Wake lock ──────────────────────────────────────────────────────────────
   useEffect(() => {
     async function acquireWakeLock() {
+      if (!keepAwake) return
       if ('wakeLock' in navigator) {
         try {
           wakeLockRef.current = await navigator.wakeLock.request('screen')
         } catch {
           // Wake lock not available — non-critical
         }
+      } else {
+        setWakeLockSupported(false)
       }
     }
     acquireWakeLock()
-    return () => {
-      wakeLockRef.current?.release().catch(() => {})
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') void acquireWakeLock()
     }
-  }, [])
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+      wakeLockRef.current?.release().catch(() => {})
+      wakeLockRef.current = null
+    }
+  }, [keepAwake])
 
   // ── Keyboard navigation ────────────────────────────────────────────────────
   useEffect(() => {
@@ -212,9 +225,20 @@ export function CookMode({ recipe, recipeId }: Props) {
             <p className="text-xs text-slate-500">Cook Mode</p>
             <p className="text-sm font-semibold text-slate-950 truncate max-w-[180px]">{recipe.name}</p>
           </div>
-          <span className="text-sm text-slate-500 tabular-nums">
-            {currentDisplayStep} / {totalDisplaySteps}
-          </span>
+          <button
+            type="button"
+            onClick={() => setKeepAwake((value) => !value)}
+            disabled={!wakeLockSupported}
+            className={[
+              'flex h-9 w-9 items-center justify-center rounded-full border text-slate-700',
+              keepAwake ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-orange-100 bg-orange-50',
+              !wakeLockSupported ? 'opacity-40' : '',
+            ].join(' ')}
+            aria-label={keepAwake ? 'Disable screen wake lock' : 'Keep screen awake'}
+            title={wakeLockSupported ? 'Keep screen awake' : 'Wake lock is not supported on this browser'}
+          >
+            <ShieldCheck className="h-4 w-4" />
+          </button>
         </div>
 
         {/* Progress bar */}
@@ -250,8 +274,8 @@ export function CookMode({ recipe, recipeId }: Props) {
               <p className="text-xl font-medium leading-relaxed text-slate-950">{step.instruction}</p>
 
               {/* Timer if step has one */}
-              {step.timerSeconds && step.timerSeconds > 0 && (
-                <StepTimer seconds={step.timerSeconds} />
+              {(step.timerSeconds ?? extractTimerSeconds(step.instruction)) && (
+                <StepTimer seconds={(step.timerSeconds ?? extractTimerSeconds(step.instruction))!} />
               )}
 
               {/* Mark done */}

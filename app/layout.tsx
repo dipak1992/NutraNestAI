@@ -4,6 +4,7 @@ import './globals.css'
 import { Providers } from '@/components/providers'
 import { Toaster } from '@/components/ui/sonner'
 import { PWAServiceWorkerRegister } from '@/components/pwa/PWAServiceWorkerRegister'
+import { PWAInstallPrompt } from '@/components/pwa/PWAInstallPrompt'
 import { getSiteUrl } from '@/lib/seo'
 import { organizationSchema } from '@/lib/schema'
 
@@ -87,6 +88,7 @@ export default function RootLayout({
         <Providers>
           <PWAServiceWorkerRegister />
           {children}
+          <PWAInstallPrompt />
           <Toaster richColors position="top-right" />
         </Providers>
       </body>

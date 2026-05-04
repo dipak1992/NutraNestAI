@@ -1,4 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
+import { detectAllergens, buildSafetyNotes, type AllergenWarning } from '@/lib/safety/allergen-detector'
+import { findRelevantCulinaryRules, type CulinaryRule } from '@/lib/safety/culinary-rules'
+import { enrichStepsWithTimers } from '@/lib/recipes/timer-extractor'
 
 // ─── LoadedRecipe type ────────────────────────────────────────────────────────
 
@@ -17,6 +20,12 @@ export type LoadedRecipe = {
   ingredients: Array<{ name: string; quantity: number; unit: string }>
   steps: Array<{ order: number; instruction: string; timerSeconds?: number }>
   nutrition?: { calories: number; protein: number; carbs: number; fat: number }
+  verifiedStatus: 'unverified' | 'chef_verified' | 'safety_reviewed'
+  verifiedBy: string | null
+  verifiedAt: string | null
+  allergenWarnings: AllergenWarning[]
+  safetyNotes: string[]
+  culinaryRules: CulinaryRule[]
 }
 
 // ─── Mock fallback ────────────────────────────────────────────────────────────
@@ -52,6 +61,20 @@ const MOCK_RECIPE: LoadedRecipe = {
     { order: 7, instruction: 'Cook spaghetti according to package directions until al dente. Drain and serve topped with the Bolognese sauce.' },
   ],
   nutrition: { calories: 520, protein: 34, carbs: 58, fat: 14 },
+  verifiedStatus: 'safety_reviewed',
+  verifiedBy: 'MealEase safety rules',
+  verifiedAt: null,
+  allergenWarnings: detectAllergens(['Spaghetti', 'Ground beef', 'Tomato sauce', 'Onion', 'Garlic cloves', 'Olive oil', 'Salt & pepper']),
+  safetyNotes: buildSafetyNotes({
+    ingredients: ['Spaghetti', 'Ground beef', 'Tomato sauce', 'Onion', 'Garlic cloves', 'Olive oil', 'Salt & pepper'],
+  }),
+  culinaryRules: findRelevantCulinaryRules({
+    ingredients: ['Spaghetti', 'Ground beef', 'Tomato sauce', 'Onion', 'Garlic cloves', 'Olive oil', 'Salt & pepper'],
+    instructions: [
+      'Add ground beef and cook, breaking it up, until browned — about 5 minutes.',
+      'Pour in tomato sauce, season with salt and pepper, and simmer for 15 minutes.',
+    ],
+  }),
 }
 
 // ─── loadRecipe ───────────────────────────────────────────────────────────────
@@ -78,6 +101,26 @@ export async function loadRecipe(id: string): Promise<LoadedRecipe> {
 
     if (error || !data) throw new RecipeNotFoundError(id)
 
+    const ingredients = data.ingredients ?? []
+    const steps = enrichStepsWithTimers((data.steps ?? data.base_instructions?.map((instruction: string, i: number) => ({
+      order: i + 1,
+      instruction,
+    })) ?? []) as Array<{ order: number; instruction: string; timerSeconds?: number }>)
+    const ingredientNames = ingredients.map((ingredient: { name?: string } | string) =>
+      typeof ingredient === 'string' ? ingredient : ingredient.name ?? '',
+    )
+    const instructionTexts = steps.map((step: { instruction: string }) => step.instruction)
+    const allergenWarnings = data.allergen_warnings ?? detectAllergens(ingredientNames)
+    const culinaryRules = data.culinary_rules ?? findRelevantCulinaryRules({
+      ingredients: ingredientNames,
+      instructions: instructionTexts,
+      tags: data.tags ?? [],
+    })
+    const safetyNotes = data.safety_notes ?? buildSafetyNotes({
+      ingredients: ingredientNames,
+      instructions: instructionTexts,
+    })
+
     // Map DB row → LoadedRecipe
     return {
       id: data.id,
@@ -91,12 +134,15 @@ export async function loadRecipe(id: string): Promise<LoadedRecipe> {
       costTotal: data.cost_total ?? data.estimated_cost ?? 0,
       costPerServing: data.cost_per_serving ?? 0,
       tags: data.tags ?? [],
-      ingredients: data.ingredients ?? [],
-      steps: data.steps ?? data.base_instructions?.map((instruction: string, i: number) => ({
-        order: i + 1,
-        instruction,
-      })) ?? [],
+      ingredients,
+      steps,
       nutrition: data.nutrition ?? undefined,
+      verifiedStatus: data.verified_status ?? 'unverified',
+      verifiedBy: data.verified_by ?? null,
+      verifiedAt: data.verified_at ?? null,
+      allergenWarnings,
+      safetyNotes,
+      culinaryRules,
     }
   } catch (error) {
     if (error instanceof RecipeNotFoundError) throw error

@@ -6,6 +6,10 @@ import { STEPS, type StepId } from '@/lib/onboarding/steps'
 type OnboardingData = {
   householdSize: number
   dietary: string[]
+  cuisinePreferences: string[]
+  spiceTolerance: 'none' | 'mild' | 'medium' | 'hot'
+  budgetStyle: number
+  pickyEaterMode: boolean
   dislikes: string[]
   skillLevel: 'beginner' | 'intermediate' | 'advanced'
   weeklyBudget: number | null
@@ -27,6 +31,10 @@ type OnboardingStore = {
 const DEFAULT_DATA: OnboardingData = {
   householdSize: 2,
   dietary: [],
+  cuisinePreferences: [],
+  spiceTolerance: 'mild',
+  budgetStyle: 2,
+  pickyEaterMode: false,
   dislikes: [],
   skillLevel: 'intermediate',
   weeklyBudget: null,

@@ -4,6 +4,7 @@ import { useOnboardingStore } from '@/stores/onboardingStore'
 import { OnboardingShell } from '@/components/onboarding/OnboardingShell'
 import StepHouseholdSize from '@/components/onboarding/StepHouseholdSize'
 import StepDietary from '@/components/onboarding/StepDietary'
+import StepFlavorProfile from '@/components/onboarding/StepFlavorProfile'
 import StepDislikes from '@/components/onboarding/StepDislikes'
 import StepSkillLevel from '@/components/onboarding/StepSkillLevel'
 import StepBudget from '@/components/onboarding/StepBudget'
@@ -13,6 +14,7 @@ import StepBudget from '@/components/onboarding/StepBudget'
 const STEP_COMPONENTS = {
   household: StepHouseholdSize,
   dietary:   StepDietary,
+  flavor:    StepFlavorProfile,
   dislikes:  StepDislikes,
   skill:     StepSkillLevel,
   budget:    StepBudget,
@@ -24,6 +26,10 @@ const STEP_COMPONENTS = {
 function countPreferences(data: {
   householdSize: number
   dietary: string[]
+  cuisinePreferences: string[]
+  spiceTolerance: string
+  budgetStyle: number
+  pickyEaterMode: boolean
   dislikes: string[]
   skillLevel: string
   weeklyBudget: number | null
@@ -33,6 +39,10 @@ function countPreferences(data: {
   if (data.householdSize >= 1) count++
   // Each dietary selection counts
   count += data.dietary.length
+  count += data.cuisinePreferences.length
+  if (data.spiceTolerance) count++
+  if (data.budgetStyle) count++
+  if (data.pickyEaterMode) count++
   // Each dislike counts
   count += data.dislikes.length
   // Skill level always counts as 1
@@ -51,6 +61,10 @@ export function OnboardingClient() {
   const dietary       = useOnboardingStore((s) => s.data.dietary)
   const dislikes      = useOnboardingStore((s) => s.data.dislikes)
   const weeklyBudget  = useOnboardingStore((s) => s.data.weeklyBudget)
+  const cuisinePreferences = useOnboardingStore((s) => s.data.cuisinePreferences)
+  const spiceTolerance = useOnboardingStore((s) => s.data.spiceTolerance)
+  const budgetStyle = useOnboardingStore((s) => s.data.budgetStyle)
+  const pickyEaterMode = useOnboardingStore((s) => s.data.pickyEaterMode)
 
   // Determine whether the current step allows proceeding
   const canProceed: boolean = (() => {
@@ -59,7 +73,17 @@ export function OnboardingClient() {
       case 'skill':     return !!skillLevel
       case 'budget': {
         // Last step: require at least 3 total preferences across all steps
-        return countPreferences({ householdSize, dietary, dislikes, skillLevel, weeklyBudget }) >= 3
+        return countPreferences({
+          householdSize,
+          dietary,
+          cuisinePreferences,
+          spiceTolerance,
+          budgetStyle,
+          pickyEaterMode,
+          dislikes,
+          skillLevel,
+          weeklyBudget,
+        }) >= 3
       }
       default:          return true   // dietary / dislikes are optional per-step
     }

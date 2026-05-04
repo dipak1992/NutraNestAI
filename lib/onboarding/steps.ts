@@ -1,6 +1,7 @@
 export const STEPS = [
   { id: 'household', label: 'Household' },
   { id: 'dietary', label: 'Dietary' },
+  { id: 'flavor', label: 'Flavor' },
   { id: 'dislikes', label: 'Dislikes' },
   { id: 'skill', label: 'Skill' },
   { id: 'budget', label: 'Budget' },

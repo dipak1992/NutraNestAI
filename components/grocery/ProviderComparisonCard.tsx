@@ -117,7 +117,7 @@ export function ProviderComparisonCard({ estimates, onSelectProvider }: Props) {
       </div>
 
       <p className="text-[10px] text-neutral-400 dark:text-neutral-500 text-center">
-        Estimates based on average prices. Actual costs may vary by location.
+        Estimates based on average prices. Actual costs may vary by location. Store links may use affiliate tracking when configured.
       </p>
     </section>
   )

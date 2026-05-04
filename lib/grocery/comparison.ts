@@ -54,7 +54,8 @@ export function buildProviderSearchUrl(
     .join(', ')
 
   const encoded = encodeURIComponent(combinedQuery)
-  return provider.searchUrlTemplate.replace('{{query}}', encoded)
+  const url = provider.searchUrlTemplate.replace('{{query}}', encoded)
+  return appendAffiliateParams(url, provider.id)
 }
 
 /**
@@ -65,7 +66,20 @@ export function buildSingleItemSearchUrl(
   item: ProviderCartItem
 ): string {
   const encoded = encodeURIComponent(item.searchQuery)
-  return provider.searchUrlTemplate.replace('{{query}}', encoded)
+  return appendAffiliateParams(provider.searchUrlTemplate.replace('{{query}}', encoded), provider.id)
+}
+
+function appendAffiliateParams(url: string, providerId: GroceryProvider['id']): string {
+  const params = new URLSearchParams()
+  if (providerId === 'instacart' && process.env.NEXT_PUBLIC_INSTACART_AFFILIATE_ID) {
+    params.set('irgwc', process.env.NEXT_PUBLIC_INSTACART_AFFILIATE_ID)
+  }
+  if ((providerId === 'walmart_us' || providerId === 'walmart_ca') && process.env.NEXT_PUBLIC_WALMART_AFFILIATE_ID) {
+    params.set('veh', 'aff')
+    params.set('affiliates_ad_id', process.env.NEXT_PUBLIC_WALMART_AFFILIATE_ID)
+  }
+  if (params.size === 0) return url
+  return `${url}${url.includes('?') ? '&' : '?'}${params.toString()}`
 }
 
 /**

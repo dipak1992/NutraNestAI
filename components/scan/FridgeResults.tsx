@@ -10,11 +10,12 @@ import type { FridgeResult, Ingredient, FridgeRecipe } from '@/lib/scan/types'
 
 interface FridgeResultsProps {
   result: FridgeResult
+  isDemo?: boolean
   onClose: () => void
   onRetake: () => void
 }
 
-export function FridgeResults({ result, onClose, onRetake }: FridgeResultsProps) {
+export function FridgeResults({ result, isDemo = false, onClose, onRetake }: FridgeResultsProps) {
   const [ingredients, setIngredients] = useState<Ingredient[]>(result.ingredients)
   const [savedToPantry, setSavedToPantry] = useState(result.savedToPantry)
   const [saving, setSaving] = useState(false)
@@ -25,6 +26,10 @@ export function FridgeResults({ result, onClose, onRetake }: FridgeResultsProps)
   }
 
   const handleSavePantry = async () => {
+    if (isDemo) {
+      window.location.href = '/signup?intent=save-pantry'
+      return
+    }
     if (savedToPantry || saving) return
     hapticSuccess()
     setSaving(true)
@@ -130,7 +135,7 @@ export function FridgeResults({ result, onClose, onRetake }: FridgeResultsProps)
             </h3>
             <div className="space-y-3">
               {result.recipes.map((recipe) => (
-                <RecipeCard key={recipe.id} recipe={recipe} />
+                <RecipeCard key={recipe.id} recipe={recipe} isDemo={isDemo} />
               ))}
             </div>
           </section>
@@ -150,7 +155,7 @@ export function FridgeResults({ result, onClose, onRetake }: FridgeResultsProps)
   )
 }
 
-function RecipeCard({ recipe }: { recipe: FridgeRecipe }) {
+function RecipeCard({ recipe, isDemo }: { recipe: FridgeRecipe; isDemo: boolean }) {
   return (
     <div className="rounded-2xl bg-white dark:bg-neutral-900 ring-1 ring-neutral-200 dark:ring-neutral-800 overflow-hidden">
       {recipe.imageUrl && (
@@ -182,8 +187,13 @@ function RecipeCard({ recipe }: { recipe: FridgeRecipe }) {
             Missing: {recipe.missingIngredients.join(', ')}
           </p>
         )}
-        <button className="mt-3 w-full py-2 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-sm font-semibold text-neutral-900 dark:text-neutral-100 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors">
-          View Recipe
+        <button
+          onClick={() => {
+            window.location.href = isDemo ? `/signup?intent=scan-recipe&recipe=${recipe.id}` : `/recipes/${recipe.id}`
+          }}
+          className="mt-3 w-full py-2 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-sm font-semibold text-neutral-900 dark:text-neutral-100 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+        >
+          {isDemo ? 'Unlock this recipe' : 'View Recipe'}
         </button>
       </div>
     </div>

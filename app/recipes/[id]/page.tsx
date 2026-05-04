@@ -6,6 +6,7 @@ import { RecipeHero } from '@/components/recipes/RecipeHero'
 import { IngredientList } from '@/components/recipes/IngredientList'
 import { NutritionCard } from '@/components/recipes/NutritionCard'
 import { RecipeActions } from '@/components/recipes/RecipeActions'
+import { RecipeSafetyFooter } from '@/components/recipes/RecipeSafetyFooter'
 
 type Props = {
   params: Promise<{ id: string }>
@@ -93,6 +94,8 @@ export default async function RecipePage({ params, searchParams }: Props) {
             {recipe.nutrition && (
               <NutritionCard nutrition={recipe.nutrition} />
             )}
+
+            <RecipeSafetyFooter recipe={recipe} />
           </div>
         </div>
       </main>

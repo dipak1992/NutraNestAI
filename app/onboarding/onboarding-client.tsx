@@ -3,6 +3,7 @@
 import { useOnboardingStore } from '@/stores/onboardingStore'
 import { OnboardingShell } from '@/components/onboarding/OnboardingShell'
 import StepHouseholdSize from '@/components/onboarding/StepHouseholdSize'
+import StepCookingGoal from '@/components/onboarding/StepCookingGoal'
 import StepDietary from '@/components/onboarding/StepDietary'
 import StepFlavorProfile from '@/components/onboarding/StepFlavorProfile'
 import StepDislikes from '@/components/onboarding/StepDislikes'
@@ -13,6 +14,7 @@ import StepBudget from '@/components/onboarding/StepBudget'
 
 const STEP_COMPONENTS = {
   household: StepHouseholdSize,
+  goal:      StepCookingGoal,
   dietary:   StepDietary,
   flavor:    StepFlavorProfile,
   dislikes:  StepDislikes,
@@ -25,6 +27,7 @@ const STEP_COMPONENTS = {
 /** Count total preferences selected across all steps */
 function countPreferences(data: {
   householdSize: number
+  cookingGoal: string | null
   dietary: string[]
   cuisinePreferences: string[]
   spiceTolerance: string
@@ -37,6 +40,8 @@ function countPreferences(data: {
   let count = 0
   // Household size counts as 1 preference if set (always >= 1)
   if (data.householdSize >= 1) count++
+  // Cooking goal counts as 1 if set
+  if (data.cookingGoal) count++
   // Each dietary selection counts
   count += data.dietary.length
   count += data.cuisinePreferences.length
@@ -57,6 +62,7 @@ function countPreferences(data: {
 export function OnboardingClient() {
   const step          = useOnboardingStore((s) => s.step)
   const householdSize = useOnboardingStore((s) => s.data.householdSize)
+  const cookingGoal   = useOnboardingStore((s) => s.data.cookingGoal)
   const skillLevel    = useOnboardingStore((s) => s.data.skillLevel)
   const dietary       = useOnboardingStore((s) => s.data.dietary)
   const dislikes      = useOnboardingStore((s) => s.data.dislikes)
@@ -70,11 +76,13 @@ export function OnboardingClient() {
   const canProceed: boolean = (() => {
     switch (step) {
       case 'household': return householdSize >= 1
+      case 'goal':      return true // optional — user can skip
       case 'skill':     return !!skillLevel
       case 'budget': {
         // Last step: require at least 3 total preferences across all steps
         return countPreferences({
           householdSize,
+          cookingGoal,
           dietary,
           cuisinePreferences,
           spiceTolerance,

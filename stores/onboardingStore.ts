@@ -5,6 +5,7 @@ import { STEPS, type StepId } from '@/lib/onboarding/steps'
 
 type OnboardingData = {
   householdSize: number
+  cookingGoal: string | null
   dietary: string[]
   cuisinePreferences: string[]
   spiceTolerance: 'none' | 'mild' | 'medium' | 'hot'
@@ -30,6 +31,7 @@ type OnboardingStore = {
 
 const DEFAULT_DATA: OnboardingData = {
   householdSize: 2,
+  cookingGoal: null,
   dietary: [],
   cuisinePreferences: [],
   spiceTolerance: 'mild',

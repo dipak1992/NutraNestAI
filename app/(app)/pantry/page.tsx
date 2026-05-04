@@ -9,6 +9,7 @@ import { ProPaywallCard } from '@/components/paywall/ProPaywallCard'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 import { Package, Plus, Trash2, Search, Camera, Clock, ChefHat } from 'lucide-react'
 import { GROCERY_CATEGORY_ICONS } from '@/lib/utils'
+import { PantryExpiryBanner } from '@/components/pantry/PantryExpiryBanner'
 
 interface PantryItem {
   id: string
@@ -199,6 +200,9 @@ export default function PantryPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Pantry expiry notification banner */}
+      <PantryExpiryBanner />
+
       <div className="flex items-start justify-between gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">

@@ -14,7 +14,7 @@ export const PRICING_TIERS = {
   pro: {
     name: 'Plus',
     monthlyPrice: 9.99,
-    yearlyPrice: 83,
+    yearlyPrice: 79,
     monthlyPriceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_MONTHLY,
     yearlyPriceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_YEARLY,
   },
@@ -46,7 +46,7 @@ export const FAMILY_PLUS_UNLOCKS = PRO_UNLOCKS
 
 // ── Savings calculations ──────────────────────────────────────────────────
 
-export const PRO_ANNUAL_SAVINGS = Math.round((1 - PRICING_TIERS.pro.yearlyPrice / (PRICING_TIERS.pro.monthlyPrice * 12)) * 100) // 38%
+export const PRO_ANNUAL_SAVINGS = Math.round((1 - PRICING_TIERS.pro.yearlyPrice / (PRICING_TIERS.pro.monthlyPrice * 12)) * 100) // 34% ($79/yr vs $119.88/yr)
 export const FAMILY_ANNUAL_SAVINGS = PRO_ANNUAL_SAVINGS // alias kept for compat
 
 // ── Tier normalization & checks ───────────────────────────────────────────

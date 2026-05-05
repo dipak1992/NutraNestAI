@@ -6,7 +6,7 @@ const FACTS = [
   { label: 'Headquarters', value: 'United States (remote)' },
   { label: 'Category', value: 'Consumer · Food & household' },
   { label: 'Platform', value: 'Web, iOS, Android' },
-  { label: 'Business model', value: 'Freemium — Free, Plus $7.99/mo, Family $14.99/mo' },
+  { label: 'Business model', value: 'Freemium — Free forever, Plus $9.99/mo or $79/yr' },
 ]
 
 const ONELINERS = [

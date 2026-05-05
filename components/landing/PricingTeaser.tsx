@@ -22,7 +22,7 @@ const plans = [
   {
     name: 'Plus',
     price: '$9.99',
-    period: '/month',
+    period: '/month · or $79/yr (save 34%)',
     description: 'Everything you need to stop the dinner spiral.',
     features: [
       'Full 7-day Planner / Weekly Autopilot',

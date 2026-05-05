@@ -33,7 +33,7 @@ export function mapPriceIdToTier(priceId: string | undefined): PriceMapping | nu
       tier: 'pro',
       interval: 'yearly',
       displayName: 'Plus Yearly',
-      monthlyEquivalent: 6.92, // $83/12 ≈ $6.92/month equivalent
+      monthlyEquivalent: 6.58, // $79/12 ≈ $6.58/month equivalent
     },
     // Legacy Family Plus price IDs — map to pro for backward compat
     [process.env.STRIPE_PRICE_FAMILY_MONTHLY || '']: {
@@ -46,7 +46,7 @@ export function mapPriceIdToTier(priceId: string | undefined): PriceMapping | nu
       tier: 'pro',
       interval: 'yearly',
       displayName: 'Plus Yearly (legacy family)',
-      monthlyEquivalent: 6.92,
+      monthlyEquivalent: 6.58,
     },
   }
 

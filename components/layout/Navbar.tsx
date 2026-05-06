@@ -10,6 +10,7 @@ import {
   Crown,
   BarChart2,
   Gift,
+  Home,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -125,6 +126,14 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
                 >
                   <User className="h-4 w-4" />
                   Profile &amp; Settings
+                </button>
+                <button
+                  role="menuitem"
+                  onClick={() => { closeMenu(); router.push('/dashboard/household') }}
+                  className="flex w-full items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors"
+                >
+                  <Home className="h-4 w-4" />
+                  Household
                 </button>
                 <button
                   role="menuitem"

@@ -45,7 +45,7 @@ export function BudgetSetupModal() {
       role="dialog"
       aria-modal="true"
       aria-labelledby="budget-setup-title"
-      className="fixed inset-0 z-50 flex items-end md:items-center justify-center"
+      className="fixed inset-0 z-[90] flex items-end justify-center md:items-center"
     >
       {/* Backdrop */}
       <motion.div
@@ -63,7 +63,7 @@ export function BudgetSetupModal() {
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: '100%', opacity: 0 }}
         transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-        className="relative w-full md:max-w-md bg-white dark:bg-neutral-900 rounded-t-3xl md:rounded-3xl shadow-2xl max-h-[90vh] overflow-y-auto"
+        className="relative max-h-[90vh] w-full overflow-y-auto rounded-t-3xl bg-white shadow-2xl pb-[max(1rem,env(safe-area-inset-bottom))] dark:bg-neutral-900 md:max-w-md md:rounded-3xl md:pb-0"
       >
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1 md:hidden">

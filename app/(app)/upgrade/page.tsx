@@ -7,12 +7,29 @@ export const metadata = {
   description: 'Unlock the connected MealEase system: Planner, grocery, budget, leftovers, Cook Mode, and household memory.',
 }
 
-export default async function UpgradePage() {
-  const status = await getPaywallStatus()
+const FEATURE_REDIRECTS: Record<string, string> = {
+  budget: '/budget',
+  grocery: '/grocery-list',
+  household: '/dashboard/household',
+  leftovers: '/leftovers',
+  planner: '/planner',
+  weekly_autopilot: '/planner',
+  scan: '/dashboard/cook',
+  guided_cooking: '/dashboard/tonight',
+  insights: '/insights',
+}
 
-  // Already a Plus member — redirect to dashboard
+export default async function UpgradePage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ feature?: string }>
+}) {
+  const status = await getPaywallStatus()
+  const resolvedSearchParams = await searchParams
+  const feature = resolvedSearchParams?.feature
+
   if (status.isPro) {
-    redirect('/dashboard')
+    redirect(FEATURE_REDIRECTS[feature ?? ''] ?? '/dashboard')
   }
 
   return <UpgradeClient isAuthenticated={status.isAuthenticated} />

@@ -135,7 +135,6 @@ export type DashboardPayload = {
     contextMessage: string
   }
   tonight: TonightState
-  weekPlan: WeekPlanState
   leftovers: LeftoversState
   budget: BudgetState
   quickActions: QuickAction[]

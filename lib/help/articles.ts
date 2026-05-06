@@ -245,7 +245,7 @@ The expiration date is set from the ingredient with the shortest shelf life. Alw
     description: 'Free vs. Plus limits on AI suggestions.',
     updatedAt: '2024-12-15',
     body: `**Free:** 2 AI recipe ideas per week across all your leftovers.
-**Plus and Family:** Unlimited.
+**Plus:** Unlimited.
 
 You can always view, edit, and mark leftovers as used — those are free forever. The limit is only on AI-generated new recipes.`,
   },

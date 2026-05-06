@@ -23,7 +23,7 @@ create extension if not exists "pg_trgm"; -- for fuzzy ingredient name search
 -- ENUMS
 -- ============================================================
 
-create type subscription_tier as enum ('free', 'pro', 'family');
+create type subscription_tier as enum ('free', 'pro');
 create type life_stage as enum ('adult', 'teen', 'kid', 'toddler', 'baby');
 create type meal_type as enum ('breakfast', 'lunch', 'dinner', 'snack');
 create type budget_level as enum ('low', 'medium', 'high');

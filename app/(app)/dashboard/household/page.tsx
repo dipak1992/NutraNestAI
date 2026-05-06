@@ -3,19 +3,13 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import {
   ArrowLeft,
   Crown,
   Users,
-  User,
-  Settings,
-  Heart,
   Brain,
   ChevronRight,
-  Plus,
-  Mail,
-  Loader2,
   Sparkles,
   AlertTriangle,
 } from 'lucide-react'
@@ -110,9 +104,9 @@ function MemberChip({ member }: { member: FamilyMemberRecord }) {
   const roleEmoji: Record<string, string> = {
     adult: '🧑',
     teen: '🧑‍🎓',
-    child: '👦',
-    toddler: '🧒',
-    baby: '👶',
+    child: '👤',
+    toddler: '👤',
+    baby: '👤',
   }
 
   return (
@@ -173,10 +167,6 @@ export default function HouseholdPillarPage() {
   const [paywallOpen, setPaywallOpen] = useState(false)
   const [paywallMessage, setPaywallMessage] = useState({ title: '', description: '' })
   const [members, setMembers] = useState<FamilyMemberRecord[]>([])
-  const [inviteEmail, setInviteEmail] = useState('')
-  const [inviting, setInviting] = useState(false)
-  const [inviteError, setInviteError] = useState<string | null>(null)
-  const [inviteSent, setInviteSent] = useState<string | null>(null)
 
   const { status } = usePaywallStatus()
   const { state: { householdName } } = useOnboardingStore()
@@ -198,41 +188,6 @@ export default function HouseholdPillarPage() {
     setPaywallMessage({ title, description })
     setPaywallOpen(true)
   }, [])
-
-  const handleInvite = useCallback(async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const email = inviteEmail.trim()
-    if (!email) return
-
-    if (!status.isPro) {
-      setPaywallMessage({
-        title: 'Invite a co-chef',
-        description: 'Plus lets you invite household members so meal planning can be shared.',
-      })
-      setPaywallOpen(true)
-      return
-    }
-
-    setInviting(true)
-    setInviteError(null)
-    setInviteSent(null)
-    try {
-      const res = await fetch('/api/settings/household/invite', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      })
-      const data = await res.json().catch(() => null) as { error?: string } | null
-      if (!res.ok) {
-        setInviteError(data?.error ?? 'Could not send invite')
-        return
-      }
-      setInviteSent(email)
-      setInviteEmail('')
-    } finally {
-      setInviting(false)
-    }
-  }, [inviteEmail, status.isPro])
 
   const householdTypeLabel = light.householdType === 'solo'
     ? 'Just me'
@@ -266,47 +221,15 @@ export default function HouseholdPillarPage() {
           </p>
         </div>
 
-        <motion.section
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-6 rounded-2xl border border-orange-200/70 bg-white p-5 shadow-sm"
-        >
-          <div className="mb-4 flex items-start gap-3">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-orange-50 text-[#D97757]">
-              <Mail className="h-5 w-5" />
-            </span>
-            <div>
-              <h2 className="text-base font-bold text-foreground">Invite a co-chef</h2>
-              <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
-                Send an invite to someone who helps plan, shop, or cook with you.
-              </p>
-            </div>
-          </div>
-
-          <form onSubmit={handleInvite} className="flex flex-col gap-2 sm:flex-row">
-            <input
-              type="email"
-              value={inviteEmail}
-              onChange={(event) => setInviteEmail(event.target.value)}
-              placeholder="email@example.com"
-              required
-              className="min-h-11 flex-1 rounded-xl border border-border bg-background px-3 text-sm outline-none focus:border-[#D97757]/70 focus:ring-2 focus:ring-[#D97757]/15"
+        {status.isAuthenticated && (
+          <div className="mb-6">
+            <InviteCoChef
+              householdName={householdName || undefined}
+              memberCount={members.length}
+              maxMembers={6}
             />
-            <Button type="submit" disabled={inviting || !inviteEmail.trim()} className="min-h-11 gap-2">
-              {inviting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
-              {status.isPro ? 'Send invite' : 'Unlock with Plus'}
-            </Button>
-          </form>
-
-          {inviteSent && (
-            <p className="mt-2 text-xs text-emerald-700">
-              Invite sent to {inviteSent}.
-            </p>
-          )}
-          {inviteError && (
-            <p className="mt-2 text-xs text-red-600">{inviteError}</p>
-          )}
-        </motion.section>
+          </div>
+        )}
 
         {/* Household summary card */}
         <motion.div
@@ -321,7 +244,6 @@ export default function HouseholdPillarPage() {
               </h2>
               <p className="text-xs text-muted-foreground mt-0.5">
                 {householdTypeLabel}
-                {light.hasKids && ' · Has kids'}
                 {light.lowEnergy && ' · Low energy mode'}
               </p>
             </div>
@@ -354,11 +276,6 @@ export default function HouseholdPillarPage() {
             {light.lowEnergy && (
               <Badge className="bg-blue-50 text-blue-700 border-0 text-[11px]">
                 ⚡ Low energy
-              </Badge>
-            )}
-            {light.hasKids && light.kidsAgeGroup && (
-              <Badge className="bg-pink-50 text-pink-700 border-0 text-[11px]">
-                👶 {light.kidsAgeGroup.replace('_', ' ')}
               </Badge>
             )}
           </div>
@@ -429,37 +346,10 @@ export default function HouseholdPillarPage() {
                 : 'bg-slate-50 text-slate-600'
             }
           >
-            {members.length === 0 && (
-              <div className="mt-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="text-xs h-7 gap-1"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    setInviteEmail('')
-                  }}
-                >
-                  <Plus className="h-3 w-3" />
-                  Use invite form above
-                </Button>
-              </div>
-            )}
             <p className="mt-1.5 text-[11px] text-muted-foreground/70">
               Profiles store preferences, allergies, and food goals — not separate logins.
             </p>
           </SectionCard>
-
-          {/* Invite Co-Chef CTA */}
-          {status.isAuthenticated && (
-            <InviteCoChef
-              compact
-              householdName={householdName || undefined}
-              memberCount={members.length}
-              maxMembers={6}
-            />
-          )}
 
           {/* 3. Household Memory */}
           <SectionCard

@@ -4,14 +4,11 @@ import type {
   DashboardPayload,
   TonightState,
   LeftoversState,
-  WeekPlanState,
   BudgetState,
   RetentionState,
   Nudge,
   QuickAction,
 } from '@/lib/dashboard/types'
-import { calcBudget } from '@/lib/dashboard/budget'
-import { parseMainIngredients } from '@/lib/leftovers/ingredient-parser'
 
 type DashboardStore = {
   // Core state
@@ -19,7 +16,6 @@ type DashboardStore = {
   user: DashboardPayload['user'] | null
   tonight: TonightState | null
   leftovers: LeftoversState | null
-  weekPlan: WeekPlanState | null
   budget: BudgetState | null
   retention: RetentionState | null
   quickActions: QuickAction[]
@@ -35,8 +31,6 @@ type DashboardStore = {
   // UI state
   isRegeneratingTonight: boolean
   tonightSwapSeenIds: string[]
-  dismissedNudgeIds: string[]
-  budgetDrawerOpen: boolean
 
   // Actions
   hydrate: (payload: DashboardPayload) => void
@@ -45,11 +39,6 @@ type DashboardStore = {
   /** Re-fetch dashboard data from the API */
   refresh: () => Promise<void>
   regenerateTonight: () => Promise<void>
-  markCooked: (dayId: string) => Promise<void>
-  setBudget: (amount: number | null) => Promise<void>
-  dismissNudge: (id: string) => void
-  openBudgetDrawer: () => void
-  closeBudgetDrawer: () => void
 }
 
 export const useDashboardStore = create<DashboardStore>()(
@@ -59,7 +48,6 @@ export const useDashboardStore = create<DashboardStore>()(
       user: null,
       tonight: null,
       leftovers: null,
-      weekPlan: null,
       budget: null,
       retention: null,
       quickActions: [],
@@ -71,8 +59,6 @@ export const useDashboardStore = create<DashboardStore>()(
       lastFetchedAt: null,
       isRegeneratingTonight: false,
       tonightSwapSeenIds: [],
-      dismissedNudgeIds: [],
-      budgetDrawerOpen: false,
 
       hydrate: (payload) =>
         set({
@@ -80,7 +66,6 @@ export const useDashboardStore = create<DashboardStore>()(
           user: payload.user,
           tonight: payload.tonight,
           leftovers: payload.leftovers,
-          weekPlan: payload.weekPlan,
           budget: payload.budget,
           retention: payload.retention,
           quickActions: payload.quickActions,
@@ -101,22 +86,15 @@ export const useDashboardStore = create<DashboardStore>()(
           const res = await fetch('/api/dashboard', { cache: 'no-store' })
           if (!res.ok) throw new Error(`Dashboard fetch failed: ${res.status}`)
           const payload: DashboardPayload = await res.json()
-          // Preserve dismissed nudge IDs across refresh
-          const dismissed = get().dismissedNudgeIds
-          const nudge =
-            payload.nudge && dismissed.includes(payload.nudge.id)
-              ? null
-              : payload.nudge
           set({
             hydrated: true,
             user: payload.user,
             tonight: payload.tonight,
             leftovers: payload.leftovers,
-            weekPlan: payload.weekPlan,
             budget: payload.budget,
             retention: payload.retention,
             quickActions: payload.quickActions,
-            nudge,
+            nudge: payload.nudge,
             household: payload.household,
             limits: payload.limits,
             tonightSwapSeenIds: payload.tonight.recipe?.id ? [payload.tonight.recipe.id] : [],
@@ -175,100 +153,12 @@ export const useDashboardStore = create<DashboardStore>()(
           window.clearTimeout(timeout)
         }
       },
-
-      markCooked: async (dayId) => {
-        const prev = get().weekPlan
-        const weekPlan = get().weekPlan
-        const cookedDay = weekPlan?.days.find((d) => d.id === dayId)
-
-        if (weekPlan) {
-          const updatedDays = weekPlan.days.map((d) =>
-            d.id === dayId ? { ...d, status: 'cooked' as const } : d
-          )
-          const cookedCount = updatedDays.filter((d) => d.status === 'cooked').length
-          set({
-            weekPlan: {
-              ...weekPlan,
-              days: updatedDays,
-              completionPercentage: Math.round((cookedCount / updatedDays.length) * 100),
-            },
-          })
-        }
-
-        if (cookedDay?.recipe) {
-          const recipe = cookedDay.recipe
-          const mainIngredients = parseMainIngredients({ name: recipe.name })
-          // Lazy import to avoid circular dependency
-          import('@/stores/leftoversStore').then(({ useLeftoversStore }) => {
-            useLeftoversStore.getState().openCookedPrompt({
-              recipeId: recipe.id,
-              recipeName: recipe.name,
-              recipeImage: recipe.image,
-              servings: recipe.servings,
-              costPerServing: recipe.costPerServing,
-              mainIngredients,
-            })
-          })
-        }
-
-        try {
-          const res = await fetch(`/api/dashboard/week/${dayId}/cook`, {
-            method: 'POST',
-          })
-          if (!res.ok) throw new Error('Cook update failed')
-          const updated: Partial<DashboardPayload> = await res.json()
-          set({
-            ...(updated.leftovers ? { leftovers: updated.leftovers } : {}),
-            ...(updated.weekPlan ? { weekPlan: updated.weekPlan } : {}),
-            ...(updated.budget ? { budget: updated.budget } : {}),
-          })
-        } catch (e) {
-          set({ weekPlan: prev })
-          console.error(e)
-        }
-      },
-
-      setBudget: async (amount) => {
-        const prev = get().budget
-        const current = get().budget
-        if (current) {
-          set({ budget: calcBudget(amount, current.weekSpent) })
-        }
-
-        try {
-          const res = await fetch('/api/dashboard/budget', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ weeklyLimit: amount }),
-          })
-          if (!res.ok) throw new Error('Budget update failed')
-        } catch (e) {
-          set({ budget: prev })
-          console.error(e)
-        }
-      },
-
-      dismissNudge: (id) => {
-        set((state) => ({
-          dismissedNudgeIds: [...state.dismissedNudgeIds, id],
-          nudge: state.nudge?.id === id ? null : state.nudge,
-        }))
-        fetch('/api/dashboard/nudge/dismiss', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id }),
-        }).catch(() => {})
-      },
-
-      openBudgetDrawer: () => set({ budgetDrawerOpen: true }),
-      closeBudgetDrawer: () => set({ budgetDrawerOpen: false }),
     }),
     {
       name: 'dashboard-store',
       storage: createJSONStorage(() => sessionStorage),
       // Only persist UI state — server data is always re-fetched
       partialize: (state) => ({
-        dismissedNudgeIds: state.dismissedNudgeIds,
         lastFetchedAt: state.lastFetchedAt,
       }),
     }

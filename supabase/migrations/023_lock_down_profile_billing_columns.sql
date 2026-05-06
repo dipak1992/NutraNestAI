@@ -84,7 +84,6 @@ declare
     'trial_ending_email_sent_at',
     'temp_pro_until',
     'bonus_days',
-    'family_member_count',
     'plan',
     'plan_status',
     'plan_renews_at'

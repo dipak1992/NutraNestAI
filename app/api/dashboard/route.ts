@@ -10,7 +10,6 @@ import { getDaysUntilExpiry, getUrgency } from '@/lib/leftovers/expiration-calcu
 import type {
   DashboardPayload,
   Leftover,
-  DayPlan,
   Plan,
 } from '@/lib/dashboard/types'
 
@@ -82,23 +81,6 @@ export async function getDashboardPayload(
 
   const leftovers = await loadDashboardLeftovers(userId)
 
-  const days: DayPlan[] = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(
-    (abbr, i) => ({
-      id: `day_${i}`,
-      dayAbbrev: abbr,
-      date: nextDate(i),
-      recipe: null,
-      status: 'empty' as const,
-    })
-  )
-
-  const weekPlan = {
-    days,
-    completionPercentage: 0,
-    isAutopilotEnabled: false,
-    estimatedTotalCost: 0,
-  }
-
   let budget = calcBudget(null, 0)
   try {
     const budgetPayload = await loadBudgetPayload(userId, plan === 'free' ? 'free' : 'plus')
@@ -142,7 +124,6 @@ export async function getDashboardPayload(
     },
     greeting: greetingInfo,
     tonight,
-    weekPlan,
     leftovers: {
       active: leftovers,
       expiringSoon: leftovers.filter((l) => l.daysUntilExpiry <= 2),
@@ -153,7 +134,7 @@ export async function getDashboardPayload(
       expiringSoon: leftovers.filter((l) => l.daysUntilExpiry <= 2).length,
       isSunday: _now.getDay() === 0,
       isDinnerWindow: _hour >= 16 && _hour < 20,
-      plannedDays: weekPlan.days.filter((d) => d.recipe !== null).length,
+      plannedDays: 0,
       weeklyBudgetRemaining:
         budget.weeklyLimit != null
           ? Math.max(0, budget.weeklyLimit - budget.weekSpent)
@@ -169,12 +150,6 @@ export async function getDashboardPayload(
   base.nudge = pickNudge(nudges)
 
   return base
-}
-
-function nextDate(offset: number) {
-  const d = new Date()
-  d.setDate(d.getDate() + offset)
-  return d.toISOString().split('T')[0]
 }
 
 async function loadDashboardLeftovers(userId: string): Promise<Leftover[]> {

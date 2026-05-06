@@ -106,18 +106,18 @@ export function WeekPlanStrip() {
   const heading = isPlusMember
     ? 'Your week is ready'
     : hasPlan
-      ? 'Your next 3 days are ready'
-      : 'Weekly Autopilot preview'
+      ? 'Next 3 dinners'
+      : 'Plan the next 3 dinners'
 
   const subtext = isPlusMember
-    ? 'Full 7-day planning powered by MealEase.'
+    ? 'Generate, swap, cook, and send meals to groceries from here.'
     : hasPlan
-      ? 'Tap a day, then unlock the full week and grocery preview with Plus.'
-      : 'Generate 3 days to unlock a grocery preview.'
+      ? 'Tap a day to cook, swap, or add ingredients.'
+      : 'Start with a simple preview before planning the full week.'
 
   const primaryCta = isPlusMember
     ? hasPlan ? 'Refresh Week' : 'Generate Week'
-    : hasPlan ? 'Refresh My 3 Days' : 'Generate My 3 Days'
+    : hasPlan ? 'Refresh 3 Days' : 'Generate 3 Days'
 
   const selectedMeal = selectedDay?.meal ?? null
 
@@ -348,11 +348,6 @@ export function WeekPlanStrip() {
               <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
                 {subtext}
               </p>
-              {isPlusMember && (
-                <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-500">
-                  Powered by Autopilot
-                </p>
-              )}
             </div>
 
             {showBudget && (
@@ -437,39 +432,13 @@ export function WeekPlanStrip() {
           ) : (
             <div className="mt-5 rounded-2xl border border-white/70 bg-white/70 p-4">
               <p className="text-sm font-semibold text-neutral-900">
-                {isPlusMember ? 'Plan all 7 dinners from here.' : 'Start with your free 3-day preview.'}
+                {isPlusMember ? 'Plan all 7 dinners from here.' : 'Start with a 3-day preview.'}
               </p>
               <p className="mt-1 text-xs leading-relaxed text-neutral-600">
                 {isPlusMember
                   ? 'Generate Week fills every day and keeps this section usable from the dashboard.'
-                  : 'Generate My 3 Days, then tap Mon, Tue, or Wed. Plus unlocks Thu-Sun and the weekly grocery preview.'}
+                  : 'Generate 3 Days, then tap a meal to cook, swap, or send ingredients to groceries.'}
               </p>
-            </div>
-          )}
-
-          {!isPlusMember && hasPlan && (
-            <div className="mt-4 rounded-2xl border border-[#D97757]/20 bg-neutral-950 p-4 text-white">
-              <div className="flex items-start gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#D97757]/20">
-                  <Sparkles className="h-4 w-4 text-[#D97757]" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold">Unlock your full week with Plus</p>
-                  <p className="mt-1 text-xs text-white/60">
-                    Unlock Thu-Sun, grocery planning, unlimited swaps, and Cook This recipes.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    trackEvent('upgrade_from_weekly_lock', { source: 'dashboard_upgrade_card' })
-                    setPaywallOpen(true)
-                  }}
-                  className="shrink-0 rounded-full bg-[#D97757] px-3 py-1.5 text-xs font-bold text-white hover:bg-[#C86646]"
-                >
-                  Upgrade
-                </button>
-              </div>
             </div>
           )}
         </div>

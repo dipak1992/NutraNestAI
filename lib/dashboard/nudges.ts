@@ -47,7 +47,7 @@ export function pickNudge(
 export function selectNudge(
   ctx: Pick<
     DashboardPayload,
-    'user' | 'leftovers' | 'budget' | 'limits' | 'household' | 'weekPlan' | 'retention'
+    'user' | 'leftovers' | 'budget' | 'limits' | 'household' | 'retention'
   >,
   dismissed: string[] = []
 ): Nudge | null {
@@ -58,7 +58,7 @@ export function selectNudge(
 export function buildNudgeCandidates(
   ctx: Pick<
     DashboardPayload,
-    'user' | 'leftovers' | 'budget' | 'limits' | 'household' | 'weekPlan' | 'retention'
+    'user' | 'leftovers' | 'budget' | 'limits' | 'household' | 'retention'
   >
 ): Nudge[] {
   const candidates: Nudge[] = []
@@ -166,25 +166,7 @@ export function buildNudgeCandidates(
     }
   }
 
-  // 7. Autopilot education (plus users who haven't enabled autopilot)
-  if (
-    ctx.user.plan === 'plus' &&
-    !ctx.weekPlan.isAutopilotEnabled
-  ) {
-    candidates.push({
-      id: 'nudge-autopilot',
-      type: 'autopilot_education',
-      priority: NUDGE_PRIORITY.autopilot_education,
-      title: 'Let autopilot plan your week',
-      body: 'We can fill your whole week with meals that match your budget and preferences.',
-      ctaLabel: 'Enable autopilot',
-      ctaHref: '/planner?mode=autopilot',
-      dismissible: true,
-      variant: NUDGE_VARIANT.autopilot_education,
-    })
-  }
-
-  // 8. Sunday planning ritual
+  // 7. Sunday planning ritual
   if (ctx.retention.isSunday && ctx.retention.plannedDays < 3) {
     candidates.push({
       id: 'nudge-sunday-plan',
@@ -199,8 +181,8 @@ export function buildNudgeCandidates(
     })
   }
 
-  // 9. Weekday dinner reminder
-  if (!ctx.retention.isSunday && ctx.retention.isDinnerWindow && ctx.weekPlan.completionPercentage < 100) {
+  // 8. Weekday dinner reminder
+  if (!ctx.retention.isSunday && ctx.retention.isDinnerWindow && ctx.retention.plannedDays < 7) {
     candidates.push({
       id: 'nudge-dinner-reminder',
       type: 'weekday_dinner_reminder',
@@ -214,7 +196,7 @@ export function buildNudgeCandidates(
     })
   }
 
-  // 10. Pantry scan reminder (no scans used yet)
+  // 9. Pantry scan reminder (no scans used yet)
   if (ctx.limits.scansUsed === 0) {
     candidates.push({
       id: 'nudge-pantry-scan',
@@ -229,7 +211,7 @@ export function buildNudgeCandidates(
     })
   }
 
-  // 11. Weekly savings recap
+  // 10. Weekly savings recap
   if (
     ctx.retention.weeklyBudgetRemaining != null &&
     ctx.retention.weeklyBudgetRemaining > 0 &&
@@ -248,7 +230,7 @@ export function buildNudgeCandidates(
     })
   }
 
-  // 12. Referral (plus users who have been active for 14+ days)
+  // 11. Referral (plus users who have been active for 14+ days)
   if (ctx.user.plan === 'plus') {
     const createdAt = new Date(ctx.user.createdAt)
     const daysSinceJoin = Math.floor(

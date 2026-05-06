@@ -120,7 +120,7 @@ export default function TermsPage() {
                     .
                   </p>
                   <p>
-                    <strong>Plus and Family.</strong> Paid monthly via Stripe.
+                    <strong>Plus.</strong> Paid monthly or yearly via Stripe.
                     Your plan renews automatically until you cancel. Prices may
                     change, but we&apos;ll email you 30 days before any price increase
                     affects you.

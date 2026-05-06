@@ -1,13 +1,12 @@
 'use client'
 
 import Link from 'next/link'
-import { Bookmark, Settings, ShoppingCart, Wallet } from 'lucide-react'
+import { Bookmark, Settings, ShoppingCart } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const MEAL_TOOLS = [
   { href: '/saved', label: 'Saved meals', icon: Bookmark },
   { href: '/grocery-list', label: 'Grocery list', icon: ShoppingCart },
-  { href: '/budget', label: 'Budget', icon: Wallet },
   { href: '/settings', label: 'Settings', icon: Settings },
 ]
 
@@ -21,7 +20,7 @@ export function QuickActions() {
         Your meal tools
       </h2>
 
-      <div className="grid grid-cols-4 gap-2 overflow-x-auto pb-1 sm:flex sm:gap-2.5">
+      <div className="grid grid-cols-3 gap-2 overflow-x-auto pb-1 sm:flex sm:gap-2.5">
         {MEAL_TOOLS.map(({ href, label, icon: Icon }) => {
           return (
             <Link

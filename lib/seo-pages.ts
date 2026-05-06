@@ -84,7 +84,7 @@ export const commercialPages: CommercialPage[] = [
       'Supports budget-aware swaps before the grocery bill balloons.',
     ],
     workflow: [
-      'Pick tonight’s dinner or generate a weekly family plan.',
+      'Pick tonight’s dinner or generate a weekly household meal plan.',
       'Swap meals by time, energy, ingredients, or household preferences.',
       'Turn the plan into a grocery list that is easy to edit before shopping.',
       'Use leftovers and pantry ingredients to keep the plan realistic midweek.',

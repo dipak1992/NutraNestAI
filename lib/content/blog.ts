@@ -209,7 +209,7 @@ const BLOG_POSTS: BlogPost[] = [
     internalLinks: [
       { label: 'Dinner Ideas Picky Kids Will Actually Eat', href: '/blog/dinner-ideas-picky-kids-will-actually-eat' },
       { label: 'Baby-Led Weaning Meals for the Whole Family', href: '/blog/baby-led-weaning-meals-for-the-whole-family' },
-      { label: 'Build your family plan with MealEase', href: '/' },
+      { label: 'Build your household meal plan with MealEase', href: '/' },
     ],
     ctaText: DEFAULT_CTA,
     author: DEFAULT_AUTHOR,
@@ -1527,7 +1527,7 @@ const BLOG_POSTS: BlogPost[] = [
     internalLinks: [
       { label: 'Low-Sodium Family Dinners Without Bland Food', href: '/blog/low-sodium-family-dinners-without-bland-food' },
       { label: '15-Minute Dinners for Busy Families', href: '/blog/15-minute-dinners-for-busy-families' },
-      { label: 'Build a healthy family plan with MealEase', href: '/' },
+      { label: 'Build a healthy household meal plan with MealEase', href: '/' },
     ],
     ctaText: DEFAULT_CTA,
     author: DEFAULT_AUTHOR,

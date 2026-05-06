@@ -32,7 +32,7 @@ create extension if not exists "pg_trgm"; -- fuzzy ingredient name search
 -- ============================================================
 
 do $$ begin
-  create type subscription_tier as enum ('free', 'pro', 'family');
+  create type subscription_tier as enum ('free', 'pro');
 exception when duplicate_object then null; end $$;
 
 do $$ begin

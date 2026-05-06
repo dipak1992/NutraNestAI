@@ -264,6 +264,14 @@ export const useWeeklyPlanStore = create<WeeklyPlanStore>()(
         storeFormat: s.storeFormat,
         selectedDayIndex: s.selectedDayIndex,
       }),
+      onRehydrateStorage: () => (state) => {
+        // Auto-reset stale plans from previous weeks
+        if (state && state.plan.weekStart !== getWeekStart()) {
+          state.plan = makeEmptyPlan()
+          state.groceryList = null
+          state.selectedDayIndex = 0
+        }
+      },
     }
   )
 )

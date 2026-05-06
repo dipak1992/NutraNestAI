@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getPaywallStatus } from '@/lib/paywall/server'
-import { loadBudgetPayload } from '@/app/budget/loader'
+import { loadBudgetPayload } from '@/app/(app)/budget/loader'
 import { cleanString, validationError } from '@/lib/validation/input'
 import { z } from 'zod'
 

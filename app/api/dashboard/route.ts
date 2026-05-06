@@ -5,7 +5,7 @@ import { getGreeting } from '@/lib/dashboard/greeting'
 import { calcBudget } from '@/lib/dashboard/budget'
 import { getTonightSuggestion } from '@/lib/dashboard/tonight-intelligence'
 import { buildNudgeCandidates, pickNudge } from '@/lib/dashboard/nudges'
-import { loadBudgetPayload } from '@/app/budget/loader'
+import { loadBudgetPayload } from '@/app/(app)/budget/loader'
 import { getDaysUntilExpiry, getUrgency } from '@/lib/leftovers/expiration-calculator'
 import type {
   DashboardPayload,

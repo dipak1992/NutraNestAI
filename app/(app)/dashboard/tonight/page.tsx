@@ -214,8 +214,7 @@ export default function TonightPillarPage() {
 
       // Mode-specific overrides
       if (chipMode === 'budget') body.budgetMode = true
-      if (chipMode === 'date-night') body.dateNight = true
-      if (chipMode === 'guests') body.guestsMode = true
+      if (chipMode === 'kids') body.kidsMode = true
 
       const res = await decideMeal(body as unknown as Parameters<typeof decideMeal>[0])
       setMeal(res.meal)
@@ -440,7 +439,7 @@ export default function TonightPillarPage() {
         onOpenChange={setPaywallOpen}
         feature="guided_cooking"
         title="Unlock this mode"
-        description="Upgrade to access Budget, Date Night, Kids, and Guest modes — plus unlimited meal ideas."
+        description="Upgrade to access Budget and Kids modes — plus unlimited meal ideas personalized for your household."
         isAuthenticated={status.isAuthenticated}
         redirectPath="/dashboard/tonight"
       />

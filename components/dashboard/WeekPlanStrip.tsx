@@ -90,7 +90,7 @@ export function WeekPlanStrip() {
   const [swappingDayIndex, setSwappingDayIndex] = useState<number | null>(null)
   const [paywallOpen, setPaywallOpen] = useState(false)
 
-  const isPlusMember = status.isPro || status.isFamily || user?.plan === 'plus' || user?.plan === 'family'
+  const isPlusMember = status.isPro || user?.plan === 'plus'
   const plannedDays = plan.days.filter((day) => day.meal).length
   const hasPlan = plannedDays > 0
   const selectedDay = selectedDayIndex === null ? null : plan.days[selectedDayIndex] ?? null

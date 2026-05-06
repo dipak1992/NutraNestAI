@@ -68,7 +68,6 @@ export async function POST(req: NextRequest) {
 
   const isPlusMember =
     profile?.subscription_tier === 'pro' ||
-    profile?.subscription_tier === 'family' ||
     profile?.subscription_tier === 'plus'
 
   if (!isPlusMember) {

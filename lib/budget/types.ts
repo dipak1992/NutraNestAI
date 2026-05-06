@@ -110,5 +110,5 @@ export type BudgetPayload = {
     breakdown: CategorySpend[]
   }
   history: SpendingHistoryWeek[]
-  plan: 'free' | 'plus' | 'family'
+  plan: 'free' | 'plus'
 }

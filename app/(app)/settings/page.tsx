@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { SettingsClient } from './settings-client'
 import type { PlanId } from '@/lib/stripe/plans'
+import { normalizeTier } from '@/lib/paywall/config'
 
 export const metadata = {
   title: 'Settings — NutriNest AI',
@@ -15,20 +16,16 @@ export default async function SettingsPage() {
   // Load profile
   const { data: profile } = await supabase
     .from('profiles')
-    .select('first_name, full_name, email, plan, plan_status, plan_renews_at, stripe_customer_id, notification_prefs')
+    .select('first_name, full_name, email, subscription_tier, plan, plan_status, plan_renews_at, stripe_customer_id, notification_prefs')
     .eq('id', user.id)
     .single()
 
-  // Load household members
-  const { data: members } = await supabase
-    .from('household_members')
-    .select('id, invited_email, role, status, created_at')
-    .eq('household_owner_id', user.id)
-    .order('created_at', { ascending: true })
-
   const firstName = profile?.first_name ?? profile?.full_name?.split(' ')[0] ?? ''
   const email = profile?.email ?? user.email ?? ''
-  const currentPlan = (profile?.plan as PlanId) ?? 'free'
+  const currentPlan: PlanId =
+    normalizeTier(profile?.subscription_tier) === 'pro' || profile?.plan === 'plus'
+      ? 'plus'
+      : 'free'
   const planStatus = profile?.plan_status ?? null
   const renewsAt = profile?.plan_renews_at ?? null
   const stripeCustomerId = profile?.stripe_customer_id ?? null
@@ -56,7 +53,6 @@ export default async function SettingsPage() {
           stripeCustomerId={stripeCustomerId}
           hasStripeCustomer={!!stripeCustomerId}
           notifPrefs={notifPrefs}
-          members={members ?? []}
         />
       </div>
     </main>

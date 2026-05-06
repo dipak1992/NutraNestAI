@@ -2,19 +2,10 @@
 
 import { SectionProfile } from '@/components/settings/SectionProfile'
 import { SectionNotifications } from '@/components/settings/SectionNotifications'
-import { SectionHousehold } from '@/components/settings/SectionHousehold'
 import { SectionBilling } from '@/components/settings/SectionBilling'
 import { SectionSecurity } from '@/components/settings/SectionSecurity'
 import { SectionDangerZone } from '@/components/settings/SectionDangerZone'
 import type { PlanId } from '@/lib/stripe/plans'
-
-type HouseholdMember = {
-  id: string
-  invited_email: string
-  role: string
-  status: string
-  created_at: string
-}
 
 type NotifPrefs = {
   dinner_reminders: boolean
@@ -34,7 +25,6 @@ type Props = {
   stripeCustomerId: string | null
   hasStripeCustomer: boolean
   notifPrefs: NotifPrefs
-  members: HouseholdMember[]
 }
 
 export function SettingsClient({
@@ -46,13 +36,11 @@ export function SettingsClient({
   stripeCustomerId,
   hasStripeCustomer,
   notifPrefs,
-  members,
 }: Props) {
   return (
     <div className="space-y-6">
       <SectionProfile firstName={firstName} email={email} />
       <SectionNotifications prefs={notifPrefs} />
-      <SectionHousehold members={members} currentPlan={currentPlan} />
       <SectionSecurity />
       <SectionBilling
         currentPlan={currentPlan}

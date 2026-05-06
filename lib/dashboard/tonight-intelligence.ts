@@ -24,7 +24,7 @@ export async function getTonightSuggestion(
   userId: string,
   plan: Plan,
 ): Promise<TonightState> {
-  if (plan === 'plus' || plan === 'family') {
+  if (plan === 'plus') {
     return getPlusTonightSuggestion(supabase, userId)
   }
   return getFreeTonightSuggestion(userId)

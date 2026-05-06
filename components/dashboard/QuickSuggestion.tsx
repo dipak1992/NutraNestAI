@@ -121,7 +121,7 @@ export function QuickSuggestion() {
 
   function handleCook() {
     if (meal) {
-      if (!status.isPro && !status.isFamily) {
+      if (!status.isPro) {
         setPaywallCopy({
           title: 'Unlock full recipes with Plus',
           description: 'Cook This is a Plus feature. Upgrade for guided recipes, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning.',
@@ -324,7 +324,7 @@ export function QuickSuggestion() {
         <div>
           <div className="mb-2 flex items-center justify-between gap-3">
             <p className="text-xs text-muted-foreground">Not quite? Try:</p>
-            {!status.isPro && !status.isFamily && (
+            {!status.isPro && (
               <p className="text-xs text-muted-foreground">
                 {swaps.remaining > 0 ? `${swaps.remaining} swaps left today` : 'Free swaps used'}
               </p>
@@ -355,6 +355,7 @@ export function QuickSuggestion() {
       <PaywallDialog
         open={paywallOpen}
         onOpenChange={setPaywallOpen}
+        feature="guided_cooking"
         title={paywallCopy.title}
         description={paywallCopy.description}
         isAuthenticated={status.isAuthenticated}

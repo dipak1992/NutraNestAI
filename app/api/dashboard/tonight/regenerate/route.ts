@@ -6,7 +6,7 @@ import type { Plan } from '@/lib/dashboard/types'
 /**
  * POST /api/dashboard/tonight/regenerate
  * Returns a new tonight suggestion different from the current one.
- * For plus/family users: respects dietary restrictions and dislikes.
+ * For Plus users: respects dietary restrictions and dislikes.
  */
 
 type RegenerateBody = {
@@ -41,17 +41,19 @@ export async function POST(req: Request) {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('subscription_tier')
+    .select('subscription_tier, plan')
     .eq('id', user.id)
     .maybeSingle()
 
   const tierMap: Record<string, Plan> = {
     pro: 'plus',
     plus: 'plus',
-    family: 'family',
     free: 'free',
   }
-  const plan = tierMap[profile?.subscription_tier ?? 'free'] ?? 'free'
+  const plan =
+    tierMap[profile?.subscription_tier ?? 'free'] ??
+    tierMap[profile?.plan ?? 'free'] ??
+    'free'
   const body = await readBody(req)
   const excludeIds = Array.from(
     new Set([
@@ -60,10 +62,10 @@ export async function POST(req: Request) {
     ]),
   ).slice(0, 25)
 
-  // For plus/family users, load dietary context so swaps respect preferences
+  // For Plus users, load dietary context so swaps respect preferences
   let prefContext: { dietary: string[]; dislikes: string[]; cuisines: string[] } | undefined
 
-  if (plan === 'plus' || plan === 'family') {
+  if (plan === 'plus') {
     try {
       // Try household_preferences first (written by onboarding)
       const { data: householdPrefs } = await supabase

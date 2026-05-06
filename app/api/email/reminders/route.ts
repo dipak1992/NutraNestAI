@@ -193,7 +193,7 @@ async function handleAdminSummary(supabase: SupabaseClient) {
     { count: failures },
   ] = await Promise.all([
     supabase.from('profiles').select('*', { count: 'exact', head: true }).gte('created_at', weekStart),
-    supabase.from('profiles').select('*', { count: 'exact', head: true }).in('subscription_tier', ['pro', 'family']).gte('updated_at', weekStart),
+    supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('subscription_tier', 'pro').gte('updated_at', weekStart),
     supabase.from('profiles').select('*', { count: 'exact', head: true }),
     supabase.from('email_logs').select('*', { count: 'exact', head: true }).eq('status', 'sent').gte('created_at', weekStart),
     supabase.from('email_logs').select('*', { count: 'exact', head: true }).eq('status', 'failed').gte('created_at', weekStart),

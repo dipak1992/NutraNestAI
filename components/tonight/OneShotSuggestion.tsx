@@ -123,7 +123,7 @@ export function OneShotSuggestion({ mode = 'tonight', title }: Props) {
 
   const handleCook = () => {
     if (!meal) return
-    if (!paywallStatus.isPro && !paywallStatus.isFamily) {
+    if (!paywallStatus.isPro) {
       setPaywallCopy({
         title: 'Unlock full recipes with Plus',
         description: 'Cook This is a Plus feature. Upgrade for guided recipes, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning.',
@@ -383,6 +383,7 @@ export function OneShotSuggestion({ mode = 'tonight', title }: Props) {
       <PaywallDialog
         open={paywallOpen}
         onOpenChange={setPaywallOpen}
+        feature="guided_cooking"
         title={paywallCopy.title}
         description={paywallCopy.description}
         isAuthenticated={paywallStatus.isAuthenticated}

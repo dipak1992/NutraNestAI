@@ -21,7 +21,7 @@ export default async function LeftoversPage() {
     <LeftoversClient
       initialLeftovers={leftovers}
       initialInsights={insights}
-      isPlusMember={paywall.isPro || paywall.isFamily}
+      isPlusMember={paywall.isPro}
     />
   )
 }

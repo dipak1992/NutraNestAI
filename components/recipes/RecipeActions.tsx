@@ -43,7 +43,7 @@ export function RecipeActions({ recipe, recipeId, hasActiveSession = false }: Pr
       <button
         type="button"
         onClick={() => {
-          if (!status.isPro && !status.isFamily) {
+          if (!status.isPro) {
             setPaywallOpen(true)
             return
           }

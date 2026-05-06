@@ -141,7 +141,7 @@ function UpgradeBanner() {
       transition={{ delay: 0.5, duration: 0.3 }}
     >
       <Link
-        href={`/pricing?intent=${trigger.targetTier}&trigger=${trigger.id}`}
+        href={`/upgrade?feature=${encodeURIComponent(trigger.id)}`}
         className="block rounded-2xl border border-amber-200/60 bg-gradient-to-r from-amber-50 to-orange-50/80 p-4 hover:shadow-md transition-all"
       >
         <div className="flex items-start gap-3">

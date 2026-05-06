@@ -141,7 +141,7 @@ export function TonightRecommendation({ refreshKey }: Props) {
   }, [refreshKey])
 
   const handleCook = useCallback((meal: SmartMealResult) => {
-    if (!paywallStatus.isPro && !paywallStatus.isFamily) {
+    if (!paywallStatus.isPro) {
       setPaywallCopy({
         title: 'Unlock full recipes with Plus',
         description: 'Cook This is a Plus feature. Upgrade for guided recipes, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning.',
@@ -157,7 +157,7 @@ export function TonightRecommendation({ refreshKey }: Props) {
     sessionStorage.setItem('recipe-source', 'tonight')
     setCookedMealId(meal.id)
     setGroceryMeal(meal)
-  }, [recordLike, paywallStatus.isPro, paywallStatus.isFamily])
+  }, [recordLike, paywallStatus.isPro])
 
   const handleSwapLunch = useCallback(async () => {
     if (!lunchMeal) return
@@ -332,6 +332,7 @@ export function TonightRecommendation({ refreshKey }: Props) {
       <PaywallDialog
         open={paywallOpen}
         onOpenChange={setPaywallOpen}
+        feature="guided_cooking"
         title={paywallCopy.title}
         description={paywallCopy.description}
         isAuthenticated={paywallStatus.isAuthenticated}

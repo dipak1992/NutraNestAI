@@ -73,7 +73,7 @@ export function LeftoverRecipeSuggestions({ leftoverId, leftoverName }: Props) {
   }
 
   function cookMeal(meal: SmartMealResult) {
-    if (!status.isPro && !status.isFamily) {
+    if (!status.isPro) {
       setPaywallOpen(true)
       return
     }

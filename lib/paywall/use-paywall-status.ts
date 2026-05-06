@@ -8,7 +8,6 @@ export interface ClientPaywallStatus {
   isAuthenticated: boolean
   tier: SubscriptionTier
   isPro: boolean
-  isFamily: boolean
   isTempPro: boolean
   effectivePlanPreviewDays: number
   freePlanPreviewDays: number
@@ -23,7 +22,6 @@ const DEFAULT_STATUS: ClientPaywallStatus = {
   isAuthenticated: false,
   tier: 'free',
   isPro: false,
-  isFamily: false,
   isTempPro: false,
   effectivePlanPreviewDays: FREE_PLAN_PREVIEW_DAYS,
   freePlanPreviewDays: FREE_PLAN_PREVIEW_DAYS,

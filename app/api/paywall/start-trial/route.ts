@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
       .maybeSingle()
 
     // Already has paid subscription → no trial needed
-    if (profile?.subscription_tier === 'pro' || profile?.subscription_tier === 'family') {
+    if (profile?.subscription_tier === 'pro') {
       return NextResponse.json(
         { error: 'You already have a paid subscription. No trial needed.' },
         { status: 400 },

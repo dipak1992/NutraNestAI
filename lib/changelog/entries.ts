@@ -26,7 +26,7 @@ export const CHANGELOG: ChangelogEntry[] = [
       { type: 'new', text: 'Budget Intelligence — real grocery budget tracking' },
       { type: 'improved', text: 'Completely redesigned dashboard with all 5 pillars in one view' },
       { type: 'improved', text: '30-second onboarding — down from ~4 minutes' },
-      { type: 'improved', text: 'Household sharing on Plus and Family plans' },
+      { type: 'improved', text: 'Household sharing on Plus' },
     ],
   },
   {

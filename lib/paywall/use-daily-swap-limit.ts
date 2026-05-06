@@ -23,7 +23,7 @@ export function useDailySwapLimit(
 ) {
   const [count, setCount] = useState(0)
   const limit = status.freeTonightSwipeLimit || FREE_TONIGHT_SWIPE_LIMIT
-  const isUnlimited = status.isPro || status.isFamily
+  const isUnlimited = status.isPro
 
   useEffect(() => {
     if (typeof window === 'undefined') return

@@ -556,6 +556,7 @@ export function PantryCapture({ onConfirm, onCancel }: Props) {
       <PaywallDialog
         open={paywallOpen}
         onOpenChange={setPaywallOpen}
+        feature="scan"
         title="Unlock Unlimited Snap & Cook"
         description="Free accounts get 3 Snap & Cook scans per week. Upgrade to Plus for unlimited scans and faster meal decisions."
         isAuthenticated={paywallStatusLoading || status.isAuthenticated}

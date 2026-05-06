@@ -17,10 +17,6 @@ export const serverEnv = {
     monthly: process.env.STRIPE_PRICE_PRO_MONTHLY ?? '',
     yearly: process.env.STRIPE_PRICE_PRO_YEARLY ?? '',
   },
-  stripePricingTierFamily: {
-    monthly: process.env.STRIPE_PRICE_FAMILY_MONTHLY ?? '',
-    yearly: process.env.STRIPE_PRICE_FAMILY_YEARLY ?? '',
-  },
   stripeTrialDays: parseInt(process.env.STRIPE_TRIAL_DAYS ?? '7', 10),
   adminEmail: process.env.ADMIN_EMAIL ?? '',
   webPushPrivateKey: process.env.WEB_PUSH_PRIVATE_KEY ?? '',

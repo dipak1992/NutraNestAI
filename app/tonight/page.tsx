@@ -316,7 +316,7 @@ function BlurredPlanPreview() {
               </Link>
             </Button>
             <Button asChild variant="outline" size="lg">
-              <Link href="/pricing">See pricing</Link>
+              <Link href="/upgrade">See Plus</Link>
             </Button>
           </div>
         </div>
@@ -793,6 +793,7 @@ function TonightPageInner() {
         <PaywallDialog
           open={paywallOpen}
           onOpenChange={setPaywallOpen}
+          feature="guided_cooking"
           title="You’ve used your free Tonight swipes"
           description="Keep the instant preview, then unlock unlimited swipes, the full weekly planner, grocery list, and advanced family tools with Plus."
           isAuthenticated={status.isAuthenticated}

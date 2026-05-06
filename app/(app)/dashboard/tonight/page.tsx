@@ -214,7 +214,6 @@ export default function TonightPillarPage() {
 
       // Mode-specific overrides
       if (chipMode === 'budget') body.budgetMode = true
-      if (chipMode === 'kids') body.kidsMode = true
       if (chipMode === 'date-night') body.dateNight = true
       if (chipMode === 'guests') body.guestsMode = true
 

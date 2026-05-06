@@ -84,7 +84,7 @@ export function MealCard({ meal, pantryMatch, swapping, onCook, onSwap, onOrder,
   }
 
   function handleCookClick() {
-    if (!status.isPro && !status.isFamily) {
+    if (!status.isPro) {
       setPaywallOpen(true)
       return
     }
@@ -271,6 +271,7 @@ export function MealCard({ meal, pantryMatch, swapping, onCook, onSwap, onOrder,
       <PaywallDialog
         open={paywallOpen}
         onOpenChange={setPaywallOpen}
+        feature="guided_cooking"
         title="Unlock full recipes with Plus"
         description="Cook This is a Plus feature. Upgrade for guided recipes, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning."
         isAuthenticated={status.isAuthenticated}

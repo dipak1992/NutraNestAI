@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
     display_order: body.display_order ?? existing.length,
   }
 
-  // Full profile fields — only for Family Plus
+  // Full profile fields — Plus only
   if (isFullProfile) {
     Object.assign(payload, {
       foods_loved_json: body.foods_loved_json ?? [],

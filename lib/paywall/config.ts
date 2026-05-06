@@ -41,27 +41,18 @@ export const PRO_UNLOCKS = [
   'Household memory for preferences and dislikes',
 ] as const
 
-// ── Kept for backward compat (same as PRO_UNLOCKS now) ──────────────────
-export const FAMILY_PLUS_UNLOCKS = PRO_UNLOCKS
-
 // ── Savings calculations ──────────────────────────────────────────────────
 
 export const PRO_ANNUAL_SAVINGS = Math.round((1 - PRICING_TIERS.pro.yearlyPrice / (PRICING_TIERS.pro.monthlyPrice * 12)) * 100) // 34% ($79/yr vs $119.88/yr)
-export const FAMILY_ANNUAL_SAVINGS = PRO_ANNUAL_SAVINGS // alias kept for compat
 
 // ── Tier normalization & checks ───────────────────────────────────────────
 
 export function normalizeTier(tier: string | null | undefined): SubscriptionTier {
-  if (tier === 'pro' || tier === 'family') return 'pro'
+  if (tier === 'pro' || tier === 'plus') return 'pro'
   return 'free'
 }
 
 export function isProTier(tier: SubscriptionTier | string | null | undefined): boolean {
   const normalized = typeof tier === 'string' ? normalizeTier(tier) : 'free'
   return normalized === 'pro'
-}
-
-export function isFamilyTier(_tier: SubscriptionTier | string | null | undefined): boolean {
-  void _tier
-  return false
 }

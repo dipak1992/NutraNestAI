@@ -25,9 +25,8 @@ export type PillarId = 'tonight' | 'plan' | 'cook' | 'household'
 export type TonightMode =
   | 'fast'        // Quick / low-energy meals
   | 'budget'      // Budget-friendly meals (PRO)
-  | 'kids'        // Kid-safe tonight meals (FAMILY)
   | 'date-night'  // Dinner date night (PRO)
-  | 'guests'      // Hosting guests tonight (FAMILY)
+  | 'guests'      // Hosting guests tonight (PRO)
 
 // ── Plan sub-modes ────────────────────────────────────────────────────────────
 
@@ -54,7 +53,6 @@ export interface TonightChip {
 export const TONIGHT_CHIPS: TonightChip[] = [
   { id: 'fast',       label: 'Fast',       emoji: '⚡', requiredTier: 'free' },
   { id: 'budget',     label: 'Budget',     emoji: '💰', requiredTier: 'pro' },
-  { id: 'kids',       label: 'Kids',       emoji: '👶', requiredTier: 'pro' },
   { id: 'date-night', label: 'Date Night', emoji: '🕯️', requiredTier: 'pro' },
   { id: 'guests',     label: 'Guests',     emoji: '🍽️', requiredTier: 'pro' },
 ]
@@ -147,7 +145,6 @@ export interface TierFeatures {
   oneProfile: boolean
   householdMemory: boolean
   multiMember: boolean
-  kidsTools: boolean
 }
 
 export const TIER_FEATURES: Record<SubscriptionTier, TierFeatures> = {
@@ -165,7 +162,6 @@ export const TIER_FEATURES: Record<SubscriptionTier, TierFeatures> = {
     oneProfile: true,
     householdMemory: false,
     multiMember: false,
-    kidsTools: false,
   },
   pro: {
     tonightBasic: true,
@@ -181,7 +177,6 @@ export const TIER_FEATURES: Record<SubscriptionTier, TierFeatures> = {
     oneProfile: true,
     householdMemory: true,
     multiMember: true,
-    kidsTools: true,
   },
 }
 
@@ -223,13 +218,6 @@ export const UPGRADE_TRIGGERS: UpgradeTrigger[] = [
     cta: 'Unlock Budget Mode',
   },
   {
-    id: 'kids-filters',
-    condition: 'User has used kids filters 3+ times',
-    targetTier: 'pro',
-    message: 'Kids tools make every meal safe and picky-eater approved.',
-    cta: 'Unlock Kids Tools',
-  },
-  {
     id: 'household-adjustments',
     condition: 'User has edited household settings 3+ times',
     targetTier: 'pro',
@@ -240,14 +228,14 @@ export const UPGRADE_TRIGGERS: UpgradeTrigger[] = [
     id: 'snap-cook-limit',
     condition: 'User has used Snap & Cook 5+ times',
     targetTier: 'pro',
-    message: 'Pro unlocks pantry meals and smart leftover reuse.',
-    cta: 'Upgrade to Pro',
+    message: 'Plus unlocks pantry meals and smart leftover reuse.',
+    cta: 'Upgrade to Plus',
   },
   {
     id: 'multi-member',
     condition: 'User tried to add more than 1 household member',
     targetTier: 'pro',
-    message: 'Pro supports up to 6 household members with conflict balancing.',
-    cta: 'Upgrade to Pro',
+    message: 'Plus supports up to 6 household members with conflict balancing.',
+    cta: 'Upgrade to Plus',
   },
 ]

@@ -422,7 +422,7 @@ export function MealSwipeStack({ mode, input }: Props) {
       <motion.button
         whileTap={{ scale: 0.97 }}
         onClick={() => {
-          if (!status.isPro && !status.isFamily) {
+          if (!status.isPro) {
             setPaywallCopy({
               title: 'Unlock full recipes with Plus',
               description: 'Cook This is a Plus feature. Upgrade for guided recipes, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning.',
@@ -441,7 +441,7 @@ export function MealSwipeStack({ mode, input }: Props) {
         Cook this
         <ChevronRight className="h-4 w-4" />
       </motion.button>
-      {!status.isPro && !status.isFamily && (
+      {!status.isPro && (
         <p className="text-center text-xs text-muted-foreground">
           {swaps.remaining > 0 ? `${swaps.remaining} swaps left today` : 'Free swaps used today'}
         </p>
@@ -524,6 +524,7 @@ export function MealSwipeStack({ mode, input }: Props) {
       <PaywallDialog
         open={paywallOpen}
         onOpenChange={setPaywallOpen}
+        feature="guided_cooking"
         title={paywallCopy.title}
         description={paywallCopy.description}
         isAuthenticated={status.isAuthenticated}

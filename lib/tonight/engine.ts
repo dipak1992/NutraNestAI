@@ -161,8 +161,8 @@ export function getSwapSuggestion(
   // Filter out already-seen meals
   let available = themed.filter((m) => !excludeIds.includes(m.id))
 
-  // For plus/family users with context: also filter dislikes and dietary
-  if (context && (plan === 'plus' || plan === 'family')) {
+  // For Plus users with context: also filter dislikes and dietary
+  if (context && plan === 'plus') {
     available = applyHardFilters(available, context)
     // If filtering leaves nothing, fall back to just exclude-filtered pool
     if (available.length === 0) {
@@ -182,7 +182,7 @@ export function getSwapSuggestion(
   const meal = finalPool[dailyHash(`${userId}:swap:${offset}`) % finalPool.length]
 
   return toTonightState(meal, reason, {
-    alternativesAvailable: plan === 'plus' || plan === 'family' ? 99 : Math.max(0, 3 - excludeIds.length),
+    alternativesAvailable: plan === 'plus' ? 99 : Math.max(0, 3 - excludeIds.length),
   })
 }
 

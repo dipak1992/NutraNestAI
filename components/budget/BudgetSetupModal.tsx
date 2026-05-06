@@ -98,7 +98,7 @@ export function BudgetSetupModal() {
                     <h2 id="budget-setup-title" className="font-semibold text-lg text-neutral-900 dark:text-neutral-50">
                       Budget Intelligence
                     </h2>
-                    <p className="text-xs text-neutral-500">Plus & Family plans</p>
+                    <p className="text-xs text-neutral-500">Plus plan</p>
                   </div>
                 </div>
 

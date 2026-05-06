@@ -8,14 +8,12 @@ import {
   FREE_KIDS_RECIPE_LIMIT,
   FREE_DAILY_GENERATIONS,
   isProTier,
-  isFamilyTier,
   normalizeTier,
 } from '@/lib/paywall/config'
 export interface PaywallStatus {
   isAuthenticated: boolean
   tier: SubscriptionTier
   isPro: boolean
-  isFamily: boolean
   isTempPro: boolean
   effectivePlanPreviewDays: number
   freePlanPreviewDays: number
@@ -34,13 +32,16 @@ async function ensureProfile(user: User): Promise<{
   const supabase = await createClient()
   const { data } = await supabase
     .from('profiles')
-    .select('subscription_tier, bonus_days, temp_pro_until')
+    .select('subscription_tier, plan, bonus_days, temp_pro_until')
     .eq('id', user.id)
     .maybeSingle()
 
-  if (data?.subscription_tier) {
+  if (data?.subscription_tier || data?.plan) {
+    const tier = normalizeTier(data.subscription_tier) === 'pro'
+      ? 'pro'
+      : normalizeTier(data.plan)
     return {
-      tier: normalizeTier(data.subscription_tier),
+      tier,
       bonusDays: data.bonus_days ?? 0,
       tempProUntil: data.temp_pro_until ?? null,
     }
@@ -71,7 +72,6 @@ export async function getPaywallStatus(): Promise<PaywallStatus> {
       isAuthenticated: false,
       tier: 'free',
       isPro: false,
-      isFamily: false,
       isTempPro: false,
       effectivePlanPreviewDays: FREE_PLAN_PREVIEW_DAYS,
       freePlanPreviewDays: FREE_PLAN_PREVIEW_DAYS,
@@ -87,7 +87,6 @@ export async function getPaywallStatus(): Promise<PaywallStatus> {
 
   const isTempPro = !!tempProUntil && new Date(tempProUntil) > new Date()
   const isPro = isProTier(tier) || isTempPro
-  const isFamily = isFamilyTier(tier)
   const effectivePlanPreviewDays = isPro
     ? 7
     : Math.min(FREE_PLAN_PREVIEW_DAYS + bonusDays, 7)
@@ -96,7 +95,6 @@ export async function getPaywallStatus(): Promise<PaywallStatus> {
     isAuthenticated: true,
     tier,
     isPro,
-    isFamily,
     isTempPro,
     effectivePlanPreviewDays,
     freePlanPreviewDays: FREE_PLAN_PREVIEW_DAYS,

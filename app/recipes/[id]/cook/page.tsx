@@ -27,9 +27,9 @@ export default async function CookPage({ params }: Props) {
     getPaywallStatus(),
   ])
 
-  const isPlusMember = paywall.isPro || paywall.isFamily
+  const isPlusMember = paywall.isPro
   if (!isPlusMember) {
-    redirect(`/pricing?feature=cook&redirect=/recipes/${encodeURIComponent(id)}`)
+    redirect(`/upgrade?feature=guided_cooking&redirect=/recipes/${encodeURIComponent(id)}`)
   }
 
   // Create or resume a cook session

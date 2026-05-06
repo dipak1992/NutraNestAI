@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { getGreeting } from '@/lib/dashboard/greeting'
 import { budgetColorClasses } from '@/lib/dashboard/budget'
+import { StreakBadge } from '@/components/habit/StreakBadge'
 import type { BudgetState } from '@/lib/dashboard/types'
 
 type Props = {
@@ -15,10 +16,13 @@ export function GreetingHeader({ firstName, budget }: Props) {
   const [g, setG] = useState<ReturnType<typeof getGreeting> | null>(null)
 
   useEffect(() => {
-    // Set greeting on client only after mount
-    setG(getGreeting())
-    const t = setInterval(() => setG(getGreeting()), 60_000)
-    return () => clearInterval(t)
+    const refresh = () => setG(getGreeting())
+    const first = window.setTimeout(refresh, 0)
+    const t = window.setInterval(refresh, 60_000)
+    return () => {
+      window.clearTimeout(first)
+      window.clearInterval(t)
+    }
   }, [])
 
   const hasBudget = budget?.weeklyLimit != null
@@ -28,10 +32,13 @@ export function GreetingHeader({ firstName, budget }: Props) {
     <header className="mb-2 md:mb-4">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <h1 className="font-serif text-3xl md:text-4xl font-bold text-neutral-900 dark:text-neutral-50 tracking-tight leading-tight">
-            {g ? g.greeting : 'Hello'}, {firstName}{' '}
-            <span aria-hidden>👋</span>
-          </h1>
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="font-serif text-3xl md:text-4xl font-bold text-neutral-900 dark:text-neutral-50 tracking-tight leading-tight">
+              {g ? g.greeting : 'Hello'}, {firstName}{' '}
+              <span aria-hidden>👋</span>
+            </h1>
+            <StreakBadge />
+          </div>
           <p suppressHydrationWarning className="mt-1.5 text-sm md:text-base text-neutral-500 dark:text-neutral-400 leading-snug">
             {g ? (
               <>

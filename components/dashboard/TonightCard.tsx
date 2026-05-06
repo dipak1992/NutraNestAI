@@ -122,7 +122,7 @@ export function TonightCard({ state }: Props) {
       trackTonightEvent('dashboard_tonight_viewed', {
         meal_id: state.recipe.id,
         meal_name: state.recipe.name,
-        is_personalized: status.isPro || status.isFamily,
+        is_personalized: status.isPro,
         plan: status.isPro ? 'plus' : 'free',
       })
     }
@@ -232,7 +232,7 @@ export function TonightCard({ state }: Props) {
           <div className="mb-3 flex flex-wrap items-center gap-2 md:mb-4">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-[#D97757] text-white text-xs font-bold px-3 py-1.5 shadow-sm shadow-orange-900/40">
               <Sparkles className="w-3 h-3" />
-              {status.isPro || status.isFamily ? 'Tonight\u2019s Smart Pick' : 'Tonight\u2019s Pick'}
+              {status.isPro ? 'Tonight\u2019s Smart Pick' : 'Tonight\u2019s Pick'}
             </span>
             {usesLeftover && (
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-900/60 text-emerald-300 text-xs font-semibold px-3 py-1.5 border border-emerald-700/50 backdrop-blur-sm">
@@ -295,7 +295,7 @@ export function TonightCard({ state }: Props) {
           )}
         </div>
 
-        {!status.isPro && !status.isFamily && (
+        {!status.isPro && (
           <p className="relative z-10 mt-3 text-xs font-medium text-white/60">
             {swaps.remaining > 0
               ? `${swaps.remaining} swap${swaps.remaining === 1 ? '' : 's'} left today`
@@ -348,7 +348,7 @@ export function TonightCard({ state }: Props) {
             {isRegenerating ? 'Finding…' : 'Show another'}
           </button>
         </div>
-        {!status.isPro && !status.isFamily && (
+        {!status.isPro && (
           <button
             type="button"
             onClick={() => {

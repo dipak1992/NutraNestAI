@@ -97,7 +97,7 @@ export default function TonightRecipePage() {
 
   const recipe = mealToRecipe(meal, source)
 
-  if (showCookMode && !status.isPro && !status.isFamily) {
+  if (showCookMode && !status.isPro) {
     return (
       <PaywallDialog
         open
@@ -105,6 +105,7 @@ export default function TonightRecipePage() {
           setPaywallOpen(open)
           if (!open) setShowCookMode(false)
         }}
+        feature="guided_cooking"
         title="Unlock guided cooking with Plus"
         description="The basic recipe is yours. Plus adds step-by-step Cook Mode, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning."
         isAuthenticated={status.isAuthenticated}
@@ -186,7 +187,7 @@ export default function TonightRecipePage() {
           <div className="mt-5 flex flex-wrap gap-2">
             <Button
               onClick={() => {
-                if (!status.isPro && !status.isFamily) {
+                if (!status.isPro) {
                   setPaywallOpen(true)
                   return
                 }
@@ -293,6 +294,7 @@ export default function TonightRecipePage() {
       <PaywallDialog
         open={paywallOpen}
         onOpenChange={setPaywallOpen}
+        feature="guided_cooking"
         title="Unlock guided cooking with Plus"
         description="The basic recipe is yours. Plus adds step-by-step Cook Mode, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning."
         isAuthenticated={status.isAuthenticated}

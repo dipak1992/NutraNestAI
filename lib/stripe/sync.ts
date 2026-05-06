@@ -70,8 +70,6 @@ export async function clearSubscription(
 
 function matchPlan(priceId: string | undefined): PlanId {
   if (priceId === process.env.STRIPE_PLUS_PRICE_ID) return 'plus'
-  // family price ID now maps to plus (Family Plus removed)
-  if (priceId === process.env.STRIPE_FAMILY_PRICE_ID) return 'plus'
   return 'free'
 }
 

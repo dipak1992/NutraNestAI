@@ -39,7 +39,7 @@ export async function getDashboardPayload(
   // --- Real profile fetch ---
   const { data: profile } = await supabase
     .from('profiles')
-    .select('full_name, subscription_tier, onboarding_complete, created_at')
+    .select('full_name, subscription_tier, plan, onboarding_complete, created_at')
     .eq('id', userId)
     .maybeSingle()
 
@@ -60,10 +60,12 @@ export async function getDashboardPayload(
   const tierMap: Record<string, Plan> = {
     pro: 'plus',
     plus: 'plus',
-    family: 'family',
     free: 'free',
   }
-  const plan: Plan = tierMap[profile?.subscription_tier ?? 'free'] ?? 'free'
+  const plan: Plan =
+    tierMap[profile?.subscription_tier ?? 'free'] ??
+    tierMap[profile?.plan ?? 'free'] ??
+    'free'
 
   // Onboarding complete — default true if column doesn't exist yet
   const onboardingComplete: boolean = profile?.onboarding_complete ?? true

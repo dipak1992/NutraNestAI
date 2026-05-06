@@ -8,10 +8,10 @@ export const NUDGE_PRIORITY: Record<Nudge['type'], number> = {
   household_invite: 80,
   upgrade_prompt: 75,
   autopilot_education: 60,
+  sunday_plan_ritual: 58,
+  weekday_dinner_reminder: 57,
   pantry_scan_reminder: 55,
-  sunday_plan_ritual: 54,
-  weekday_dinner_reminder: 53,
-  weekly_savings_recap: 52,
+  weekly_savings_recap: 54,
   referral: 50,
 }
 
@@ -23,9 +23,9 @@ const NUDGE_VARIANT: Record<Nudge['type'], NudgeVariant> = {
   household_invite: 'info',
   upgrade_prompt: 'promo',
   autopilot_education: 'info',
-  pantry_scan_reminder: 'info',
   sunday_plan_ritual: 'info',
   weekday_dinner_reminder: 'info',
+  pantry_scan_reminder: 'info',
   weekly_savings_recap: 'success',
   referral: 'success',
 }
@@ -47,7 +47,7 @@ export function pickNudge(
 export function selectNudge(
   ctx: Pick<
     DashboardPayload,
-    'user' | 'leftovers' | 'budget' | 'limits' | 'household' | 'weekPlan'
+    'user' | 'leftovers' | 'budget' | 'limits' | 'household' | 'weekPlan' | 'retention'
   >,
   dismissed: string[] = []
 ): Nudge | null {
@@ -58,7 +58,7 @@ export function selectNudge(
 export function buildNudgeCandidates(
   ctx: Pick<
     DashboardPayload,
-    'user' | 'leftovers' | 'budget' | 'limits' | 'household' | 'weekPlan'
+    'user' | 'leftovers' | 'budget' | 'limits' | 'household' | 'weekPlan' | 'retention'
   >
 ): Nudge[] {
   const candidates: Nudge[] = []
@@ -138,8 +138,8 @@ export function buildNudgeCandidates(
       priority: NUDGE_PRIORITY.household_invite,
       title: 'Cook together',
       body: 'Invite your partner or family to share meal plans and grocery lists.',
-      ctaLabel: 'Invite family',
-      ctaHref: '/family',
+      ctaLabel: 'Invite a co-chef',
+      ctaHref: '/dashboard/household',
       dismissible: true,
       variant: NUDGE_VARIANT.household_invite,
     })
@@ -168,7 +168,7 @@ export function buildNudgeCandidates(
 
   // 7. Autopilot education (plus users who haven't enabled autopilot)
   if (
-    (ctx.user.plan === 'plus' || ctx.user.plan === 'family') &&
+    ctx.user.plan === 'plus' &&
     !ctx.weekPlan.isAutopilotEnabled
   ) {
     candidates.push({
@@ -184,7 +184,37 @@ export function buildNudgeCandidates(
     })
   }
 
-  // 8. Pantry scan reminder (no scans used yet)
+  // 8. Sunday planning ritual
+  if (ctx.retention.isSunday && ctx.retention.plannedDays < 3) {
+    candidates.push({
+      id: 'nudge-sunday-plan',
+      type: 'sunday_plan_ritual',
+      priority: NUDGE_PRIORITY.sunday_plan_ritual,
+      title: 'Set up the week',
+      body: 'Sunday is a good moment to plan dinners before the week starts moving.',
+      ctaLabel: 'Plan this week',
+      ctaHref: '/planner',
+      dismissible: true,
+      variant: NUDGE_VARIANT.sunday_plan_ritual,
+    })
+  }
+
+  // 9. Weekday dinner reminder
+  if (!ctx.retention.isSunday && ctx.retention.isDinnerWindow && ctx.weekPlan.completionPercentage < 100) {
+    candidates.push({
+      id: 'nudge-dinner-reminder',
+      type: 'weekday_dinner_reminder',
+      priority: NUDGE_PRIORITY.weekday_dinner_reminder,
+      title: "Dinner window is here",
+      body: 'Pick tonight now, then let leftovers and groceries update around it.',
+      ctaLabel: 'Open Tonight',
+      ctaHref: '/dashboard',
+      dismissible: true,
+      variant: NUDGE_VARIANT.weekday_dinner_reminder,
+    })
+  }
+
+  // 10. Pantry scan reminder (no scans used yet)
   if (ctx.limits.scansUsed === 0) {
     candidates.push({
       id: 'nudge-pantry-scan',
@@ -199,8 +229,27 @@ export function buildNudgeCandidates(
     })
   }
 
-  // 9. Referral (plus users who have been active for 14+ days)
-  if (ctx.user.plan === 'plus' || ctx.user.plan === 'family') {
+  // 11. Weekly savings recap
+  if (
+    ctx.retention.weeklyBudgetRemaining != null &&
+    ctx.retention.weeklyBudgetRemaining > 0 &&
+    ctx.user.plan !== 'free'
+  ) {
+    candidates.push({
+      id: 'nudge-savings-recap',
+      type: 'weekly_savings_recap',
+      priority: NUDGE_PRIORITY.weekly_savings_recap,
+      title: 'You are under budget',
+      body: `$${ctx.retention.weeklyBudgetRemaining.toFixed(0)} left this week. Want lower-cost ideas to keep it that way?`,
+      ctaLabel: 'See savings',
+      ctaHref: '/budget?tab=swaps',
+      dismissible: true,
+      variant: NUDGE_VARIANT.weekly_savings_recap,
+    })
+  }
+
+  // 12. Referral (plus users who have been active for 14+ days)
+  if (ctx.user.plan === 'plus') {
     const createdAt = new Date(ctx.user.createdAt)
     const daysSinceJoin = Math.floor(
       (Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24)

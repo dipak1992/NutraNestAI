@@ -77,7 +77,7 @@ function MealDayCard({ meal, dayLabel, date, onRegenerate, isRegenerating }: Mea
   const toBuyItems = meal.ingredients.filter((i) => !i.fromPantry)
 
   function openRecipe(cook = false) {
-    if (cook && !status.isPro && !status.isFamily) {
+    if (cook && !status.isPro) {
       setPaywallOpen(true)
       return
     }
@@ -289,6 +289,7 @@ function MealDayCard({ meal, dayLabel, date, onRegenerate, isRegenerating }: Mea
       <PaywallDialog
         open={paywallOpen}
         onOpenChange={setPaywallOpen}
+        feature="guided_cooking"
         title="Unlock full recipes with Plus"
         description="Cook weekly meals with guided recipes, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning."
         isAuthenticated={status.isAuthenticated}

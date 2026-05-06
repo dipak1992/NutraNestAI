@@ -1,6 +1,5 @@
 export type UpgradeFeature =
   | 'budget'
-  | 'family'
   | 'grocery'
   | 'household'
   | 'leftovers'
@@ -25,12 +24,6 @@ const FEATURE_COPY: Record<string, FeatureCopy> = {
     description: 'See meal costs before you shop, catch budget drift early, and swap pricey dinners for lower-cost options.',
     bullets: ['Budget-aware swaps', 'Weekly spend alerts', 'Cost estimates before shopping'],
   },
-  family: {
-    eyebrow: 'Household memory',
-    title: 'Personalize dinner for everyone',
-    description: 'Plus remembers household preferences, profile needs, dislikes, and what actually worked at dinner.',
-    bullets: ['Up to 6 profiles', 'Picky-eater memory', 'Household-safe suggestions'],
-  },
   grocery: {
     eyebrow: 'Grocery utility',
     title: 'Turn plans into grocery lists',
@@ -41,7 +34,7 @@ const FEATURE_COPY: Record<string, FeatureCopy> = {
     eyebrow: 'Household memory',
     title: 'Stop re-explaining your food life',
     description: 'Plus keeps your household context attached to every Tonight pick, weekly plan, and grocery decision.',
-    bullets: ['Shared preferences', 'Family profiles', 'Better repeat suggestions'],
+    bullets: ['Shared preferences', 'Household profiles', 'Better repeat suggestions'],
   },
   leftovers: {
     eyebrow: 'Waste less',

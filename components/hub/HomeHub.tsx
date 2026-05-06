@@ -256,7 +256,7 @@ export function HomeHub({ userName }: Props) {
   // ── Meal actions ──────────────────────────────────────────
 
   const handleCook = useCallback((m: SmartMealResult) => {
-    if (!paywallStatus.isPro && !paywallStatus.isFamily) {
+    if (!paywallStatus.isPro) {
       setPaywallCopy({
         title: 'Unlock full recipes with Plus',
         description: 'Cook This is a Plus feature. Upgrade for guided recipes, unlimited swaps, premium meal tools, smarter Tonight suggestions, and better planning.',
@@ -271,7 +271,7 @@ export function HomeHub({ userName }: Props) {
     persistMealForRecipe(m, '/dashboard', source)
     sessionStorage.setItem('recipe-open-cook', 'true')
     router.push('/tonight/recipe')
-  }, [recordLike, activeTile, router, paywallStatus.isPro, paywallStatus.isFamily])
+  }, [recordLike, activeTile, router, paywallStatus.isPro])
 
   const handleSwap = useCallback(async (m: SmartMealResult) => {
     if (!swaps.recordSwap()) {
@@ -493,7 +493,7 @@ export function HomeHub({ userName }: Props) {
                     </div>
                   </div>
                   <Link
-                    href="/pricing"
+                    href="/upgrade"
                     className="mt-3 flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition-colors"
                   >
                     See your Plus preview
@@ -646,6 +646,7 @@ export function HomeHub({ userName }: Props) {
     <PaywallDialog
       open={paywallOpen}
       onOpenChange={setPaywallOpen}
+      feature="guided_cooking"
       title={paywallCopy.title}
       description={paywallCopy.description}
       isAuthenticated={paywallStatus.isAuthenticated}

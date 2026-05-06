@@ -18,10 +18,6 @@ export const publicEnv = {
     monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_MONTHLY ?? '',
     yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_YEARLY ?? '',
   },
-  stripePricingTierFamily: {
-    monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_FAMILY_MONTHLY ?? '',
-    yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_FAMILY_YEARLY ?? '',
-  },
   webPushPublicKey: process.env.NEXT_PUBLIC_WEB_PUSH_PUBLIC_KEY ?? '',
 } as const
 

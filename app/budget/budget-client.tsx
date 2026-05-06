@@ -366,7 +366,7 @@ function SwapCard({ swap, onCook }: { swap: SwapSuggestion; onCook: (meal: Smart
           <div className="mt-3 flex flex-wrap gap-2">
             <button
               onClick={() => {
-                if (!status.isPro && !status.isFamily) {
+                if (!status.isPro) {
                   setPaywallOpen(true)
                   return
                 }

@@ -12,14 +12,12 @@ import {
   Settings,
   Heart,
   Brain,
-  ShieldCheck,
   ChevronRight,
   Plus,
+  Mail,
+  Loader2,
   Sparkles,
   AlertTriangle,
-  CheckCircle2,
-  Baby,
-  UtensilsCrossed,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -27,7 +25,7 @@ import { PaywallDialog } from '@/components/paywall/PaywallDialog'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 import { useOnboardingStore, useLightOnboardingStore } from '@/lib/store'
 import { useLearningStore } from '@/lib/learning/store'
-import { hasAccess, TIER_FEATURES, getFeatures } from '@/lib/pillars/config'
+import { getFeatures } from '@/lib/pillars/config'
 import { cn } from '@/lib/utils'
 import type { FamilyMemberRecord } from '@/lib/family/types'
 import { InviteCoChef } from '@/components/household/InviteCoChef'
@@ -175,7 +173,10 @@ export default function HouseholdPillarPage() {
   const [paywallOpen, setPaywallOpen] = useState(false)
   const [paywallMessage, setPaywallMessage] = useState({ title: '', description: '' })
   const [members, setMembers] = useState<FamilyMemberRecord[]>([])
-  const [membersLoading, setMembersLoading] = useState(false)
+  const [inviteEmail, setInviteEmail] = useState('')
+  const [inviting, setInviting] = useState(false)
+  const [inviteError, setInviteError] = useState<string | null>(null)
+  const [inviteSent, setInviteSent] = useState<string | null>(null)
 
   const { status } = usePaywallStatus()
   const { state: { householdName } } = useOnboardingStore()
@@ -185,20 +186,53 @@ export default function HouseholdPillarPage() {
   // Load household profiles for all authenticated tiers
   useEffect(() => {
     if (!status.isAuthenticated) return
-    setMembersLoading(true)
     fetch('/api/family/members', { cache: 'no-store' })
       .then(r => r.json())
       .then(data => {
         setMembers(data.members ?? [])
       })
       .catch(() => {})
-      .finally(() => setMembersLoading(false))
   }, [status.isAuthenticated])
 
   const handleLockedClick = useCallback((title: string, description: string) => {
     setPaywallMessage({ title, description })
     setPaywallOpen(true)
   }, [])
+
+  const handleInvite = useCallback(async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const email = inviteEmail.trim()
+    if (!email) return
+
+    if (!status.isPro) {
+      setPaywallMessage({
+        title: 'Invite a co-chef',
+        description: 'Plus lets you invite household members so meal planning can be shared.',
+      })
+      setPaywallOpen(true)
+      return
+    }
+
+    setInviting(true)
+    setInviteError(null)
+    setInviteSent(null)
+    try {
+      const res = await fetch('/api/settings/household/invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+      const data = await res.json().catch(() => null) as { error?: string } | null
+      if (!res.ok) {
+        setInviteError(data?.error ?? 'Could not send invite')
+        return
+      }
+      setInviteSent(email)
+      setInviteEmail('')
+    } finally {
+      setInviting(false)
+    }
+  }, [inviteEmail, status.isPro])
 
   const householdTypeLabel = light.householdType === 'solo'
     ? 'Just me'
@@ -228,9 +262,51 @@ export default function HouseholdPillarPage() {
             🏠 Household
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Preferences, family profiles, memory
+            Invite a co-chef, manage profiles, and keep meal preferences together
           </p>
         </div>
+
+        <motion.section
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6 rounded-2xl border border-orange-200/70 bg-white p-5 shadow-sm"
+        >
+          <div className="mb-4 flex items-start gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-orange-50 text-[#D97757]">
+              <Mail className="h-5 w-5" />
+            </span>
+            <div>
+              <h2 className="text-base font-bold text-foreground">Invite a co-chef</h2>
+              <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+                Send an invite to someone who helps plan, shop, or cook with you.
+              </p>
+            </div>
+          </div>
+
+          <form onSubmit={handleInvite} className="flex flex-col gap-2 sm:flex-row">
+            <input
+              type="email"
+              value={inviteEmail}
+              onChange={(event) => setInviteEmail(event.target.value)}
+              placeholder="email@example.com"
+              required
+              className="min-h-11 flex-1 rounded-xl border border-border bg-background px-3 text-sm outline-none focus:border-[#D97757]/70 focus:ring-2 focus:ring-[#D97757]/15"
+            />
+            <Button type="submit" disabled={inviting || !inviteEmail.trim()} className="min-h-11 gap-2">
+              {inviting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
+              {status.isPro ? 'Send invite' : 'Unlock with Plus'}
+            </Button>
+          </form>
+
+          {inviteSent && (
+            <p className="mt-2 text-xs text-emerald-700">
+              Invite sent to {inviteSent}.
+            </p>
+          )}
+          {inviteError && (
+            <p className="mt-2 text-xs text-red-600">{inviteError}</p>
+          )}
+        </motion.section>
 
         {/* Household summary card */}
         <motion.div
@@ -339,10 +415,9 @@ export default function HouseholdPillarPage() {
             title="Household Profiles"
             subtitle={
               status.isPro
-                ? 'Add up to 6 household member profiles — preferences, allergies, kids tools, and more'
+                ? 'Add up to 6 household member profiles with preferences, allergies, and food goals'
                 : 'Add your personal profile. Upgrade to Plus for up to 6 profiles.'
             }
-            href="/family"
             badge={
               status.isPro
                 ? `${members.length} profiles`
@@ -363,11 +438,11 @@ export default function HouseholdPillarPage() {
                   onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
-                    router.push('/family')
+                    setInviteEmail('')
                   }}
                 >
                   <Plus className="h-3 w-3" />
-                  Add your profile
+                  Use invite form above
                 </Button>
               </div>
             )}
@@ -410,37 +485,6 @@ export default function HouseholdPillarPage() {
           >
             {features.householdMemory && <IntelligenceSummary />}
           </SectionCard>
-
-          {/* 4. Kids Tools */}
-          {(light.hasKids || light.householdType === 'family') && (
-            <SectionCard
-              index={3}
-              emoji="👶"
-              title="Kids Tools"
-              subtitle={
-                features.kidsTools
-                  ? 'Lunchbox help, picky eater mode, age-safe meals, and baking activities'
-                  : 'Unlock kid-safe meals, lunchbox planning, and picky eater tools'
-              }
-              locked={!features.kidsTools}
-              onClick={
-                !features.kidsTools
-                  ? () => handleLockedClick(
-                      'Unlock Kids Tools',
-                      'Family Plus includes kid-safe meal variations, lunchbox planning, picky eater mode, and fun baking activities.'
-                    )
-                  : undefined
-              }
-              badge={features.kidsTools ? 'Unlocked' : 'Family Plus'}
-              badgeColor={features.kidsTools ? 'bg-pink-50 text-pink-700' : 'bg-amber-50 text-amber-700'}
-            >
-              {features.kidsTools && (
-                <p className="mt-1.5 text-[11px] text-muted-foreground/70">
-                  Kid-friendly meal tools coming in the next update.
-                </p>
-              )}
-            </SectionCard>
-          )}
 
         </div>
 
@@ -500,6 +544,7 @@ export default function HouseholdPillarPage() {
       <PaywallDialog
         open={paywallOpen}
         onOpenChange={setPaywallOpen}
+        feature="household"
         title={paywallMessage.title}
         description={paywallMessage.description}
         isAuthenticated={status.isAuthenticated}

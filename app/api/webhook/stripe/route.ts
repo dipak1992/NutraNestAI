@@ -4,7 +4,7 @@
 // with the Supabase profiles table.
 //
 // Events handled:
-//   checkout.session.completed    → upgrade user to pro/family
+//   checkout.session.completed    → upgrade user to pro
 //   customer.subscription.updated → sync tier on plan change
 //   customer.subscription.deleted → downgrade to free
 //   invoice.payment_failed        → log (no immediate downgrade)
@@ -139,7 +139,7 @@ async function handleCheckoutCompleted(session: Record<string, unknown>) {
   let tier: SubscriptionTier = 'pro'
   if (metadata?.plan) {
     const plan = String(metadata.plan)
-    if (plan.includes('pro') || plan.includes('family')) tier = 'pro'
+    if (plan.includes('pro')) tier = 'pro'
   }
 
   const supabase = adminSupabase()

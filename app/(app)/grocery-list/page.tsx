@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { ShoppingCart, Lock, Globe, ChevronDown, Settings2 } from 'lucide-react'
 import { GroceryListPanel } from '@/components/grocery/GroceryListPanel'
 import { ProviderComparisonCard } from '@/components/grocery/ProviderComparisonCard'
@@ -21,6 +21,7 @@ const REGION_OPTIONS: { value: DetectedRegion; label: string; flag: string }[] =
 export default function GroceryListPage() {
   const { status, loading } = usePaywallStatus()
   const groceryList = useWeeklyPlanStore((s) => s.groceryList)
+  const [preferredStore, setPreferredStore] = useState<string | null>(null)
   const {
     region,
     hasProviders,
@@ -32,7 +33,7 @@ export default function GroceryListPage() {
     downloadPDF,
     emailList,
     shareList,
-  } = useGroceryCommerce(groceryList)
+  } = useGroceryCommerce(groceryList, preferredStore)
 
   const [copySuccess, setCopySuccess] = useState(false)
   const [showRegionPicker, setShowRegionPicker] = useState(false)
@@ -48,6 +49,19 @@ export default function GroceryListPage() {
   const handleProviderSelect = useCallback((providerId: string) => {
     openProvider(providerId as ProviderId)
   }, [openProvider])
+
+  useEffect(() => {
+    void fetch('/api/budget', { cache: 'no-store' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        const nextPreferredStore =
+          typeof data?.settings?.preferredStore === 'string'
+            ? data.settings.preferredStore
+            : null
+        setPreferredStore(nextPreferredStore)
+      })
+      .catch(() => {})
+  }, [])
 
   // Free plan gate — show limited view
   if (!loading && !status.isPro) {
@@ -68,7 +82,7 @@ export default function GroceryListPage() {
             Your personalized grocery list lives here
           </p>
           <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1 max-w-sm">
-            Generate your weekly meal plan to unlock a smart grocery list with store comparison, one-tap shopping, and export tools.
+            Generate your weekly meal plan to unlock a smart grocery list with store comparison, retailer handoff, and export tools.
           </p>
 
           {/* Feature preview */}
@@ -91,7 +105,7 @@ export default function GroceryListPage() {
         <div className="mt-6">
           <ProPaywallCard
             title="Turn your meal plan into a shopping list"
-            description="Upgrade to Plus to unlock auto-built grocery lists with store comparison, one-tap shopping at Walmart & Instacart, PDF export, and smart pantry deduction."
+            description="Upgrade to Plus to unlock auto-built grocery lists with store comparison, Walmart, Instacart, and Kroger handoff, PDF export, and smart pantry deduction."
             isAuthenticated={status.isAuthenticated}
             redirectPath="/grocery-list"
             feature="grocery"
@@ -161,10 +175,17 @@ export default function GroceryListPage() {
 
       {/* Provider comparison — only for supported regions with a grocery list */}
       {!regionLoading && hasProviders && groceryList && groceryList.items.length > 0 && (
-        <ProviderComparisonCard
-          estimates={estimates}
-          onSelectProvider={handleProviderSelect}
-        />
+        <div className="space-y-2">
+          {preferredStore && (
+            <p className="text-xs text-neutral-500 dark:text-neutral-400">
+              Preferred store: <span className="font-medium text-neutral-700 dark:text-neutral-300">{preferredStore}</span>
+            </p>
+          )}
+          <ProviderComparisonCard
+            estimates={estimates}
+            onSelectProvider={handleProviderSelect}
+          />
+        </div>
       )}
 
       {/* Export actions — always available when there's a list */}
@@ -193,10 +214,11 @@ export default function GroceryListPage() {
         <div className="rounded-xl bg-neutral-50 dark:bg-neutral-900/50 border border-neutral-100 dark:border-neutral-800 px-4 py-3 text-[11px] text-neutral-400 dark:text-neutral-500 space-y-1">
           <p className="font-medium text-neutral-500 dark:text-neutral-400">ℹ️ About store links</p>
           <p>
-            MealEase is not affiliated with Walmart or Instacart. Clicking &ldquo;Shop&rdquo; opens the
-            retailer&rsquo;s website where you can search for and purchase items directly. Estimated prices
-            are approximations and may differ from actual store prices. MealEase does not process
-            payments or handle orders.
+            MealEase is not affiliated with Walmart, Instacart, or Kroger. Clicking &ldquo;Shop&rdquo; opens the
+            retailer&rsquo;s website where you can search for and purchase items directly. MealEase also copies
+            your full grocery list when you open a retailer so you have a reliable fallback. Estimated prices
+            are approximations and may differ from actual store prices. MealEase does not process payments or
+            handle orders.
           </p>
         </div>
       )}

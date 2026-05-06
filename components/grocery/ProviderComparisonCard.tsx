@@ -57,9 +57,14 @@ export function ProviderComparisonCard({ estimates, onSelectProvider }: Props) {
                 <span className="block text-sm font-bold text-neutral-900 dark:text-neutral-50">
                   {estimate.provider.displayName}
                 </span>
-                <span className="block text-[11px] text-neutral-500 dark:text-neutral-400">
-                  {estimate.provider.description.slice(0, 45)}
-                </span>
+                <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
+                  <span className="block text-[11px] text-neutral-500 dark:text-neutral-400">
+                    {estimate.provider.description.slice(0, 45)}
+                  </span>
+                  <span className="rounded-full bg-neutral-100 px-1.5 py-0.5 text-[10px] font-semibold text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
+                    {estimate.provider.cartBuilderSupported ? 'Direct cart' : 'Search handoff'}
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -96,7 +101,7 @@ export function ProviderComparisonCard({ estimates, onSelectProvider }: Props) {
             {/* CTA */}
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-[#D97757] group-hover:underline underline-offset-2">
-                Shop {estimate.itemCount} items
+                {providerCtaLabel(estimate)}
               </span>
               <ArrowRight className="h-3.5 w-3.5 text-[#D97757] group-hover:translate-x-0.5 transition-transform" />
             </div>
@@ -117,8 +122,26 @@ export function ProviderComparisonCard({ estimates, onSelectProvider }: Props) {
       </div>
 
       <p className="text-[10px] text-neutral-400 dark:text-neutral-500 text-center">
-        Estimates based on average prices. Actual costs may vary by location. Store links may use affiliate tracking when configured.
+        Estimates are approximate. Retailer buttons currently open store search pages, and MealEase copies your full list as backup.
       </p>
     </section>
   )
+}
+
+function providerCtaLabel(estimate: ProviderEstimate): string {
+  if (estimate.provider.cartBuilderSupported) {
+    return `Shop at ${estimate.provider.displayName}`
+  }
+  if (estimate.providerId === 'instacart') {
+    return 'Open in Instacart'
+  }
+  if (estimate.providerId === 'kroger') {
+    return 'Search at Kroger'
+  }
+  if (estimate.providerId === 'walmart_us' || estimate.providerId === 'walmart_ca') {
+    return estimate.provider.displayName === 'Walmart Canada'
+      ? 'Shop at Walmart Canada'
+      : 'Shop at Walmart'
+  }
+  return `Open ${estimate.provider.displayName}`
 }

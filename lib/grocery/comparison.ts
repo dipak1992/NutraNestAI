@@ -8,6 +8,9 @@ import type { GroceryList } from '@/lib/planner/types'
 import { getProvidersForRegion } from './providers/registry'
 import type { DetectedRegion } from './types'
 
+const warnedProviders = new Set<string>()
+const PREFERRED_PROVIDER_BOOST = -1000
+
 /**
  * Build optimized search queries for grocery items.
  * Strips unnecessary words, keeps brand-relevant terms.
@@ -47,14 +50,12 @@ export function buildProviderSearchUrl(
   provider: GroceryProvider,
   items: ProviderCartItem[]
 ): string {
-  // Build a combined search query from top items
-  const topItems = items.slice(0, 10) // Limit to avoid URL length issues
-  const combinedQuery = topItems
-    .map((item) => item.name)
-    .join(', ')
-
+  const combinedQuery = buildCombinedProviderQuery(provider, items)
   const encoded = encodeURIComponent(combinedQuery)
-  const url = provider.searchUrlTemplate.replace('{{query}}', encoded)
+  const template = provider.multiItemSearchUrl ?? provider.searchUrlTemplate
+  const url = template
+    .replace('{{items}}', encoded)
+    .replace('{{query}}', encoded)
   return appendAffiliateParams(url, provider.id)
 }
 
@@ -78,8 +79,48 @@ function appendAffiliateParams(url: string, providerId: GroceryProvider['id']): 
     params.set('veh', 'aff')
     params.set('affiliates_ad_id', process.env.NEXT_PUBLIC_WALMART_AFFILIATE_ID)
   }
+  if (providerId === 'kroger' && process.env.NEXT_PUBLIC_KROGER_AFFILIATE_ID) {
+    params.set('cid', process.env.NEXT_PUBLIC_KROGER_AFFILIATE_ID)
+  }
+  if (process.env.NODE_ENV === 'development' && params.size === 0) {
+    const missingEnv =
+      providerId === 'instacart'
+        ? 'NEXT_PUBLIC_INSTACART_AFFILIATE_ID'
+        : providerId === 'kroger'
+          ? 'NEXT_PUBLIC_KROGER_AFFILIATE_ID'
+          : providerId === 'walmart_us' || providerId === 'walmart_ca'
+            ? 'NEXT_PUBLIC_WALMART_AFFILIATE_ID'
+            : null
+    if (missingEnv && !warnedProviders.has(providerId)) {
+      warnedProviders.add(providerId)
+      console.warn(`[grocery] ${providerId} link opened without ${missingEnv}`)
+    }
+  }
   if (params.size === 0) return url
   return `${url}${url.includes('?') ? '&' : '?'}${params.toString()}`
+}
+
+function buildCombinedProviderQuery(
+  provider: GroceryProvider,
+  items: ProviderCartItem[]
+): string {
+  const maxItems = provider.id === 'instacart' ? 8 : 10
+  const selected = items
+    .slice(0, maxItems)
+    .map((item) => item.searchQuery.trim())
+    .filter(Boolean)
+
+  if (selected.length === 0) return ''
+
+  if (provider.id === 'instacart') {
+    return selected.join(' ')
+  }
+
+  if (provider.id === 'kroger') {
+    return selected.join(', ')
+  }
+
+  return selected.join(', ')
 }
 
 /**
@@ -112,7 +153,8 @@ function estimateProviderTotal(
  */
 export function compareProviders(
   groceryList: GroceryList,
-  region: DetectedRegion
+  region: DetectedRegion,
+  preferredStore?: string | null
 ): ProviderEstimate[] {
   const providers = getProvidersForRegion(region)
   const cartItems = buildProviderCartItems(groceryList)
@@ -150,8 +192,29 @@ export function compareProviders(
     })
   }
 
-  // Sort by estimated total (cheapest first)
-  estimates.sort((a, b) => a.estimatedTotal - b.estimatedTotal)
+  // Sort with preferred store first, then by estimated total.
+  estimates.sort((a, b) => {
+    const aScore = scoreEstimate(a, preferredStore)
+    const bScore = scoreEstimate(b, preferredStore)
+    return aScore - bScore
+  })
 
   return estimates
+}
+
+function scoreEstimate(estimate: ProviderEstimate, preferredStore?: string | null): number {
+  const normalizedPreferred = normalizeProviderName(preferredStore)
+  const normalizedDisplay = normalizeProviderName(estimate.provider.displayName)
+  const normalizedName = normalizeProviderName(estimate.provider.name)
+  const preferredBoost =
+    normalizedPreferred &&
+    (normalizedPreferred === normalizedDisplay || normalizedPreferred === normalizedName)
+      ? PREFERRED_PROVIDER_BOOST
+      : 0
+
+  return estimate.estimatedTotal + preferredBoost
+}
+
+function normalizeProviderName(value?: string | null): string {
+  return (value ?? '').trim().toLowerCase().replace(/\s+/g, '_')
 }

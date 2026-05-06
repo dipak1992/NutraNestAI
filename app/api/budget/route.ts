@@ -52,13 +52,19 @@ export async function PUT(req: Request) {
   if (!parsed.success) return NextResponse.json({ error: validationError(parsed.error) }, { status: 400 })
   const { weeklyLimit, strictMode, zipCode, preferredStore } = parsed.data
 
+  const { data: existing } = await supabase
+    .from('budgets')
+    .select('weekly_limit, strict_mode, zip_code, preferred_store')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
   const { error } = await supabase.from('budgets').upsert(
     {
       user_id: user.id,
-      weekly_limit: weeklyLimit ?? null,
-      strict_mode: strictMode ?? false,
-      zip_code: zipCode ?? null,
-      preferred_store: preferredStore ?? null,
+      weekly_limit: weeklyLimit ?? existing?.weekly_limit ?? null,
+      strict_mode: strictMode ?? existing?.strict_mode ?? false,
+      zip_code: zipCode ?? existing?.zip_code ?? null,
+      preferred_store: preferredStore ?? existing?.preferred_store ?? null,
       updated_at: new Date().toISOString(),
     },
     { onConflict: 'user_id' },

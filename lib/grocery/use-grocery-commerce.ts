@@ -6,9 +6,10 @@
 'use client'
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
+import { toast } from 'sonner'
 import { detectRegion, setRegionOverride } from '@/lib/grocery/region'
 import { getProvidersForRegion, hasProviderSupport } from '@/lib/grocery/providers/registry'
-import { compareProviders, buildProviderCartItems, buildProviderSearchUrl } from '@/lib/grocery/comparison'
+import { compareProviders, buildProviderCartItems, buildProviderSearchUrl, buildSingleItemSearchUrl } from '@/lib/grocery/comparison'
 import { trackGroceryPageView, trackRegionDetected, trackProviderSelected, trackExportAction, trackComparisonViewed } from '@/lib/grocery/analytics'
 import { copyGroceryList, downloadGroceryListPDF, shareGroceryList, getEmailGroceryListUrl } from '@/lib/grocery/exports'
 import type { DetectedRegion, GroceryProvider, ProviderEstimate, ProviderId } from '@/lib/grocery/types'
@@ -31,7 +32,12 @@ export interface UseGroceryCommerceReturn {
   refreshEstimates: () => void
 }
 
-export function useGroceryCommerce(groceryList: GroceryList | null): UseGroceryCommerceReturn {
+const LARGE_LIST_THRESHOLD = 12
+
+export function useGroceryCommerce(
+  groceryList: GroceryList | null,
+  preferredStore?: string | null
+): UseGroceryCommerceReturn {
   const [region, setRegionState] = useState<DetectedRegion>('OTHER')
   const [isLoading, setIsLoading] = useState(true)
 
@@ -50,8 +56,8 @@ export function useGroceryCommerce(groceryList: GroceryList | null): UseGroceryC
   // Generate estimates
   const estimates = useMemo(() => {
     if (!groceryList || !hasProviders) return []
-    return compareProviders(groceryList, region)
-  }, [groceryList, region, hasProviders])
+    return compareProviders(groceryList, region, preferredStore)
+  }, [groceryList, region, hasProviders, preferredStore])
 
   // Track page view once loaded
   useEffect(() => {
@@ -82,7 +88,29 @@ export function useGroceryCommerce(groceryList: GroceryList | null): UseGroceryC
     trackProviderSelected(providerId, region)
 
     const cartItems = buildProviderCartItems(groceryList)
-    const url = buildProviderSearchUrl(provider, cartItems)
+    const useSingleItemFallback = cartItems.length > LARGE_LIST_THRESHOLD
+    const url = useSingleItemFallback
+      ? buildSingleItemSearchUrl(provider, cartItems[0])
+      : buildProviderSearchUrl(provider, cartItems)
+    void copyGroceryList(groceryList).then((copied) => {
+      toast.success(
+        copied
+          ? `${provider.displayName} opened and your grocery list was copied.`
+          : `${provider.displayName} opened in a new tab.`,
+        {
+          description: copied
+            ? useSingleItemFallback
+              ? 'Large list detected. We opened the first item and copied the full grocery list for checkout.'
+              : 'Use the copied list to finish checkout if the retailer search misses anything.'
+            : 'If the store search is incomplete, use PDF, email, or share export instead.',
+        },
+      )
+    })
+    void fetch('/api/budget', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ preferredStore: provider.displayName }),
+    }).catch(() => {})
     window.open(url, '_blank', 'noopener,noreferrer')
   }, [groceryList, providers, region])
 

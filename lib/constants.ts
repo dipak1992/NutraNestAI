@@ -193,7 +193,7 @@ export const LEFTOVER_EXPIRY_DAYS = {
 
 export const GROCERY_EXPORT_DESTINATIONS = [
   { id: 'instacart',    label: 'Instacart',      emoji: '🛒', available: true },
-  { id: 'kroger',       label: 'Kroger',          emoji: '🏪', available: false },
+  { id: 'kroger',       label: 'Kroger',          emoji: '🏪', available: true },
   { id: 'amazon_fresh', label: 'Amazon Fresh',    emoji: '📦', available: false },
   { id: 'email',        label: 'Email to myself', emoji: '📧', available: true },
   { id: 'pdf',          label: 'Download PDF',    emoji: '📄', available: true },

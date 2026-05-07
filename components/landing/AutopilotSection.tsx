@@ -138,7 +138,6 @@ export function AutopilotSection() {
                     height={1086}
                     sizes="(min-width: 1024px) 620px, calc(100vw - 40px)"
                     className="h-auto w-full object-contain"
-                    quality={90}
                   />
                 </div>
 

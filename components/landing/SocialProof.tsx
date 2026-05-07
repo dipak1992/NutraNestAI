@@ -134,7 +134,6 @@ export function SocialProof() {
                       alt={t.name}
                       fill
                       sizes="44px"
-                      loading={i < 3 ? 'eager' : 'lazy'}
                       className="object-cover object-top"
                     />
                   </div>

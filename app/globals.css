@@ -247,3 +247,24 @@
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
+
+@keyframes me-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.me-fade-in {
+  animation: me-fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .me-fade-in {
+    animation: none;
+  }
+}

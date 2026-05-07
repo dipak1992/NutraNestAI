@@ -31,8 +31,7 @@ export function AuthShell({
               fill
               sizes="100vw"
               className="object-cover object-center"
-              priority
-              quality={85}
+              fetchPriority="high"
             />
             {/* Fix 4: stronger overlay + slight blur boost so card pops cleanly */}
             <div className="absolute inset-0 bg-neutral-900/65 dark:bg-neutral-950/78" />
@@ -83,8 +82,7 @@ export function AuthShell({
               fill
               sizes="50vw"
               className="object-cover object-[30%_center]"
-              priority
-              quality={90}
+              fetchPriority="high"
             />
           </div>
 

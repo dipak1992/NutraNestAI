@@ -1,10 +1,8 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, Fraunces } from 'next/font/google'
 import './globals.css'
-import { Providers } from '@/components/providers'
 import { Toaster } from '@/components/ui/sonner'
 import { PWAServiceWorkerRegister } from '@/components/pwa/PWAServiceWorkerRegister'
-import { PWAInstallPrompt } from '@/components/pwa/PWAInstallPrompt'
 import { getSiteUrl } from '@/lib/seo'
 import { organizationSchema } from '@/lib/schema'
 
@@ -85,12 +83,9 @@ export default function RootLayout({
             __html: JSON.stringify(organizationSchema),
           }}
         />
-        <Providers>
-          <PWAServiceWorkerRegister />
-          {children}
-          <PWAInstallPrompt />
-          <Toaster richColors position="top-right" />
-        </Providers>
+        <PWAServiceWorkerRegister />
+        {children}
+        <Toaster richColors position="top-right" />
       </body>
     </html>
   )

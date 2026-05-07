@@ -50,9 +50,6 @@ function PillarCard({
   pillar: (typeof pillars)[number]
   index: number
 }) {
-  // Only the first card is above the fold — prioritize it, lazy-load the rest
-  const isPriority = index === 0
-
   return (
     <article className="group relative h-full rounded-3xl bg-neutral-50 dark:bg-neutral-900 ring-1 ring-neutral-200/70 dark:ring-neutral-800 hover:ring-[#D97757]/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl overflow-hidden">
       {/* Feature image — 16:10 aspect ratio */}
@@ -63,9 +60,6 @@ function PillarCard({
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
           className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-          priority={isPriority}
-          loading={isPriority ? 'eager' : 'lazy'}
-          quality={85}
         />
         {/* Subtle bottom gradient for visual continuity into card body */}
         <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-neutral-50 dark:from-neutral-900 to-transparent" />

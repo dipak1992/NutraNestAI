@@ -26,7 +26,7 @@ export function Hero() {
           src="/landing/heroSection.jpg"
           alt=""
           fill
-          priority
+          fetchPriority="high"
           sizes="100vw"
           className="object-cover object-center opacity-25"
         />
@@ -39,7 +39,7 @@ export function Hero() {
           src="/mobile/hero_section.jpg"
           alt=""
           fill
-          priority
+          fetchPriority="high"
           sizes="100vw"
           className="object-cover object-right"
         />

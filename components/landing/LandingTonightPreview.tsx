@@ -38,7 +38,7 @@ export function LandingTonightPreview() {
           fill
           sizes="260px"
           className="object-cover object-center"
-          priority
+          fetchPriority="high"
         />
         {/* Gradient overlay for text legibility */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />

@@ -19,17 +19,17 @@ const autopilotFeatures = [
   {
     icon: Brain,
     title: 'Learns your household',
-    body: 'Dietary needs, dislikes, skill level, and household size shape every suggestion.',
+    body: 'Dietary needs, dislikes, skill level, and past meal ratings shape every suggestion.',
   },
   {
     icon: Recycle,
     title: 'Uses your leftovers first',
-    body: 'Expiring food gets repurposed into creative dinners — less waste, more flavor.',
+    body: 'Expiring food gets priority. AI repurposes leftovers into creative dinners automatically.',
   },
   {
     icon: DollarSign,
-    title: 'Respects your budget',
-    body: 'Stays within your weekly limit. Strict mode never exceeds the per-day cap.',
+    title: 'AI budget swaps',
+    body: 'Over budget? AI suggests cheaper alternatives that taste just as good — one tap to swap.',
   },
   {
     icon: Leaf,
@@ -43,8 +43,8 @@ const autopilotFeatures = [
   },
   {
     icon: Utensils,
-    title: 'Cuisine rotation',
-    body: 'Never the same cuisine twice in a row. Italian → Mexican → Asian → variety.',
+    title: 'Cross-feature awareness',
+    body: 'Tonight, weekly plan, budget, and leftovers all share context — nothing works in isolation.',
   },
 ]
 

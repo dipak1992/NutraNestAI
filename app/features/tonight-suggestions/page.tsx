@@ -38,11 +38,11 @@ const steps = [
 
 const benefits = [
   { icon: '⚡', title: 'Instant answer', body: 'No more "what should I make?" paralysis. One tap, one great dinner.' },
-  { icon: '🧠', title: 'Learns your taste', body: 'The more you cook, the smarter it gets. Rate meals and it adapts.' },
+  { icon: '🧠', title: 'Connected intelligence', body: 'Tonight checks your weekly plan, avoids repeats, uses expiring leftovers, and respects your budget — all automatically.' },
   { icon: '🔄', title: 'Swap in one tap', body: "Not feeling it? Tap 'Show another' for a fresh suggestion instantly." },
   { icon: '🥗', title: 'Diet-aware', body: 'Vegetarian, gluten-free, keto, halal — every suggestion respects your restrictions.' },
   { icon: '⏱️', title: 'Under 30 minutes', body: 'Weeknight-friendly meals only. No 3-hour recipes on a Tuesday.' },
-  { icon: '📖', title: 'Step-by-step cook mode', body: 'Follow along with a clean, distraction-free cooking interface.' },
+  { icon: '📅', title: 'Weekly plan aware', body: 'If you have a meal planned for today, Tonight suggests it. No conflicts between features.' },
 ]
 
 const relatedFeatures = [

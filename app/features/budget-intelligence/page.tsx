@@ -39,10 +39,10 @@ const steps = [
 const benefits = [
   { icon: '💰', title: 'See costs upfront', body: 'Know your grocery total before you shop. No more surprise bills at checkout.' },
   { icon: '📊', title: 'Cooking updates the budget', body: 'Mark cooked can move estimated dinner cost into the weekly budget picture.' },
-  { icon: '🔄', title: 'Budget-aware swaps', body: 'Swap any meal for a cheaper alternative that fits your remaining budget.' },
+  { icon: '🤖', title: 'AI-powered budget swaps', body: 'AI analyzes your most expensive meals and suggests cheaper alternatives that respect your dietary needs, use pantry items, and taste just as good.' },
   { icon: '📉', title: 'Save $100+/month', body: 'Households using Budget Intelligence save an average of $100–$200/month on groceries.' },
   { icon: '🛒', title: 'Grocery list cost visibility', body: 'Consolidated ingredients, pantry deductions, and estimated prices help you shop intentionally.' },
-  { icon: '📈', title: 'Monthly insights', body: 'See spending trends over time. Identify where your money goes and where to cut.' },
+  { icon: '🧠', title: 'Learns your preferences', body: 'The more you cook, the smarter swaps get. AI remembers what you like and avoids what you reject.' },
 ]
 
 const relatedFeatures = [

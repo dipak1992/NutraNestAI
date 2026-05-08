@@ -17,13 +17,13 @@ const systemSteps = [
     icon: ChefHat,
     label: 'Tonight',
     title: 'Pick dinner',
-    body: 'MealEase starts with the meal you need now, not a blank prompt.',
+    body: 'AI checks your weekly plan, avoids repeats, and picks something different tonight.',
   },
   {
     icon: CalendarDays,
     label: 'Planner',
     title: 'Shape the week',
-    body: 'The same context becomes a 3-day preview or full 7-day Autopilot plan.',
+    body: 'Autopilot reads pantry, leftovers, budget, and learning signals to build your week.',
   },
   {
     icon: ShoppingCart,
@@ -34,22 +34,22 @@ const systemSteps = [
   {
     icon: DollarSign,
     label: 'Budget',
-    title: 'Track the cost',
-    body: 'Meal costs and grocery estimates update the weekly budget picture.',
+    title: 'AI-powered swaps',
+    body: 'Over budget? AI suggests cheaper alternatives that respect your dietary needs.',
   },
   {
     icon: Refrigerator,
     label: 'Leftovers',
     title: 'Use what remains',
-    body: 'Cooked meals create leftover options instead of becoming fridge clutter.',
+    body: 'Expiring leftovers get priority — AI suggests meals that use them first.',
   },
 ]
 
 const memoryItems = [
+  'Tonight never repeats what\u2019s already planned this week',
   'Liked dinners become stronger future picks',
-  'Avoided foods stay out of the plan',
-  'Repeated favorites resurface at the right time',
-  'Household preferences follow every swap',
+  'Budget swaps use real AI to find cheaper alternatives',
+  'Every feature shares context — nothing works in isolation',
 ]
 
 const postCookItems = [

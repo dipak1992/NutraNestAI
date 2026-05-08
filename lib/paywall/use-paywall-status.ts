@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import type { SubscriptionTier } from '@/types'
-import { FREE_PLAN_PREVIEW_DAYS, FREE_TONIGHT_SWIPE_LIMIT, FREE_KIDS_RECIPE_LIMIT, FREE_DAILY_GENERATIONS } from '@/lib/paywall/config'
+import { FREE_PLAN_PREVIEW_DAYS, FREE_TONIGHT_SWIPE_LIMIT, FREE_DAILY_GENERATIONS } from '@/lib/paywall/config'
 
 export interface ClientPaywallStatus {
   isAuthenticated: boolean
@@ -12,7 +12,6 @@ export interface ClientPaywallStatus {
   effectivePlanPreviewDays: number
   freePlanPreviewDays: number
   freeTonightSwipeLimit: number
-  freeKidsRecipeLimit: number
   freeDailyGenerations: number
   bonusDays: number
   tempProUntil: string | null
@@ -26,7 +25,6 @@ const DEFAULT_STATUS: ClientPaywallStatus = {
   effectivePlanPreviewDays: FREE_PLAN_PREVIEW_DAYS,
   freePlanPreviewDays: FREE_PLAN_PREVIEW_DAYS,
   freeTonightSwipeLimit: FREE_TONIGHT_SWIPE_LIMIT,
-  freeKidsRecipeLimit: FREE_KIDS_RECIPE_LIMIT,
   freeDailyGenerations: FREE_DAILY_GENERATIONS,
   bonusDays: 0,
   tempProUntil: null,

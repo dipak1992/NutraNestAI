@@ -5,7 +5,6 @@ import { createSupabaseServiceClient } from '@/lib/supabase/service'
 import {
   FREE_PLAN_PREVIEW_DAYS,
   FREE_TONIGHT_SWIPE_LIMIT,
-  FREE_KIDS_RECIPE_LIMIT,
   FREE_DAILY_GENERATIONS,
   isProTier,
   normalizeTier,
@@ -18,7 +17,6 @@ export interface PaywallStatus {
   effectivePlanPreviewDays: number
   freePlanPreviewDays: number
   freeTonightSwipeLimit: number
-  freeKidsRecipeLimit: number
   freeDailyGenerations: number
   bonusDays: number
   tempProUntil: string | null
@@ -76,7 +74,6 @@ export async function getPaywallStatus(): Promise<PaywallStatus> {
       effectivePlanPreviewDays: FREE_PLAN_PREVIEW_DAYS,
       freePlanPreviewDays: FREE_PLAN_PREVIEW_DAYS,
       freeTonightSwipeLimit: FREE_TONIGHT_SWIPE_LIMIT,
-      freeKidsRecipeLimit: FREE_KIDS_RECIPE_LIMIT,
       freeDailyGenerations: FREE_DAILY_GENERATIONS,
       bonusDays: 0,
       tempProUntil: null,
@@ -99,7 +96,6 @@ export async function getPaywallStatus(): Promise<PaywallStatus> {
     effectivePlanPreviewDays,
     freePlanPreviewDays: FREE_PLAN_PREVIEW_DAYS,
     freeTonightSwipeLimit: FREE_TONIGHT_SWIPE_LIMIT,
-    freeKidsRecipeLimit: FREE_KIDS_RECIPE_LIMIT,
     freeDailyGenerations: FREE_DAILY_GENERATIONS,
     bonusDays,
     tempProUntil,

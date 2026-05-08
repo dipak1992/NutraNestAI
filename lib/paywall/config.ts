@@ -28,7 +28,6 @@ export const STRIPE_TRIAL_DAYS = parseInt(process.env.STRIPE_TRIAL_DAYS || '7', 
 export const FREE_TONIGHT_SWIPE_LIMIT = 3 // Free users: 3 swipes/day
 export const FREE_PLAN_PREVIEW_DAYS = 3   // Free users: 3-day week preview
 export const FREE_DAILY_GENERATIONS = 3   // Free users: 3 meal generations/day
-export const FREE_KIDS_RECIPE_LIMIT = 3   // Free users: 3 kid recipe variations
 
 // ── Pro tier unlocks ─────────────────────────────────────────────────────
 

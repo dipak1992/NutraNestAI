@@ -18,7 +18,6 @@ import type { UpgradeTrigger } from '@/lib/pillars/config'
 interface UsageSignals {
   manualPlanCount: number
   budgetFilterCount: number
-  kidsFilterCount: number
   householdEditCount: number
   snapCookCount: number
   triedMultiMember: boolean
@@ -31,7 +30,6 @@ function readSignals(): UsageSignals {
     return {
       manualPlanCount: 0,
       budgetFilterCount: 0,
-      kidsFilterCount: 0,
       householdEditCount: 0,
       snapCookCount: 0,
       triedMultiMember: false,
@@ -45,7 +43,6 @@ function readSignals(): UsageSignals {
     return {
       manualPlanCount: 0,
       budgetFilterCount: 0,
-      kidsFilterCount: 0,
       householdEditCount: 0,
       snapCookCount: 0,
       triedMultiMember: false,
@@ -90,9 +87,6 @@ export function useUpgradeTrigger(): UpgradeTrigger | null {
           break
         case 'budget-edits':
           shouldFire = signals.budgetFilterCount >= 3
-          break
-        case 'kids-filters':
-          shouldFire = signals.kidsFilterCount >= 3
           break
         case 'household-adjustments':
           shouldFire = signals.householdEditCount >= 3

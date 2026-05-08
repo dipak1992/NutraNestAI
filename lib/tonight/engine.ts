@@ -20,6 +20,7 @@ import {
   pickDailyMeal,
   getMealDayOfWeek,
 } from './catalog'
+import { getCrossFeatureSignals, applyCrossFeatureFilter } from '@/lib/ai/cross-feature'
 
 // ─── LANDING PAGE ENGINE ────────────────────────────────────────────────────────
 
@@ -123,14 +124,46 @@ export async function getPlusTonightSuggestion(
   const { theme } = WEEKDAY_THEMES[day]
 
   try {
-    const context = await loadPersonalizationContext(supabase, userId)
+    // Load personalization context and cross-feature signals in parallel
+    const [context, crossSignals] = await Promise.all([
+      loadPersonalizationContext(supabase, userId),
+      getCrossFeatureSignals(supabase, userId).catch(() => null),
+    ])
+
+    // If today has a planned meal in the weekly plan, suggest that directly
+    if (crossSignals?.todayPlanned) {
+      const planned = crossSignals.todayPlanned
+      // Find it in catalog for full data, or build a minimal state
+      const catalogMatch = TONIGHT_CATALOG.find(
+        (m) => m.name.toLowerCase() === planned.name.toLowerCase() || m.id === planned.id
+      )
+      if (catalogMatch) {
+        return toTonightState(catalogMatch, `From your weekly plan — already planned for today.`, {
+          alternativesAvailable: 99,
+          isFromPantry: false,
+          usesLeftover: null,
+        })
+      }
+    }
+
     const themed = getMealsByTheme(theme)
-    const allMeals = themed.length >= 2 ? themed : TONIGHT_CATALOG
+    let allMeals = themed.length >= 2 ? themed : TONIGHT_CATALOG
+
+    // Apply cross-feature filter: avoid meals already planned this week
+    if (crossSignals) {
+      allMeals = applyCrossFeatureFilter(allMeals, crossSignals)
+    }
 
     // Try personalization in priority order
     const personalized = personalizeSelection(allMeals, context, userId)
 
-    return toTonightState(personalized.meal, personalized.reason, {
+    // Enhance reason with cross-feature context
+    let reason = personalized.reason
+    if (crossSignals?.reasonHint && !personalized.usesLeftover) {
+      reason = `${reason} ${crossSignals.reasonHint}.`
+    }
+
+    return toTonightState(personalized.meal, reason, {
       alternativesAvailable: 99,
       isFromPantry: personalized.isFromPantry,
       usesLeftover: personalized.usesLeftover,

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import OpenAI from 'openai'
 import { loadWeekPlan, getCurrentWeekStart } from '@/app/plan/loader'
 import { getActiveLeftoverIngredients } from '@/app/api/leftovers/route'
 import { AUTOPILOT_SYSTEM_PROMPT, buildAutopilotPrompt } from '@/lib/plan/autopilot-prompt'
@@ -10,6 +9,7 @@ import { enforceFeatureQuota, incrementFeatureQuota } from '@/lib/usage/feature-
 import type { AutopilotOptions, AutopilotResult, AutopilotPreferences } from '@/lib/plan/types'
 import type { Recipe } from '@/lib/dashboard/types'
 import { detectCuisine, detectProtein } from '@/lib/plan/scoring'
+import { generateText } from '@/lib/ai/service'
 
 const AUTOPILOT_QUOTA = {
   key: 'ai_autopilot_plan',
@@ -23,8 +23,6 @@ export async function POST(req: NextRequest) {
   const rl = await rateLimit({ key: rateLimitKeyFromRequest(req), limit: 10, windowMs: 60_000 })
   if (!rl.success) return apiRateLimited(rl.reset)
 
-  // Lazy-init so the key is read at request time, not build time
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
   const supabase = await createClient()
   const {
     data: { user },
@@ -173,18 +171,16 @@ export async function POST(req: NextRequest) {
       options: autopilotOptions,
     })
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+    const aiResult = await generateText({
+      system: AUTOPILOT_SYSTEM_PROMPT,
+      user: userPrompt,
+      task: 'autopilot',
       temperature: 0.7,
-      response_format: { type: 'json_object' },
-      messages: [
-        { role: 'system', content: AUTOPILOT_SYSTEM_PROMPT },
-        { role: 'user', content: userPrompt },
-      ],
+      jsonMode: true,
     })
     await incrementFeatureQuota(supabase, AUTOPILOT_QUOTA)
 
-    const raw = completion.choices[0]?.message?.content ?? '{}'
+    const raw = aiResult.text || '{}'
     const parsed = JSON.parse(raw) as {
       days: Array<{
         dayIndex: number

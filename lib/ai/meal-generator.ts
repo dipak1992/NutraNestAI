@@ -11,6 +11,7 @@ import { DEMO_WEEKLY_PLAN } from '@/lib/demo-data';
 import { format, addDays } from 'date-fns';
 import logger from '@/lib/logger';
 import { formatRulesForPrompt, findRelevantCulinaryRules } from '@/lib/safety/culinary-rules';
+import { generateText, stripJsonFences } from './service';
 
 // ── Prompt Builder ──────────────────────────────────────────
 
@@ -147,58 +148,39 @@ Return a complete AIGeneratedPlan JSON object.`;
 // ── AI Service ──────────────────────────────────────────────
 
 export async function generateMealPlan(request: AIGenerationRequest): Promise<AIGeneratedPlan> {
-  // Check if we have a real API key
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  // Check if we have any AI provider key available
+  const hasOpenAI = !!process.env.OPENAI_API_KEY;
+  const hasAnthropic = process.env.ANTHROPIC_API_KEY && process.env.ANTHROPIC_API_KEY !== 'mock';
 
-  if (apiKey && apiKey !== 'mock') {
-    return generateWithClaude(request, apiKey);
+  if (hasOpenAI || hasAnthropic) {
+    return generateWithAI(request);
   }
 
   // Fallback to mock/demo data
-  console.info('[MealEase] Using mock meal plan — set ANTHROPIC_API_KEY to enable live generation');
+  console.info('[MealEase] Using mock meal plan — set OPENAI_API_KEY or ANTHROPIC_API_KEY to enable live generation');
   return generateMockPlan(request);
 }
 
-async function generateWithClaude(
-  request: AIGenerationRequest,
-  apiKey: string
-): Promise<AIGeneratedPlan> {
-  const { default: Anthropic } = await import('@anthropic-ai/sdk');
-  const client = new Anthropic({ apiKey });
-
-  const message = await client.messages.create({
-    model: 'claude-opus-4-5',
-    max_tokens: 8192,
+async function generateWithAI(request: AIGenerationRequest): Promise<AIGeneratedPlan> {
+  const result = await generateText({
     system: buildSystemPrompt(),
-    messages: [
-      {
-        role: 'user',
-        content: buildUserPrompt(request),
-      },
-    ],
+    user: buildUserPrompt(request),
+    task: 'weekly-plan',
+    maxTokens: 8192,
+    temperature: 0.7,
+    jsonMode: true,
   });
 
-  const content = message.content[0];
-  if (content.type !== 'text') {
-    throw new Error('Unexpected AI response type');
-  }
-
-  // Log token usage
-  if (message.usage) {
-    logger.info('[meal-generator] Token usage', {
-      feature: 'generate-plan',
-      provider: 'anthropic',
-      prompt_tokens: message.usage.input_tokens,
-      completion_tokens: message.usage.output_tokens,
-    });
-  }
+  logger.info('[meal-generator] Plan generated', {
+    feature: 'generate-plan',
+    provider: result.provider,
+    model: result.model,
+    prompt_tokens: result.usage?.prompt_tokens,
+    completion_tokens: result.usage?.completion_tokens,
+  });
 
   try {
-    // Claude sometimes wraps JSON in markdown — strip it
-    let jsonText = content.text.trim();
-    if (jsonText.startsWith('```')) {
-      jsonText = jsonText.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
-    }
+    const jsonText = stripJsonFences(result.text);
     const parsed = JSON.parse(jsonText);
     return aiGeneratedPlanSchema.parse(parsed) as AIGeneratedPlan;
   } catch (err) {

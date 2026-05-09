@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Camera, Upload, Sparkles, Clock, ChefHat, ShieldCheck, ArrowRight, RefreshCw, CheckCircle2, AlertTriangle } from 'lucide-react'
+import { Camera, Upload, Sparkles, Clock, ChefHat, ShieldCheck, ArrowRight, RefreshCw, CheckCircle2, AlertTriangle, Lock, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Nav } from '@/components/landing/Nav'
 import type { FridgeResult } from '@/lib/scan/types'
@@ -18,7 +18,18 @@ export function ScanDemoClient() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [result, setResult] = useState<FridgeResult | null>(null)
   const [errorMsg, setErrorMsg] = useState<string>('')
+  const [showStickyCta, setShowStickyCta] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Show sticky CTA 2s after results appear
+  useEffect(() => {
+    if (phase === 'results') {
+      const timer = setTimeout(() => setShowStickyCta(true), 2000)
+      return () => clearTimeout(timer)
+    } else {
+      setShowStickyCta(false)
+    }
+  }, [phase])
 
   const analyzeImage = useCallback(async (file: File) => {
     setPhase('scanning')
@@ -33,7 +44,7 @@ export function ScanDemoClient() {
       })
 
       if (res.status === 429) {
-        setErrorMsg('You\u2019ve reached the demo limit (3 scans/hour). Sign up free for more!')
+        setErrorMsg('You\u2019ve reached the demo limit (3 scans/hour). Sign up free for unlimited scans!')
         setPhase('error')
         return
       }
@@ -169,7 +180,7 @@ export function ScanDemoClient() {
                     onClick={handleDemoWithoutPhoto}
                     className="text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 underline underline-offset-2"
                   >
-                    Or try with a sample photo \u2192
+                    Or try with a sample photo &rarr;
                   </button>
                 </div>
 
@@ -278,7 +289,7 @@ export function ScanDemoClient() {
                 transition={{ duration: 0.3 }}
                 className="space-y-6"
               >
-                {/* Detected ingredients */}
+                {/* Detected ingredients — fully visible */}
                 <div className="rounded-2xl border border-emerald-200 dark:border-emerald-800/50 bg-white dark:bg-neutral-900 p-5">
                   <div className="flex items-center gap-2 mb-3">
                     <CheckCircle2 className="h-5 w-5 text-emerald-600" />
@@ -305,7 +316,7 @@ export function ScanDemoClient() {
                   </div>
                 </div>
 
-                {/* Meal suggestions */}
+                {/* Meal suggestions — titles visible, details gated */}
                 {result.recipes.length > 0 && (
                   <div>
                     <div className="flex items-center gap-2 mb-4">
@@ -315,63 +326,87 @@ export function ScanDemoClient() {
                       </h2>
                     </div>
                     <div className="space-y-3">
-                      {result.recipes.map((recipe, i) => (
-                        <motion.div
-                          key={recipe.id}
-                          initial={{ opacity: 0, y: 8 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: i * 0.12, duration: 0.25 }}
-                          className="rounded-2xl border border-border/60 bg-white dark:bg-neutral-900 p-5 hover:shadow-md transition-shadow"
-                        >
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="flex-1">
-                              <h3 className="font-bold text-neutral-900 dark:text-white">{recipe.title}</h3>
+                      {result.recipes.map((recipe, i) => {
+                        const matchPercent = recipe.matchedIngredients.length > 0
+                          ? Math.round((recipe.matchedIngredients.length / (recipe.matchedIngredients.length + recipe.missingIngredients.length)) * 100)
+                          : null
+
+                        return (
+                          <motion.div
+                            key={recipe.id}
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: i * 0.12, duration: 0.25 }}
+                            className="relative rounded-2xl border border-border/60 bg-white dark:bg-neutral-900 overflow-hidden"
+                          >
+                            {/* Visible: title, match %, cook time */}
+                            <div className="p-5">
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="flex-1">
+                                  <h3 className="font-bold text-neutral-900 dark:text-white">{recipe.title}</h3>
+                                  <div className="flex flex-wrap items-center gap-2 mt-2">
+                                    <span className="inline-flex items-center gap-1 text-xs font-medium text-neutral-600 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 rounded-full px-2.5 py-0.5">
+                                      <Clock className="h-3 w-3" />
+                                      {recipe.cookTime} min
+                                    </span>
+                                    <span className="inline-flex items-center gap-1 text-xs font-medium text-neutral-600 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 rounded-full px-2.5 py-0.5">
+                                      <Users className="h-3 w-3" />
+                                      {recipe.servings} servings
+                                    </span>
+                                    <span className="inline-flex items-center gap-1 text-xs font-medium text-neutral-600 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 rounded-full px-2.5 py-0.5">
+                                      <ChefHat className="h-3 w-3" />
+                                      ~${recipe.estimatedCost.toFixed(0)}
+                                    </span>
+                                  </div>
+                                </div>
+                                {matchPercent !== null && (
+                                  <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-xs font-bold px-2.5 py-1 border border-emerald-200 dark:border-emerald-800/50">
+                                    {matchPercent}% match
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* Matched ingredients preview */}
                               {recipe.matchedIngredients.length > 0 && (
-                                <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-0.5">
-                                  Uses: {recipe.matchedIngredients.slice(0, 4).join(', ')}
-                                  {recipe.matchedIngredients.length > 4 && ` +${recipe.matchedIngredients.length - 4} more`}
+                                <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2">
+                                  Uses: {recipe.matchedIngredients.slice(0, 3).join(', ')}
+                                  {recipe.matchedIngredients.length > 3 && ` +${recipe.matchedIngredients.length - 3} more`}
                                 </p>
                               )}
                             </div>
-                            {recipe.matchedIngredients.length > 0 && (
-                              <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-xs font-bold px-2.5 py-1 border border-emerald-200 dark:border-emerald-800/50">
-                                {Math.round((recipe.matchedIngredients.length / (recipe.matchedIngredients.length + recipe.missingIngredients.length)) * 100)}% match
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex flex-wrap items-center gap-2 mt-3">
-                            <span className="inline-flex items-center gap-1 text-xs font-medium text-neutral-600 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 rounded-full px-2.5 py-0.5">
-                              <Clock className="h-3 w-3" />
-                              {recipe.cookTime} min
-                            </span>
-                            <span className="inline-flex items-center gap-1 text-xs font-medium text-neutral-600 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 rounded-full px-2.5 py-0.5">
-                              <ChefHat className="h-3 w-3" />
-                              {recipe.servings} servings
-                            </span>
-                            <span className="inline-flex items-center gap-1 text-xs font-medium text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/40 rounded-full px-2.5 py-0.5 border border-teal-200 dark:border-teal-800/50">
-                              <ShieldCheck className="h-3 w-3" />
-                              AI-Generated
-                            </span>
-                          </div>
-                          {recipe.missingIngredients.length > 0 && (
-                            <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-2">
-                              May need: {recipe.missingIngredients.slice(0, 3).join(', ')}
-                              {recipe.missingIngredients.length > 3 && ` +${recipe.missingIngredients.length - 3} more`}
-                            </p>
-                          )}
-                        </motion.div>
-                      ))}
+
+                            {/* Gated: locked overlay for full recipe */}
+                            <div className="border-t border-border/40 bg-neutral-50/80 dark:bg-neutral-800/50 px-5 py-3">
+                              <Link
+                                href={`/signup?intent=scan-recipe&recipe=${recipe.id}`}
+                                className="flex items-center justify-between group"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <Lock className="h-3.5 w-3.5 text-[#D97757]" />
+                                  <span className="text-sm font-semibold text-[#D97757] group-hover:text-[#C86646] transition-colors">
+                                    Sign up free to see full recipe
+                                  </span>
+                                </div>
+                                <ArrowRight className="h-4 w-4 text-[#D97757] group-hover:translate-x-0.5 transition-transform" />
+                              </Link>
+                              <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-1 ml-5.5">
+                                Step-by-step instructions, grocery list &amp; cooking tips
+                              </p>
+                            </div>
+                          </motion.div>
+                        )
+                      })}
                     </div>
                   </div>
                 )}
 
-                {/* CTA section */}
+                {/* Inline CTA section */}
                 <div className="rounded-2xl bg-gradient-to-br from-[#D97757]/10 to-orange-50 dark:from-[#D97757]/20 dark:to-neutral-900 border border-[#D97757]/20 p-6 text-center">
                   <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-2">
                     Like what you see? Get the full experience.
                   </h3>
                   <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-5 max-w-sm mx-auto">
-                    Sign up free to unlock full recipes, step-by-step cooking, grocery lists, and personalized meal plans for your whole family.
+                    Sign up free to unlock full recipes with step-by-step cooking, save ingredients to your pantry, get grocery lists, and personalized meal plans for your whole family.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <Link
@@ -392,9 +427,9 @@ export function ScanDemoClient() {
                 </div>
 
                 {/* Social proof */}
-                <div className="text-center pt-4">
+                <div className="text-center pt-4 pb-16">
                   <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                    Trusted by 2,000+ families \u2022 Free forever plan available \u2022 No credit card required
+                    Trusted by 2,000+ families &bull; Free forever plan available &bull; No credit card required
                   </p>
                 </div>
               </motion.div>
@@ -402,6 +437,38 @@ export function ScanDemoClient() {
           </AnimatePresence>
         </div>
       </main>
+
+      {/* ── Sticky bottom CTA bar (appears after results) ── */}
+      <AnimatePresence>
+        {showStickyCta && (
+          <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            className="fixed inset-x-0 bottom-0 z-50 border-t border-border/60 bg-white/95 dark:bg-neutral-950/95 backdrop-blur-lg shadow-[0_-4px_20px_rgba(0,0,0,0.08)]"
+            style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+          >
+            <div className="mx-auto max-w-2xl flex items-center justify-between gap-3 px-4 py-3 sm:px-6">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-neutral-900 dark:text-white truncate">
+                  Ready to cook? Get full recipes free.
+                </p>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400 hidden sm:block">
+                  3 free scans/week + step-by-step recipes + grocery lists
+                </p>
+              </div>
+              <Link
+                href="/signup"
+                className="shrink-0 inline-flex items-center gap-1.5 bg-gradient-to-r from-[#D97757] to-[#E8895A] hover:from-[#C86646] hover:to-[#D97757] text-white font-semibold rounded-full px-5 py-2.5 text-sm transition-all shadow-md shadow-orange-200/50 dark:shadow-none"
+              >
+                Sign up free
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   )
 }

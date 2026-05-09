@@ -32,10 +32,10 @@ function InstagramIcon({ className }: { className?: string }) {
 }
 
 export const metadata: Metadata = {
-  title: 'MealEase AI — Links',
-  description: 'AI that answers "what\'s for dinner?" — weekly plans, grocery lists, leftovers & more.',
+  title: 'MealEase AI · Dinner Planner — Free for Families',
+  description: 'AI that answers "what\'s for dinner?" — weekly plans, grocery lists, leftovers & more. Free forever.',
   openGraph: {
-    title: 'MealEase AI',
+    title: 'MealEase AI · Dinner Planner',
     description: 'AI that answers "what\'s for dinner?" Built for busy families. Free forever.',
     url: 'https://mealeaseai.com/link',
   },

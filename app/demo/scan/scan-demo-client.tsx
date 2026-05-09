@@ -4,59 +4,55 @@ import { useState, useRef, useCallback } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Camera, Upload, Sparkles, Clock, ChefHat, ShieldCheck, ArrowRight, RefreshCw, CheckCircle2 } from 'lucide-react'
+import { Camera, Upload, Sparkles, Clock, ChefHat, ShieldCheck, ArrowRight, RefreshCw, CheckCircle2, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Nav } from '@/components/landing/Nav'
-
-// ── Demo data — simulated scan results ──────────────────────────────────────
-
-const DEMO_INGREDIENTS = [
-  { name: 'Chicken breast', confidence: 0.95, fromPantry: true },
-  { name: 'Bell peppers', confidence: 0.92, fromPantry: true },
-  { name: 'Rice', confidence: 0.88, fromPantry: true },
-  { name: 'Soy sauce', confidence: 0.85, fromPantry: true },
-  { name: 'Garlic', confidence: 0.90, fromPantry: true },
-  { name: 'Broccoli', confidence: 0.87, fromPantry: true },
-]
-
-const DEMO_MEALS = [
-  {
-    id: 'demo-1',
-    title: 'Chicken Stir-Fry Bowl',
-    tagline: 'Quick, colorful, and uses everything in your fridge.',
-    cookTime: 22,
-    difficulty: 'easy' as const,
-    pantryMatch: 92,
-    tags: ['Quick', 'High Protein', 'Family-Friendly'],
-  },
-  {
-    id: 'demo-2',
-    title: 'Garlic Chicken & Rice',
-    tagline: 'Comfort food that practically cooks itself.',
-    cookTime: 28,
-    difficulty: 'easy' as const,
-    pantryMatch: 85,
-    tags: ['Budget', 'One-Pan', 'Meal Prep'],
-  },
-  {
-    id: 'demo-3',
-    title: 'Pepper & Chicken Fajita Bowl',
-    tagline: 'All the flavor, zero the takeout guilt.',
-    cookTime: 25,
-    difficulty: 'easy' as const,
-    pantryMatch: 88,
-    tags: ['Quick', 'Customizable', 'Kid-Approved'],
-  },
-]
+import type { FridgeResult } from '@/lib/scan/types'
 
 // ── Component ───────────────────────────────────────────────────────────────
 
-type DemoPhase = 'upload' | 'scanning' | 'results'
+type DemoPhase = 'upload' | 'scanning' | 'results' | 'error'
 
 export function ScanDemoClient() {
   const [phase, setPhase] = useState<DemoPhase>('upload')
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [result, setResult] = useState<FridgeResult | null>(null)
+  const [errorMsg, setErrorMsg] = useState<string>('')
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const analyzeImage = useCallback(async (file: File) => {
+    setPhase('scanning')
+
+    try {
+      const formData = new FormData()
+      formData.append('image', file)
+
+      const res = await fetch('/api/scan/demo', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (res.status === 429) {
+        setErrorMsg('You\u2019ve reached the demo limit (3 scans/hour). Sign up free for more!')
+        setPhase('error')
+        return
+      }
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        setErrorMsg(body.error || 'Something went wrong. Please try again.')
+        setPhase('error')
+        return
+      }
+
+      const data: FridgeResult = await res.json()
+      setResult(data)
+      setPhase('results')
+    } catch {
+      setErrorMsg('Network error. Please check your connection and try again.')
+      setPhase('error')
+    }
+  }, [])
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -64,11 +60,8 @@ export function ScanDemoClient() {
 
     const url = URL.createObjectURL(file)
     setPreviewUrl(url)
-    setPhase('scanning')
-
-    // Simulate AI processing delay
-    setTimeout(() => setPhase('results'), 2400)
-  }, [])
+    analyzeImage(file)
+  }, [analyzeImage])
 
   const handleCameraCapture = useCallback(() => {
     fileInputRef.current?.click()
@@ -77,13 +70,25 @@ export function ScanDemoClient() {
   const handleReset = useCallback(() => {
     setPhase('upload')
     setPreviewUrl(null)
+    setResult(null)
+    setErrorMsg('')
   }, [])
 
-  const handleDemoWithoutPhoto = useCallback(() => {
+  const handleDemoWithoutPhoto = useCallback(async () => {
     setPreviewUrl('/landing/pantry.jpg')
     setPhase('scanning')
-    setTimeout(() => setPhase('results'), 2000)
-  }, [])
+
+    try {
+      // Fetch the sample image and send it to the real API
+      const imgRes = await fetch('/landing/pantry.jpg')
+      const blob = await imgRes.blob()
+      const file = new File([blob], 'sample-pantry.jpg', { type: blob.type || 'image/jpeg' })
+      await analyzeImage(file)
+    } catch {
+      setErrorMsg('Failed to load sample image. Please try uploading your own photo.')
+      setPhase('error')
+    }
+  }, [analyzeImage])
 
   return (
     <>
@@ -164,7 +169,7 @@ export function ScanDemoClient() {
                     onClick={handleDemoWithoutPhoto}
                     className="text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 underline underline-offset-2"
                   >
-                    Or try with a sample photo →
+                    Or try with a sample photo \u2192
                   </button>
                 </div>
 
@@ -172,8 +177,8 @@ export function ScanDemoClient() {
                 <div className="grid grid-cols-3 gap-4 pt-4">
                   {[
                     { icon: ShieldCheck, label: 'No sign-up needed' },
-                    { icon: Clock, label: 'Results in 3 seconds' },
-                    { icon: Sparkles, label: 'AI-powered matching' },
+                    { icon: Clock, label: 'AI-powered results' },
+                    { icon: Sparkles, label: 'Real ingredient detection' },
                   ].map(({ icon: Icon, label }) => (
                     <div key={label} className="text-center">
                       <Icon className="h-5 w-5 text-emerald-600 dark:text-emerald-400 mx-auto mb-1" />
@@ -225,8 +230,46 @@ export function ScanDemoClient() {
               </motion.div>
             )}
 
-            {/* ── Phase 3: Results ── */}
-            {phase === 'results' && (
+            {/* ── Phase 3: Error ── */}
+            {phase === 'error' && (
+              <motion.div
+                key="error"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.25 }}
+                className="text-center space-y-6"
+              >
+                <div className="rounded-2xl border border-amber-200 dark:border-amber-800/50 bg-amber-50 dark:bg-amber-950/20 p-8">
+                  <AlertTriangle className="h-10 w-10 text-amber-600 mx-auto mb-4" />
+                  <h2 className="text-lg font-bold text-neutral-900 dark:text-white mb-2">
+                    Couldn&apos;t complete scan
+                  </h2>
+                  <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-6 max-w-sm mx-auto">
+                    {errorMsg}
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <Button
+                      onClick={handleReset}
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-full px-6"
+                    >
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      Try Again
+                    </Button>
+                    <Link
+                      href="/signup"
+                      className="inline-flex items-center justify-center gap-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 font-medium rounded-full px-6 py-2 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors"
+                    >
+                      Sign up for unlimited scans
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* ── Phase 4: Results ── */}
+            {phase === 'results' && result && (
               <motion.div
                 key="results"
                 initial={{ opacity: 0, y: 12 }}
@@ -240,74 +283,87 @@ export function ScanDemoClient() {
                   <div className="flex items-center gap-2 mb-3">
                     <CheckCircle2 className="h-5 w-5 text-emerald-600" />
                     <h2 className="text-sm font-bold text-neutral-800 dark:text-neutral-200">
-                      {DEMO_INGREDIENTS.length} ingredients detected
+                      {result.ingredients.length} ingredient{result.ingredients.length !== 1 ? 's' : ''} detected
                     </h2>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {DEMO_INGREDIENTS.map((ing) => (
+                    {result.ingredients.map((ing) => (
                       <span
-                        key={ing.name}
+                        key={ing.id}
                         className="inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-xs font-medium px-2.5 py-1 border border-emerald-200 dark:border-emerald-800/50"
                       >
+                        {ing.emoji && <span>{ing.emoji}</span>}
                         <CheckCircle2 className="h-3 w-3" />
                         {ing.name}
-                        <span className="text-emerald-500 text-[10px]">{Math.round(ing.confidence * 100)}%</span>
+                        {ing.quantity && (
+                          <span className="text-emerald-500 text-[10px]">
+                            {ing.quantity}{ing.unit ? ` ${ing.unit}` : ''}
+                          </span>
+                        )}
                       </span>
                     ))}
                   </div>
                 </div>
 
                 {/* Meal suggestions */}
-                <div>
-                  <div className="flex items-center gap-2 mb-4">
-                    <Sparkles className="h-5 w-5 text-[#D97757]" />
-                    <h2 className="text-lg font-bold text-neutral-800 dark:text-neutral-200">
-                      Meals you can make tonight
-                    </h2>
-                  </div>
-                  <div className="space-y-3">
-                    {DEMO_MEALS.map((meal, i) => (
-                      <motion.div
-                        key={meal.id}
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.12, duration: 0.25 }}
-                        className="rounded-2xl border border-border/60 bg-white dark:bg-neutral-900 p-5 hover:shadow-md transition-shadow"
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="flex-1">
-                            <h3 className="font-bold text-neutral-900 dark:text-white">{meal.title}</h3>
-                            <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-0.5">{meal.tagline}</p>
+                {result.recipes.length > 0 && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <Sparkles className="h-5 w-5 text-[#D97757]" />
+                      <h2 className="text-lg font-bold text-neutral-800 dark:text-neutral-200">
+                        Meals you can make tonight
+                      </h2>
+                    </div>
+                    <div className="space-y-3">
+                      {result.recipes.map((recipe, i) => (
+                        <motion.div
+                          key={recipe.id}
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.12, duration: 0.25 }}
+                          className="rounded-2xl border border-border/60 bg-white dark:bg-neutral-900 p-5 hover:shadow-md transition-shadow"
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1">
+                              <h3 className="font-bold text-neutral-900 dark:text-white">{recipe.title}</h3>
+                              {recipe.matchedIngredients.length > 0 && (
+                                <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-0.5">
+                                  Uses: {recipe.matchedIngredients.slice(0, 4).join(', ')}
+                                  {recipe.matchedIngredients.length > 4 && ` +${recipe.matchedIngredients.length - 4} more`}
+                                </p>
+                              )}
+                            </div>
+                            {recipe.matchedIngredients.length > 0 && (
+                              <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-xs font-bold px-2.5 py-1 border border-emerald-200 dark:border-emerald-800/50">
+                                {Math.round((recipe.matchedIngredients.length / (recipe.matchedIngredients.length + recipe.missingIngredients.length)) * 100)}% match
+                              </span>
+                            )}
                           </div>
-                          <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-xs font-bold px-2.5 py-1 border border-emerald-200 dark:border-emerald-800/50">
-                            {meal.pantryMatch}% match
-                          </span>
-                        </div>
-                        <div className="flex flex-wrap items-center gap-2 mt-3">
-                          <span className="inline-flex items-center gap-1 text-xs font-medium text-neutral-600 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 rounded-full px-2.5 py-0.5">
-                            <Clock className="h-3 w-3" />
-                            {meal.cookTime} min
-                          </span>
-                          <span className="inline-flex items-center gap-1 text-xs font-medium text-neutral-600 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 rounded-full px-2.5 py-0.5 capitalize">
-                            <ChefHat className="h-3 w-3" />
-                            {meal.difficulty}
-                          </span>
-                          <span className="inline-flex items-center gap-1 text-xs font-medium text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/40 rounded-full px-2.5 py-0.5 border border-teal-200 dark:border-teal-800/50">
-                            <ShieldCheck className="h-3 w-3" />
-                            Chef-Verified
-                          </span>
-                        </div>
-                        <div className="flex flex-wrap gap-1.5 mt-2.5">
-                          {meal.tags.map((tag) => (
-                            <span key={tag} className="text-[10px] font-semibold text-neutral-500 dark:text-neutral-400 bg-neutral-50 dark:bg-neutral-800/50 rounded-full px-2 py-0.5">
-                              {tag}
+                          <div className="flex flex-wrap items-center gap-2 mt-3">
+                            <span className="inline-flex items-center gap-1 text-xs font-medium text-neutral-600 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 rounded-full px-2.5 py-0.5">
+                              <Clock className="h-3 w-3" />
+                              {recipe.cookTime} min
                             </span>
-                          ))}
-                        </div>
-                      </motion.div>
-                    ))}
+                            <span className="inline-flex items-center gap-1 text-xs font-medium text-neutral-600 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 rounded-full px-2.5 py-0.5">
+                              <ChefHat className="h-3 w-3" />
+                              {recipe.servings} servings
+                            </span>
+                            <span className="inline-flex items-center gap-1 text-xs font-medium text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/40 rounded-full px-2.5 py-0.5 border border-teal-200 dark:border-teal-800/50">
+                              <ShieldCheck className="h-3 w-3" />
+                              AI-Generated
+                            </span>
+                          </div>
+                          {recipe.missingIngredients.length > 0 && (
+                            <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-2">
+                              May need: {recipe.missingIngredients.slice(0, 3).join(', ')}
+                              {recipe.missingIngredients.length > 3 && ` +${recipe.missingIngredients.length - 3} more`}
+                            </p>
+                          )}
+                        </motion.div>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* CTA section */}
                 <div className="rounded-2xl bg-gradient-to-br from-[#D97757]/10 to-orange-50 dark:from-[#D97757]/20 dark:to-neutral-900 border border-[#D97757]/20 p-6 text-center">
@@ -338,7 +394,7 @@ export function ScanDemoClient() {
                 {/* Social proof */}
                 <div className="text-center pt-4">
                   <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                    Trusted by 2,000+ families • Free forever plan available • No credit card required
+                    Trusted by 2,000+ families \u2022 Free forever plan available \u2022 No credit card required
                   </p>
                 </div>
               </motion.div>

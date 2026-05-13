@@ -68,17 +68,17 @@ export function Hero() {
               <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
                 {/* CTA: slightly narrower on mobile, premium shadow, active press state */}
                 <Button
-                  href="/signup"
+                  href="/start"
                   className="w-[88%] sm:w-auto text-center shadow-md shadow-[#D97757]/20 hover:shadow-lg hover:shadow-[#D97757]/28 active:shadow-sm active:scale-[0.98] transition-all duration-150"
                 >
-                  Start planning free
+                  Plan dinner free
                 </Button>
                 <Button
-                  href="/start"
+                  href="/demo/scan"
                   variant="secondary"
                   className="w-[88%] sm:w-auto text-center"
                 >
-                  Try the first plan
+                  Try fridge scan
                 </Button>
                 <LandingScanDemoButton />
                 <a

@@ -2,6 +2,7 @@ import { Nav } from '@/components/landing/Nav'
 import { Hero } from '@/components/landing/Hero'
 import { ProductProofStrip } from '@/components/landing/ProductProofStrip'
 import { ConversionStory } from '@/components/landing/ConversionStory'
+import { FounderNote } from '@/components/landing/FounderNote'
 import { HowItWorks } from '@/components/landing/HowItWorks'
 import { FivePillarsSection } from '@/components/landing/FivePillarsSection'
 import { AutopilotSection } from '@/components/landing/AutopilotSection'
@@ -58,6 +59,7 @@ export default async function LandingPage() {
         <Hero />
         <ProductProofStrip />
         <ConversionStory />
+        <FounderNote />
         <HowItWorks />
         <FivePillarsSection />
         <AutopilotSection />

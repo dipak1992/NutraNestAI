@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { Bookmark, Home, Settings, ShoppingCart } from 'lucide-react'
+import { useWeeklyPlanStore } from '@/lib/planner/store'
 import { cn } from '@/lib/utils'
 
 const MEAL_TOOLS = [
@@ -12,6 +13,9 @@ const MEAL_TOOLS = [
 ]
 
 export function QuickActions() {
+  const groceryList = useWeeklyPlanStore((s) => s.groceryList)
+  const hasGroceryItems = groceryList && groceryList.items.length > 0
+
   return (
     <section aria-labelledby="quick-actions-heading" className="space-y-3">
       <h2
@@ -40,6 +44,20 @@ export function QuickActions() {
           )
         })}
       </div>
+
+      {/* Grocery nudge when list is empty */}
+      {!hasGroceryItems && (
+        <Link
+          href="/grocery-list"
+          className="flex items-center gap-2 rounded-xl bg-orange-50/70 dark:bg-orange-950/20 border border-orange-100 dark:border-orange-900/30 px-3.5 py-2.5 text-xs text-neutral-600 dark:text-neutral-400 hover:bg-orange-50 dark:hover:bg-orange-950/30 transition-colors group"
+        >
+          <ShoppingCart className="h-3.5 w-3.5 text-[#D97757] flex-shrink-0" />
+          <span>
+            Your grocery list builds automatically when you plan your week{' '}
+            <span className="text-[#D97757] font-medium group-hover:underline">→</span>
+          </span>
+        </Link>
+      )}
     </section>
   )
 }

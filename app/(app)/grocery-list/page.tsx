@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useCallback, useEffect, useRef } from 'react'
-import { ShoppingCart, Lock, Globe, ChevronDown } from 'lucide-react'
+import Link from 'next/link'
+import { ShoppingCart, Lock, Globe, ChevronDown, Calendar, Utensils, AlertTriangle, RefreshCw } from 'lucide-react'
 import { GroceryListPanel } from '@/components/grocery/GroceryListPanel'
 import { ProviderComparisonCard } from '@/components/grocery/ProviderComparisonCard'
 import { GroceryExportActions } from '@/components/grocery/GroceryExportActions'
@@ -12,6 +13,7 @@ import { useGroceryCommerce } from '@/lib/grocery/use-grocery-commerce'
 import type { DetectedRegion, ProviderId } from '@/lib/grocery/types'
 import type { GroceryList, WeeklyPlan } from '@/lib/planner/types'
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 
 const REGION_OPTIONS: { value: DetectedRegion; label: string; flag: string }[] = [
   { value: 'US', label: 'United States', flag: '🇺🇸' },
@@ -41,6 +43,7 @@ export default function GroceryListPage() {
 
   const [copySuccess, setCopySuccess] = useState(false)
   const [showRegionPicker, setShowRegionPicker] = useState(false)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const loadedServerState = useRef(false)
   const lastSavedPayload = useRef<string | null>(null)
 
@@ -75,10 +78,14 @@ export default function GroceryListPage() {
     let cancelled = false
     async function loadSavedList() {
       try {
+        setLoadError(null)
         const res = await fetch(`/api/grocery-list?weekStart=${encodeURIComponent(plan.weekStart)}`, {
           cache: 'no-store',
         })
-        if (!res.ok) return
+        if (!res.ok) {
+          if (!cancelled) setLoadError('Unable to load your grocery list. Please try again.')
+          return
+        }
         const data = (await res.json()) as {
           plan: WeeklyPlan | null
           groceryList: GroceryList | null
@@ -91,6 +98,7 @@ export default function GroceryListPage() {
         }
         loadedServerState.current = true
       } catch {
+        if (!cancelled) setLoadError('Network error — check your connection and try again.')
         loadedServerState.current = true
       }
     }
@@ -118,6 +126,40 @@ export default function GroceryListPage() {
 
     return () => window.clearTimeout(timeout)
   }, [groceryList, loading, status.isAuthenticated])
+
+  // Error state — network failure or server error
+  if (loadError) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex items-center gap-2 mb-6">
+          <ShoppingCart className="h-6 w-6 text-[#D97757]" />
+          <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-50">Grocery List</h1>
+        </div>
+
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-red-200 dark:border-red-900/50 bg-gradient-to-br from-red-50/50 to-white dark:from-neutral-900 dark:to-neutral-950 py-16 px-6 text-center">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-red-100 dark:bg-red-900/30 mb-4">
+            <AlertTriangle className="h-7 w-7 text-red-500 dark:text-red-400" />
+          </div>
+          <p className="text-lg font-bold text-neutral-900 dark:text-neutral-50">
+            Something went wrong
+          </p>
+          <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1 max-w-sm">
+            {loadError}
+          </p>
+          <Button
+            className="mt-6 bg-[#D97757] hover:bg-[#c4684b] text-white"
+            onClick={() => {
+              setLoadError(null)
+              window.location.reload()
+            }}
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Try Again
+          </Button>
+        </div>
+      </div>
+    )
+  }
 
   // Free plan gate — show limited view
   if (!loading && !status.isPro && !groceryList) {
@@ -166,6 +208,75 @@ export default function GroceryListPage() {
             redirectPath="/grocery-list"
             feature="grocery"
           />
+        </div>
+      </div>
+    )
+  }
+
+  // Pro user with no grocery list — actionable empty state
+  if (!loading && status.isPro && !groceryList) {
+    const hasMeals = plan.days.some((day) => day.meal)
+    return (
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex items-center gap-2 mb-6">
+          <ShoppingCart className="h-6 w-6 text-[#D97757]" />
+          <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-50">Grocery List</h1>
+        </div>
+
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-neutral-200 dark:border-neutral-800 bg-gradient-to-br from-orange-50/30 to-white dark:from-neutral-900 dark:to-neutral-950 py-16 px-6 text-center">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-100 dark:bg-orange-900/30 mb-4">
+            <ShoppingCart className="h-7 w-7 text-[#D97757]" />
+          </div>
+          <p className="text-lg font-bold text-neutral-900 dark:text-neutral-50">
+            Your grocery list is empty
+          </p>
+          <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1 max-w-sm">
+            {hasMeals
+              ? 'You have meals in your plan! Generate your grocery list to see everything you need to buy this week.'
+              : 'Create a weekly meal plan first — your grocery list builds automatically from the meals you choose.'}
+          </p>
+
+          <div className="mt-6 flex flex-col sm:flex-row gap-3">
+            <Link href="/planner">
+              <Button className="bg-[#D97757] hover:bg-[#c4684b] text-white w-full sm:w-auto">
+                <Calendar className="h-4 w-4 mr-2" />
+                {hasMeals ? 'Open Weekly Plan' : 'Generate Weekly Plan'}
+              </Button>
+            </Link>
+            <Link href="/dashboard/tonight">
+              <Button variant="outline" className="w-full sm:w-auto">
+                <Utensils className="h-4 w-4 mr-2" />
+                Plan Tonight&rsquo;s Dinner
+              </Button>
+            </Link>
+          </div>
+
+          {/* How it works */}
+          <div className="mt-8 w-full max-w-md">
+            <p className="text-xs font-bold uppercase tracking-wide text-neutral-400 dark:text-neutral-500 mb-3">
+              How it works
+            </p>
+            <div className="grid grid-cols-3 gap-3">
+              <div className="text-center">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/30 mx-auto mb-1.5">
+                  <span className="text-sm font-bold text-[#D97757]">1</span>
+                </div>
+                <p className="text-[11px] text-neutral-600 dark:text-neutral-400">Plan your meals</p>
+              </div>
+              <div className="text-center">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/30 mx-auto mb-1.5">
+                  <span className="text-sm font-bold text-[#D97757]">2</span>
+                </div>
+                <p className="text-[11px] text-neutral-600 dark:text-neutral-400">List auto-generates</p>
+              </div>
+              <div className="text-center">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/30 mx-auto mb-1.5">
+                  <span className="text-sm font-bold text-[#D97757]">3</span>
+                </div>
+                <p className="text-[11px] text-neutral-600 dark:text-neutral-400">Shop & check off</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     )

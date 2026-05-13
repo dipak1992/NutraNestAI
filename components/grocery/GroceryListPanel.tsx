@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState, useRef } from 'react'
+import Link from 'next/link'
 import { useWeeklyPlanStore } from '@/lib/planner/store'
 import { buildGroceryList } from '@/lib/planner/grocery'
 import { CATEGORY_ORDER, GROCERY_ICONS } from '@/lib/planner/types'
@@ -22,6 +23,9 @@ import {
   Pencil,
   Check,
   StickyNote,
+  Calendar,
+  Utensils,
+  ArrowRight,
 } from 'lucide-react'
 import {
   Tooltip,
@@ -414,21 +418,48 @@ export function GroceryListPanel() {
   }, [groceryList])
 
   if (!groceryList) {
+    const hasMeals = plan.days.some((day) => day.meal)
     return (
       <div className="space-y-4">
-        {/* Empty state — non-blocking */}
-        <div className="rounded-xl border border-dashed border-border/60 p-6 text-center text-muted-foreground">
-          <ShoppingCart className="h-10 w-10 mx-auto mb-3 opacity-30" />
-          <p className="font-semibold mb-1">No grocery list yet</p>
-          <p className="text-sm">
-            Generate 3 days to unlock your grocery preview, or add items manually below.
+        {/* Empty state — actionable */}
+        <div className="rounded-2xl border border-dashed border-border/60 bg-gradient-to-br from-orange-50/30 to-white dark:from-neutral-900/50 dark:to-neutral-950 p-8 text-center">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-100 dark:bg-orange-900/30 mx-auto mb-4">
+            <ShoppingCart className="h-7 w-7 text-[#D97757]" />
+          </div>
+          <p className="text-lg font-bold text-foreground mb-1">No grocery list yet</p>
+          <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+            {hasMeals
+              ? 'You have meals planned! Generate your grocery list to see all the ingredients you need.'
+              : 'Plan your weekly meals first — your grocery list builds automatically from the recipes you choose.'}
           </p>
-          {plan.days.some((day) => day.meal) && (
-            <Button size="sm" className="mt-4" onClick={regenerateFromWeeklyPlan}>
-              <RotateCcw className="h-4 w-4 mr-1.5" />
-              Regenerate from weekly plan
-            </Button>
-          )}
+
+          <div className="mt-5 flex flex-col sm:flex-row items-center justify-center gap-3">
+            {hasMeals ? (
+              <Button size="sm" onClick={regenerateFromWeeklyPlan} className="bg-[#D97757] hover:bg-[#c4684b] text-white">
+                <RotateCcw className="h-4 w-4 mr-1.5" />
+                Generate Grocery List
+              </Button>
+            ) : (
+              <Link href="/planner">
+                <Button size="sm" className="bg-[#D97757] hover:bg-[#c4684b] text-white">
+                  <Calendar className="h-4 w-4 mr-1.5" />
+                  Generate Weekly Plan
+                </Button>
+              </Link>
+            )}
+            <Link href="/dashboard/tonight">
+              <Button variant="outline" size="sm">
+                <Utensils className="h-4 w-4 mr-1.5" />
+                Plan Tonight&rsquo;s Dinner
+              </Button>
+            </Link>
+          </div>
+
+          {/* Tip */}
+          <div className="mt-6 inline-flex items-center gap-1.5 rounded-full bg-muted/60 px-3 py-1.5 text-xs text-muted-foreground">
+            <ArrowRight className="h-3 w-3" />
+            <span>Tip: You can also add items manually below</span>
+          </div>
         </div>
 
         {/* Add custom item — accessible without a meal plan */}

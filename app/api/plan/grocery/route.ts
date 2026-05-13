@@ -25,6 +25,54 @@ type GrocerySection = {
   items: GroceryItem[]
 }
 
+type EmptyReason = 'no_plan' | 'no_meals' | 'no_recipes' | 'empty_ingredients'
+
+type EmptyAction = {
+  label: string
+  href: string
+}
+
+type GroceryMeta = {
+  reason: EmptyReason
+  message: string
+  actions: EmptyAction[]
+}
+
+function emptyResponse(reason: EmptyReason): NextResponse {
+  const META: Record<EmptyReason, { message: string; actions: EmptyAction[] }> = {
+    no_plan: {
+      message: 'You haven\u2019t created a weekly meal plan yet. Generate one to automatically build your grocery list.',
+      actions: [
+        { label: 'Generate Weekly Plan', href: '/planner' },
+        { label: 'Plan Tonight\u2019s Dinner', href: '/dashboard/tonight' },
+      ],
+    },
+    no_meals: {
+      message: 'Your weekly plan doesn\u2019t have any meals assigned yet. Add meals to your plan to build a grocery list.',
+      actions: [
+        { label: 'Open Weekly Plan', href: '/planner' },
+        { label: 'Plan Tonight\u2019s Dinner', href: '/dashboard/tonight' },
+      ],
+    },
+    no_recipes: {
+      message: 'We couldn\u2019t find recipes for the meals in your plan. Try regenerating your weekly plan.',
+      actions: [
+        { label: 'Regenerate Weekly Plan', href: '/planner' },
+      ],
+    },
+    empty_ingredients: {
+      message: 'The recipes in your plan don\u2019t have ingredient data yet. Try regenerating your plan or adding meals with ingredients.',
+      actions: [
+        { label: 'Open Weekly Plan', href: '/planner' },
+        { label: 'Plan Tonight\u2019s Dinner', href: '/dashboard/tonight' },
+      ],
+    },
+  }
+
+  const meta: GroceryMeta = { reason, ...META[reason] }
+  return NextResponse.json({ sections: [], meta })
+}
+
 // ─── Category mapping ─────────────────────────────────────────────────────────
 
 const CATEGORY_KEYWORDS: Record<string, string[]> = {
@@ -74,14 +122,14 @@ export async function POST(req: NextRequest) {
   const parsed = groceryRequestSchema.safeParse(await req.json())
   if (!parsed.success) {
     if (parsed.error.issues.some((issue) => issue.path[0] === 'recipeIds')) {
-      return NextResponse.json({ sections: [] })
+      return emptyResponse('no_meals')
     }
     return NextResponse.json({ error: validationError(parsed.error) }, { status: 400 })
   }
   const { recipeIds, weekStart } = parsed.data
 
   if (recipeIds.length === 0) {
-    return NextResponse.json({ sections: [] })
+    return emptyResponse('no_meals')
   }
 
   try {
@@ -93,7 +141,7 @@ export async function POST(req: NextRequest) {
       .maybeSingle()
 
     if (!planRow?.id) {
-      return NextResponse.json({ sections: [] })
+      return emptyResponse('no_plan')
     }
 
     const requestedIds = Array.from(new Set(recipeIds.filter((id): id is string => typeof id === 'string')))
@@ -110,7 +158,7 @@ export async function POST(req: NextRequest) {
     ))
 
     if (ownedRecipeIds.length === 0) {
-      return NextResponse.json({ sections: [] })
+      return emptyResponse('no_meals')
     }
 
     // Load recipes with their ingredients
@@ -120,7 +168,7 @@ export async function POST(req: NextRequest) {
       .in('id', ownedRecipeIds)
 
     if (!recipeRows || recipeRows.length === 0) {
-      return NextResponse.json({ sections: [] })
+      return emptyResponse('no_recipes')
     }
 
     // Aggregate ingredients across all recipes
@@ -158,6 +206,10 @@ export async function POST(req: NextRequest) {
           })
         }
       }
+    }
+
+    if (aggregated.size === 0) {
+      return emptyResponse('empty_ingredients')
     }
 
     // Build sections

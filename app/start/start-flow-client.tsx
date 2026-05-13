@@ -232,7 +232,10 @@ export function StartFlowClient() {
           </div>
         </div>
 
-        <div className="rounded-[2rem] border border-orange-100 bg-white p-5 shadow-xl shadow-orange-100/40">
+        <div
+          data-marketing-shot="first-result"
+          className="rounded-[2rem] border border-orange-100 bg-white p-5 shadow-xl shadow-orange-100/40"
+        >
           {!result ? (
             <div className="flex min-h-[560px] flex-col justify-center rounded-3xl bg-[#FBFAF3] p-6">
               <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#D97757]">

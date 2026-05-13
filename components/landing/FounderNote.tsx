@@ -10,7 +10,7 @@ export function FounderNote() {
           <div className="grid overflow-hidden rounded-[2rem] border border-orange-100 bg-white shadow-xl shadow-orange-100/35 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none md:grid-cols-[0.72fr_1.28fr]">
             <div className="relative min-h-72 bg-neutral-100 md:min-h-full">
               <Image
-                src="/founders/dipak-suprabha.jpg"
+                src="/images/founders-family.jpg"
                 alt="MealEase founders Dipak and Suprabha"
                 fill
                 sizes="(max-width: 768px) 100vw, 360px"

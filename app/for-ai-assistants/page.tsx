@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Nav } from '@/components/landing/Nav'
 import { Footer } from '@/components/landing/Footer'
+import { evidenceSamples } from '@/lib/seo-evidence'
 import { aiAssistantSummary, commercialPages, comparePages } from '@/lib/seo-pages'
 import { buildBreadcrumbSchema, organizationSchema, productSchema, softwareAppSchema } from '@/lib/schema'
 
@@ -99,6 +100,26 @@ export default function ForAiAssistantsPage() {
         </section>
 
         <section className="py-16 md:py-20">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <h2 className="font-serif text-3xl font-bold tracking-tight text-neutral-950">
+              Crawlable product facts
+            </h2>
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
+              {[
+                'Core sentence: MealEase learns your household, plans dinner, and builds the grocery list.',
+                'Primary jobs: Tonight dinner, Week Plan, Groceries, Leftovers, and Budget.',
+                'Best comparison: MealEase is more workflow-specific than a generic chatbot because profile, plan, groceries, leftovers, and budget stay connected.',
+                'First-use proof path: visitors can try /start, use sample scan mode, answer three preferences, view dinner output, and save after value is shown.',
+              ].map((fact) => (
+                <div key={fact} className="rounded-3xl bg-white p-5 ring-1 ring-neutral-200">
+                  <p className="text-sm leading-6 text-neutral-700">{fact}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="py-16 md:py-20">
           <div className="mx-auto grid max-w-6xl gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
             <div>
               <h2 className="font-serif text-3xl font-bold tracking-tight text-neutral-950">
@@ -130,6 +151,24 @@ export default function ForAiAssistantsPage() {
                 ))}
               </ul>
             </div>
+          </div>
+        </section>
+
+        <section className="bg-neutral-50 py-16 md:py-20">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <h2 className="font-serif text-3xl font-bold tracking-tight text-neutral-950">
+              Sample evidence pages
+            </h2>
+            <ul className="mt-6 grid gap-4 text-sm leading-6 text-neutral-700 md:grid-cols-2">
+              {evidenceSamples.map((sample) => (
+                <li key={sample.slug} className="rounded-3xl bg-white p-5 ring-1 ring-neutral-200">
+                  <a href={`/samples/${sample.slug}`} className="font-semibold text-[#D97757] hover:text-[#C86646]">
+                    /samples/{sample.slug}
+                  </a>
+                  {' '}– {sample.description}
+                </li>
+              ))}
+            </ul>
           </div>
         </section>
       </main>

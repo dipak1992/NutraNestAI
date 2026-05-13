@@ -59,17 +59,17 @@ export function BlogCTA({
         </div>
         <div className="flex flex-col gap-3 sm:flex-row md:flex-col">
           <Link
-            href="/signup"
+            href="/start"
             className="inline-flex min-h-[46px] items-center justify-center gap-2 rounded-full bg-[#D97757] px-5 text-sm font-bold text-white transition-colors hover:bg-[#c4664a]"
           >
-            Plan tonight free
+            Try the first-use flow
             <ArrowRight className="h-4 w-4" aria-hidden />
           </Link>
           <Link
-            href="/features/weekly-autopilot"
+            href="/samples/family-grocery-list"
             className="inline-flex min-h-[46px] items-center justify-center rounded-full border border-white/20 px-5 text-sm font-semibold text-white/88 transition-colors hover:bg-white/10"
           >
-            See weekly autopilot
+            See a sample grocery list
           </Link>
         </div>
       </div>

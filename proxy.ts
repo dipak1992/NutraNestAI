@@ -50,7 +50,7 @@ function buildCsp() {
   ].join('; ')
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const requestId = request.headers.get('x-request-id') ?? crypto.randomUUID()
   const pathname = request.nextUrl.pathname
   const origin = request.headers.get('origin')

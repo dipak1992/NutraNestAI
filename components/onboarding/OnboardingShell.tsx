@@ -35,7 +35,10 @@ export function OnboardingShell({
 
   // Use ref for isFirst to avoid re-registering the ESC listener on every step change
   const isFirstRef = useRef(isFirst)
-  isFirstRef.current = isFirst
+
+  useEffect(() => {
+    isFirstRef.current = isFirst
+  }, [isFirst])
 
   // ESC to go back — stable listener using ref
   useEffect(() => {

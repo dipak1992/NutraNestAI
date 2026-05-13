@@ -26,7 +26,19 @@ function DonutChart({ breakdown, total }: { breakdown: CategorySpend[]; total: n
   const cx = size / 2
   const cy = size / 2
 
-  let cumulativePercent = 0
+  const segments = breakdown.reduce<Array<{ item: CategorySpend; dashArray: number; dashOffset: number }>>(
+    (acc, item) => {
+      const previousPercent = acc.reduce((sum, segment) => sum + segment.dashArray / circumference, 0)
+      const pct = total > 0 ? item.amount / total : 0
+      acc.push({
+        item,
+        dashArray: circumference * pct,
+        dashOffset: circumference * (1 - previousPercent),
+      })
+      return acc
+    },
+    [],
+  )
 
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden>
@@ -41,12 +53,8 @@ function DonutChart({ breakdown, total }: { breakdown: CategorySpend[]; total: n
         className="text-neutral-100 dark:text-neutral-800"
       />
 
-      {breakdown.map((item) => {
+      {segments.map(({ item, dashArray, dashOffset }) => {
         const config = CATEGORY_CONFIG[item.category] ?? CATEGORY_CONFIG.other
-        const pct = total > 0 ? item.amount / total : 0
-        const dashArray = circumference * pct
-        const dashOffset = circumference * (1 - cumulativePercent)
-        cumulativePercent += pct
 
         return (
           <circle

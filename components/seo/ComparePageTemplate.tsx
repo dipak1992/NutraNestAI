@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { ArrowRight, CheckCircle2, MessageSquareText } from 'lucide-react'
 import { Nav } from '@/components/landing/Nav'
 import { Footer } from '@/components/landing/Footer'
+import { evidenceSamples } from '@/lib/seo-evidence'
 import type { ComparePage } from '@/lib/seo-pages'
 
 export function ComparePageTemplate({
@@ -137,6 +138,40 @@ export function ComparePageTemplate({
                 </article>
               ))}
             </div>
+          </div>
+        </section>
+
+        <section className="py-16 md:py-20">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <div className="max-w-2xl">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D97757]">
+                Original examples
+              </p>
+              <h2 className="mt-3 font-serif text-3xl font-bold tracking-tight text-neutral-950">
+                Real workflows you can inspect
+              </h2>
+              <p className="mt-3 text-sm leading-6 text-neutral-600">
+                These sample plans and grocery lists show the practical output MealEase is built around, so the comparison is grounded in workflow evidence instead of abstract AI claims.
+              </p>
+            </div>
+            <div className="mt-8 grid gap-4 md:grid-cols-3">
+              {evidenceSamples.slice(0, 3).map((sample) => (
+                <Link
+                  key={sample.slug}
+                  href={`/samples/${sample.slug}`}
+                  className="rounded-3xl border border-neutral-200 bg-white p-5 transition-colors hover:border-[#D97757]"
+                >
+                  <p className="text-xs font-bold uppercase tracking-wide text-[#D97757]">
+                    {sample.intent}
+                  </p>
+                  <h3 className="mt-3 text-lg font-semibold text-neutral-950">{sample.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-neutral-600">{sample.description}</p>
+                </Link>
+              ))}
+            </div>
+            <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-neutral-500">
+              Founder-reviewed by the MealEase team for household dinner planning accuracy.
+            </p>
           </div>
         </section>
 

@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { Mail, MessageCircle, Clock, Shield } from 'lucide-react'
 
 export function ContactInfo() {
@@ -47,19 +48,19 @@ export function ContactInfo() {
         </p>
         <ul className="space-y-2 text-sm text-neutral-600 dark:text-neutral-400">
           <li>
-            <a href="/pricing" className="hover:text-[#D97757] transition-colors">
+            <Link href="/pricing" className="hover:text-[#D97757] transition-colors">
               Pricing &amp; plans →
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="/press" className="hover:text-[#D97757] transition-colors">
+            <Link href="/press" className="hover:text-[#D97757] transition-colors">
               Press kit →
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="/about" className="hover:text-[#D97757] transition-colors">
+            <Link href="/about" className="hover:text-[#D97757] transition-colors">
               About us →
-            </a>
+            </Link>
           </li>
         </ul>
       </div>

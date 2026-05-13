@@ -21,22 +21,25 @@ export function useDailySwapLimit(
   status: ClientPaywallStatus,
   scope = 'tonight',
 ) {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(() => readSwapCount(scope))
   const limit = status.freeTonightSwipeLimit || FREE_TONIGHT_SWIPE_LIMIT
   const isUnlimited = status.isPro
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    const key = storageKey(scope)
-    const today = todayKey()
-    const raw = window.localStorage.getItem(key)
-    const parsed = raw ? (JSON.parse(raw) as SwapState) : null
-    if (!parsed || parsed.date !== today) {
-      window.localStorage.setItem(key, JSON.stringify({ date: today, count: 0 }))
-      setCount(0)
-      return
-    }
-    setCount(parsed.count)
+    const timeout = window.setTimeout(() => {
+      const key = storageKey(scope)
+      const today = todayKey()
+      const raw = window.localStorage.getItem(key)
+      const parsed = raw ? (JSON.parse(raw) as SwapState) : null
+      if (!parsed || parsed.date !== today) {
+        window.localStorage.setItem(key, JSON.stringify({ date: today, count: 0 }))
+        setCount(0)
+        return
+      }
+      setCount(parsed.count)
+    }, 0)
+    return () => window.clearTimeout(timeout)
   }, [scope])
 
   const recordSwap = useCallback(() => {
@@ -59,4 +62,13 @@ export function useDailySwapLimit(
     isUnlimited,
     recordSwap,
   }
+}
+
+function readSwapCount(scope: string) {
+  if (typeof window === 'undefined') return 0
+  const key = storageKey(scope)
+  const today = todayKey()
+  const raw = window.localStorage.getItem(key)
+  const parsed = raw ? (JSON.parse(raw) as SwapState) : null
+  return parsed?.date === today ? parsed.count : 0
 }

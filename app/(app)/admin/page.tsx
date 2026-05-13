@@ -30,7 +30,9 @@ export default async function AdminPage() {
   }
 
   const serviceClient = createSupabaseServiceClient()
-  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+  const weekAgoDate = new Date()
+  weekAgoDate.setDate(weekAgoDate.getDate() - 7)
+  const weekAgo = weekAgoDate.toISOString()
 
   const [totalResult, proResult, usersResult, emailSentResult, emailFailedResult] = await Promise.all([
     serviceClient.from('profiles').select('id', { count: 'exact', head: true }),

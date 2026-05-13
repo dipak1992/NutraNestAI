@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { Loader2, Check, Send } from 'lucide-react'
 import { TOPIC_LABELS, type ContactPayload, type ContactTopic } from '@/lib/contact/types'
 import { cn } from '@/lib/utils'
@@ -168,9 +169,9 @@ export function ContactForm() {
 
       <p className="text-xs text-neutral-500">
         By sending, you agree to our{' '}
-        <a href="/privacy" className="underline hover:text-[#D97757]">
+        <Link href="/privacy" className="underline hover:text-[#D97757]">
           Privacy Policy
-        </a>
+        </Link>
         . We&apos;ll never add you to a marketing list without asking.
       </p>
     </form>

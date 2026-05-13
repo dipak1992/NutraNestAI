@@ -267,27 +267,18 @@ export function PricingContent() {
 
       {/* ── HERO ── */}
       <section className="relative overflow-hidden bg-neutral-950 px-4 py-12 text-center text-white md:py-20">
-        {/* Desktop image (lg+) */}
-        <div className="absolute inset-0 hidden lg:block">
-          <Image
-            src="/pricing/pricing_desktop.jpg"
-            alt=""
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-center"
-          />
-        </div>
-        {/* Mobile image (< lg) */}
-        <div className="absolute inset-0 lg:hidden">
-          <Image
-            src="/pricing/pricing_mobile.jpg"
-            alt=""
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-top"
-          />
+        <div className="absolute inset-0">
+          <picture>
+            <source media="(min-width: 1024px)" srcSet="/pricing/pricing_desktop.jpg" />
+            <img
+              src="/pricing/pricing_mobile.jpg"
+              fetchPriority="high"
+              decoding="async"
+              loading="eager"
+              alt=""
+              className="h-full w-full object-cover object-top lg:object-center"
+            />
+          </picture>
         </div>
         {/* Overlay: stronger top scrim for text readability */}
         <div

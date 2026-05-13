@@ -4,6 +4,7 @@ import { ArrowRight, CheckCircle2, ShoppingCart, Sparkles, Users } from 'lucide-
 import { Nav } from '@/components/landing/Nav'
 import { Footer } from '@/components/landing/Footer'
 import { socialProof } from '@/config/social-proof'
+import { evidenceSamples } from '@/lib/seo-evidence'
 import type { CommercialPage } from '@/lib/seo-pages'
 
 export function CommercialPageTemplate({
@@ -120,6 +121,40 @@ export function CommercialPageTemplate({
                 ))}
               </ul>
             </div>
+          </div>
+        </section>
+
+        <section className="bg-white py-16 md:py-20">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <div className="max-w-2xl">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D97757]">
+                Evidence library
+              </p>
+              <h2 className="mt-3 font-serif text-3xl font-bold tracking-tight text-neutral-950">
+                See sample outputs before you sign up
+              </h2>
+              <p className="mt-3 text-sm leading-6 text-neutral-600">
+                MealEase is easier to judge when you can inspect real examples: weekly plans, grocery lists, budget choices, leftovers, and fridge-scan workflows.
+              </p>
+            </div>
+            <div className="mt-8 grid gap-4 md:grid-cols-3">
+              {evidenceSamples.slice(1, 4).map((sample) => (
+                <Link
+                  key={sample.slug}
+                  href={`/samples/${sample.slug}`}
+                  className="rounded-3xl border border-neutral-200 bg-[#FBFAF3] p-5 transition-colors hover:border-[#D97757]"
+                >
+                  <p className="text-xs font-bold uppercase tracking-wide text-[#D97757]">
+                    {sample.intent}
+                  </p>
+                  <h3 className="mt-3 text-lg font-semibold text-neutral-950">{sample.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-neutral-600">{sample.description}</p>
+                </Link>
+              ))}
+            </div>
+            <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-neutral-500">
+              Founder-reviewed examples. Updated as the product workflow improves.
+            </p>
           </div>
         </section>
 

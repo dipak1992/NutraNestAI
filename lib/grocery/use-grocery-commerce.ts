@@ -43,10 +43,13 @@ export function useGroceryCommerce(
 
   // Detect region on mount
   useEffect(() => {
-    const detected = detectRegion()
-    setRegionState(detected)
-    setIsLoading(false)
-    trackRegionDetected(detected)
+    const timeout = window.setTimeout(() => {
+      const detected = detectRegion()
+      setRegionState(detected)
+      setIsLoading(false)
+      trackRegionDetected(detected)
+    }, 0)
+    return () => window.clearTimeout(timeout)
   }, [])
 
   // Get providers for region

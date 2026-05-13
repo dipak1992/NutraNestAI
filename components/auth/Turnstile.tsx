@@ -30,12 +30,11 @@ export function Turnstile({ onToken }: Props) {
   const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
   const containerRef = useRef<HTMLDivElement | null>(null)
   const widgetRef = useRef<string | null>(null)
-  const [ready, setReady] = useState(false)
+  const [ready, setReady] = useState(() => typeof window !== 'undefined' && Boolean(window.turnstile))
 
   useEffect(() => {
     if (!siteKey) return
     if (window.turnstile) {
-      setReady(true)
       return
     }
 

@@ -12,7 +12,7 @@ import { PricingTeaser } from '@/components/landing/PricingTeaser'
 import { FAQ } from '@/components/landing/FAQ'
 import { FinalCTA } from '@/components/landing/FinalCTA'
 import { Footer } from '@/components/landing/Footer'
-import { organizationSchema, productSchema, softwareAppSchema, faqSchema } from '@/lib/schema'
+import { productSchema, softwareAppSchema, faqSchema } from '@/lib/schema'
 
 // Revalidate every 30 minutes so the "Tonight's meal" rotates at 7am CT
 // ISR ensures the page is regenerated after the meal day boundary
@@ -40,10 +40,6 @@ export default async function LandingPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
       />
       <script
         type="application/ld+json"

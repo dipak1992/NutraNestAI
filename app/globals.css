@@ -263,6 +263,11 @@
   animation: me-fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+.me-defer-section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 760px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .me-fade-in {
     animation: none;

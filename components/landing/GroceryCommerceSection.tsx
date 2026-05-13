@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { Container } from './shared/Container'
 import { FadeIn } from './shared/FadeIn'
+import groceryImage from '@/public/landing/optimized/grocery.webp'
 
 const steps = [
   {
@@ -47,7 +48,7 @@ const exportOptions = [
 export function GroceryCommerceSection() {
   return (
     <section
-      className="relative overflow-hidden bg-white py-20 dark:bg-neutral-950 md:py-28"
+      className="me-defer-section relative overflow-hidden bg-white py-20 dark:bg-neutral-950 md:py-28"
       aria-labelledby="grocery-commerce-heading"
     >
       <div
@@ -111,11 +112,12 @@ export function GroceryCommerceSection() {
               <div className="relative overflow-hidden rounded-[2rem] bg-neutral-950 shadow-2xl shadow-neutral-900/15 ring-1 ring-black/10 dark:ring-white/10">
                 <div className="relative aspect-[16/10] min-h-[220px] md:aspect-[4/3] md:min-h-[360px]">
                   <Image
-                    src="/landing/grocery.jpg"
+                    src={groceryImage}
                     alt="Fresh groceries ready for a MealEase weekly plan"
                     fill
                     sizes="(min-width: 1024px) 620px, 100vw"
                     className="object-cover object-center"
+                    placeholder="blur"
                   />
                   <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(8,8,8,0.46)_0%,rgba(8,8,8,0.08)_52%,rgba(8,8,8,0)_100%)] md:bg-[linear-gradient(to_right,rgba(8,8,8,0.78)_0%,rgba(8,8,8,0.42)_45%,rgba(8,8,8,0.08)_100%)]" />
                 </div>

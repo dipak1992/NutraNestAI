@@ -1,6 +1,3 @@
-'use client'
-
-import { useId } from 'react'
 import { cn } from '@/lib/utils'
 
 interface MealEaseLogoProps {
@@ -27,11 +24,10 @@ export function MealEaseLogo({
   showBadge = false,
   invertText = false,
 }: MealEaseLogoProps) {
-  const uid = useId()
-  const bgId = `me-bg-${uid}`
-  const leafId = `me-leaf-${uid}`
-  const bowlId = `me-bowl-${uid}`
-  const clipId = `me-clip-${uid}`
+  const bgId = 'me-logo-bg'
+  const leafId = 'me-logo-leaf'
+  const bowlId = 'me-logo-bowl'
+  const clipId = 'me-logo-clip'
   const { icon, text, gap } = sizeMap[size]
 
   return (

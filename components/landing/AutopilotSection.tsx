@@ -14,6 +14,8 @@ import {
 } from 'lucide-react'
 import { Container } from './shared/Container'
 import { FadeIn } from './shared/FadeIn'
+import smartAutopilotImage from '@/public/landing/optimized/smartautopilot.webp'
+import familyDinnerImage from '@/public/landing/optimized/family-dinner.webp'
 
 const autopilotFeatures = [
   {
@@ -58,7 +60,7 @@ const smartSignals = [
 export function AutopilotSection() {
   return (
     <section
-      className="relative overflow-hidden bg-[#FDF6F1] py-20 dark:bg-neutral-950 md:py-28"
+      className="me-defer-section relative overflow-hidden bg-[#FDF6F1] py-20 dark:bg-neutral-950 md:py-28"
       aria-labelledby="autopilot-heading"
     >
       <div
@@ -132,12 +134,11 @@ export function AutopilotSection() {
               <div className="relative overflow-hidden rounded-[1.75rem] bg-white p-2 shadow-2xl shadow-neutral-900/15 ring-1 ring-neutral-200/80 dark:bg-neutral-900 dark:ring-white/10 sm:rounded-[2rem] sm:p-3">
                 <div className="relative overflow-hidden rounded-[1.25rem] bg-[#FBFAF3] sm:rounded-[1.5rem]">
                   <Image
-                    src="/landing/smartautopilot.png"
+                    src={smartAutopilotImage}
                     alt="MealEase Autopilot weekly planning interface"
-                    width={1448}
-                    height={1086}
                     sizes="(min-width: 1024px) 620px, calc(100vw - 40px)"
                     className="h-auto w-full object-contain"
+                    placeholder="blur"
                   />
                 </div>
 
@@ -206,11 +207,12 @@ export function AutopilotSection() {
             <div className="grid md:grid-cols-[0.9fr_1.1fr]">
               <div className="relative min-h-[280px]">
                 <Image
-                  src="/landing/family-dinner.jpg"
+                  src={familyDinnerImage}
                   alt="Family enjoying a meal planned by MealEase Autopilot"
                   fill
                   sizes="(min-width: 768px) 360px, 100vw"
                   className="object-cover"
+                  placeholder="blur"
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent to-neutral-950/30 md:bg-gradient-to-l" />
               </div>

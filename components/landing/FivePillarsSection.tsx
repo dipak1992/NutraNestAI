@@ -7,7 +7,7 @@ export function FivePillarsSection() {
   return (
     <section
       id="pillars"
-      className="py-20 md:py-28 bg-white dark:bg-neutral-950"
+      className="me-defer-section py-20 md:py-28 bg-white dark:bg-neutral-950"
       aria-labelledby="pillars-heading"
     >
       <Container>
@@ -34,7 +34,7 @@ export function FivePillarsSection() {
               delay={i * 0.08}
               className="md:col-span-2"
             >
-              <PillarCard pillar={p} index={i} />
+              <PillarCard pillar={p} />
             </FadeIn>
           ))}
         </div>
@@ -45,10 +45,8 @@ export function FivePillarsSection() {
 
 function PillarCard({
   pillar,
-  index,
 }: {
   pillar: (typeof pillars)[number]
-  index: number
 }) {
   return (
     <article className="group relative h-full rounded-3xl bg-neutral-50 dark:bg-neutral-900 ring-1 ring-neutral-200/70 dark:ring-neutral-800 hover:ring-[#D97757]/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl overflow-hidden">

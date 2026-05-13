@@ -20,35 +20,25 @@ export function Hero() {
         className="absolute inset-0 -z-10 bg-gradient-to-b from-[#FDF6F1] via-white to-white dark:from-neutral-900 dark:via-neutral-950 dark:to-neutral-950"
       />
 
-      {/* Desktop background wash (sm+) — subtle heroSection.jpg */}
-      <div className="absolute inset-0 -z-10 hidden sm:block">
-        <Image
-          src="/landing/heroSection.jpg"
-          alt=""
-          fill
-          fetchPriority="high"
-          sizes="100vw"
-          className="object-cover object-center opacity-25"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-white via-white/88 to-white/45 dark:from-neutral-950 dark:via-neutral-950/88 dark:to-neutral-950/56" />
-      </div>
-
-      {/* Mobile background (< sm) — portrait hero_section.jpg, right-anchored */}
-      <div className="absolute inset-0 -z-10 sm:hidden">
-        <Image
-          src="/mobile/hero_section.jpg"
-          alt=""
-          fill
-          fetchPriority="high"
-          sizes="100vw"
-          className="object-cover object-right"
-        />
-        {/* Stronger left-heavy gradient: text zone is near-opaque, right edge reveals image */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.97)_0%,rgba(255,255,255,0.92)_40%,rgba(255,255,255,0.62)_65%,rgba(255,255,255,0.14)_100%)] dark:bg-[linear-gradient(to_right,rgba(10,10,10,0.97)_0%,rgba(10,10,10,0.92)_40%,rgba(10,10,10,0.62)_65%,rgba(10,10,10,0.14)_100%)]" />
-        {/* Warm top fade for nav transition */}
-        <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#FDF6F1]/90 to-transparent dark:from-neutral-950/90" />
-        {/* Soft bottom fade so phone mockup blends in */}
-        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white/80 to-transparent dark:from-neutral-950/80" />
+      {/* Art-directed hero background: one responsive request, no hidden priority image. */}
+      <div className="absolute inset-0 -z-10">
+        <picture>
+          <source media="(max-width: 639px)" srcSet="/landing/optimized/hero-section-mobile.avif" type="image/avif" />
+          <source media="(max-width: 639px)" srcSet="/landing/optimized/hero-section-mobile.webp" type="image/webp" />
+          <source srcSet="/landing/optimized/hero-section.avif" type="image/avif" />
+          <source srcSet="/landing/optimized/hero-section.webp" type="image/webp" />
+          <img
+            src="/landing/optimized/hero-section.webp"
+            alt=""
+            fetchPriority="high"
+            decoding="async"
+            className="h-full w-full object-cover object-right opacity-100 sm:object-center sm:opacity-25"
+          />
+        </picture>
+        <div className="absolute inset-0 hidden bg-gradient-to-r from-white via-white/88 to-white/45 dark:from-neutral-950 dark:via-neutral-950/88 dark:to-neutral-950/56 sm:block" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.97)_0%,rgba(255,255,255,0.92)_40%,rgba(255,255,255,0.62)_65%,rgba(255,255,255,0.14)_100%)] dark:bg-[linear-gradient(to_right,rgba(10,10,10,0.97)_0%,rgba(10,10,10,0.92)_40%,rgba(10,10,10,0.62)_65%,rgba(10,10,10,0.14)_100%)] sm:hidden" />
+        <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#FDF6F1]/90 to-transparent dark:from-neutral-950/90 sm:hidden" />
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white/80 to-transparent dark:from-neutral-950/80 sm:hidden" />
       </div>
 
       <Container wide>

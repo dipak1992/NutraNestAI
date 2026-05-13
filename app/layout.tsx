@@ -1,14 +1,15 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, Fraunces } from 'next/font/google'
+import Script from 'next/script'
 import './globals.css'
-import { Toaster } from '@/components/ui/sonner'
-import { PWAServiceWorkerRegister } from '@/components/pwa/PWAServiceWorkerRegister'
+import { LazyToaster } from '@/components/providers/LazyToaster'
 import { getSiteUrl } from '@/lib/seo'
 import { organizationSchema } from '@/lib/schema'
 
 const inter = Inter({
   variable: '--font-inter',
   subsets: ['latin'],
+  display: 'swap',
 })
 
 const fraunces = Fraunces({
@@ -83,9 +84,11 @@ export default function RootLayout({
             __html: JSON.stringify(organizationSchema),
           }}
         />
-        <PWAServiceWorkerRegister />
+        <Script id="pwa-service-worker" strategy="lazyOnload">
+          {`if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(error){console.warn('[pwa] service worker registration failed',error)})}`}
+        </Script>
         {children}
-        <Toaster richColors position="top-right" />
+        <LazyToaster />
       </body>
     </html>
   )

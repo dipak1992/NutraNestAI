@@ -59,7 +59,7 @@ export const productSchema = {
   category: 'Meal Planning Software',
   description:
     'Family-first AI meal prep planner with weekly planning, grocery lists, pantry scanning, leftovers workflows, and budget-aware dinner suggestions.',
-  image: [absoluteUrl('/landing/family-dinner.jpg')],
+  image: [absoluteUrl('/landing/optimized/family-dinner.webp')],
   url: absoluteUrl('/'),
   aggregateRating: {
     '@type': 'AggregateRating',

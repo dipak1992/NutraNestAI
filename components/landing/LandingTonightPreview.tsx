@@ -33,7 +33,7 @@ export function LandingTonightPreview() {
       {/* Meal image — full bleed, takes ~45% of card height */}
       <div className="relative mx-4 rounded-2xl overflow-hidden shadow-lg" style={{ height: '44%' }}>
         <Image
-          src={meal.image}
+          src="/landing/optimized/tonight-card.webp"
           alt={meal.name}
           fill
           sizes="260px"

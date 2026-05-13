@@ -11,6 +11,8 @@ import {
 } from 'lucide-react'
 import { Container } from './shared/Container'
 import { FadeIn } from './shared/FadeIn'
+import afterDinnerImage from '@/public/landing/optimized/after-dinner.webp'
+import memoryImage from '@/public/landing/optimized/memory.webp'
 
 const systemSteps = [
   {
@@ -61,7 +63,7 @@ const postCookItems = [
 
 export function ConnectedSystem() {
   return (
-    <section className="bg-neutral-950 py-20 text-white md:py-28" aria-labelledby="system-heading">
+    <section className="me-defer-section bg-neutral-950 py-20 text-white md:py-28" aria-labelledby="system-heading">
       <Container>
         <FadeIn>
           <div className="mx-auto max-w-3xl text-center">
@@ -110,12 +112,13 @@ export function ConnectedSystem() {
             <article className="relative h-full overflow-hidden rounded-3xl border border-white/10 shadow-2xl shadow-black/40">
               {/* Background image */}
               <Image
-                src="/landing/memory.jpg"
+                src={memoryImage}
                 alt=""
                 fill
                 loading="lazy"
                 sizes="(min-width: 1024px) 50vw, 100vw"
                 className="object-cover object-center"
+                placeholder="blur"
               />
               {/* Dark gradient overlay — top lighter, bottom denser for text safety */}
               <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(5,10,20,0.42)_0%,rgba(5,10,20,0.65)_100%)]" />
@@ -153,12 +156,13 @@ export function ConnectedSystem() {
             <article className="relative h-full overflow-hidden rounded-3xl border border-white/10 shadow-2xl shadow-black/40">
               {/* Background image */}
               <Image
-                src="/landing/after_dinner.jpg"
+                src={afterDinnerImage}
                 alt=""
                 fill
                 loading="lazy"
                 sizes="(min-width: 1024px) 50vw, 100vw"
                 className="object-cover object-center"
+                placeholder="blur"
               />
               {/* Dark gradient overlay — top lighter, bottom denser for text safety */}
               <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(10,5,2,0.40)_0%,rgba(10,5,2,0.68)_100%)]" />

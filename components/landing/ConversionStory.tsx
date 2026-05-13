@@ -2,6 +2,7 @@ import Image from 'next/image'
 import { CheckCircle2, RefreshCcw, ShoppingCart, Sparkles } from 'lucide-react'
 import { Container } from './shared/Container'
 import { FadeIn } from './shared/FadeIn'
+import conversionStoryImage from '@/public/landing/optimized/conversion-story.webp'
 
 const workflow = [
   { icon: Sparkles, label: 'Tonight Pick' },
@@ -31,10 +32,11 @@ export function ConversionStory() {
             <div className="relative overflow-hidden rounded-[2rem] bg-neutral-950 p-5 text-white shadow-2xl shadow-neutral-950/10">
               <div className="absolute inset-0">
                 <Image
-                  src="/landing/conversion-story.jpg"
+                  src={conversionStoryImage}
                   alt=""
                   fill
                   sizes="(max-width: 1024px) 100vw, 58vw"
+                  placeholder="blur"
                   className="object-cover opacity-65"
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-neutral-950/85 via-neutral-950/55 to-neutral-950/20" />

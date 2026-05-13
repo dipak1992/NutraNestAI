@@ -2,7 +2,7 @@ export const pillars = [
   {
     id: 'tonight',
     icon: '🍽️',
-    image: '/cards/tonight.jpg',
+    image: '/landing/optimized/tonight-card.webp',
     question: "What's for dinner?",
     title: 'Tonight Suggestions',
     answer:
@@ -12,7 +12,7 @@ export const pillars = [
   {
     id: 'snap',
     icon: '📸',
-    image: '/cards/snap.jpg',
+    image: '/landing/optimized/snap-card.webp',
     question: "What's in my fridge?",
     title: 'Snap & Cook',
     answer:
@@ -22,7 +22,7 @@ export const pillars = [
   {
     id: 'autopilot',
     icon: '📅',
-    image: '/cards/weekly.jpg',
+    image: '/landing/optimized/weekly-card.webp',
     question: "What's this week?",
     title: 'Weekly Autopilot',
     answer:
@@ -32,7 +32,7 @@ export const pillars = [
   {
     id: 'leftovers',
     icon: '🍱',
-    image: '/cards/leftover.jpg',
+    image: '/landing/optimized/leftover-card.webp',
     question: 'What do I do with leftovers?',
     title: 'Leftovers AI',
     answer:
@@ -42,7 +42,7 @@ export const pillars = [
   {
     id: 'budget',
     icon: '💰',
-    image: '/cards/budget.jpg',
+    image: '/landing/optimized/budget-card.webp',
     question: 'What will it cost me?',
     title: 'Budget Intelligence',
     answer:
@@ -52,7 +52,7 @@ export const pillars = [
   {
     id: 'grocery',
     icon: '🛒',
-    image: '/landing/grocery.jpg',
+    image: '/landing/optimized/grocery-card.webp',
     question: 'How do I buy everything?',
     title: 'Grocery Commerce',
     answer:

@@ -101,7 +101,7 @@ export function SocialProof() {
                   {example.title}
                 </h3>
                 <ul className="mt-4 space-y-3">
-                  {example.items.map((item) => (
+                  {example.after.map((item) => (
                     <li key={item} className="flex gap-3 text-sm leading-6 text-neutral-700 dark:text-neutral-300">
                       <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#D97757]" />
                       {item}

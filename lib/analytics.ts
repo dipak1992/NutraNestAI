@@ -45,11 +45,6 @@ export const Analytics = {
   REFERRAL_INVITE_SENT: 'referral_invite_sent',
   REVIEW_PROMPT_VIEWED: 'review_prompt_viewed',
   REVIEW_PROMPT_CLICKED: 'review_prompt_clicked',
-  START_SAMPLE_SELECTED: 'start_sample_selected',
-  START_RESULT_GENERATED: 'start_result_generated',
-  START_GROCERY_PREVIEW_VIEWED: 'start_grocery_preview_viewed',
-  START_SAVE_ACCOUNT_CLICKED: 'start_save_account_clicked',
-  START_FIRST_RETURN: 'start_first_return',
 } as const
 
 export type AnalyticsEvent = (typeof Analytics)[keyof typeof Analytics]

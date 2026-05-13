@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540">
-  <rect width="960" height="540" fill="#050505"/>
-  <image href="/proof/compare-chatgpt.png" x="-40" y="-10" width="1040" height="731">
-    <animate attributeName="y" values="-10;-150;-10" dur="6s" repeatCount="indefinite"/>
-  </image>
-  <rect x="0" y="0" width="960" height="540" fill="none" stroke="#3b2a24" stroke-width="2"/>
-</svg>

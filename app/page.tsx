@@ -1,7 +1,6 @@
 import { Nav } from '@/components/landing/Nav'
 import { Hero } from '@/components/landing/Hero'
 import { ProductProofStrip } from '@/components/landing/ProductProofStrip'
-import { ProofAssetsSection } from '@/components/landing/ProofAssetsSection'
 import { ConversionStory } from '@/components/landing/ConversionStory'
 import { FounderNote } from '@/components/landing/FounderNote'
 import { HowItWorks } from '@/components/landing/HowItWorks'
@@ -59,7 +58,6 @@ export default async function LandingPage() {
       <main id="main-content">
         <Hero />
         <ProductProofStrip />
-        <ProofAssetsSection />
         <ConversionStory />
         <FounderNote />
         <HowItWorks />

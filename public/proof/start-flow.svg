@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540">
-  <rect width="960" height="540" fill="#fbfaf3"/>
-  <image href="/proof/start-result.png" x="-40" y="-60" width="1040" height="731">
-    <animate attributeName="x" values="-40;-80;-40" dur="5s" repeatCount="indefinite"/>
-    <animate attributeName="y" values="-60;-92;-60" dur="5s" repeatCount="indefinite"/>
-  </image>
-  <rect x="0" y="0" width="960" height="540" fill="none" stroke="#f0d8c8" stroke-width="2"/>
-</svg>

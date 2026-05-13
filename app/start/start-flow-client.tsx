@@ -1,13 +1,12 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight, Camera, Check, Loader2, ShoppingCart, Sparkles, Upload } from 'lucide-react'
 import { MealEaseLogo } from '@/components/ui/MealEaseLogo'
 import type { GroceryList, WeeklyPlan } from '@/lib/planner/types'
 import type { SmartMealResult } from '@/lib/engine/types'
 import type { FridgeResult } from '@/lib/scan/types'
-import { Analytics, trackEvent } from '@/lib/analytics'
 
 type Goal = 'quick' | 'budget' | 'healthy' | 'picky' | 'leftovers'
 
@@ -42,48 +41,9 @@ export function StartFlowClient() {
   const [isGenerating, setIsGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<StartResult | null>(null)
-  const groceryPreviewRef = useRef<HTMLDivElement | null>(null)
-  const groceryPreviewTracked = useRef(false)
 
   const visibleItems = pantryItems.length > 0 ? pantryItems : sampleItems
   const previewItems = useMemo(() => visibleItems.slice(0, 8), [visibleItems])
-
-  useEffect(() => {
-    const generatedAt = window.localStorage.getItem('mealease:start-result-generated-at')
-    const firstReturnTracked = window.localStorage.getItem('mealease:start-first-return-tracked')
-    const generatedThisSession = window.sessionStorage.getItem('mealease:start-generated-this-session')
-
-    if (generatedAt && !firstReturnTracked && !generatedThisSession) {
-      trackEvent(Analytics.START_FIRST_RETURN, {
-        generated_at: generatedAt,
-        source: 'start_flow',
-      })
-      window.localStorage.setItem('mealease:start-first-return-tracked', new Date().toISOString())
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!result || !groceryPreviewRef.current || groceryPreviewTracked.current) return
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry?.isIntersecting || groceryPreviewTracked.current) return
-        groceryPreviewTracked.current = true
-        trackEvent(Analytics.START_GROCERY_PREVIEW_VIEWED, {
-          meal_id: result.meal.id,
-          meal_title: result.meal.title,
-          item_count: result.groceryList.items.length,
-          pantry_item_count: result.activation.pantryItems.length,
-          goal: result.activation.goal,
-        })
-        observer.disconnect()
-      },
-      { threshold: 0.45 },
-    )
-
-    observer.observe(groceryPreviewRef.current)
-    return () => observer.disconnect()
-  }, [result])
 
   async function scanImage(file: File) {
     setError(null)
@@ -101,10 +61,6 @@ export function StartFlowClient() {
     const names = data.ingredients.map((item) => item.name).filter(Boolean)
     setPantryItems(names.length > 0 ? names : sampleItems)
     setScanState('ready')
-    trackEvent('start_photo_scanned', {
-      ingredient_count: names.length,
-      fallback_to_sample: names.length === 0,
-    })
   }
 
   async function generatePlan(items = visibleItems) {
@@ -119,24 +75,10 @@ export function StartFlowClient() {
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const data = (await res.json()) as StartResult
       setResult(data)
-      const generatedAt = new Date().toISOString()
-      window.localStorage.setItem('mealease:start-result-generated-at', generatedAt)
-      window.sessionStorage.setItem('mealease:start-generated-this-session', '1')
       window.localStorage.setItem('mealease:first-plan', JSON.stringify({
         ...data,
         weekStart: data.plan.weekStart,
       }))
-      trackEvent(Analytics.START_RESULT_GENERATED, {
-        meal_id: data.meal.id,
-        meal_title: data.meal.title,
-        matched_pantry_items: data.meal.meta.matchedPantryItems,
-        pantry_utilization: data.meal.meta.pantryUtilization,
-        pantry_item_count: data.activation.pantryItems.length,
-        grocery_item_count: data.groceryList.items.length,
-        goal: data.activation.goal,
-        household_size: data.activation.householdSize,
-        dietary_count: data.activation.dietary.length,
-      })
     } catch {
       setError('MealEase could not build that plan. Try again with the sample fridge.')
     } finally {
@@ -157,16 +99,7 @@ export function StartFlowClient() {
           <Link href="/" aria-label="MealEase home">
             <MealEaseLogo size="md" showBadge />
           </Link>
-          <Link
-            href="/signup"
-            onClick={() => {
-              trackEvent(Analytics.START_SAVE_ACCOUNT_CLICKED, {
-                source: 'start_header',
-                has_result: Boolean(result),
-              })
-            }}
-            className="text-sm font-medium text-slate-600 hover:text-[#D97757]"
-          >
+          <Link href="/signup" className="text-sm font-medium text-slate-600 hover:text-[#D97757]">
             Save account
           </Link>
         </div>
@@ -211,10 +144,6 @@ export function StartFlowClient() {
                 onClick={() => {
                   setPantryItems(sampleItems)
                   setScanState('ready')
-                  trackEvent(Analytics.START_SAMPLE_SELECTED, {
-                    ingredient_count: sampleItems.length,
-                    source: 'start_flow',
-                  })
                 }}
                 className="min-h-28 rounded-2xl border border-orange-100 bg-white p-4 text-left text-sm font-medium text-slate-700 shadow-sm hover:border-[#D97757]"
               >
@@ -340,7 +269,7 @@ export function StartFlowClient() {
                 </div>
               </div>
 
-              <div ref={groceryPreviewRef} className="rounded-3xl border border-emerald-100 p-5">
+              <div className="rounded-3xl border border-emerald-100 p-5">
                 <div className="flex items-center gap-2">
                   <ShoppingCart className="h-5 w-5 text-emerald-600" />
                   <h3 className="font-serif text-2xl font-bold">Grocery list preview</h3>
@@ -357,14 +286,6 @@ export function StartFlowClient() {
 
               <Link
                 href="/signup?next=/start/save"
-                onClick={() => {
-                  trackEvent(Analytics.START_SAVE_ACCOUNT_CLICKED, {
-                    meal_id: result.meal.id,
-                    meal_title: result.meal.title,
-                    grocery_item_count: result.groceryList.items.length,
-                    goal: result.activation.goal,
-                  })
-                }}
                 className="flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#D97757] px-5 py-3 font-semibold text-white shadow-lg shadow-[#D97757]/20 hover:bg-[#C86646]"
               >
                 Save this plan

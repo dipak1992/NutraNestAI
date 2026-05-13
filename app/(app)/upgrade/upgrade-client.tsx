@@ -25,7 +25,7 @@ const TRUST_SIGNALS = [
   'Cancel anytime — one click',
   '7-day free trial included',
   'No credit card to start trial',
-  'Trusted by 2,000+ households',
+  'Built with beta household feedback',
 ]
 
 /* ─────────────────────── COMPONENT ─────────────────────── */
@@ -60,21 +60,9 @@ export function UpgradeClient({ isAuthenticated }: Props) {
 
     try {
       const plan = billing === 'yearly' ? 'pro_yearly' : 'pro_monthly'
-      const res = await fetch('/api/stripe/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan }),
-      })
-      const data = await res.json()
-
-      if (data.error === 'billing_not_configured') {
-        // Stripe not configured — fall back to trial
-        const trialRes = await fetch('/api/paywall/start-trial', { method: 'POST' })
-        const trialData = await trialRes.json()
-        if (!trialRes.ok) {
-          toast.error(trialData.error || 'Could not start trial')
-          return
-        }
+      const trialRes = await fetch('/api/paywall/start-trial', { method: 'POST' })
+      const trialData = await trialRes.json().catch(() => ({}))
+      if (trialRes.ok) {
         posthog.capture('upgrade_trial_started', { billing, feature_trigger: feature })
         toast.success('Your 7-day Plus trial is active!', {
           description: 'Enjoy full access to every feature.',
@@ -83,6 +71,17 @@ export function UpgradeClient({ isAuthenticated }: Props) {
         router.refresh()
         return
       }
+      if (!String(trialData.error ?? '').toLowerCase().includes('already used')) {
+        toast.error(trialData.error || 'Could not start trial')
+        return
+      }
+
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan }),
+      })
+      const data = await res.json()
 
       if (!res.ok) {
         toast.error(data.error || 'Could not start checkout. Please try again.')
@@ -207,7 +206,7 @@ export function UpgradeClient({ isAuthenticated }: Props) {
                   <span className="animate-pulse">Processing…</span>
                 ) : (
                   <>
-                    Continue to Checkout
+                    Start 7-day free trial
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
@@ -267,8 +266,8 @@ export function UpgradeClient({ isAuthenticated }: Props) {
               ))}
             </div>
             <div className="text-left">
-              <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-50">2,000+ households</p>
-              <p className="text-xs text-neutral-500">already use MealEase Plus</p>
+              <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-50">Beta household feedback</p>
+              <p className="text-xs text-neutral-500">shaping the MealEase Plus workflow</p>
             </div>
           </div>
         </div>

@@ -225,6 +225,10 @@ export function StartFlowClient() {
               Build my first plan
             </button>
             {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+            <p className="mt-3 text-xs leading-5 text-slate-500">
+              Privacy note: uploaded photos are used to detect visible ingredients for this demo.
+              The first-use demo result is saved only if you create an account and choose to save it.
+            </p>
           </div>
         </div>
 

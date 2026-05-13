@@ -1,4 +1,4 @@
-import { CheckCircle2, Sparkles, XCircle } from 'lucide-react'
+import { ArrowRight, CheckCircle2, MessageSquareText, Sparkles, XCircle } from 'lucide-react'
 import { Container } from './shared/Container'
 import { Button } from './shared/Button'
 import { FadeIn } from './shared/FadeIn'
@@ -19,6 +19,17 @@ const mealease = [
   'Keeps budget visible',
   'Built for households',
 ]
+
+const workflowProof = [
+  {
+    label: 'ChatGPT prompt burden',
+    body: 'Tell me dietary needs, budget, ingredients, dislikes, leftovers, time limit, grocery needs, and what we ate recently.',
+  },
+  {
+    label: 'MealEase saved once',
+    body: 'Household profile, fridge context, weekly plan, grocery list, leftovers, and budget stay connected.',
+  },
+] as const
 
 export function ComparisonTable() {
   return (
@@ -45,6 +56,34 @@ export function ComparisonTable() {
         </FadeIn>
 
         <FadeIn delay={0.1}>
+          <div className="mb-8 grid gap-4 rounded-3xl bg-white p-4 ring-1 ring-black/5 dark:bg-neutral-950 dark:ring-white/5 md:grid-cols-[1fr_auto_1fr] md:items-center">
+            {workflowProof.slice(0, 1).map((item) => (
+              <div key={item.label} className="rounded-2xl bg-[#FBFAF3] p-5 dark:bg-neutral-900">
+                <div className="flex items-center gap-2 text-sm font-bold text-neutral-900 dark:text-neutral-100">
+                  <MessageSquareText className="h-4 w-4 text-[#D97757]" aria-hidden />
+                  {item.label}
+                </div>
+                <p className="mt-2 text-sm leading-6 text-neutral-600 dark:text-neutral-400">
+                  {item.body}
+                </p>
+              </div>
+            ))}
+            <ArrowRight className="hidden h-6 w-6 text-[#D97757] md:block" aria-hidden />
+            {workflowProof.slice(1).map((item) => (
+              <div key={item.label} className="rounded-2xl bg-[#FBFAF3] p-5 dark:bg-neutral-900">
+                <div className="flex items-center gap-2 text-sm font-bold text-neutral-900 dark:text-neutral-100">
+                  <MessageSquareText className="h-4 w-4 text-[#D97757]" aria-hidden />
+                  {item.label}
+                </div>
+                <p className="mt-2 text-sm leading-6 text-neutral-600 dark:text-neutral-400">
+                  {item.body}
+                </p>
+                <p className="mt-3 text-xs font-bold uppercase tracking-wide text-[#D97757]">
+                  Dinner and groceries generated from remembered context.
+                </p>
+              </div>
+            ))}
+          </div>
           <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
             <ComparisonBlock
               title="Generic AI"

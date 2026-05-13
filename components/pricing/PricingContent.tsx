@@ -17,6 +17,8 @@ import {
   ShieldCheck,
   ShoppingCart,
   Sparkles,
+  HelpCircle,
+  LockKeyhole,
   UserRound,
   UsersRound,
   Utensils,
@@ -66,6 +68,51 @@ const REASSURANCE = [
   { icon: ShieldCheck, text: 'Cancel anytime' },
   { icon: CheckCircle2, text: 'No card required' },
 ]
+
+const PLAN_COMPARISON = [
+  ['Tonight dinner help', 'Included', 'Unlimited use with household memory'],
+  ['Weekly planning', '3-day preview', 'Full 7-day week plan'],
+  ['Grocery list', 'Basic preview/manual items', 'Auto-built, editable, export-ready list'],
+  ['Fridge and pantry scan', 'Basic demo/free usage', 'Higher limits and saved context'],
+  ['Household profiles', '1 profile', 'Up to 6 household members'],
+  ['Leftovers and budget', 'Limited previews', 'Connected leftovers and budget workflow'],
+] as const
+
+const TRUST_NOTES = [
+  {
+    icon: ShieldCheck,
+    title: 'No-card trial',
+    body: 'Start the 7-day Plus trial without entering payment details. Add billing only when you decide to continue.',
+  },
+  {
+    icon: LockKeyhole,
+    title: 'Private by default',
+    body: 'Photos are used to identify ingredients for the scan result. Demo scans are not saved to your pantry.',
+  },
+  {
+    icon: HelpCircle,
+    title: 'Real support',
+    body: 'Questions, cancellations, or billing issues can go straight to hello@mealeaseai.com.',
+  },
+]
+
+const BETA_QUOTES = [
+  {
+    quote: 'The week plan plus grocery list is the part I would come back for.',
+    name: 'Priya S.',
+    context: 'Beta household',
+  },
+  {
+    quote: 'The fridge scan made it easier to pick dinner without starting from scratch.',
+    name: 'James R.',
+    context: 'Beta scanner tester',
+  },
+  {
+    quote: 'The household preferences are what make it feel different from a chat prompt.',
+    name: 'Elena M.',
+    context: 'Beta parent',
+  },
+] as const
 
 const PLUS_UNLOCKS = [
   {
@@ -119,6 +166,26 @@ const FAQ = [
     q: 'Can I cancel anytime?',
     a: 'Yes — cancel with one click from your account settings. No questions asked. Your plan stays active until the end of the current billing period.',
   },
+  {
+    q: 'What if I forget to cancel?',
+    a: 'Contact hello@mealeaseai.com. We keep billing support human and straightforward, especially during launch.',
+  },
+  {
+    q: 'Do I need a card for the 7-day trial?',
+    a: 'No. The trial starts without payment details. If you decide Plus is worth keeping, you can add billing after the trial.',
+  },
+  {
+    q: 'Who is DDS Supply LLC?',
+    a: 'DDS Supply LLC is the company that operates MealEase. If you later add a paid subscription, billing and receipts may show DDS Supply LLC and are processed securely through Stripe.',
+  },
+  {
+    q: 'What happens to fridge scan photos?',
+    a: 'Demo scan photos are used to identify visible ingredients for your result and are not saved to your pantry. Signed-in users can choose to save pantry context for better planning.',
+  },
+  {
+    q: 'Is my family data private?',
+    a: 'MealEase uses household preferences to personalize dinner, grocery, leftovers, and budget flows. We keep that data tied to your account and do not make your household profile public.',
+  },
 ]
 
 /* ─────────────────────── COMPONENT ─────────────────────── */
@@ -165,6 +232,36 @@ export function PricingContent() {
     }
   }, [status, router])
 
+  const handlePrimaryTrial = useCallback(async () => {
+    const plan = isAnnual ? 'pro_yearly' : 'pro_monthly'
+    if (!status.isAuthenticated) {
+      router.push(`/signup?plan=${plan}&next=/dashboard`)
+      return
+    }
+    if (status.isPro) {
+      toast.info('You already have Plus!')
+      return
+    }
+
+    try {
+      const trialRes = await fetch('/api/paywall/start-trial', { method: 'POST' })
+      const trialData = await trialRes.json().catch(() => ({})) as { error?: string }
+      if (trialRes.ok) {
+        toast.success('Your 7-day Plus trial is active.')
+        router.push('/dashboard')
+        router.refresh()
+        return
+      }
+      if (trialData.error?.toLowerCase().includes('already used')) {
+        await handleCheckout(plan)
+        return
+      }
+      toast.error(trialData.error || 'Could not start trial')
+    } catch {
+      toast.error('Something went wrong. Try again.')
+    }
+  }, [handleCheckout, isAnnual, router, status])
+
   return (
     <div className="min-h-screen bg-white dark:bg-neutral-950">
 
@@ -207,11 +304,10 @@ export function PricingContent() {
             Simple pricing
           </div>
           <h1 className="mx-auto mt-4 max-w-[300px] font-serif text-4xl font-bold tracking-tight text-white [text-shadow:0_2px_12px_rgba(0,0,0,0.45)] sm:max-w-4xl md:text-5xl">
-            Stop stressing about dinner.{' '}
-            <span className="italic text-[#D97757]">Start tonight.</span>
+            Start free. Try Plus when you want the full week.
           </h1>
           <p className="mx-auto mt-3 max-w-[280px] text-base text-white/82 sm:max-w-xl sm:text-lg">
-            Free forever. Upgrade when dinner gets easier.
+            Clear limits, one primary trial CTA, no payment details required to start.
           </p>
         </div>
       </section>
@@ -240,9 +336,9 @@ export function PricingContent() {
             )}
           >
             Annual
-            <span className="bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
-              SAVE {PRO_ANNUAL_SAVINGS}%
-            </span>
+                <span className="bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                  SAVE {PRO_ANNUAL_SAVINGS}%
+                </span>
           </button>
         </div>
       </section>
@@ -353,7 +449,7 @@ export function PricingContent() {
                   <p className="mt-1 text-xs text-neutral-400">${proAnnual}/yr · billed annually</p>
                 )}
                 <p className="mt-2 text-sm text-neutral-400">
-                  Everything you need to end the dinner spiral and get groceries ready faster.
+                  Start with a no-card trial. Choose monthly or annual billing only if Plus earns its place.
                 </p>
               </div>
 
@@ -380,27 +476,18 @@ export function PricingContent() {
               </ul>
 
               <button
-                onClick={() => handleCheckout(isAnnual ? 'pro_yearly' : 'pro_monthly')}
+                onClick={handlePrimaryTrial}
                 disabled={paywallLoading || status.isPro}
                 className="block w-full text-center rounded-xl bg-gradient-to-r from-[#D97757] to-[#E8895A] hover:from-[#C86646] hover:to-[#D97757] disabled:opacity-60 py-3.5 text-sm font-bold text-white transition-all shadow-lg shadow-orange-900/30"
               >
-                {status.isPro ? '✓ You have Plus' : isAnnual ? `Start free trial — $${proAnnualMonthly}/mo` : `Start free trial — $${proMonthly}/mo`}
+                {status.isPro ? '✓ You have Plus' : 'Start 7-day free trial'}
               </button>
 
-              {!status.isPro && (
-                <Link
-                  href={`/upgrade?plan=${isAnnual ? 'pro_yearly' : 'pro_monthly'}`}
-                  className="block w-full text-center rounded-xl border border-[#D97757]/40 hover:border-[#D97757] py-3 text-sm font-semibold text-[#D97757] hover:bg-[#D97757]/10 transition-all mt-2"
-                >
-                  Buy Plus now →
-                </Link>
-              )}
-
               <p className="text-center text-xs text-neutral-500 mt-3">
-                7-day free trial · No credit card required · Cancel anytime
+                No credit card required · Cancel anytime · {isAnnual ? `$${proAnnual}/yr after trial if you continue` : `$${proMonthly}/mo after trial if you continue`}
               </p>
               <p className="text-center text-[11px] leading-relaxed text-neutral-500 mt-2">
-                MealEase subscriptions are securely billed through DDS Supply LLC via Stripe.
+                MealEase is operated by DDS Supply LLC. Paid billing is processed securely through Stripe.
               </p>
               <p className="text-center text-xs font-semibold text-[#F3B18E] mt-2">
                 Many users upgrade for grocery convenience alone.
@@ -408,25 +495,82 @@ export function PricingContent() {
             </div>
           </div>
         </div>
-        <div className="mx-auto mt-5 grid max-w-3xl gap-3 rounded-2xl border border-neutral-200 bg-white p-4 text-sm dark:border-neutral-800 dark:bg-neutral-900 sm:grid-cols-2">
-          <div className="rounded-xl bg-neutral-50 p-4 dark:bg-neutral-950">
-            <p className="text-xs font-bold uppercase tracking-widest text-neutral-500">Free</p>
-            <p className="mt-1 font-semibold text-neutral-900 dark:text-neutral-100">Manual grocery planning</p>
-            <p className="mt-1 text-xs leading-5 text-neutral-500 dark:text-neutral-400">Preview the basics and build from there.</p>
+        <div className="mx-auto mt-5 max-w-3xl overflow-hidden rounded-2xl border border-neutral-200 bg-white text-sm dark:border-neutral-800 dark:bg-neutral-900">
+          <div className="grid grid-cols-[1.2fr_1fr_1fr] bg-neutral-50 text-xs font-bold uppercase tracking-wide text-neutral-500 dark:bg-neutral-950">
+            <div className="p-3">Limit</div>
+            <div className="p-3">Free</div>
+            <div className="p-3 text-[#D97757]">Plus</div>
           </div>
-          <div className="rounded-xl bg-[#FDF6F1] p-4 ring-1 ring-[#D97757]/20 dark:bg-neutral-950">
-            <p className="text-xs font-bold uppercase tracking-widest text-[#D97757]">Plus</p>
-            <p className="mt-1 font-semibold text-neutral-900 dark:text-neutral-100">Auto grocery list + faster shopping</p>
-            <p className="mt-1 text-xs leading-5 text-neutral-500 dark:text-neutral-400">Edit, export, and use supported store handoff tools.</p>
-          </div>
+          {PLAN_COMPARISON.map(([label, free, plus]) => (
+            <div key={label} className="grid grid-cols-[1.2fr_1fr_1fr] border-t border-neutral-100 dark:border-neutral-800">
+              <div className="p-3 font-medium text-neutral-900 dark:text-neutral-100">{label}</div>
+              <div className="p-3 text-neutral-600 dark:text-neutral-400">{free}</div>
+              <div className="p-3 font-medium text-neutral-800 dark:text-neutral-200">{plus}</div>
+            </div>
+          ))}
         </div>
-        <div className="mx-auto mt-8 max-w-3xl rounded-2xl border border-[#D97757]/20 bg-[#FDF6F1] p-5 text-center shadow-sm shadow-neutral-900/5 dark:border-[#D97757]/20 dark:bg-neutral-900">
-          <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-            ★★★★★ “It replaced the nightly group text about dinner.”
-          </p>
-          <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-            Trusted by thousands of households planning dinner, groceries, leftovers, and budget in one place.
-          </p>
+        <div className="mx-auto mt-8 grid max-w-3xl gap-3 md:grid-cols-3">
+          {TRUST_NOTES.map((note) => {
+            const Icon = note.icon
+            return (
+              <div key={note.title} className="rounded-2xl border border-[#D97757]/20 bg-[#FDF6F1] p-4 shadow-sm shadow-neutral-900/5 dark:border-[#D97757]/20 dark:bg-neutral-900">
+                <Icon className="h-5 w-5 text-[#D97757]" aria-hidden />
+                <p className="mt-3 text-sm font-semibold text-neutral-900 dark:text-neutral-100">{note.title}</p>
+                <p className="mt-1 text-xs leading-5 text-neutral-500 dark:text-neutral-400">{note.body}</p>
+              </div>
+            )
+          })}
+        </div>
+      </section>
+
+      <section className="pb-16 px-4">
+        <div className="mx-auto mb-6 grid max-w-3xl gap-4 md:grid-cols-3">
+          {BETA_QUOTES.map((quote) => (
+            <figure key={quote.name} className="rounded-2xl border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900">
+              <blockquote className="text-sm font-medium leading-6 text-neutral-800 dark:text-neutral-200">
+                &ldquo;{quote.quote}&rdquo;
+              </blockquote>
+              <figcaption className="mt-4 text-xs text-neutral-500 dark:text-neutral-400">
+                <span className="font-semibold text-neutral-800 dark:text-neutral-200">{quote.name}</span> · {quote.context}
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+        <div className="mx-auto grid max-w-3xl overflow-hidden rounded-3xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900 md:grid-cols-[0.7fr_1.3fr]">
+          <div className="relative min-h-56">
+            <Image
+              src="/founders/dipak-suprabha.jpg"
+              alt="MealEase founders Dipak and Suprabha"
+              fill
+              sizes="(max-width: 768px) 100vw, 320px"
+              className="object-cover"
+            />
+          </div>
+          <div className="p-6">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D97757]">Founder note</p>
+            <h2 className="mt-2 font-serif text-2xl font-bold text-neutral-950 dark:text-neutral-50">
+              Built for busy households, not perfect meal-prep influencers.
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-neutral-600 dark:text-neutral-400">
+              MealEase started from the familiar problem of having food at home and still
+              defaulting to takeout. The product is designed around practical dinner decisions:
+              what to cook, what to buy, what to do with leftovers, and what it will cost.
+            </p>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              <div className="rounded-2xl bg-[#FBFAF3] p-4 dark:bg-neutral-950">
+                <p className="text-xs font-bold uppercase tracking-wide text-neutral-500">Before</p>
+                <p className="mt-1 text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                  Fridge photo, scattered preferences, no list.
+                </p>
+              </div>
+              <div className="rounded-2xl bg-[#FDF6F1] p-4 ring-1 ring-[#D97757]/15 dark:bg-neutral-950">
+                <p className="text-xs font-bold uppercase tracking-wide text-[#D97757]">After</p>
+                <p className="mt-1 text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                  Dinner plan, grocery list, leftovers and budget connected.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -495,7 +639,7 @@ export function PricingContent() {
           Ready to simplify dinner?
         </h3>
         <p className="text-neutral-500 dark:text-neutral-400 mb-8 text-sm max-w-md mx-auto">
-          Join thousands of households who stopped stressing about meals. Start free, upgrade when you&rsquo;re ready.
+          Start free, try Plus without a card, and keep it only if the weekly dinner flow earns its place.
         </p>
         {!status.isAuthenticated ? (
           <Link
@@ -513,7 +657,7 @@ export function PricingContent() {
           </Link>
         ) : (
           <button
-            onClick={() => handleCheckout(isAnnual ? 'pro_yearly' : 'pro_monthly')}
+            onClick={handlePrimaryTrial}
             disabled={paywallLoading}
             className="inline-flex items-center gap-2 rounded-xl bg-[#D97757] hover:bg-[#c4694a] px-8 py-3.5 text-sm font-semibold text-white transition-colors disabled:opacity-60"
           >

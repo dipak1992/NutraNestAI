@@ -2,14 +2,15 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Calendar, BookOpen, User } from 'lucide-react'
+import { Calendar, Refrigerator, ShoppingCart, Utensils, Wallet } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const tabs = [
-  { href: '/dashboard', label: 'Home', icon: Home },
-  { href: '/planner', label: 'Plan', icon: Calendar },
-  { href: '/meals', label: 'Recipes', icon: BookOpen },
-  { href: '/settings', label: 'Profile', icon: User },
+  { href: '/dashboard/tonight', label: 'Tonight', icon: Utensils },
+  { href: '/planner', label: 'Week Plan', icon: Calendar },
+  { href: '/grocery-list', label: 'Groceries', icon: ShoppingCart },
+  { href: '/leftovers', label: 'Leftovers', icon: Refrigerator },
+  { href: '/budget', label: 'Budget', icon: Wallet },
 ]
 
 export function DashboardNav() {
@@ -55,7 +56,7 @@ export function DashboardNav() {
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         aria-label="Primary navigation"
       >
-        <ul className="grid grid-cols-4">
+        <ul className="grid grid-cols-5">
           {tabs.map((t) => {
             const Icon = t.icon
             const active = pathname === t.href || pathname.startsWith(t.href + '/')

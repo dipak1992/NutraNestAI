@@ -287,13 +287,13 @@ export const comparePages: ComparePage[] = [
     ],
     proofCards: [
       {
-        title: 'Built for dinner, not prompting',
-        body: 'MealEase starts with the family dinner job and turns it into a weekly routine.',
+        title: 'Sample output: remembered dinner context',
+        body: 'MealEase can use saved household preferences, recent meals, and pantry context before suggesting dinner.',
         image: '/pricing/pricing_desktop.jpg',
       },
       {
-        title: 'Works from your kitchen',
-        body: 'Snap & Cook helps MealEase suggest meals from ingredients you already have.',
+        title: 'Sample output: grocery-ready plan',
+        body: 'The workflow moves from meal choice to grocery list instead of leaving the user to translate a chat response.',
         image: '/landing/pantry.jpg',
       },
     ],

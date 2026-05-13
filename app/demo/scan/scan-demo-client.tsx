@@ -26,12 +26,11 @@ export function ScanDemoClient() {
     if (phase === 'results') {
       const timer = setTimeout(() => setShowStickyCta(true), 2000)
       return () => clearTimeout(timer)
-    } else {
-      setShowStickyCta(false)
     }
   }, [phase])
 
   const analyzeImage = useCallback(async (file: File) => {
+    setShowStickyCta(false)
     setPhase('scanning')
 
     try {
@@ -79,6 +78,7 @@ export function ScanDemoClient() {
   }, [])
 
   const handleReset = useCallback(() => {
+    setShowStickyCta(false)
     setPhase('upload')
     setPreviewUrl(null)
     setResult(null)
@@ -187,8 +187,8 @@ export function ScanDemoClient() {
                 {/* Trust signals */}
                 <div className="grid grid-cols-3 gap-4 pt-4">
                   {[
-                    { icon: ShieldCheck, label: 'No sign-up needed' },
-                    { icon: Clock, label: 'AI-powered results' },
+                    { icon: ShieldCheck, label: 'Demo photos not saved' },
+                    { icon: Clock, label: 'Results in seconds' },
                     { icon: Sparkles, label: 'Real ingredient detection' },
                   ].map(({ icon: Icon, label }) => (
                     <div key={label} className="text-center">
@@ -408,6 +408,10 @@ export function ScanDemoClient() {
                   <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-5 max-w-sm mx-auto">
                     Sign up free to unlock full recipes with step-by-step cooking, save ingredients to your pantry, get grocery lists, and personalized meal plans for your whole family.
                   </p>
+                  <p className="mx-auto mb-5 max-w-sm text-xs leading-5 text-neutral-500 dark:text-neutral-400">
+                    Privacy note: this demo uses your photo only to detect visible ingredients.
+                    The demo result is not saved to your pantry.
+                  </p>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <Link
                       href="/signup"
@@ -429,7 +433,7 @@ export function ScanDemoClient() {
                 {/* Social proof */}
                 <div className="text-center pt-4 pb-16">
                   <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                    Trusted by 2,000+ families &bull; Free forever plan available &bull; No credit card required
+                    Built with beta household feedback &bull; Free plan available &bull; No credit card required
                   </p>
                 </div>
               </motion.div>

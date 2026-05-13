@@ -5,6 +5,9 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Pricing — MealEase',
   description: 'Simple, honest pricing. Free and Plus plans for every household.',
+  alternates: {
+    canonical: '/pricing',
+  },
 }
 
 export default async function PricingPage() {

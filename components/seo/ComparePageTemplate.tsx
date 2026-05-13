@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowRight, CheckCircle2 } from 'lucide-react'
+import { ArrowRight, CheckCircle2, MessageSquareText } from 'lucide-react'
 import { Nav } from '@/components/landing/Nav'
 import { Footer } from '@/components/landing/Footer'
 import type { ComparePage } from '@/lib/seo-pages'
@@ -41,6 +41,38 @@ export function ComparePageTemplate({
             </div>
           </div>
         </section>
+
+        {page.slug === 'mealease-vs-chatgpt' && (
+          <section className="border-b border-neutral-200 bg-[#FBFAF3] py-12">
+            <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+              <h2 className="font-serif text-3xl font-bold tracking-tight text-neutral-950">
+                The real difference is the workflow
+              </h2>
+              <div className="mt-6 grid gap-4 lg:grid-cols-2">
+                <article className="rounded-3xl bg-white p-6 ring-1 ring-neutral-200">
+                  <div className="flex items-center gap-2 text-sm font-bold text-neutral-950">
+                    <MessageSquareText className="h-4 w-4 text-neutral-500" />
+                    ChatGPT starts from a prompt
+                  </div>
+                  <p className="mt-3 text-sm leading-6 text-neutral-600">
+                    &ldquo;Tell me dietary needs, budget, ingredients, dislikes, grocery needs,
+                    leftovers, cook time, and what we already ate this week.&rdquo;
+                  </p>
+                </article>
+                <article className="rounded-3xl bg-neutral-950 p-6 text-white">
+                  <div className="flex items-center gap-2 text-sm font-bold">
+                    <CheckCircle2 className="h-4 w-4 text-[#F3B18E]" />
+                    MealEase starts from remembered household context
+                  </div>
+                  <p className="mt-3 text-sm leading-6 text-white/75">
+                    Saved once: household profile, disliked foods, fridge context,
+                    weekly plan, grocery list, leftovers, and budget stay connected.
+                  </p>
+                </article>
+              </div>
+            </div>
+          </section>
+        )}
 
         <section className="py-16 md:py-20">
           <div className="mx-auto grid max-w-6xl gap-8 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-8">

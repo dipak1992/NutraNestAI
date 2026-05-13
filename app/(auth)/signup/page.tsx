@@ -51,6 +51,21 @@ export default async function SignupPage({
           </Link>
           .
         </p>
+
+        <div className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-3 text-xs leading-5 text-emerald-900 dark:border-emerald-900/50 dark:bg-emerald-950/20 dark:text-emerald-200">
+          <p className="font-semibold">Privacy note</p>
+          <p className="mt-1">
+            MealEase uses your household preferences to personalize dinner and groceries.
+            Fridge photos are used for ingredient detection; demo photos are not saved to your pantry.
+          </p>
+          <p className="mt-2">
+            Need help?{' '}
+            <Link href="/contact" className="font-semibold underline underline-offset-2">
+              Contact support
+            </Link>
+            .
+          </p>
+        </div>
       </div>
     </AuthShell>
   )

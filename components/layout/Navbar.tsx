@@ -11,11 +11,24 @@ import {
   BarChart2,
   Gift,
   Home,
+  CalendarDays,
+  Refrigerator,
+  ShoppingCart,
+  Utensils,
+  Wallet,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { createClient } from '@/lib/supabase/client'
 import { MealEaseLogo } from '@/components/ui/MealEaseLogo'
+
+const coreNav = [
+  { href: '/dashboard/tonight', label: 'Tonight', icon: Utensils },
+  { href: '/planner', label: 'Week Plan', icon: CalendarDays },
+  { href: '/grocery-list', label: 'Groceries', icon: ShoppingCart },
+  { href: '/leftovers', label: 'Leftovers', icon: Refrigerator },
+  { href: '/budget', label: 'Budget', icon: Wallet },
+] as const
 
 export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: string; subscriptionTier?: SubscriptionTier }) {
   const router = useRouter()
@@ -69,6 +82,22 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
         <Link href="/dashboard" className="flex items-center">
           <MealEaseLogo size="md" />
         </Link>
+
+        <nav className="hidden items-center gap-1 lg:flex" aria-label="Core app navigation">
+          {coreNav.map((item) => {
+            const Icon = item.icon
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              >
+                <Icon className="h-4 w-4" aria-hidden />
+                {item.label}
+              </Link>
+            )
+          })}
+        </nav>
 
         {/* Right side — tier badge + upgrade + account */}
         <div className="flex items-center gap-2">

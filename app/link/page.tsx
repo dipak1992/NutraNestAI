@@ -149,7 +149,7 @@ export default function LinkPage() {
       {/* Social proof */}
       <div className="mt-8 text-center">
         <p className="text-xs text-neutral-400">
-          Trusted by 2,000+ families &bull; No credit card required
+          Built with beta household feedback &bull; No credit card required
         </p>
       </div>
 

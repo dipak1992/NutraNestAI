@@ -2,16 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { CalendarDays, Home, Utensils, Camera, Refrigerator, Wallet } from 'lucide-react'
+import { CalendarDays, Utensils, Refrigerator, Wallet, ShoppingCart } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-// Home + the 5 core pillars. Keep labels short so the full product shape is
-// visible without turning the tab bar into a word salad.
+// The app is intentionally focused around the five jobs users return for.
 const TABS = [
-  { href: '/dashboard',         label: 'Home',      icon: Home },
   { href: '/dashboard/tonight', label: 'Tonight',   icon: Utensils },
-  { href: '/dashboard/cook',    label: 'Snap',      icon: Camera },
-  { href: '/planner',           label: 'Plan',      icon: CalendarDays },
+  { href: '/planner',           label: 'Week',      icon: CalendarDays },
+  { href: '/grocery-list',      label: 'Groceries', icon: ShoppingCart },
   { href: '/leftovers',         label: 'Leftovers', icon: Refrigerator },
   { href: '/budget',            label: 'Budget',    icon: Wallet },
 ]
@@ -20,7 +18,6 @@ export function MobileTabBar() {
   const pathname = usePathname()
 
   function isActive(href: string) {
-    if (href === '/dashboard') return pathname === '/dashboard'
     if (href === '/planner') return pathname?.startsWith('/planner') || pathname?.startsWith('/plan')
     return pathname?.startsWith(href)
   }

@@ -261,6 +261,21 @@ function applyHardFilters(
   return filtered
 }
 
+/** Known protein terms for pantry-protein matching */
+const KNOWN_PROTEIN_TERMS = ['chicken', 'beef', 'pork', 'fish', 'salmon', 'shrimp', 'turkey', 'tofu', 'tempeh', 'eggs', 'sausage', 'lamb', 'tuna', 'cod', 'trout']
+
+function extractProteinsFromStrings(items: string[]): string[] {
+  const lower = items.map(i => i.toLowerCase())
+  return KNOWN_PROTEIN_TERMS.filter(p => lower.some(item => item.includes(p) || p.includes(item)))
+}
+
+function mealHasProteinMatch(meal: CuratedMeal, pantryProteins: string[]): boolean {
+  const mealIngLower = meal.keyIngredients.map(k => k.toLowerCase())
+  return pantryProteins.some(pp =>
+    mealIngLower.some(ing => ing.includes(pp) || pp.includes(ing))
+  )
+}
+
 function personalizeSelection(
   pool: CuratedMeal[],
   context: PersonalizationContext,
@@ -271,9 +286,37 @@ function personalizeSelection(
     ? applyHardFilters(pool, context)
     : pool
 
+  // Hard filter: if pantry has proteins, remove meals whose protein doesn't match
+  let pantryFilteredPool = safePool
+  if (context.pantry.length > 0) {
+    const pantryProteins = extractProteinsFromStrings(context.pantry)
+    if (pantryProteins.length > 0) {
+      const matched = safePool.filter(m => mealHasProteinMatch(m, pantryProteins))
+      // Only apply if we still have at least 2 meals to choose from
+      if (matched.length >= 2) {
+        pantryFilteredPool = matched
+      }
+    }
+  }
+
+  // Ensure selected meal uses at least 2 pantry items when pantry is available
+  let pantryPreferredPool = pantryFilteredPool
+  if (context.pantry.length >= 2) {
+    const lowerPantry = context.pantry.map(p => p.toLowerCase())
+    const multiMatch = pantryFilteredPool.filter(m => {
+      const matchCount = m.keyIngredients.filter(k =>
+        lowerPantry.some(p => k.toLowerCase().includes(p) || p.includes(k.toLowerCase()))
+      ).length
+      return matchCount >= 2
+    })
+    if (multiMatch.length >= 1) {
+      pantryPreferredPool = multiMatch
+    }
+  }
+
   // Priority 1: Use leftovers — highest value signal
   if (context.leftovers.length > 0) {
-    const leftoverMatch = findIngredientMatch(safePool, context.leftovers)
+    const leftoverMatch = findIngredientMatch(pantryPreferredPool, context.leftovers)
     if (leftoverMatch) {
       return {
         meal: leftoverMatch.meal,
@@ -286,7 +329,7 @@ function personalizeSelection(
 
   // Priority 2: Match pantry ingredients
   if (context.pantry.length > 0) {
-    const pantryMatch = findIngredientMatch(safePool, context.pantry)
+    const pantryMatch = findIngredientMatch(pantryPreferredPool, context.pantry)
     if (pantryMatch) {
       return {
         meal: pantryMatch.meal,
@@ -299,7 +342,7 @@ function personalizeSelection(
 
   // Priority 3: Match grocery items already bought
   if (context.groceryItems.length > 0) {
-    const groceryMatch = findIngredientMatch(safePool, context.groceryItems)
+    const groceryMatch = findIngredientMatch(pantryPreferredPool, context.groceryItems)
     if (groceryMatch) {
       return {
         meal: groceryMatch.meal,
@@ -315,8 +358,8 @@ function personalizeSelection(
     const budgetRemaining = context.weeklyBudget - context.weekSpent
     const perMealBudget = context.weeklyBudget / 7
     if (budgetRemaining < perMealBudget * 1.5) {
-      // Under budget pressure — find cheapest meal in safe pool
-      const sorted = [...safePool].sort((a, b) => a.costPerServing - b.costPerServing)
+      // Under budget pressure — find cheapest meal in pantry-filtered pool
+      const sorted = [...pantryPreferredPool].sort((a, b) => a.costPerServing - b.costPerServing)
       const budgetMeal = sorted[0]
       if (budgetMeal) {
         return {
@@ -331,7 +374,7 @@ function personalizeSelection(
 
   // Priority 5: Respect dietary preferences
   if (context.dietary.length > 0) {
-    const dietaryMeal = findDietaryMatch(safePool, context.dietary)
+    const dietaryMeal = findDietaryMatch(pantryPreferredPool, context.dietary)
     if (dietaryMeal) {
       return {
         meal: dietaryMeal,
@@ -344,7 +387,7 @@ function personalizeSelection(
 
   // Priority 6: Cuisine preference
   if (context.cuisines.length > 0) {
-    const cuisineMeal = findCuisineMatch(safePool, context.cuisines)
+    const cuisineMeal = findCuisineMatch(pantryPreferredPool, context.cuisines)
     if (cuisineMeal) {
       return {
         meal: cuisineMeal,
@@ -357,7 +400,7 @@ function personalizeSelection(
 
   // Priority 7: Cook time constraint
   if (context.maxCookTimeMin != null) {
-    const quickMeals = safePool.filter((m) => m.cookTimeMin <= context.maxCookTimeMin!)
+    const quickMeals = pantryPreferredPool.filter((m) => m.cookTimeMin <= context.maxCookTimeMin!)
     if (quickMeals.length > 0) {
       const meal = pickDailyMeal(quickMeals, `plus:${userId}`)
       return {
@@ -371,7 +414,7 @@ function personalizeSelection(
 
   // Priority 8: Budget goal from profile
   if (context.goals.includes('save_money')) {
-    const budgetMeal = safePool.find((m) => m.tags.includes('budget'))
+    const budgetMeal = pantryPreferredPool.find((m) => m.tags.includes('budget'))
     if (budgetMeal) {
       return {
         meal: budgetMeal,
@@ -382,8 +425,8 @@ function personalizeSelection(
     }
   }
 
-  // Fallback: per-user deterministic pick from safe pool
-  const meal = pickDailyMeal(safePool, `plus:${userId}`)
+  // Fallback: per-user deterministic pick from pantry-filtered pool
+  const meal = pickDailyMeal(pantryPreferredPool, `plus:${userId}`)
 
   return {
     meal,

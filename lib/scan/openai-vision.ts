@@ -85,14 +85,23 @@ export async function analyzeFridgeImage(image: File): Promise<FridgeResult> {
     maxOutputTokens: 1800,
     prompt: `You are MealEase Snap & Cook. Analyze this fridge, pantry, counter, or grocery photo.
 
-Rules:
+STRICT RULES:
 - Return JSON only. No markdown.
-- Identify only food ingredients that are visible or strongly label-supported.
-- Do not invent meat, dairy, or allergens if they are not visible.
+- Identify only food ingredients that are VISIBLE or strongly label-supported.
+- Do NOT invent meat, dairy, or allergens if they are not visible.
 - Quantities can be approximate, like "1", "half bag", "small bunch", or "".
 - Suggest exactly 3 realistic, low-friction recipes.
-- Recipes should mostly use matched ingredients and list missing ingredients honestly.
 - Use stable ids with lowercase words and hyphens.
+
+CRITICAL RECIPE RULES:
+- Recipe 1: MUST use ONLY ingredients detected in the image. Zero missing ingredients.
+- Recipe 2: May require at most 1 basic pantry staple (salt, pepper, oil, butter, garlic) as missing.
+- Recipe 3: May require at most 2 basic pantry staples as missing.
+- NEVER suggest a recipe with a protein or main ingredient that is NOT visible in the image.
+- If you see chicken, do NOT suggest fish. If you see eggs, do NOT suggest beef.
+- "matchedIngredients" must ONLY contain items from your detected ingredients list.
+- "missingIngredients" must ONLY contain basic pantry staples (salt, pepper, oil, butter, garlic, onion, soy sauce, flour).
+- Do NOT suggest recipes with proteins or main ingredients not visible in the image.
 
 Return this exact shape:
 {
@@ -107,7 +116,7 @@ Return this exact shape:
       "servings": 2,
       "estimatedCost": 4.5,
       "matchedIngredients": ["Eggs", "Spinach"],
-      "missingIngredients": ["Toast"]
+      "missingIngredients": []
     }
   ],
   "savedToPantry": false

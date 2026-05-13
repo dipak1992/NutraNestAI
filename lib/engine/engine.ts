@@ -20,9 +20,10 @@ import { applyLearnedBoosts } from '@/lib/learning/engine'
 // ── Scoring Weights ─────────────────────────────────────────
 
 const W = {
-  PANTRY_PER_ITEM: 8,
-  PANTRY_BONUS: 25,
+  PANTRY_PER_ITEM: 12,
+  PANTRY_BONUS: 38,
   PANTRY_THRESHOLD: 0.4,
+  PROTEIN_MISMATCH_PENALTY: -80,
   INSPIRATION: 50,
   ENERGY_MATCH: 35,
   ENERGY_MISMATCH: -20,
@@ -234,6 +235,20 @@ export function generateSmartMeal(
         score += W.PROTEIN
         reasons.push(`Uses preferred protein: ${meal.proteinType}`)
         break
+      }
+    }
+
+    // Hard penalty: if pantry has proteins and this meal uses a protein NOT in the pantry
+    if (pantry.length > 0 && meal.proteinType) {
+      const KNOWN_PROTEINS = ['chicken', 'beef', 'pork', 'fish', 'salmon', 'shrimp', 'turkey', 'tofu', 'tempeh', 'eggs', 'sausage', 'lamb', 'tuna', 'cod', 'trout']
+      const pantryProteins = pantry.filter(p => KNOWN_PROTEINS.some(kp => p.includes(kp) || kp.includes(p)))
+      if (pantryProteins.length > 0) {
+        const mealProtein = meal.proteinType.toLowerCase()
+        const pantryHasMealProtein = pantryProteins.some(pp => mealProtein.includes(pp) || pp.includes(mealProtein))
+        if (!pantryHasMealProtein) {
+          score += W.PROTEIN_MISMATCH_PENALTY
+          reasons.push(`Protein "${meal.proteinType}" not in pantry — penalized`)
+        }
       }
     }
 

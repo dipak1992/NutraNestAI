@@ -25,11 +25,11 @@ const PROBLEMS = [
   {
     pain: 'Groceries quietly hit $1,200/month',
     solution: 'Budget Intelligence',
-    body: "See your week's grocery total before you shop. Stay under your number. Save $100+ a month, every month.",
+    body: "See your week's estimated grocery total before you shop. Stay under your number by swapping before checkout.",
   },
   {
     pain: 'The plan still had to become a grocery trip',
-    solution: 'Grocery Commerce',
+    solution: 'Smart Grocery List',
     body: 'MealEase now turns weekly plans into editable grocery lists with supported store handoff, copy, PDF, and local-store export.',
   },
 ]

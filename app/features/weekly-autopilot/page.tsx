@@ -134,12 +134,12 @@ export default function WeeklyAutopilotPage() {
           </Container>
         </section>
 
-        {/* Grocery Commerce flow */}
+        {/* Smart grocery list flow */}
         <section className="py-16 md:py-20 bg-[#FDF6F1]">
           <Container>
             <div className="mx-auto max-w-3xl rounded-3xl border border-[#D97757]/20 bg-white p-7 shadow-sm md:p-9">
               <p className="text-xs font-semibold uppercase tracking-widest text-[#D97757] mb-3">
-                Grocery Commerce
+                Smart grocery list
               </p>
               <h2 className="font-serif text-3xl font-bold tracking-tight text-neutral-900 mb-3">
                 From meal plan to groceries in minutes.

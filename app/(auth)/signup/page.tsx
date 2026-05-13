@@ -1,22 +1,31 @@
 import { AuthShell } from '@/components/auth/AuthShell'
 import { AuthProviders } from '@/components/auth/AuthProviders'
 import { EmailAuthForm } from '@/components/auth/EmailAuthForm'
+import { productStory } from '@/lib/marketing/stats'
+import Link from 'next/link'
 
 export const metadata = {
   title: 'Create account | MealEase',
-  description: 'Start planning meals for your household — free forever.',
+  description: productStory,
 }
 
-export default function SignupPage() {
+export default async function SignupPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ next?: string }>
+}) {
+  const params = searchParams ? await searchParams : {}
+  const next = params.next?.startsWith('/') ? params.next : '/onboarding'
+
   return (
     <AuthShell
       title="Start free today"
-      subtitle="Plan meals, scan your fridge, and stop the 'what's for dinner?' spiral."
+      subtitle={productStory}
       footerText="Already have an account?"
       footerLink={{ label: 'Sign in', href: '/login' }}
     >
       <div className="space-y-4">
-        <AuthProviders next="/onboarding" />
+        <AuthProviders next={next} />
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
@@ -29,17 +38,17 @@ export default function SignupPage() {
           </div>
         </div>
 
-        <EmailAuthForm mode="signup" next="/onboarding" />
+        <EmailAuthForm mode="signup" next={next} />
 
         <p className="text-center text-xs text-neutral-400 dark:text-neutral-500">
           By signing up you agree to our{' '}
-          <a href="/terms" className="underline hover:text-neutral-600">
+          <Link href="/terms" className="underline hover:text-neutral-600">
             Terms
-          </a>{' '}
+          </Link>{' '}
           and{' '}
-          <a href="/privacy" className="underline hover:text-neutral-600">
+          <Link href="/privacy" className="underline hover:text-neutral-600">
             Privacy Policy
-          </a>
+          </Link>
           .
         </p>
       </div>

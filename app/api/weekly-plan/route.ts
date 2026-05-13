@@ -81,7 +81,7 @@ export async function POST(req: Request) {
     let familyOverrides: ReturnType<typeof buildFamilyEngineOverrides> | null = null
     if (user && paywall.isPro) {
       try {
-        const members = await getFamilyMembers(supabase as any, user.id)
+        const members = await getFamilyMembers(supabase, user.id)
         if (members.length > 0) {
           familyOverrides = buildFamilyEngineOverrides(members)
         }
@@ -130,6 +130,21 @@ export async function POST(req: Request) {
     const groceryList = buildGroceryList(meals, pantryItems, storeFormat, weekStart)
     await incrementFeatureQuota(supabase, WEEKLY_PLAN_QUOTA)
 
+    const plannerPayload = {
+      id: `plan-${weekStart}`,
+      weekStart,
+      days: meals.map((meal, i) => {
+        const d = new Date(`${weekStart}T00:00:00`)
+        d.setDate(d.getDate() + i)
+        return {
+          dayIndex: i,
+          date: d.toISOString().split('T')[0],
+          meal,
+        }
+      }),
+      generatedAt: new Date().toISOString(),
+    }
+
     if (!paywall.isPro) {
       const previewDays = paywall.effectivePlanPreviewDays ?? FREE_PLAN_PREVIEW_DAYS
       // Strip locked meals to a teaser payload — enough to render a blurred
@@ -148,6 +163,26 @@ export async function POST(req: Request) {
           isLocked: true,
         }
       })
+      await supabase
+        .from('weekly_plans')
+        .upsert(
+          {
+            user_id: user.id,
+            week_of: weekStart,
+            planner_payload: {
+              ...plannerPayload,
+              days: plannerPayload.days.map((day, i) => ({
+                ...day,
+                meal: teaseredMeals[i] ?? null,
+              })),
+            },
+            grocery_list: null,
+            source: 'weekly-plan-preview',
+            status: 'active',
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: 'user_id,week_of' },
+        )
       return NextResponse.json({
         meals: teaseredMeals,
         groceryList: null,
@@ -155,6 +190,21 @@ export async function POST(req: Request) {
         previewDays,
       })
     }
+
+    await supabase
+      .from('weekly_plans')
+      .upsert(
+        {
+          user_id: user.id,
+          week_of: weekStart,
+          planner_payload: plannerPayload,
+          grocery_list: groceryList,
+          source: 'weekly-plan',
+          status: 'active',
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'user_id,week_of' },
+      )
 
     return NextResponse.json({
       meals,

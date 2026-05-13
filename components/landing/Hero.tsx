@@ -5,8 +5,9 @@ import { FadeIn } from './shared/FadeIn'
 import { socialProof } from '@/config/social-proof'
 import { LandingTonightPreview } from './LandingTonightPreview'
 import { LandingScanDemoButton } from './LandingScanDemoButton'
+import { productStory, productStoryShort, trustCopy } from '@/lib/marketing/stats'
 
-const trustItems = ['Free forever', 'No card required', 'Built for households']
+const trustItems = trustCopy
 
 export function Hero() {
   return (
@@ -50,16 +51,16 @@ export function Hero() {
                 id="hero-heading"
                 className="font-serif text-[38px] leading-[1.05] sm:text-5xl md:text-6xl lg:text-[64px] font-bold tracking-tight text-neutral-900 dark:text-neutral-50"
               >
-                The <span className="italic text-[#D97757]">family-first AI meal prep planner</span>
+                {productStoryShort}
                 <br />
-                for busy households.
+                <span className="italic text-[#D97757]">Household dinner handled.</span>
               </h1>
             </FadeIn>
 
             <FadeIn delay={0.1}>
               <p className="mt-4 sm:mt-6 max-w-[230px] sm:max-w-xl text-base sm:text-lg leading-[1.6] text-neutral-600 dark:text-neutral-300 md:text-xl">
-                MealEase connects dinner ideas, weekly meal prep, groceries,
-                leftovers, pantry scans, and budget-aware swaps into one calm family system.
+                {productStory} Start with a fridge scan or three quick preferences,
+                then get a dinner plan and shopping-ready list.
               </p>
             </FadeIn>
 
@@ -71,6 +72,13 @@ export function Hero() {
                   className="w-[88%] sm:w-auto text-center shadow-md shadow-[#D97757]/20 hover:shadow-lg hover:shadow-[#D97757]/28 active:shadow-sm active:scale-[0.98] transition-all duration-150"
                 >
                   Start planning free
+                </Button>
+                <Button
+                  href="/start"
+                  variant="secondary"
+                  className="w-[88%] sm:w-auto text-center"
+                >
+                  Try the first plan
                 </Button>
                 <LandingScanDemoButton />
                 <a
@@ -128,7 +136,7 @@ export function Hero() {
                     <span className="font-medium text-neutral-700 dark:text-neutral-300">{socialProof.rating}</span>
                   </div>
                   <div className="text-xs sm:text-sm font-medium text-neutral-600 dark:text-neutral-400 leading-tight mt-0.5">
-                    Trusted by {socialProof.householdCount} households
+                    {socialProof.householdCount} · built with early households
                   </div>
                 </div>
               </div>

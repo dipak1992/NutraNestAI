@@ -5,6 +5,7 @@ import './globals.css'
 import { LazyToaster } from '@/components/providers/LazyToaster'
 import { getSiteUrl } from '@/lib/seo'
 import { organizationSchema } from '@/lib/schema'
+import { productStory } from '@/lib/marketing/stats'
 
 const inter = Inter({
   variable: '--font-inter',
@@ -26,7 +27,7 @@ export const metadata: Metadata = {
     template: '%s | MealEase',
   },
   description:
-    'MealEase is the family-first AI meal prep planner for busy households. Plan dinners, generate grocery lists, use leftovers, and shop smarter.',
+    productStory,
   keywords: ['meal prep app', 'meal planning app', 'AI meal prep planner', 'weekly meal prep with grocery list', 'meal prep for parents'],
   alternates: {
     canonical: '/',
@@ -45,7 +46,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'MealEase – Family-First AI Meal Prep Planner',
-    description: 'Plan dinners, generate grocery lists, use leftovers, and keep budget visible with MealEase.',
+    description: productStory,
     type: 'website',
     url: '/',
     siteName: 'MealEase',
@@ -54,7 +55,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'MealEase – Family-First AI Meal Prep Planner',
-    description: 'Plan dinners, generate grocery lists, use leftovers, and keep budget visible with MealEase.',
+    description: productStory,
     images: ['/twitter-image'],
   },
 }

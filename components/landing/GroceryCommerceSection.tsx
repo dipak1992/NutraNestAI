@@ -60,7 +60,7 @@ export function GroceryCommerceSection() {
           <FadeIn>
             <div className="max-w-xl">
               <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#D97757]">
-                Grocery Commerce
+                Smart grocery list
               </p>
               <h2
                 id="grocery-commerce-heading"
@@ -69,7 +69,7 @@ export function GroceryCommerceSection() {
                 The plan becomes a grocery run you can actually finish.
               </h2>
               <p className="mt-5 text-lg leading-relaxed text-neutral-600 dark:text-neutral-400">
-                Autopilot consolidates ingredients, deducts what you already have,
+                MealEase consolidates ingredients, deducts what you already have,
                 groups the list by aisle, and hands it off to supported stores or exports
                 cleanly for any local market.
               </p>

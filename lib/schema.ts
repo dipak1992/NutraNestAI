@@ -24,7 +24,7 @@ export const organizationSchema = {
   url: getSiteUrl(),
   logo: `${getSiteUrl()}/icons/logo-generated.png`,
   description:
-    'MealEase is the family-first AI meal prep planner for busy households that need dinner ideas, weekly plans, grocery lists, fridge scans, and leftovers support.',
+    'MealEase learns your household, plans dinner, and builds the grocery list for busy households.',
 }
 
 export const softwareAppSchema = {

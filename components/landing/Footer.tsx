@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Container } from './shared/Container'
 import { MealEaseLogo } from '@/components/ui/MealEaseLogo'
+import { productStory } from '@/lib/marketing/stats'
 
 const links = {
   Product: [
@@ -44,7 +45,7 @@ export function Footer() {
                 <MealEaseLogo size="md" invertText showBadge />
               </Link>
             <p className="mt-3 text-sm leading-relaxed">
-              AI-powered meal planning for real households.
+              {productStory}
             </p>
             <p className="mt-3 text-xs leading-relaxed text-neutral-500">
               MealEase is a product of DDS Supply LLC.

@@ -1,8 +1,10 @@
+import { marketingStats } from '@/lib/marketing/stats'
+
 export const socialProof = {
-  householdCount: '2,400+',
-  dinnersPlanned: '92,000+',
-  rating: '4.8',
-  hoursSavedPerWeek: '4.2',
+  householdCount: marketingStats.householdCount,
+  dinnersPlanned: marketingStats.dinnersPlanned,
+  rating: marketingStats.rating,
+  hoursSavedPerWeek: marketingStats.hoursSavedPerWeek,
 
   avatars: [
     { src: '/avatars/1.jpg', alt: 'Marissa' },
@@ -17,31 +19,31 @@ export const socialProof = {
       name: 'Marissa K.',
       city: 'Austin, TX',
       photo: '/testimonials/marissa.jpg',
-      quote: 'Saved us $340/month on takeout.',
+      quote: 'MealEase made the weekly dinner conversation easier to start.',
     },
     {
       name: 'Dev P.',
       city: 'Brooklyn, NY',
       photo: '/testimonials/dev.jpg',
-      quote: "The leftovers feature alone pays for it. No more sad Tupperware in the back of the fridge.",
+      quote: 'The leftovers flow helped us use what was already in the fridge.',
     },
     {
       name: 'Priya S.',
       city: 'Toronto, ON',
       photo: '/testimonials/priya.jpg',
-      quote: 'Sunday meal planning used to take me two hours. Now it takes ninety seconds.',
+      quote: 'The week plan plus grocery list is the part I would come back for.',
     },
     {
       name: 'James R.',
       city: 'Denver, CO',
       photo: '/testimonials/james.jpg',
-      quote: 'I snapped my fridge on a Tuesday night and had dinner on the table in 22 minutes.',
+      quote: 'The fridge scan made it easier to pick dinner without starting from scratch.',
     },
     {
       name: 'Elena M.',
       city: 'San Diego, CA',
       photo: '/testimonials/elena.jpg',
-      quote: "Finally an app that remembers my kid won't touch mushrooms.",
+      quote: "The household preferences are what make it feel different from a chat prompt.",
     },
   ],
 }

@@ -46,7 +46,7 @@ export const pillars = [
     question: 'What will it cost me?',
     title: 'Budget Intelligence',
     answer:
-      "See your week's grocery total before you shop. Set a budget, stay under it. Save $100+ a month.",
+      "See your week's estimated grocery total before you shop. Set a budget and swap before checkout.",
     badge: 'NEW',
   },
   {
@@ -54,7 +54,7 @@ export const pillars = [
     icon: '🛒',
     image: '/landing/optimized/grocery-card.webp',
     question: 'How do I buy everything?',
-    title: 'Grocery Commerce',
+    title: 'Smart Grocery List',
     answer:
       'Turn your weekly plan into a ready-to-shop grocery list with supported store handoff, copy, PDF, and local-store export.',
     badge: 'NEW',

@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { MealEaseLogo } from '@/components/ui/MealEaseLogo'
+import { marketingStats } from '@/lib/marketing/stats'
 
 type Props = {
   title: string
@@ -107,9 +108,9 @@ export function AuthShell({
             </div>
 
             <div className="mt-8 grid grid-cols-3 gap-5">
-              <Stat label="Households" value="2,400+" />
-              <Stat label="Meals planned" value="180k+" />
-              <Stat label="Avg. saved/wk" value="$47" />
+              <Stat label="Households" value={marketingStats.householdCount} />
+              <Stat label="Plans" value={marketingStats.dinnersPlanned} />
+              <Stat label="Savings" value={marketingStats.savings} />
             </div>
           </div>
         </div>

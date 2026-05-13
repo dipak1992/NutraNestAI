@@ -95,11 +95,11 @@ export function SocialProof() {
         {/* Stats row */}
         <FadeIn>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 text-center mb-20 md:mb-28">
-            {[
-              { value: socialProof.householdCount, label: 'households cooking smarter' },
-              { value: socialProof.dinnersPlanned, label: 'dinners planned' },
-              { value: `★ ${socialProof.rating}`, label: 'average rating' },
-              { value: `${socialProof.hoursSavedPerWeek}h`, label: 'saved per week, per household' },
+              {[
+              { value: socialProof.householdCount, label: 'household feedback program' },
+              { value: socialProof.dinnersPlanned, label: 'dinner-plan data under review' },
+              { value: socialProof.rating, label: 'feedback stage' },
+              { value: socialProof.hoursSavedPerWeek, label: 'time-saved study status' },
             ].map((stat) => (
               <div key={stat.label}>
                 <div className="font-serif text-4xl md:text-5xl font-bold text-[#D97757]">

@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
-import { ShoppingCart, Lock, Globe, ChevronDown, Settings2 } from 'lucide-react'
+import { useState, useCallback, useEffect, useRef } from 'react'
+import { ShoppingCart, Lock, Globe, ChevronDown } from 'lucide-react'
 import { GroceryListPanel } from '@/components/grocery/GroceryListPanel'
 import { ProviderComparisonCard } from '@/components/grocery/ProviderComparisonCard'
 import { GroceryExportActions } from '@/components/grocery/GroceryExportActions'
@@ -10,6 +10,7 @@ import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 import { useWeeklyPlanStore } from '@/lib/planner/store'
 import { useGroceryCommerce } from '@/lib/grocery/use-grocery-commerce'
 import type { DetectedRegion, ProviderId } from '@/lib/grocery/types'
+import type { GroceryList, WeeklyPlan } from '@/lib/planner/types'
 import { cn } from '@/lib/utils'
 
 const REGION_OPTIONS: { value: DetectedRegion; label: string; flag: string }[] = [
@@ -21,6 +22,9 @@ const REGION_OPTIONS: { value: DetectedRegion; label: string; flag: string }[] =
 export default function GroceryListPage() {
   const { status, loading } = usePaywallStatus()
   const groceryList = useWeeklyPlanStore((s) => s.groceryList)
+  const plan = useWeeklyPlanStore((s) => s.plan)
+  const setPlan = useWeeklyPlanStore((s) => s.setPlan)
+  const setGroceryList = useWeeklyPlanStore((s) => s.setGroceryList)
   const [preferredStore, setPreferredStore] = useState<string | null>(null)
   const {
     region,
@@ -37,6 +41,8 @@ export default function GroceryListPage() {
 
   const [copySuccess, setCopySuccess] = useState(false)
   const [showRegionPicker, setShowRegionPicker] = useState(false)
+  const loadedServerState = useRef(false)
+  const lastSavedPayload = useRef<string | null>(null)
 
   const handleCopy = useCallback(async () => {
     const success = await copyList()
@@ -63,8 +69,58 @@ export default function GroceryListPage() {
       .catch(() => {})
   }, [])
 
+  useEffect(() => {
+    if (!status.isAuthenticated || loading) return
+
+    let cancelled = false
+    async function loadSavedList() {
+      try {
+        const res = await fetch(`/api/grocery-list?weekStart=${encodeURIComponent(plan.weekStart)}`, {
+          cache: 'no-store',
+        })
+        if (!res.ok) return
+        const data = (await res.json()) as {
+          plan: WeeklyPlan | null
+          groceryList: GroceryList | null
+        }
+        if (cancelled) return
+        if (data.plan) setPlan(data.plan)
+        if (data.groceryList) {
+          setGroceryList(data.groceryList)
+          lastSavedPayload.current = JSON.stringify(data.groceryList)
+        }
+        loadedServerState.current = true
+      } catch {
+        loadedServerState.current = true
+      }
+    }
+
+    void loadSavedList()
+    return () => {
+      cancelled = true
+    }
+  }, [loading, plan.weekStart, setGroceryList, setPlan, status.isAuthenticated])
+
+  useEffect(() => {
+    if (!status.isAuthenticated || loading || !loadedServerState.current || !groceryList) return
+    const payload = JSON.stringify(groceryList)
+    if (payload === lastSavedPayload.current) return
+
+    const timeout = window.setTimeout(() => {
+      void fetch('/api/grocery-list', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ weekStart: groceryList.weekStart, groceryList }),
+      }).then((res) => {
+        if (res.ok) lastSavedPayload.current = payload
+      }).catch(() => {})
+    }, 700)
+
+    return () => window.clearTimeout(timeout)
+  }, [groceryList, loading, status.isAuthenticated])
+
   // Free plan gate — show limited view
-  if (!loading && !status.isPro) {
+  if (!loading && !status.isPro && !groceryList) {
     return (
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
@@ -105,7 +161,7 @@ export default function GroceryListPage() {
         <div className="mt-6">
           <ProPaywallCard
             title="Turn your meal plan into a shopping list"
-            description="Upgrade to Plus to unlock auto-built grocery lists with store comparison, Walmart, Instacart, and Kroger handoff, PDF export, and smart pantry deduction."
+            description="Upgrade to Plus to unlock auto-built smart grocery lists with store comparison, Walmart, Instacart, and Kroger handoff, PDF export, and smart pantry deduction."
             isAuthenticated={status.isAuthenticated}
             redirectPath="/grocery-list"
             feature="grocery"
@@ -125,7 +181,7 @@ export default function GroceryListPage() {
             Your Weekly List Ready
           </h1>
           <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
-            MealEase planned your week and prepared your groceries.
+            Generated from your Week Plan. Edits, pantry marks, and checked items are saved for this week.
           </p>
         </div>
 

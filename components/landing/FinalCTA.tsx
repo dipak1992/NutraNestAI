@@ -1,6 +1,7 @@
 import { Container } from './shared/Container'
 import { Button } from './shared/Button'
 import { FadeIn } from './shared/FadeIn'
+import { productStory, trustCopy } from '@/lib/marketing/stats'
 
 export function FinalCTA() {
   return (
@@ -44,7 +45,7 @@ export function FinalCTA() {
 
             {/* Paragraph: brighter white for readability */}
             <p className="mt-5 text-lg md:text-xl text-white/85 leading-relaxed max-w-xl mx-auto font-medium">
-              Join 2,400+ households planning dinners, grocery lists, and shopping workflows in one calm place.
+              {productStory}
             </p>
 
             {/* Tighter gap between paragraph and CTA */}
@@ -61,7 +62,7 @@ export function FinalCTA() {
             </div>
 
             <p className="mt-5 text-sm text-white/50">
-              Free forever · No credit card · Cancel anytime
+              {trustCopy.join(' · ')}
             </p>
           </div>
         </FadeIn>

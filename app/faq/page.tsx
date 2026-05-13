@@ -12,7 +12,7 @@ const faqCategories = [
     items: [
       {
         q: 'What is MealEase?',
-        a: "MealEase is an AI-powered meal planning app for real households. It answers the five food questions every family asks every week: What's for dinner tonight? What can I make from my fridge? What's the plan for this week? What do I do with leftovers? What will it cost me? You get all five answers in one app — in seconds.",
+        a: "MealEase learns your household, plans dinner, and builds the grocery list. It answers the five food questions every family asks every week: What's for dinner tonight? What can I make from my fridge? What's the plan for this week? What do I do with leftovers? What will it cost me?",
       },
       {
         q: 'Is MealEase free to use?',
@@ -69,7 +69,7 @@ const faqCategories = [
         a: 'Plus includes a premium grocery workflow: pantry deductions, estimated cost, store-friendly grouping, checked progress, and export-ready organization. Store handoff availability varies by region and provider.',
       },
       {
-        q: 'How does Grocery Commerce work?',
+        q: 'How does the smart grocery list work?',
         a: 'MealEase turns your weekly plan into an organized grocery list. You can edit items first, then use supported store handoff tools where available, or export the list for any local store.',
       },
       {
@@ -78,7 +78,7 @@ const faqCategories = [
       },
       {
         q: 'What if my country does not support those stores?',
-        a: 'You can still use Grocery Commerce globally. Copy your grocery list, download a PDF, or bring the organized list to your local store.',
+        a: 'You can still use the grocery workflow globally. Copy your grocery list, download a PDF, or bring the organized list to your local store.',
       },
       {
         q: 'Can I edit grocery lists first?',

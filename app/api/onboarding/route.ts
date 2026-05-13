@@ -5,6 +5,7 @@ import { z } from 'zod'
 
 const onboardingSchema = z.object({
   householdSize: z.coerce.number().int().min(1).max(20),
+  cookingGoal: z.string().max(80).nullable().optional(),
   dietary: stringArraySchema(30, 80).default([]),
   cuisinePreferences: stringArraySchema(20, 80).default([]),
   spiceTolerance: z.enum(['none', 'mild', 'medium', 'hot']).default('mild'),

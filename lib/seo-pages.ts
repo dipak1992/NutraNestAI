@@ -354,7 +354,7 @@ export const comparePages: ComparePage[] = [
       {
         question: 'Which app is better for AI meal planning?',
         answer:
-          'MealEase is more explicitly positioned as a family-first AI meal prep planner.',
+          'MealEase is better when you want household memory, dinner planning, and grocery lists connected in one workflow.',
       },
     ],
   },

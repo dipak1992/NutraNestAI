@@ -1,5 +1,6 @@
 import { Nav } from '@/components/landing/Nav'
 import { Hero } from '@/components/landing/Hero'
+import { ProductProofStrip } from '@/components/landing/ProductProofStrip'
 import { ConversionStory } from '@/components/landing/ConversionStory'
 import { HowItWorks } from '@/components/landing/HowItWorks'
 import { FivePillarsSection } from '@/components/landing/FivePillarsSection'
@@ -13,19 +14,18 @@ import { FAQ } from '@/components/landing/FAQ'
 import { FinalCTA } from '@/components/landing/FinalCTA'
 import { Footer } from '@/components/landing/Footer'
 import { productSchema, softwareAppSchema, faqSchema } from '@/lib/schema'
+import { productStory } from '@/lib/marketing/stats'
 
 // Revalidate every 30 minutes so the "Tonight's meal" rotates at 7am CT
 // ISR ensures the page is regenerated after the meal day boundary
 export const revalidate = 1800
 
 export const metadata = {
-  title: 'MealEase — Family-First AI Meal Prep Planner',
-  description:
-    'MealEase is the family-first AI meal prep planner for busy households. Plan dinners, generate grocery lists, scan your fridge, use leftovers, and keep budget visible.',
+  title: 'MealEase — Dinner Planned. Grocery List Built.',
+  description: productStory,
   openGraph: {
-    title: 'MealEase — Family-First AI Meal Prep Planner',
-    description:
-      'Plan dinners, generate grocery lists, scan your fridge, use leftovers, and keep budget visible with MealEase.',
+    title: 'MealEase — Dinner Planned. Grocery List Built.',
+    description: productStory,
     type: 'website',
   },
 }
@@ -56,6 +56,7 @@ export default async function LandingPage() {
 
       <main id="main-content">
         <Hero />
+        <ProductProofStrip />
         <ConversionStory />
         <HowItWorks />
         <FivePillarsSection />

@@ -1,6 +1,8 @@
+import { productStory } from '@/lib/marketing/stats'
+
 export const site = {
   name: 'MealEase',
-  tagline: 'The family-first AI meal prep planner.',
+  tagline: productStory,
   url: 'https://mealease.ai',
   nav: [
     { label: 'Compare', href: '/compare' },
@@ -15,17 +17,17 @@ export const site = {
     {
       label: 'Tonight Suggestions',
       href: '/features/tonight-suggestions',
-      description: 'Personalized dinner in seconds',
+      description: 'Pick dinner without rebuilding the context',
     },
     {
       label: 'Snap & Cook',
       href: '/features/snap-and-cook',
-      description: "Cook what's already in the fridge",
+      description: "Start with what's already in the fridge",
     },
     {
       label: 'Weekly Autopilot',
       href: '/features/weekly-autopilot',
-      description: 'Seven dinners planned in one tap',
+      description: 'Turn household preferences into a week plan',
     },
     {
       label: 'Leftovers AI',
@@ -40,7 +42,7 @@ export const site = {
     {
       label: '✨ Try the Scanner — Free',
       href: '/demo/scan',
-      description: 'See AI meal ideas from a fridge photo — no signup',
+      description: 'See meal ideas from a fridge photo — no signup',
     },
   ],
   brand: {

@@ -246,7 +246,7 @@ export default function FAQPage() {
               <span className="italic text-[#D97757]">&ldquo;what&rsquo;s for dinner?&rdquo;</span>
             </h2>
             <p className="text-neutral-400 text-lg mb-8 max-w-xl mx-auto">
-              Join thousands of households who solved dinner — for good.
+              Build a dinner routine that feels easier to repeat.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link

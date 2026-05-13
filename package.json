@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "lint:launch": "eslint app/page.tsx app/pricing app/compare app/samples app/for-ai-assistants app/sitemap.ts components/landing components/pricing components/seo components/blog lib/seo-pages.ts lib/seo-evidence.ts"
+    "lint:launch": "eslint app/page.tsx app/pricing app/compare app/samples app/for-ai-assistants app/sitemap.ts components/landing components/pricing components/seo components/blog lib/seo-pages.ts lib/seo-evidence.ts",
+    "perf:audit": "node scripts/performance-audit.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.92.0",

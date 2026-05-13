@@ -4,6 +4,7 @@ import { Container } from './shared/Container'
 import { Button } from './shared/Button'
 import { FadeIn } from './shared/FadeIn'
 import { socialProof } from '@/config/social-proof'
+import { groceryBeforeAfterExamples } from '@/lib/proof-assets'
 
 const flow = [
   {
@@ -89,6 +90,26 @@ export function SocialProof() {
                 Plan Your First Week Free
               </Button>
             </div>
+          </div>
+        </FadeIn>
+
+        <FadeIn delay={0.12}>
+          <div className="mb-20 grid gap-4 rounded-3xl border border-neutral-200 bg-[#FBFAF3] p-4 dark:border-neutral-800 dark:bg-neutral-900 md:grid-cols-2 md:p-6">
+            {groceryBeforeAfterExamples.map((example) => (
+              <div key={example.title} className="rounded-2xl bg-white p-5 ring-1 ring-neutral-200 dark:bg-neutral-950 dark:ring-neutral-800">
+                <h3 className="font-serif text-2xl font-bold text-neutral-950 dark:text-neutral-50">
+                  {example.title}
+                </h3>
+                <ul className="mt-4 space-y-3">
+                  {example.items.map((item) => (
+                    <li key={item} className="flex gap-3 text-sm leading-6 text-neutral-700 dark:text-neutral-300">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#D97757]" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         </FadeIn>
 

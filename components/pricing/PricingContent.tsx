@@ -481,7 +481,7 @@ export function PricingContent() {
                 MealEase is operated by DDS Supply LLC. Paid billing is processed securely through Stripe.
               </p>
               <p className="text-center text-xs font-semibold text-[#F3B18E] mt-2">
-                Many users upgrade for grocery convenience alone.
+                Beta feedback points to grocery convenience as a key upgrade reason.
               </p>
             </div>
           </div>

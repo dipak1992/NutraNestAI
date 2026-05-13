@@ -6,6 +6,43 @@ import { Footer } from '@/components/landing/Footer'
 import { evidenceSamples } from '@/lib/seo-evidence'
 import type { ComparePage } from '@/lib/seo-pages'
 
+function workflowProofFor(page: ComparePage) {
+  const proof: Record<ComparePage['slug'], { otherTitle: string; otherBody: string; mealEaseTitle: string; mealEaseBody: string }> = {
+    'mealease-vs-chatgpt': {
+      otherTitle: 'ChatGPT starts from a prompt',
+      otherBody: 'Tell me dietary needs, budget, ingredients, dislikes, grocery needs, leftovers, cook time, and what we already ate this week.',
+      mealEaseTitle: 'MealEase starts from remembered household context',
+      mealEaseBody: 'Saved once: household profile, disliked foods, fridge context, weekly plan, grocery list, leftovers, and budget stay connected.',
+    },
+    'mealease-vs-mealime': {
+      otherTitle: 'Mealime starts from recipe selection',
+      otherBody: 'Choose meals from a recipe flow, then adapt around family preferences, leftovers, pantry reality, and budget in separate steps.',
+      mealEaseTitle: 'MealEase starts from the household dinner job',
+      mealEaseBody: 'Tonight, Week Plan, Groceries, Leftovers, and Budget stay connected so the plan reflects what your family will actually cook.',
+    },
+    'mealease-vs-eat-this-much': {
+      otherTitle: 'Eat This Much starts from structured generation',
+      otherBody: 'Great for planned outputs, but families still need to translate the plan into weeknight timing, picky eaters, leftovers, and groceries.',
+      mealEaseTitle: 'MealEase starts from weeknight constraints',
+      mealEaseBody: 'The workflow keeps real dinner logistics visible: time, pantry items, grocery gaps, budget pressure, and household memory.',
+    },
+    'mealease-vs-paprika': {
+      otherTitle: 'Paprika starts from saved recipes',
+      otherBody: 'Strong recipe organization still leaves the user deciding what to cook, what to buy, and how to adapt when the week changes.',
+      mealEaseTitle: 'MealEase starts from the decision layer',
+      mealEaseBody: 'MealEase helps choose dinner, build the week, generate groceries, and reuse leftovers before recipes become another archive.',
+    },
+    'best-meal-planning-apps-for-busy-families': {
+      otherTitle: 'Many apps start from features',
+      otherBody: 'Recipe boxes, calendars, AI chats, and grocery tools are often separate surfaces that families have to stitch together.',
+      mealEaseTitle: 'MealEase starts from five repeat jobs',
+      mealEaseBody: 'Tonight, Week Plan, Groceries, Leftovers, and Budget create a tighter loop for busy households.',
+    },
+  }
+
+  return proof[page.slug]
+}
+
 export function ComparePageTemplate({
   page,
   jsonLd,
@@ -13,6 +50,8 @@ export function ComparePageTemplate({
   page: ComparePage
   jsonLd: Record<string, unknown>
 }) {
+  const workflowProof = workflowProofFor(page)
+
   return (
     <>
       <Nav />
@@ -43,37 +82,33 @@ export function ComparePageTemplate({
           </div>
         </section>
 
-        {page.slug === 'mealease-vs-chatgpt' && (
-          <section className="border-b border-neutral-200 bg-[#FBFAF3] py-12">
-            <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-              <h2 className="font-serif text-3xl font-bold tracking-tight text-neutral-950">
-                The real difference is the workflow
-              </h2>
-              <div className="mt-6 grid gap-4 lg:grid-cols-2">
-                <article className="rounded-3xl bg-white p-6 ring-1 ring-neutral-200">
-                  <div className="flex items-center gap-2 text-sm font-bold text-neutral-950">
-                    <MessageSquareText className="h-4 w-4 text-neutral-500" />
-                    ChatGPT starts from a prompt
-                  </div>
-                  <p className="mt-3 text-sm leading-6 text-neutral-600">
-                    &ldquo;Tell me dietary needs, budget, ingredients, dislikes, grocery needs,
-                    leftovers, cook time, and what we already ate this week.&rdquo;
-                  </p>
-                </article>
-                <article className="rounded-3xl bg-neutral-950 p-6 text-white">
-                  <div className="flex items-center gap-2 text-sm font-bold">
-                    <CheckCircle2 className="h-4 w-4 text-[#F3B18E]" />
-                    MealEase starts from remembered household context
-                  </div>
-                  <p className="mt-3 text-sm leading-6 text-white/75">
-                    Saved once: household profile, disliked foods, fridge context,
-                    weekly plan, grocery list, leftovers, and budget stay connected.
-                  </p>
-                </article>
-              </div>
+        <section className="border-b border-neutral-200 bg-[#FBFAF3] py-12">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <h2 className="font-serif text-3xl font-bold tracking-tight text-neutral-950">
+              The real difference is the workflow
+            </h2>
+            <div className="mt-6 grid gap-4 lg:grid-cols-2">
+              <article className="rounded-3xl bg-white p-6 ring-1 ring-neutral-200">
+                <div className="flex items-center gap-2 text-sm font-bold text-neutral-950">
+                  <MessageSquareText className="h-4 w-4 text-neutral-500" />
+                  {workflowProof.otherTitle}
+                </div>
+                <p className="mt-3 text-sm leading-6 text-neutral-600">
+                  {workflowProof.otherBody}
+                </p>
+              </article>
+              <article className="rounded-3xl bg-neutral-950 p-6 text-white">
+                <div className="flex items-center gap-2 text-sm font-bold">
+                  <CheckCircle2 className="h-4 w-4 text-[#F3B18E]" />
+                  {workflowProof.mealEaseTitle}
+                </div>
+                <p className="mt-3 text-sm leading-6 text-white/75">
+                  {workflowProof.mealEaseBody}
+                </p>
+              </article>
             </div>
-          </section>
-        )}
+          </div>
+        </section>
 
         <section className="py-16 md:py-20">
           <div className="mx-auto grid max-w-6xl gap-8 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-8">

@@ -441,7 +441,7 @@ export function AboutPageContent() {
         >
           <h2 className="text-2xl font-bold mb-3">Ready to end the dinner debate?</h2>
           <p className="text-muted-foreground mb-7 text-[15px] leading-relaxed">
-            Join thousands of households who already know what&apos;s for dinner tonight.
+            Join the private-beta households helping shape calmer dinner planning.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Button asChild size="lg" className="gradient-sage border-0 text-white hover:opacity-90">

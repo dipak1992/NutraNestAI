@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
+import { persistNormalizedPlanAndGrocery } from '@/lib/planner/persistence'
 
 const saveSchema = z.object({
   plan: z.unknown(),
@@ -39,6 +40,20 @@ export async function POST(req: Request) {
   if (error) {
     console.error('[start-plan/save]', error.message)
     return NextResponse.json({ error: 'Could not save first plan' }, { status: 500 })
+  }
+
+  try {
+    await persistNormalizedPlanAndGrocery(supabase, {
+      userId: user.id,
+      weekStart,
+      plan,
+      groceryList,
+      source: 'first_use',
+      activation,
+    })
+  } catch (normalizedError) {
+    const message = normalizedError instanceof Error ? normalizedError.message : 'Unknown normalized persistence error'
+    console.error('[start-plan/save/normalized]', message)
   }
 
   return NextResponse.json({ ok: true })

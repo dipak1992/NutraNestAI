@@ -91,7 +91,7 @@ export const POST = withErrorHandler('pantry/match-v2', async (req: Request) => 
   const ranked = rankPantryMeals(classified)
 
   // Step 4: Apply remaining filters (budget, time, etc)
-  let filtered = ranked.filter(r => {
+  const filtered = ranked.filter(r => {
     if (body.budget) {
       const levels = { low: 1, medium: 2, high: 3 }
       const mealCostLevel = r.estimatedCost < 10 ? 'low' : r.estimatedCost < 20 ? 'medium' : 'high'

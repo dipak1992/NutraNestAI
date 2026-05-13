@@ -193,7 +193,7 @@ export default function TonightSuggestionsPage() {
               Dinner, <span className="italic text-[#D97757]">decided.</span>
             </h2>
             <p className="text-neutral-400 text-lg mb-8 max-w-xl mx-auto">
-              Join thousands of households who never ask &ldquo;what&rsquo;s for dinner?&rdquo; anymore.
+              Get a dinner answer that fits what your household actually eats.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link

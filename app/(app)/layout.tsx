@@ -4,6 +4,7 @@ import { ScanModal } from '@/components/scan/ScanModal'
 import { GlobalCookedPrompt } from '@/components/leftovers/GlobalCookedPrompt'
 import { QueryProvider } from '@/components/providers'
 import { PushSubscriptionManager } from '@/components/pwa/PushSubscriptionManager'
+import { ProgressiveProfilePrompt } from '@/components/onboarding/ProgressiveProfilePrompt'
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
   const paywall = await getPaywallStatus()
@@ -14,6 +15,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
         {children}
         <ScanModal />
         <GlobalCookedPrompt />
+        <ProgressiveProfilePrompt />
         <PushSubscriptionManager />
       </AppLayout>
     </QueryProvider>

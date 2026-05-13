@@ -201,3 +201,51 @@ export function reformatGroceryList(list: GroceryList, newFormat: StoreFormat): 
   })
   return { ...list, storeFormat: newFormat, items }
 }
+
+function groceryKey(item: GroceryLine) {
+  return `${normaliseName(item.name)}::${normaliseUnit(item.unit)}`
+}
+
+function recalculateTotal(items: GroceryLine[]) {
+  return Math.round(
+    items.reduce((sum, item) => sum + (item.isInPantry || item.userRemoved ? 0 : item.estimatedCost), 0) * 100,
+  ) / 100
+}
+
+export function mergeGroceryListsPreservingEdits(
+  previous: GroceryList | null,
+  generated: GroceryList,
+): GroceryList {
+  if (!previous) return generated
+
+  const previousByKey = new Map(previous.items.map((item) => [groceryKey(item), item]))
+  const removedKeys = new Set(previous.removedItemKeys ?? [])
+  const generatedKeys = new Set<string>()
+
+  const mergedGenerated = generated.items.map((item) => {
+    const key = groceryKey(item)
+    generatedKeys.add(key)
+    if (removedKeys.has(key)) return { ...item, userRemoved: true }
+    const edited = previousByKey.get(key)
+    if (!edited) return item
+
+    return {
+      ...item,
+      isChecked: edited.isChecked,
+      isInPantry: edited.isInPantry,
+      isCustom: edited.isCustom,
+      userRemoved: edited.userRemoved,
+      note: edited.note,
+    }
+  }).filter((item) => !item.userRemoved)
+
+  const customItems = previous.items.filter((item) => item.isCustom && !generatedKeys.has(groceryKey(item)))
+  const items = [...mergedGenerated, ...customItems]
+
+  return {
+    ...generated,
+    items,
+    removedItemKeys: previous.removedItemKeys,
+    totalEstimatedCost: recalculateTotal(items),
+  }
+}

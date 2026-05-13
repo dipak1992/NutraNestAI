@@ -41,6 +41,10 @@ function makeEmptyPlan(): WeeklyPlan {
   }
 }
 
+function groceryItemKey(item: Pick<GroceryLine, 'name' | 'unit'>) {
+  return `${item.name.trim().toLowerCase().replace(/\s+/g, ' ')}::${item.unit.trim().toLowerCase()}`
+}
+
 // ── Store interface ───────────────────────────────────────────
 
 interface WeeklyPlanStore {
@@ -220,11 +224,16 @@ export const useWeeklyPlanStore = create<WeeklyPlanStore>()(
       deleteItem: (id) =>
         set((s) => {
           if (!s.groceryList) return s
+          const removed = s.groceryList.items.find((item) => item.id === id)
           const items = s.groceryList.items.filter((item) => item.id !== id)
+          const removedItemKeys = removed && !removed.isCustom
+            ? Array.from(new Set([...(s.groceryList.removedItemKeys ?? []), groceryItemKey(removed)]))
+            : s.groceryList.removedItemKeys
           return {
             groceryList: {
               ...s.groceryList,
               items,
+              removedItemKeys,
               totalEstimatedCost: items.reduce((sum, i) => sum + i.estimatedCost, 0),
             },
           }

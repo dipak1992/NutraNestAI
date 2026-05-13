@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 import { useWeeklyPlanStore } from '@/lib/planner/store'
 import { useOnboardingStore, useLightOnboardingStore } from '@/lib/store'
 import { useLearningStore } from '@/lib/learning/store'
-import { buildGroceryList } from '@/lib/planner/grocery'
+import { buildGroceryList, mergeGroceryListsPreservingEdits } from '@/lib/planner/grocery'
 import { DAY_FULL } from '@/lib/planner/types'
 import posthog from 'posthog-js'
 import { Analytics } from '@/lib/analytics'
@@ -182,7 +182,7 @@ export function WeeklyPlannerV2() {
       setPlan(newPlan)
 
       if (data.groceryList) {
-        setGroceryList(data.groceryList)
+        setGroceryList(mergeGroceryListsPreservingEdits(groceryList, data.groceryList))
       } else {
         clearGrocery()
       }
@@ -216,6 +216,7 @@ export function WeeklyPlannerV2() {
     setGroceryList,
     setIsGeneratingWeek,
     clearGrocery,
+    groceryList,
     router,
   ])
 
@@ -262,7 +263,7 @@ export function WeeklyPlannerV2() {
             .filter((i) => i.isInPantry)
             .map((i) => i.name)
           const newGrocery = buildGroceryList(allMeals, pantryNames, storeFormat, plan.weekStart)
-          setGroceryList(newGrocery)
+          setGroceryList(mergeGroceryListsPreservingEdits(groceryList, newGrocery))
         }
 
         toast.success(`${DAY_FULL[dayIndex]} updated!`)

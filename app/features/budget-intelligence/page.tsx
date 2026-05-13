@@ -213,7 +213,7 @@ export default function BudgetIntelligencePage() {
               <span className="italic text-[#D97757]">before you shop.</span>
             </h2>
             <p className="text-neutral-400 text-lg mb-8 max-w-xl mx-auto">
-              Join thousands of households saving $100+ a month on groceries — without eating worse.
+              Plan with a clearer grocery budget before you shop, without eating worse.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link

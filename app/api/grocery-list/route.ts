@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
+import { persistNormalizedPlanAndGrocery } from '@/lib/planner/persistence'
 
 const grocerySaveSchema = z.object({
   weekStart: z.string().min(8).max(16),
@@ -70,6 +71,18 @@ export async function PATCH(req: Request) {
   if (error) {
     console.error('[grocery-list/patch]', error.message)
     return NextResponse.json({ error: 'Could not save grocery list' }, { status: 500 })
+  }
+
+  try {
+    await persistNormalizedPlanAndGrocery(supabase, {
+      userId: user.id,
+      weekStart,
+      groceryList,
+      source: 'grocery_edit',
+    })
+  } catch (normalizedError) {
+    const message = normalizedError instanceof Error ? normalizedError.message : 'Unknown normalized persistence error'
+    console.error('[grocery-list/patch/normalized]', message)
   }
 
   return NextResponse.json({ ok: true })

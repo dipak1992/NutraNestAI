@@ -1,5 +1,4 @@
 import { faqs } from '@/config/faqs'
-import { socialProof } from '@/config/social-proof'
 import { absoluteUrl, getSiteUrl } from '@/lib/seo'
 
 export function buildBreadcrumbSchema(
@@ -39,11 +38,6 @@ export const softwareAppSchema = {
     price: '0',
     priceCurrency: 'USD',
   },
-  aggregateRating: {
-    '@type': 'AggregateRating',
-    ratingValue: socialProof.rating,
-    ratingCount: '2400',
-  },
   description:
     'MealEase helps busy families decide what to cook, plan the week, generate grocery lists, use leftovers, and cook from what is already at home.',
 }
@@ -61,11 +55,6 @@ export const productSchema = {
     'Family-first AI meal prep planner with weekly planning, grocery lists, pantry scanning, leftovers workflows, and budget-aware dinner suggestions.',
   image: [absoluteUrl('/landing/optimized/family-dinner.webp')],
   url: absoluteUrl('/'),
-  aggregateRating: {
-    '@type': 'AggregateRating',
-    ratingValue: socialProof.rating,
-    ratingCount: '2400',
-  },
   offers: {
     '@type': 'Offer',
     price: '0',

@@ -39,6 +39,7 @@ export interface GroceryLine {
   isInPantry: boolean   // user owns this already
   isChecked: boolean    // has been picked up
   isCustom?: boolean    // manually added by user
+  userRemoved?: boolean // preserved when generated items are intentionally removed
   note?: string         // optional user note (e.g. "buy organic")
   // Store-specific metadata
   walmartAisle?: string
@@ -48,6 +49,7 @@ export interface GroceryLine {
 export interface GroceryList {
   weekStart: string
   items: GroceryLine[]
+  removedItemKeys?: string[]
   totalEstimatedCost: number
   generatedAt: string
   storeFormat: StoreFormat

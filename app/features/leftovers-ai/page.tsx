@@ -193,7 +193,7 @@ export default function LeftoversAIPage() {
               <span className="italic text-[#D97757]">Start saving money.</span>
             </h2>
             <p className="text-neutral-400 text-lg mb-8 max-w-xl mx-auto">
-              Join thousands of households who turned their leftovers problem into a superpower.
+              Turn leftovers into dinner ideas before they become waste.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link

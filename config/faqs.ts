@@ -37,7 +37,7 @@ export const faqs = [
   },
   {
     q: 'Do I need to enter recipes myself?',
-    a: "Nope. We have thousands built in, and we write new ones for you based on what you have. Zero data entry.",
+    a: "Nope. MealEase includes a growing meal library, and it can write new ideas for you based on what you have. Zero data entry.",
   },
   {
     q: 'How accurate is the fridge scanner?',

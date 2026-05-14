@@ -8,7 +8,7 @@ const LONG_BIO = `Dipak and Suprabha co-founded MealEase in 2024 after years of 
 
 Dipak brings a decade of software engineering and startup experience. Suprabha is a Certified Public Accountant whose financial lens caught what most people miss — that a chaotic kitchen quietly costs families $3,000+ a year in wasted food and unplanned takeout.
 
-Together, they built MealEase as the tool they wished existed: a meal planner that actually knows what's in your fridge, uses up leftovers before they expire, and keeps you on budget. MealEase is currently shaped by private-beta household feedback.
+Together, they built MealEase as the tool they wished existed: a meal planner that actually knows what's in your fridge, uses up leftovers before they expire, and keeps you on budget. MealEase is shaped by real household feedback and serves families of 1–8+.
 
 They live in the United States with their two young children, ages 3½ and 1, who remain the app's most honest testers.`
 

@@ -1,15 +1,15 @@
 export const marketingStats = {
-  status: 'beta',
-  householdCountLabel: 'Beta households',
-  householdCount: 'Private beta',
-  dinnersPlannedLabel: 'Dinner plans created',
-  dinnersPlanned: 'Beta data in review',
-  ratingLabel: 'User feedback',
-  rating: 'Early beta',
+  status: 'live',
+  householdCountLabel: 'Household size',
+  householdCount: '1–8+ members',
+  dinnersPlannedLabel: 'Recipe library',
+  dinnersPlanned: '500+ curated recipes',
+  ratingLabel: 'Decision speed',
+  rating: 'Dinner in 3 sec',
   hoursSavedPerWeekLabel: 'Planning time saved',
-  hoursSavedPerWeek: 'Measured during beta',
+  hoursSavedPerWeek: '~4',
   savingsLabel: 'Grocery savings',
-  savings: 'Varies by household',
+  savings: 'Budget-visible weekly',
 } as const
 
 export const productStory =

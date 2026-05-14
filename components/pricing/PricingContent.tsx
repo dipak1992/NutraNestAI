@@ -100,7 +100,7 @@ const BETA_QUOTES = [
   {
     quote: 'The week plan plus grocery list is the part I would come back for.',
     name: 'Priya S.',
-    context: 'Beta household',
+    context: 'Early household',
   },
   {
     quote: 'The fridge scan made it easier to pick dinner without starting from scratch.',

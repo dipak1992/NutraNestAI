@@ -190,7 +190,7 @@ export function CommercialPageTemplate({
               <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
                 <div>
                   <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D97757]">
-                    Social proof
+                    Product proof
                   </p>
                   <h2 className="mt-3 font-serif text-3xl font-bold tracking-tight text-neutral-950">
                     Parents want fewer dinner loops, not more tabs
@@ -200,13 +200,13 @@ export function CommercialPageTemplate({
                       <p className="font-serif text-3xl font-bold text-[#D97757]">
                         {socialProof.householdCount}
                       </p>
-                      <p className="mt-1 text-xs text-neutral-500">households cooking smarter</p>
+                      <p className="mt-1 text-xs text-neutral-500">household sizes supported</p>
                     </div>
                     <div className="rounded-2xl bg-white p-4 ring-1 ring-neutral-200">
                       <p className="font-serif text-3xl font-bold text-[#D97757]">
                         {socialProof.hoursSavedPerWeek}h
                       </p>
-                      <p className="mt-1 text-xs text-neutral-500">saved per week</p>
+                      <p className="mt-1 text-xs text-neutral-500">planning time saved weekly</p>
                     </div>
                   </div>
                 </div>

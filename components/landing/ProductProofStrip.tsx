@@ -39,7 +39,7 @@ export function ProductProofStrip() {
             <blockquote className="mt-5 rounded-2xl border border-orange-100 bg-[#FBFAF3] p-4 text-sm leading-6 text-neutral-700 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300">
               &ldquo;The week plan plus grocery list is the part I would come back for.&rdquo;
               <footer className="mt-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#D97757]">
-                Priya S. · beta household
+                Priya S. · early household
               </footer>
             </blockquote>
             <div className="mt-5 grid gap-3">

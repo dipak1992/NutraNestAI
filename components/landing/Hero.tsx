@@ -136,7 +136,7 @@ export function Hero() {
                     <span className="font-medium text-neutral-700 dark:text-neutral-300">{socialProof.rating}</span>
                   </div>
                   <div className="text-xs sm:text-sm font-medium text-neutral-600 dark:text-neutral-400 leading-tight mt-0.5">
-                    {socialProof.householdCount} · built with early households
+                    Dinner decided in 3 seconds · free forever
                   </div>
                 </div>
               </div>

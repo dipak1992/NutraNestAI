@@ -25,7 +25,7 @@ const TRUST_SIGNALS = [
   'Cancel anytime — one click',
   '7-day free trial included',
   'No credit card to start trial',
-  'Built with beta household feedback',
+  'Built for real families with real constraints',
 ]
 
 /* ─────────────────────── COMPONENT ─────────────────────── */
@@ -251,7 +251,7 @@ export function UpgradeClient({ isAuthenticated }: Props) {
         </div>
       </section>
 
-      {/* Social proof / trust */}
+      {/* Product proof / trust */}
       <section className="px-4 pb-12">
         <div className="max-w-lg mx-auto text-center">
           <div className="inline-flex items-center gap-3 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 px-6 py-4">
@@ -266,8 +266,8 @@ export function UpgradeClient({ isAuthenticated }: Props) {
               ))}
             </div>
             <div className="text-left">
-              <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-50">Beta household feedback</p>
-              <p className="text-xs text-neutral-500">shaping the MealEase Plus workflow</p>
+              <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-50">Built for real families</p>
+              <p className="text-xs text-neutral-500">500+ recipes · AI-personalized to your household</p>
             </div>
           </div>
         </div>

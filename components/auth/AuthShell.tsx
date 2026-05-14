@@ -108,9 +108,9 @@ export function AuthShell({
             </div>
 
             <div className="mt-8 grid grid-cols-3 gap-5">
-              <Stat label="Households" value={marketingStats.householdCount} />
-              <Stat label="Plans" value={marketingStats.dinnersPlanned} />
-              <Stat label="Savings" value={marketingStats.savings} />
+              <Stat label="Household size" value={marketingStats.householdCount} />
+              <Stat label="Recipes" value={marketingStats.dinnersPlanned} />
+              <Stat label="Budget" value={marketingStats.savings} />
             </div>
           </div>
         </div>

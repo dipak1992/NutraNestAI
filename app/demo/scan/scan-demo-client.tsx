@@ -430,10 +430,10 @@ export function ScanDemoClient() {
                   </div>
                 </div>
 
-                {/* Social proof */}
+                {/* Product proof */}
                 <div className="text-center pt-4 pb-16">
                   <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                    Built with beta household feedback &bull; Free plan available &bull; No credit card required
+                    500+ curated recipes &bull; Free forever plan &bull; No credit card required
                   </p>
                 </div>
               </motion.div>

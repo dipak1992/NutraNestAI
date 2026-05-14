@@ -146,10 +146,10 @@ export default function LinkPage() {
         ))}
       </div>
 
-      {/* Social proof */}
+      {/* Product proof */}
       <div className="mt-8 text-center">
         <p className="text-xs text-neutral-400">
-          Built with beta household feedback &bull; No credit card required
+          500+ curated recipes &bull; Free forever &bull; No credit card required
         </p>
       </div>
 

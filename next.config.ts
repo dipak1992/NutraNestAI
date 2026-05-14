@@ -36,6 +36,10 @@ const nextConfig: NextConfig = {
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
   // Disable source maps in production to prevent exposing application logic
   productionBrowserSourceMaps: false,
+  // Tree-shake heavy icon/utility libraries for smaller bundles
+  experimental: {
+    optimizePackageImports: ['lucide-react'],
+  },
   images: {
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 60 * 60 * 24 * 30,

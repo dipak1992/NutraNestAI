@@ -37,6 +37,7 @@ export function ConversionStory() {
                   fill
                   sizes="(max-width: 1024px) 100vw, 58vw"
                   placeholder="blur"
+                  loading="lazy"
                   className="object-cover opacity-65"
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-neutral-950/85 via-neutral-950/55 to-neutral-950/20" />

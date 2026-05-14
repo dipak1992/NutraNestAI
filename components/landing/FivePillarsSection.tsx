@@ -57,6 +57,7 @@ function PillarCard({
           alt={pillar.title}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
+          loading="lazy"
           className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
         />
         {/* Subtle bottom gradient for visual continuity into card body */}

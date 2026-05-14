@@ -2,18 +2,31 @@
 
 import { useState, type ComponentType } from 'react'
 import { Camera } from 'lucide-react'
-import { useScanStore } from '@/stores/scanStore'
 
+/**
+ * Landing page scan demo button.
+ * Performance: does NOT eagerly import the scan store or ScanModal.
+ * Both are loaded on-demand only when the user clicks.
+ */
 export function LandingScanDemoButton() {
-  const openDemo = useScanStore((state) => state.openDemo)
   const [ScanModal, setScanModal] = useState<ComponentType | null>(null)
+  const [isOpen, setIsOpen] = useState(false)
 
   const handleClick = async () => {
     if (!ScanModal) {
-      const mod = await import('@/components/scan/ScanModal')
-      setScanModal(() => mod.ScanModal)
+      // Lazy-load both the store and modal only on interaction
+      const [storeModule, modalModule] = await Promise.all([
+        import('@/stores/scanStore'),
+        import('@/components/scan/ScanModal'),
+      ])
+      setScanModal(() => modalModule.ScanModal)
+      storeModule.useScanStore.getState().openDemo()
+    } else {
+      // Store already loaded, just open
+      const { useScanStore } = await import('@/stores/scanStore')
+      useScanStore.getState().openDemo()
     }
-    openDemo()
+    setIsOpen(true)
   }
 
   return (
@@ -26,7 +39,7 @@ export function LandingScanDemoButton() {
         <Camera className="h-4 w-4" />
         Try the scanner
       </button>
-      {ScanModal ? <ScanModal /> : null}
+      {ScanModal && isOpen ? <ScanModal /> : null}
     </>
   )
 }

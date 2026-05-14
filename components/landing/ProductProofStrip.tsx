@@ -83,6 +83,7 @@ export function ProductProofStrip() {
                   alt="MealEase first-use flow showing a generated dinner and grocery list preview"
                   fill
                   sizes="(max-width: 768px) 100vw, 620px"
+                  loading="lazy"
                   className="object-cover object-top"
                 />
               </div>

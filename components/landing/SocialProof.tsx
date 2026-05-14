@@ -155,6 +155,7 @@ export function SocialProof() {
                       alt={t.name}
                       fill
                       sizes="44px"
+                      loading="lazy"
                       className="object-cover object-top"
                     />
                   </div>

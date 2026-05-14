@@ -134,12 +134,13 @@ export function AutopilotSection() {
               <div className="relative overflow-hidden rounded-[1.75rem] bg-white p-2 shadow-2xl shadow-neutral-900/15 ring-1 ring-neutral-200/80 dark:bg-neutral-900 dark:ring-white/10 sm:rounded-[2rem] sm:p-3">
                 <div className="relative overflow-hidden rounded-[1.25rem] bg-[#FBFAF3] sm:rounded-[1.5rem]">
                   <Image
-                    src={smartAutopilotImage}
-                    alt="MealEase Autopilot weekly planning interface"
-                    sizes="(min-width: 1024px) 620px, calc(100vw - 40px)"
-                    className="h-auto w-full object-contain"
-                    placeholder="blur"
-                  />
+                      src={smartAutopilotImage}
+                      alt="MealEase Autopilot weekly planning interface"
+                      sizes="(min-width: 1024px) 620px, calc(100vw - 40px)"
+                      loading="lazy"
+                      className="h-auto w-full object-contain"
+                      placeholder="blur"
+                    />
                 </div>
 
                 <div className="grid gap-2 border-t border-neutral-100 bg-white px-3 py-3 dark:border-neutral-800 dark:bg-neutral-900 sm:grid-cols-2 sm:px-4 lg:grid-cols-4">
@@ -211,6 +212,7 @@ export function AutopilotSection() {
                   alt="Family enjoying a meal planned by MealEase Autopilot"
                   fill
                   sizes="(min-width: 768px) 360px, 100vw"
+                  loading="lazy"
                   className="object-cover"
                   placeholder="blur"
                 />

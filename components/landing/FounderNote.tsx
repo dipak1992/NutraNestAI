@@ -14,6 +14,7 @@ export function FounderNote() {
                 alt="MealEase founders Dipak and Suprabha"
                 fill
                 sizes="(max-width: 768px) 100vw, 360px"
+                loading="lazy"
                 className="object-cover object-center"
               />
             </div>

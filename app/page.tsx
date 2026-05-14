@@ -1,21 +1,25 @@
+import dynamic from 'next/dynamic'
 import { Nav } from '@/components/landing/Nav'
 import { Hero } from '@/components/landing/Hero'
 import { ProductProofStrip } from '@/components/landing/ProductProofStrip'
-import { ConversionStory } from '@/components/landing/ConversionStory'
-import { FounderNote } from '@/components/landing/FounderNote'
-import { HowItWorks } from '@/components/landing/HowItWorks'
-import { FivePillarsSection } from '@/components/landing/FivePillarsSection'
-import { AutopilotSection } from '@/components/landing/AutopilotSection'
-import { GroceryCommerceSection } from '@/components/landing/GroceryCommerceSection'
-import { ConnectedSystem } from '@/components/landing/ConnectedSystem'
-import { SocialProof } from '@/components/landing/SocialProof'
-import { ComparisonTable } from '@/components/landing/ComparisonTable'
-import { PricingTeaser } from '@/components/landing/PricingTeaser'
-import { FAQ } from '@/components/landing/FAQ'
-import { FinalCTA } from '@/components/landing/FinalCTA'
-import { Footer } from '@/components/landing/Footer'
 import { productSchema, softwareAppSchema, faqSchema } from '@/lib/schema'
 import { productStory } from '@/lib/marketing/stats'
+
+// Below-the-fold sections — lazy-loaded to reduce initial JS bundle
+// SSR is kept so the HTML is still rendered server-side for SEO
+const ConversionStory = dynamic(() => import('@/components/landing/ConversionStory').then(m => m.ConversionStory), { ssr: true })
+const FounderNote = dynamic(() => import('@/components/landing/FounderNote').then(m => m.FounderNote), { ssr: true })
+const HowItWorks = dynamic(() => import('@/components/landing/HowItWorks').then(m => m.HowItWorks), { ssr: true })
+const FivePillarsSection = dynamic(() => import('@/components/landing/FivePillarsSection').then(m => m.FivePillarsSection), { ssr: true })
+const AutopilotSection = dynamic(() => import('@/components/landing/AutopilotSection').then(m => m.AutopilotSection), { ssr: true })
+const GroceryCommerceSection = dynamic(() => import('@/components/landing/GroceryCommerceSection').then(m => m.GroceryCommerceSection), { ssr: true })
+const ConnectedSystem = dynamic(() => import('@/components/landing/ConnectedSystem').then(m => m.ConnectedSystem), { ssr: true })
+const SocialProof = dynamic(() => import('@/components/landing/SocialProof').then(m => m.SocialProof), { ssr: true })
+const ComparisonTable = dynamic(() => import('@/components/landing/ComparisonTable').then(m => m.ComparisonTable), { ssr: true })
+const PricingTeaser = dynamic(() => import('@/components/landing/PricingTeaser').then(m => m.PricingTeaser), { ssr: true })
+const FAQ = dynamic(() => import('@/components/landing/FAQ').then(m => m.FAQ), { ssr: true })
+const FinalCTA = dynamic(() => import('@/components/landing/FinalCTA').then(m => m.FinalCTA), { ssr: true })
+const Footer = dynamic(() => import('@/components/landing/Footer').then(m => m.Footer), { ssr: true })
 
 // Revalidate every 30 minutes so the "Tonight's meal" rotates at 7am CT
 // ISR ensures the page is regenerated after the meal day boundary

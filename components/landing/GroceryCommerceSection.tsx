@@ -116,6 +116,7 @@ export function GroceryCommerceSection() {
                     alt="Fresh groceries ready for a MealEase weekly plan"
                     fill
                     sizes="(min-width: 1024px) 620px, 100vw"
+                    loading="lazy"
                     className="object-cover object-center"
                     placeholder="blur"
                   />

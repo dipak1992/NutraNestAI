@@ -27,6 +27,7 @@ import { TONIGHT_CHIPS, hasAccess } from '@/lib/pillars/config'
 import { decideMeal, householdFromMembers, fallbackHousehold } from '@/lib/decide/client'
 import { SaveMealButton } from '@/components/content/SaveMealButton'
 import { ShareMealButton } from '@/components/content/ShareMealButton'
+import { SaveReminderCard } from '@/components/shared/SaveReminderCard'
 import { cn } from '@/lib/utils'
 import type { TonightMode } from '@/lib/pillars/config'
 import type { SmartMealResult } from '@/lib/engine/types'
@@ -409,6 +410,13 @@ export default function TonightPillarPage() {
                   ))}
                 </div>
               </div>
+
+              {/* Save & Remind CTA */}
+              <SaveReminderCard
+                mealId={meal.id}
+                mealName={meal.title}
+                variant="tonight"
+              />
             </motion.div>
           ) : (
             <motion.div

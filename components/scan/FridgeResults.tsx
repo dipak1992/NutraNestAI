@@ -6,6 +6,7 @@ import { X, Plus, Clock, Users, DollarSign, CheckCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { hapticTap, hapticSuccess } from '@/lib/scan/haptics'
 import { trackScan } from '@/lib/scan/analytics'
+import { SaveReminderCard } from '@/components/shared/SaveReminderCard'
 import type { FridgeResult, Ingredient, FridgeRecipe } from '@/lib/scan/types'
 
 interface FridgeResultsProps {
@@ -139,6 +140,15 @@ export function FridgeResults({ result, isDemo = false, onClose, onRetake }: Fri
               ))}
             </div>
           </section>
+        )}
+
+        {/* Save & Remind CTA — only for authenticated users */}
+        {!isDemo && result.recipes.length > 0 && (
+          <SaveReminderCard
+            mealId={result.recipes[0].id}
+            mealName={result.recipes[0].title}
+            variant="scan"
+          />
         )}
       </div>
 

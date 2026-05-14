@@ -12,6 +12,7 @@ import { LeftoversCard } from '@/components/dashboard/LeftoversCard'
 import { WeekPlanStrip } from '@/components/dashboard/WeekPlanStrip'
 import { QuickActions } from '@/components/dashboard/QuickActions'
 import { NextBestActionCard } from '@/components/dashboard/NextBestActionCard'
+import { WeeklyReminderNudge } from '@/components/shared/SaveReminderCard'
 import type { DashboardPayload } from '@/lib/dashboard/types'
 
 const REFRESH_INTERVAL_MS = 300_000 // 5 minutes
@@ -121,6 +122,8 @@ export function NewDashboardClient({ initial }: { initial: DashboardPayload }) {
         </div>
 
         <WeekPlanStrip />
+
+        <WeeklyReminderNudge />
 
         <BudgetBar />
 

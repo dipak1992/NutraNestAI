@@ -2,23 +2,24 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { CalendarDays, Utensils, Refrigerator, Wallet, ShoppingCart } from 'lucide-react'
+import { CalendarDays, Camera, DollarSign, Recycle, Utensils } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-// The app is intentionally focused around the five jobs users return for.
+// Five-job spine: the 5 core jobs users hire MealEase for.
 const TABS = [
   { href: '/dashboard/tonight', label: 'Tonight',   icon: Utensils },
-  { href: '/planner',           label: 'Week',      icon: CalendarDays },
-  { href: '/grocery-list',      label: 'Groceries', icon: ShoppingCart },
-  { href: '/leftovers',         label: 'Leftovers', icon: Refrigerator },
-  { href: '/budget',            label: 'Budget',    icon: Wallet },
+  { href: '/dashboard/cook',    label: 'Cook',      icon: Camera },
+  { href: '/dashboard',         label: 'Plan',      icon: CalendarDays },
+  { href: '/leftovers',         label: 'Leftovers', icon: Recycle },
+  { href: '/budget',            label: 'Budget',    icon: DollarSign },
 ]
 
 export function MobileTabBar() {
   const pathname = usePathname()
 
   function isActive(href: string) {
-    if (href === '/planner') return pathname?.startsWith('/planner') || pathname?.startsWith('/plan')
+    // Exact match for /dashboard (Plan tab) so it doesn't match /dashboard/tonight etc.
+    if (href === '/dashboard') return pathname === '/dashboard' || pathname === '/dashboard/'
     return pathname?.startsWith(href)
   }
 

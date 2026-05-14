@@ -12,22 +12,23 @@ import {
   Gift,
   Home,
   CalendarDays,
-  Refrigerator,
-  ShoppingCart,
+  Camera,
+  DollarSign,
+  Recycle,
   Utensils,
-  Wallet,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { createClient } from '@/lib/supabase/client'
 import { MealEaseLogo } from '@/components/ui/MealEaseLogo'
 
+// Five-job spine: Tonight, Cook, Plan, Leftovers, Budget
 const coreNav = [
   { href: '/dashboard/tonight', label: 'Tonight', icon: Utensils },
-  { href: '/planner', label: 'Week Plan', icon: CalendarDays },
-  { href: '/grocery-list', label: 'Groceries', icon: ShoppingCart },
-  { href: '/leftovers', label: 'Leftovers', icon: Refrigerator },
-  { href: '/budget', label: 'Budget', icon: Wallet },
+  { href: '/dashboard/cook', label: 'Cook', icon: Camera },
+  { href: '/dashboard', label: 'Plan', icon: CalendarDays },
+  { href: '/leftovers', label: 'Leftovers', icon: Recycle },
+  { href: '/budget', label: 'Budget', icon: DollarSign },
 ] as const
 
 export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: string; subscriptionTier?: SubscriptionTier }) {

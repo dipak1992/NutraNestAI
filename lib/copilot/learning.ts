@@ -87,10 +87,10 @@ export async function recordCopilotLearning(
       .upsert({
         user_id: userId,
         day_of_week: learning.schedule.dayOfWeek,
-        constraint: learning.schedule.constraint,
+        constraint_label: learning.schedule.constraint,
         source_text: learning.schedule.sourceText,
         confidence: 0.7,
         updated_at: now.toISOString(),
-      }, { onConflict: 'user_id,day_of_week,constraint' })
+      }, { onConflict: 'user_id,day_of_week,constraint_label' })
   }
 }

@@ -213,14 +213,14 @@ export async function POST(req: NextRequest) {
 
     const { data: scheduleRows } = await supabase
       .from('copilot_schedule_constraints')
-      .select('day_of_week, constraint')
+      .select('day_of_week, constraint_label')
       .eq('user_id', user.id)
       .order('updated_at', { ascending: false })
       .limit(8)
 
     const scheduleConstraints = (scheduleRows ?? []).map((row) => ({
       dayOfWeek: String(row.day_of_week),
-      constraint: String(row.constraint),
+      constraint: String(row.constraint_label),
     }))
 
     // Determine time of day

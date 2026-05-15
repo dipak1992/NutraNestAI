@@ -22,12 +22,12 @@ create table if not exists public.copilot_schedule_constraints (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
   day_of_week text not null,
-  constraint text not null,
+  constraint_label text not null,
   source_text text,
   confidence numeric not null default 0.7,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  unique(user_id, day_of_week, constraint)
+  unique(user_id, day_of_week, constraint_label)
 );
 
 create index if not exists idx_copilot_schedule_constraints_user

@@ -21,7 +21,7 @@ export function FivePillarsSection() {
               <span className="italic text-[#D97757]">Zero stress.</span>
             </h2>
             <p className="mt-4 text-lg text-neutral-600 dark:text-neutral-400">
-              Every food question your household asks — answered.
+              Every food question your household asks — answered, with Copilot ready when you need to refine the plan.
             </p>
           </div>
         </FadeIn>

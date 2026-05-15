@@ -5,6 +5,7 @@ import {
   CheckCircle2,
   ChefHat,
   DollarSign,
+  MessageSquareText,
   Refrigerator,
   ShoppingCart,
   Sparkles,
@@ -40,6 +41,12 @@ const systemSteps = [
     body: 'Over budget? AI suggests cheaper alternatives that respect your dietary needs.',
   },
   {
+    icon: MessageSquareText,
+    label: 'Copilot',
+    title: 'Ask for changes',
+    body: 'Free gets basic meal assists. Plus can refine plans, remember patterns, and take action across the system.',
+  },
+  {
     icon: Refrigerator,
     label: 'Leftovers',
     title: 'Use what remains',
@@ -51,6 +58,7 @@ const memoryItems = [
   'Tonight never repeats what\u2019s already planned this week',
   'Liked dinners become stronger future picks',
   'Budget swaps use real AI to find cheaper alternatives',
+  'Copilot remembers schedule patterns like practice nights',
   'Every feature shares context — nothing works in isolation',
 ]
 
@@ -84,7 +92,7 @@ export function ConnectedSystem() {
           </div>
         </FadeIn>
 
-        <div className="mt-14 grid gap-4 lg:grid-cols-5">
+        <div className="mt-14 grid gap-4 lg:grid-cols-6">
           {systemSteps.map((step, index) => {
             const Icon = step.icon
 

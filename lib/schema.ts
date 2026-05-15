@@ -23,7 +23,7 @@ export const organizationSchema = {
   url: getSiteUrl(),
   logo: `${getSiteUrl()}/icons/logo-generated.png`,
   description:
-    'MealEase learns your household, plans dinner, and builds the grocery list for busy households.',
+    'MealEase learns your household, plans dinner, builds the grocery list, and includes Copilot for meal planning help.',
 }
 
 export const softwareAppSchema = {
@@ -39,7 +39,7 @@ export const softwareAppSchema = {
     priceCurrency: 'USD',
   },
   description:
-    'MealEase helps busy families decide what to cook, plan the week, generate grocery lists, use leftovers, and cook from what is already at home.',
+    'MealEase helps busy families decide what to cook, ask Copilot for meal help, plan the week, generate grocery lists, use leftovers, and cook from what is already at home.',
 }
 
 export const productSchema = {
@@ -52,7 +52,7 @@ export const productSchema = {
   },
   category: 'Meal Planning Software',
   description:
-    'Family-first AI meal prep planner with weekly planning, grocery lists, pantry scanning, leftovers workflows, and budget-aware dinner suggestions.',
+    'Family-first AI meal prep planner with Copilot, weekly planning, grocery lists, pantry scanning, leftovers workflows, and budget-aware dinner suggestions.',
   image: [absoluteUrl('/landing/optimized/family-dinner.webp')],
   url: absoluteUrl('/'),
   offers: {

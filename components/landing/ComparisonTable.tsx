@@ -8,10 +8,12 @@ const genericAi = [
   'Forgets preferences',
   'No grocery handoff',
   'No weekly system',
+  'Cannot update the plan',
   'Generic answers',
 ]
 
 const mealease = [
+  'Copilot knows the current screen',
   'Remembers preferences',
   'Connects tonight to the week',
   'Turns plans into grocery lists',
@@ -45,10 +47,10 @@ export function ComparisonTable() {
               className="font-serif text-4xl md:text-5xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50"
             >
               Chatbots give ideas.{' '}
-              <span className="italic text-[#D97757]">MealEase gets groceries ready.</span>
+              <span className="italic text-[#D97757]">MealEase Copilot takes action.</span>
             </h2>
             <p className="mt-4 text-lg text-neutral-600 dark:text-neutral-400">
-              Generic AI can help when you know exactly what to ask. MealEase is built
+              Generic AI can help when you know exactly what to ask. MealEase Copilot is built
               for the nightly reality of feeding a household: preferences, swaps,
               weekly rhythms, grocery lists, supported store handoff, and meals people will actually eat.
             </p>
@@ -79,7 +81,7 @@ export function ComparisonTable() {
                   {item.body}
                 </p>
                 <p className="mt-3 text-xs font-bold uppercase tracking-wide text-[#D97757]">
-                  Dinner and groceries generated from remembered context.
+                  Dinner, groceries, budget, and Copilot actions generated from remembered context.
                 </p>
               </div>
             ))}
@@ -93,7 +95,7 @@ export function ComparisonTable() {
             />
             <ComparisonBlock
               title="MealEase"
-              description="A purpose-built dinner system that remembers the household and moves each meal toward a plan."
+              description="A purpose-built dinner system with Copilot layered over household memory, meals, groceries, leftovers, and budget."
               items={mealease}
               variant="highlight"
             />
@@ -106,7 +108,7 @@ export function ComparisonTable() {
               Try MealEase Free
             </Button>
             <p className="mt-3 text-sm text-neutral-500 dark:text-neutral-400">
-              No blank prompts. No starting over. Just meals that fit your life.
+              No blank prompts. No starting over. Just a Copilot that knows your food system.
             </p>
           </div>
         </FadeIn>

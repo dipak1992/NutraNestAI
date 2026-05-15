@@ -12,11 +12,11 @@ const faqCategories = [
     items: [
       {
         q: 'What is MealEase?',
-        a: "MealEase learns your household, plans dinner, and builds the grocery list. It answers the five food questions every family asks every week: What's for dinner tonight? What can I make from my fridge? What's the plan for this week? What do I do with leftovers? What will it cost me?",
+        a: "MealEase learns your household, plans dinner, builds the grocery list, and includes Copilot for conversational meal help. It answers the food questions every family asks every week: What's for dinner tonight? What can I make from my fridge? What's the plan for this week? What do I do with leftovers? What will it cost me?",
       },
       {
         q: 'Is MealEase free to use?',
-        a: 'Yes. MealEase has a useful free tier that includes Tonight Suggestions, 3 meal swaps per day, a 3-day Planner preview, basic Snap & Cook, basic grocery preview, cook mode, and basic dietary filters. Plus unlocks the full connected system.',
+        a: 'Yes. MealEase has a useful free tier that includes Tonight Suggestions, 3 meal swaps per day, 3 basic Copilot meal assists per day, a 3-day Planner preview, basic Snap & Cook, basic grocery preview, cook mode, and basic dietary filters. Plus unlocks the full connected system.',
       },
       {
         q: 'Do I need to create an account?',
@@ -29,11 +29,15 @@ const faqCategories = [
     items: [
       {
         q: 'What does the free plan include?',
-        a: "The free plan includes: Tonight Suggestions, 3 meal swaps per day, a 3-day Planner preview, basic Snap & Cook, basic grocery preview, step-by-step cook mode, and basic dietary filters. It's genuinely useful, not a crippled demo.",
+        a: "The free plan includes: Tonight Suggestions, 3 meal swaps per day, 3 basic Copilot meal assists per day, a 3-day Planner preview, basic Snap & Cook, basic grocery preview, step-by-step cook mode, and basic dietary filters. It's genuinely useful, not a crippled demo.",
       },
       {
         q: 'What does MealEase Plus unlock?',
-        a: "Plus unlocks the full food operating system: 7-day Planner / Weekly Autopilot, unlimited swaps and Snap & Cook usage, pantry-aware grocery lists with estimated cost, supported grocery handoff tools, Budget Intelligence, Leftovers AI, household memory, saved meal resurfacing, and post-cook follow-ups like leftovers and tomorrow's lunch.",
+        a: "Plus unlocks the full food operating system: unlimited/fair-use Copilot with voice, memory, proactive nudges, plan refinements, budget swaps, grocery actions, and schedule learning, plus 7-day Planner / Weekly Autopilot, unlimited swaps and Snap & Cook usage, pantry-aware grocery lists with estimated cost, supported grocery handoff tools, Budget Intelligence, Leftovers AI, household memory, saved meal resurfacing, and post-cook follow-ups like leftovers and tomorrow's lunch.",
+      },
+      {
+        q: 'What is MealEase Copilot?',
+        a: 'Copilot is not a generic chatbot. It is a conversational layer over your household food system. Free users get basic reactive meal assists. Plus users unlock voice, memory, proactive nudges, plan refinements, budget-aware swaps, grocery actions, schedule learning, and household preference learning.',
       },
       {
         q: 'How much does Plus cost?',

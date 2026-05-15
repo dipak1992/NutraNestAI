@@ -10,6 +10,7 @@ const plans = [
     description: 'For households just getting started.',
     features: [
       'Tonight Suggestions',
+      '3 basic Copilot meal assists/day',
       '3 meal swaps per day',
       '3-day Planner preview',
       'Basic Snap & Cook',
@@ -25,11 +26,12 @@ const plans = [
     period: '/month · or $79/yr (save 34%)',
     description: 'Everything you need to stop the dinner spiral.',
     features: [
+      'Unlimited Copilot with voice, memory, and nudges',
       'Full 7-day Planner / Weekly Autopilot',
       'Pantry-aware grocery list with estimated cost',
       'Budget-aware swaps before checkout',
       'Post-cook leftovers and lunch ideas',
-      'Household memory for likes and dislikes',
+      'Household memory for likes, dislikes, and schedule patterns',
       'Unlimited swaps and Snap & Cook usage',
     ],
     cta: 'Start free — upgrade anytime',
@@ -56,7 +58,7 @@ export function PricingTeaser() {
               <span className="italic text-[#D97757]">No surprises.</span>
             </h2>
             <p className="mt-4 text-lg text-neutral-600 dark:text-neutral-400">
-              Start free. Upgrade when you&rsquo;re ready.
+              Start with basic Copilot. Upgrade when you want it to act across the full household food system.
             </p>
           </div>
         </FadeIn>

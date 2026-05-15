@@ -13,13 +13,14 @@ export const marketingStats = {
 } as const
 
 export const productStory =
-  'MealEase learns your household, plans dinner, and builds the grocery list.'
+  'MealEase learns your household, plans dinner, answers with Copilot, and builds the grocery list.'
 
 export const productStoryShort =
   'Dinner planned. Grocery list built.'
 
 export const trustCopy = [
   'Free to start',
+  '3 Copilot assists/day included',
   'No card required',
   'Built for real household dinners',
 ] as const

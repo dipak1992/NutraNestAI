@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Pricing — MealEase',
-  description: 'Simple, honest pricing. Free and Plus plans for every household.',
+  description: 'Simple, honest pricing. Free includes basic Copilot meal assists; Plus unlocks voice, memory, proactive nudges, plan refinements, budget swaps, and grocery actions.',
   alternates: {
     canonical: '/pricing',
   },

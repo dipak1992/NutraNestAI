@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import {
   BookOpen,
   Brain,
+  Bot,
   CalendarDays,
   Camera,
   CheckCircle2,
@@ -40,6 +41,7 @@ type FeatureItem = {
 
 const FREE_FEATURES: FeatureItem[] = [
   { icon: Moon, text: 'Tonight Suggestions for daily dinner help' },
+  { icon: Bot, text: 'Basic Copilot with 3 meal assists per day' },
   { icon: Camera, text: 'Basic Snap & Cook' },
   { icon: CalendarDays, text: '3-day Planner preview' },
   { icon: ShoppingCart, text: 'Manual grocery planning with basic preview' },
@@ -50,6 +52,7 @@ const FREE_FEATURES: FeatureItem[] = [
 
 const PLUS_FEATURES: FeatureItem[] = [
   { icon: Sparkles, text: 'Everything in Free, connected across your week', highlight: false },
+  { icon: Bot, text: 'Unlimited Copilot with voice, memory, and proactive nudges', highlight: true },
   { icon: CalendarDays, text: 'Smart weekly plans for all 7 dinners', highlight: true },
   { icon: ShoppingCart, text: 'Auto grocery list + faster shopping workflow', highlight: true },
   { icon: ShoppingCart, text: 'One-tap grocery exports where supported', highlight: true },
@@ -71,6 +74,7 @@ const REASSURANCE = [
 
 const PLAN_COMPARISON = [
   ['Tonight dinner help', 'Included', 'Unlimited use with household memory'],
+  ['MealEase Copilot', '3 basic meal assists/day', 'Unlimited/fair-use Copilot with voice, memory, and actions'],
   ['Weekly planning', '3-day preview', 'Full 7-day week plan'],
   ['Grocery list', 'Basic preview/manual items', 'Auto-built, editable, export-ready list'],
   ['Fridge and pantry scan', 'Basic demo/free usage', 'Higher limits and saved context'],
@@ -131,6 +135,11 @@ const PLUS_UNLOCKS = [
     desc: 'See estimated costs from plans and grocery lists, then swap expensive meals before the cart gets painful.',
   },
   {
+    icon: Bot,
+    title: 'Copilot that runs the system',
+    desc: 'Ask for swaps, budget fixes, leftover ideas, grocery actions, or schedule-aware planning without rebuilding context.',
+  },
+  {
     icon: ShoppingCart,
     title: 'A grocery workflow worth paying for',
     desc: 'Auto grocery lists, edit-before-you-shop controls, supported store handoff, copy, PDF, and local-store export.',
@@ -138,10 +147,14 @@ const PLUS_UNLOCKS = [
 ]
 
 const FAQ = [
-  {
-    q: 'Is there a free version?',
-    a: "Yes. Free gives you useful dinner help: Tonight Suggestions, 3 swaps per day, a 3-day Planner preview, basic Snap & Cook, and a basic grocery preview. Plus unlocks the full connected system.",
-  },
+      {
+        q: 'Is there a free version?',
+        a: "Yes. Free gives you useful dinner help: Tonight Suggestions, 3 swaps per day, 3 basic Copilot meal assists per day, a 3-day Planner preview, basic Snap & Cook, and a basic grocery preview. Plus unlocks the full connected system.",
+      },
+      {
+        q: 'What does MealEase Copilot do?',
+        a: 'Copilot is the conversational layer for your household food system. Free users get basic reactive meal assists. Plus unlocks voice, memory, proactive nudges, plan refinements, budget-aware swaps, grocery actions, and schedule learning.',
+      },
   {
     q: 'What is a household profile?',
     a: "A profile stores preferences, allergies, age groups, and food goals for one person. Profiles are not separate logins — they help MealEase personalize every meal for each person at your table. Free plan includes 1 profile. Plus includes up to 6.",
@@ -292,13 +305,13 @@ export function PricingContent() {
         />
         <div className="relative z-10">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-[#FFD2BD] backdrop-blur">
-            Simple pricing
+            Simple pricing · Copilot included
           </div>
           <h1 className="mx-auto mt-4 max-w-[300px] font-serif text-4xl font-bold tracking-tight text-white [text-shadow:0_2px_12px_rgba(0,0,0,0.45)] sm:max-w-4xl md:text-5xl">
             Start free. Try Plus when you want the full week.
           </h1>
           <p className="mx-auto mt-3 max-w-[280px] text-base text-white/82 sm:max-w-xl sm:text-lg">
-            Clear limits, one primary trial CTA, no payment details required to start.
+            Free includes 3 Copilot meal assists/day. Plus unlocks voice, memory, proactive nudges, and action-taking Copilot.
           </p>
         </div>
       </section>

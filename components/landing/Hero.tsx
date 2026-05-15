@@ -59,8 +59,8 @@ export function Hero() {
 
             <FadeIn delay={0.1}>
               <p className="mt-4 sm:mt-6 max-w-[230px] sm:max-w-xl text-base sm:text-lg leading-[1.6] text-neutral-600 dark:text-neutral-300 md:text-xl">
-                {productStory} Start with a fridge scan or three quick preferences,
-                then get a dinner plan and shopping-ready list.
+                {productStory} Start with a fridge scan, three quick preferences,
+                or Copilot. Then get a dinner plan and shopping-ready list.
               </p>
             </FadeIn>
 
@@ -92,7 +92,7 @@ export function Hero() {
 
             <FadeIn delay={0.3}>
               <p className="mt-3 text-sm font-semibold text-neutral-700 dark:text-neutral-300">
-                Plan the week. Get groceries ready. Stop repeating dinner decisions.
+                Plan the week. Ask Copilot. Get groceries ready. Stop repeating dinner decisions.
               </p>
 
               {/* Mobile: vertical stack; sm+: horizontal row */}
@@ -136,7 +136,7 @@ export function Hero() {
                     <span className="font-medium text-neutral-700 dark:text-neutral-300">{socialProof.rating}</span>
                   </div>
                   <div className="text-xs sm:text-sm font-medium text-neutral-600 dark:text-neutral-400 leading-tight mt-0.5">
-                    Dinner decided in 3 seconds · free forever
+                    Dinner decided in 3 seconds · Copilot included free
                   </div>
                 </div>
               </div>

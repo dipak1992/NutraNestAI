@@ -4,7 +4,6 @@ import { Button } from './shared/Button'
 import { FadeIn } from './shared/FadeIn'
 import { socialProof } from '@/config/social-proof'
 import { LandingTonightPreview } from './LandingTonightPreview'
-import { LandingScanDemoButton } from './LandingScanDemoButton'
 import { productStory, productStoryShort, trustCopy } from '@/lib/marketing/stats'
 
 const trustItems = trustCopy
@@ -80,7 +79,6 @@ export function Hero() {
                 >
                   Try fridge scan
                 </Button>
-                <LandingScanDemoButton />
                 <a
                   href="#how-it-works"
                   className="text-neutral-600 dark:text-neutral-300 hover:text-[#D97757] underline-offset-4 hover:underline text-sm font-medium transition-colors"

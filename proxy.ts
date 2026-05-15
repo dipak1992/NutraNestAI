@@ -32,7 +32,7 @@ const PUBLIC_READ_ENDPOINTS = [
   '/api/content/',
 ]
 
-function buildCsp() {
+function buildCsp({ upgradeInsecureRequests = true }: { upgradeInsecureRequests?: boolean } = {}) {
   return [
     `default-src 'self'`,
     `base-uri 'self'`,
@@ -46,8 +46,29 @@ function buildCsp() {
     `font-src 'self' data:`,
     `connect-src 'self' https://*.supabase.co https://*.posthog.com https://*.sentry.io https://api.resend.com https://api.openai.com https://api.anthropic.com`,
     `frame-ancestors 'none'`,
-    `upgrade-insecure-requests`,
-  ].join('; ')
+    upgradeInsecureRequests ? `upgrade-insecure-requests` : null,
+  ].filter(Boolean).join('; ')
+}
+
+function isLocalHost(request: NextRequest) {
+  const hostname = request.nextUrl.hostname
+  const host = request.headers.get('host') ?? ''
+  return (
+    hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname === '::1' ||
+    host.startsWith('localhost:') ||
+    host.startsWith('127.0.0.1:')
+  )
+}
+
+function shouldForceHttps(request: NextRequest) {
+  if (process.env.NODE_ENV !== 'production' || isLocalHost(request)) {
+    return false
+  }
+
+  const forwardedProto = request.headers.get('x-forwarded-proto')
+  return request.nextUrl.protocol === 'http:' || forwardedProto === 'http'
 }
 
 export async function proxy(request: NextRequest) {
@@ -55,10 +76,9 @@ export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname
   const origin = request.headers.get('origin')
   const isApi = pathname.startsWith('/api/')
-  const forwardedProto = request.headers.get('x-forwarded-proto')
   const method = request.method.toUpperCase()
 
-  if (process.env.NODE_ENV === 'production' && (request.nextUrl.protocol === 'http:' || forwardedProto === 'http')) {
+  if (shouldForceHttps(request)) {
     const url = request.nextUrl.clone()
     url.protocol = 'https:'
     logSecurityEvent('http_redirect', {
@@ -92,7 +112,7 @@ export async function proxy(request: NextRequest) {
 
   if (isApi && method === 'OPTIONS') {
     const response = new NextResponse(null, { status: 204 })
-    setCommonHeaders(response, requestId)
+    setCommonHeaders(response, requestId, request)
     setCorsHeaders(response, origin)
     return response
   }
@@ -104,13 +124,13 @@ export async function proxy(request: NextRequest) {
 
   try {
     const response = await updateSession(request)
-    setCommonHeaders(response, requestId)
+    setCommonHeaders(response, requestId, request)
     if (isApi) setCorsHeaders(response, origin)
     return response
   } catch {
     // Supabase unavailable (e.g. missing env vars) — pass through
     const response = NextResponse.next()
-    setCommonHeaders(response, requestId)
+    setCommonHeaders(response, requestId, request)
     if (isApi) setCorsHeaders(response, origin)
     return response
   }
@@ -227,8 +247,11 @@ function isAutomationUserAgent(userAgent: string) {
   return !userAgent || /\b(curl|wget|python-requests|httpclient|scrapy|aiohttp|libwww-perl)\b/i.test(userAgent)
 }
 
-function setCommonHeaders(response: NextResponse, requestId: string) {
-  response.headers.set('Content-Security-Policy', buildCsp())
+function setCommonHeaders(response: NextResponse, requestId: string, request?: NextRequest) {
+  response.headers.set(
+    'Content-Security-Policy',
+    buildCsp({ upgradeInsecureRequests: request ? !isLocalHost(request) : true })
+  )
   response.headers.set('x-request-id', requestId)
 }
 

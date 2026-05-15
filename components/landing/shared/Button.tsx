@@ -7,6 +7,7 @@ type Props = {
   variant?: 'primary' | 'secondary' | 'ghost'
   className?: string
   ariaLabel?: string
+  prefetch?: boolean | null
 }
 
 export function Button({
@@ -15,6 +16,7 @@ export function Button({
   variant = 'primary',
   className,
   ariaLabel,
+  prefetch = false,
 }: Props) {
   const base =
     'inline-flex items-center justify-center gap-2 rounded-full font-medium transition-all duration-200 min-h-[48px] px-6 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#D97757]'
@@ -32,6 +34,7 @@ export function Button({
     <Link
       href={href}
       aria-label={ariaLabel}
+      prefetch={prefetch}
       className={cn(base, styles[variant], className)}
     >
       {children}

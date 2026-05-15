@@ -45,7 +45,7 @@ export function Nav() {
           aria-label="Main navigation"
         >
           {/* Logo */}
-          <Link href="/" aria-label="MealEase home" className="flex items-center">
+          <Link href="/" prefetch={false} aria-label="MealEase home" className="flex items-center">
             <MealEaseLogo size="md" showBadge />
           </Link>
 
@@ -90,6 +90,7 @@ export function Nav() {
                       <Link
                         key={feature.href}
                         href={feature.href}
+                        prefetch={false}
                         role="menuitem"
                         onClick={() => setFeaturesOpen(false)}
                         className="rounded-xl px-4 py-3 transition-colors hover:bg-[#FDF6F1] focus:bg-[#FDF6F1] focus:outline-none dark:hover:bg-neutral-900 dark:focus:bg-neutral-900"
@@ -110,6 +111,7 @@ export function Nav() {
               <Link
                 key={item.href}
                 href={item.href}
+                prefetch={false}
                 className="text-sm text-neutral-700 dark:text-neutral-300 hover:text-[#D97757] transition-colors"
               >
                 {item.label}
@@ -143,6 +145,7 @@ export function Nav() {
                   <Link
                     key={feature.href}
                     href={feature.href}
+                    prefetch={false}
                     onClick={() => setOpen(false)}
                     className="rounded-xl px-2 py-2.5"
                   >
@@ -160,6 +163,7 @@ export function Nav() {
               <Link
                 key={item.href}
                 href={item.href}
+                prefetch={false}
                 onClick={() => setOpen(false)}
                 className="text-base text-neutral-800 dark:text-neutral-200 py-2 min-h-[48px] flex items-center"
               >

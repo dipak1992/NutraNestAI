@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-05-13T17:15:00.254Z",
+  "generatedAt": "2026-05-15T16:53:09.496Z",
   "requiresFreshBuild": "Run npm run build before this script for accurate production chunks.",
   "totals": {
-    "jsAndCssChunkCount": 94,
-    "jsAndCssKb": 4399.7,
+    "jsAndCssChunkCount": 88,
+    "jsAndCssKb": 4190.6,
     "appRouteCount": 85
   },
   "largestChunks": [
@@ -12,11 +12,11 @@
       "sizeKb": 290.9
     },
     {
-      "file": ".next/static/chunks/0mg26wrtivrd8.css",
-      "sizeKb": 280.7
+      "file": ".next/static/chunks/0iolbf_-ezaco.css",
+      "sizeKb": 286.4
     },
     {
-      "file": ".next/static/chunks/0xah6ysyboz.m.js",
+      "file": ".next/static/chunks/0t-qfl31jd5wo.js",
       "sizeKb": 226.7
     },
     {
@@ -24,8 +24,8 @@
       "sizeKb": 222.5
     },
     {
-      "file": ".next/static/chunks/13lmjwah~-p...js",
-      "sizeKb": 182.2
+      "file": ".next/static/chunks/0d~xw7cxa~4a4.js",
+      "sizeKb": 175.3
     },
     {
       "file": ".next/static/chunks/0lf.ijyc2c77h.js",
@@ -40,12 +40,12 @@
       "sizeKb": 110
     },
     {
-      "file": ".next/static/chunks/01ax0rshyyc2o.js",
-      "sizeKb": 98.3
+      "file": ".next/static/chunks/05vbncuuo.ecp.js",
+      "sizeKb": 106.2
     },
     {
-      "file": ".next/static/chunks/08txde30f95gr.js",
-      "sizeKb": 77
+      "file": ".next/static/chunks/0t82riodavqbp.js",
+      "sizeKb": 87.2
     },
     {
       "file": ".next/static/chunks/01o3udtfyhcs-.js",
@@ -64,28 +64,20 @@
       "sizeKb": 70.9
     },
     {
-      "file": ".next/static/chunks/04xew9rzwxstd.js",
-      "sizeKb": 65
+      "file": ".next/static/chunks/0w0z5yp3mwqrn.js",
+      "sizeKb": 66.1
     },
     {
-      "file": ".next/static/chunks/08tjypes30g81.js",
-      "sizeKb": 65
+      "file": ".next/static/chunks/17cfwbo.obw5v.js",
+      "sizeKb": 64.6
     },
     {
-      "file": ".next/static/chunks/0xk0.ro51clg..js",
-      "sizeKb": 60.8
-    },
-    {
-      "file": ".next/static/chunks/139dh3yzutbcr.js",
+      "file": ".next/static/chunks/057orkf253wm9.js",
       "sizeKb": 60.1
     },
     {
-      "file": ".next/static/chunks/00dq-4bepbuhv.js",
-      "sizeKb": 55
-    },
-    {
-      "file": ".next/static/chunks/03.vr1xmt_8yz.js",
-      "sizeKb": 53.9
+      "file": ".next/static/chunks/18bupkb_eybu9.js",
+      "sizeKb": 59.7
     },
     {
       "file": ".next/static/chunks/0rii-shp~ffd7.js",
@@ -96,36 +88,44 @@
       "sizeKb": 53.5
     },
     {
-      "file": ".next/static/chunks/0y2tdn7r2mkmj.js",
-      "sizeKb": 49.4
+      "file": ".next/static/chunks/0hm4u5tac20lj.js",
+      "sizeKb": 49.8
     },
     {
-      "file": ".next/static/chunks/069jhbpuito37.js",
-      "sizeKb": 47.4
+      "file": ".next/static/chunks/0agukl5.1xqro.js",
+      "sizeKb": 48.9
+    },
+    {
+      "file": ".next/static/chunks/08u3_bk8ci8t_.js",
+      "sizeKb": 47.5
     },
     {
       "file": ".next/static/chunks/09a6o7soql0.r.js",
       "sizeKb": 47.4
     },
     {
-      "file": ".next/static/chunks/0pmxf..swi.sn.js",
-      "sizeKb": 44.9
+      "file": ".next/static/chunks/0a6b~osysnt0k.js",
+      "sizeKb": 45.3
     },
     {
-      "file": ".next/static/chunks/0mvhwth5chksq.js",
-      "sizeKb": 44.2
+      "file": ".next/static/chunks/0qi_wnmriko0q.js",
+      "sizeKb": 45.2
     },
     {
-      "file": ".next/static/chunks/0lor2gsq.xsga.js",
-      "sizeKb": 43
+      "file": ".next/static/chunks/0_gmz-fw4w8gp.js",
+      "sizeKb": 42.9
     },
     {
-      "file": ".next/static/chunks/0ina8ib21evqt.js",
-      "sizeKb": 42.6
+      "file": ".next/static/chunks/13x~1lkndtiy6.js",
+      "sizeKb": 42.2
     },
     {
-      "file": ".next/static/chunks/0owg6puiufnj7.js",
-      "sizeKb": 42.6
+      "file": ".next/static/chunks/0iewzj5_2bq~x.js",
+      "sizeKb": 41.6
+    },
+    {
+      "file": ".next/static/chunks/0v9_xeaoovah1.js",
+      "sizeKb": 39
     }
   ],
   "appRoutes": [

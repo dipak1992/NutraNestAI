@@ -41,7 +41,7 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-10 mb-14">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <Link href="/" aria-label="MealEase home" className="inline-flex items-center">
+            <Link href="/" prefetch={false} aria-label="MealEase home" className="inline-flex items-center">
                 <MealEaseLogo size="md" invertText showBadge />
               </Link>
             <p className="mt-3 text-sm leading-relaxed">
@@ -63,6 +63,7 @@ export function Footer() {
                   <li key={item.label}>
                     <Link
                       href={item.href}
+                      prefetch={false}
                       className="text-sm hover:text-white transition-colors"
                     >
                       {item.label}

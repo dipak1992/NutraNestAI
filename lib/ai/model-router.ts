@@ -57,6 +57,7 @@ export type AITask =
   | 'meal-regenerate'    // Regenerate a single meal
   | 'vision'             // Image analysis (fridge scan)
   | 'leftover-transform' // Transform leftovers into meals
+  | 'copilot'            // Conversational copilot (Plus only)
   | 'general'            // Generic text generation
 
 const TASK_TIER_MAP: Record<AITask, ModelTier> = {
@@ -66,6 +67,7 @@ const TASK_TIER_MAP: Record<AITask, ModelTier> = {
   'meal-regenerate': 'fast',      // Single meal modification
   'vision': 'quality',            // Vision requires gpt-4o
   'leftover-transform': 'fast',   // Simple creative task
+  'copilot': 'fast',              // Conversational — mini is fast + cheap (max 500 tokens)
   'general': 'fast',              // Default to cheapest
 }
 

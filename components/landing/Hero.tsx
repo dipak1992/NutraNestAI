@@ -4,7 +4,7 @@ import { Button } from './shared/Button'
 import { FadeIn } from './shared/FadeIn'
 import { socialProof } from '@/config/social-proof'
 import { LandingTonightPreview } from './LandingTonightPreview'
-import { productStory, productStoryShort, trustCopy } from '@/lib/marketing/stats'
+import { productStoryShort, trustCopy } from '@/lib/marketing/stats'
 
 const trustItems = trustCopy
 
@@ -58,8 +58,8 @@ export function Hero() {
 
             <FadeIn delay={0.1}>
               <p className="mt-4 sm:mt-6 max-w-[230px] sm:max-w-xl text-base sm:text-lg leading-[1.6] text-neutral-600 dark:text-neutral-300 md:text-xl">
-                {productStory} Start with a fridge scan, three quick preferences,
-                or Copilot. Then get a dinner plan and shopping-ready list.
+                Plan dinner, fix the week, use leftovers, and keep groceries ready with Copilot.
+                Start with a fridge scan, three quick preferences, or a direct ask.
               </p>
             </FadeIn>
 
@@ -90,7 +90,7 @@ export function Hero() {
 
             <FadeIn delay={0.3}>
               <p className="mt-3 text-sm font-semibold text-neutral-700 dark:text-neutral-300">
-                Plan the week. Ask Copilot. Get groceries ready. Stop repeating dinner decisions.
+                Ask Copilot to adjust the plan, use what is expiring, lower grocery cost, or brief the week.
               </p>
 
               {/* Mobile: vertical stack; sm+: horizontal row */}

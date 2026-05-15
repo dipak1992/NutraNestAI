@@ -40,6 +40,7 @@ const benefits = [
   { icon: '📅', title: '3-day preview, 7-day Plus plan', body: 'Start with a focused preview, then unlock the full weekly rhythm when you are ready.' },
   { icon: '💰', title: 'Budget-aware planning', body: 'Estimated costs stay visible so expensive weeks can be fixed before checkout.' },
   { icon: '🔄', title: 'Swap without starting over', body: "Don't like Monday's dinner? Swap it while keeping the rest of the plan intact." },
+  { icon: '✨', title: 'Copilot plan refinement', body: 'Ask Copilot to fix Thursday or rebalance the week, then review the change before applying it.' },
   { icon: '🛒', title: 'Grocery impact included', body: 'Each plan can become a consolidated grocery list with pantry deductions.' },
   { icon: '🧾', title: 'Export-ready shopping', body: 'Edit the list, use supported store handoff, copy it, download PDF, or shop at your local store.' },
   { icon: '🧬', title: 'Learns over time', body: 'Cooked meals, saves, repeats, and dislikes all teach future plans.' },
@@ -172,7 +173,7 @@ export default function WeeklyAutopilotPage() {
                 Full Weekly Autopilot is included in MealEase Plus
               </h2>
               <p className="text-neutral-400 text-lg mb-8">
-                Unlock seven dinners, unlimited swaps, grocery impact, budget tracking, household memory, and post-cook learning.
+                Unlock seven dinners, unlimited swaps, grocery impact, budget tracking, household memory, post-cook learning, and Copilot plan refinement for busy weeks.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link

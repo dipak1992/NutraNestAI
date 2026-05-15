@@ -8,17 +8,17 @@ const genericAi = [
   'Forgets preferences',
   'No grocery handoff',
   'No weekly system',
-  'Cannot update the plan',
+  'Cannot change the plan',
   'Generic answers',
 ]
 
 const mealease = [
   'Copilot knows the current screen',
   'Remembers preferences',
-  'Connects tonight to the week',
-  'Turns plans into grocery lists',
-  'Tracks leftovers after cooking',
-  'Keeps budget visible',
+  'Changes the plan workflow',
+  'Prepares grocery lists',
+  'Checks leftovers before waste',
+  'Adjusts budget before checkout',
   'Built for households',
 ]
 
@@ -50,9 +50,8 @@ export function ComparisonTable() {
               <span className="italic text-[#D97757]">MealEase Copilot takes action.</span>
             </h2>
             <p className="mt-4 text-lg text-neutral-600 dark:text-neutral-400">
-              Generic AI can help when you know exactly what to ask. MealEase Copilot is built
-              for the nightly reality of feeding a household: preferences, swaps,
-              weekly rhythms, grocery lists, supported store handoff, and meals people will actually eat.
+              ChatGPT gives meal ideas. MealEase Copilot changes the plan, checks leftovers,
+              adjusts budget, and prepares groceries around the household context you already saved.
             </p>
           </div>
         </FadeIn>
@@ -81,7 +80,7 @@ export function ComparisonTable() {
                   {item.body}
                 </p>
                 <p className="mt-3 text-xs font-bold uppercase tracking-wide text-[#D97757]">
-                  Dinner, groceries, budget, and Copilot actions generated from remembered context.
+                  Copilot routes plan, grocery, budget, and leftover actions from remembered context.
                 </p>
               </div>
             ))}
@@ -95,7 +94,7 @@ export function ComparisonTable() {
             />
             <ComparisonBlock
               title="MealEase"
-              description="A purpose-built dinner system with Copilot layered over household memory, meals, groceries, leftovers, and budget."
+              description="A purpose-built food system where Copilot routes actions across household memory, meals, groceries, leftovers, and budget."
               items={mealease}
               variant="highlight"
             />

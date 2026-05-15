@@ -43,8 +43,8 @@ const systemSteps = [
   {
     icon: MessageSquareText,
     label: 'Copilot',
-    title: 'Ask for changes',
-    body: 'Free gets basic meal assists. Plus can refine plans, remember patterns, and take action across the system.',
+    title: 'Brief and review',
+    body: 'Plus can brief the week, suggest changes, and send every action to a review-before-applying workflow.',
   },
   {
     icon: Refrigerator,
@@ -59,6 +59,8 @@ const memoryItems = [
   'Liked dinners become stronger future picks',
   'Budget swaps use real AI to find cheaper alternatives',
   'Copilot remembers schedule patterns like practice nights',
+  'Weekly briefings surface plan gaps, budget risk, and expiring leftovers',
+  'Copilot actions are reviewed before they change your week',
   'Every feature shares context — nothing works in isolation',
 ]
 
@@ -87,7 +89,9 @@ export function ConnectedSystem() {
             <p className="mt-5 text-lg leading-relaxed text-neutral-300">
               MealEase is strongest when every action moves the next one forward:
               tonight feeds the planner, the planner feeds the grocery list, cooking
-              feeds leftovers, and budget stays visible the whole time.
+              feeds leftovers, and budget stays visible the whole time. Plus Copilot
+              can brief the week and route plan changes, budget swaps, grocery actions,
+              and leftover fixes into review-before-applying workflows.
             </p>
           </div>
         </FadeIn>

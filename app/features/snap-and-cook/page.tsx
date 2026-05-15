@@ -40,6 +40,7 @@ const benefits = [
   { icon: '📸', title: 'AI vision scanner', body: 'Uses production vision AI to recognize visible fridge, pantry, and counter ingredients.' },
   { icon: '🛒', title: 'Skip the grocery run', body: 'Cook what you already have. Reduce waste and save money.' },
   { icon: '🍳', title: '3 recipes instantly', body: 'Three different meal options surfaced from your exact ingredients.' },
+  { icon: '✨', title: 'Copilot result refinement', body: 'Ask Copilot to adjust the result for time, budget, dietary needs, or what your household will actually eat.' },
   { icon: '✏️', title: 'Easy corrections', body: 'Tap any ingredient to edit. The AI learns from your corrections.' },
   { icon: '🥡', title: 'Pantry-aware', body: 'Scan your pantry too. We combine fridge + pantry for more options.' },
   { icon: '♻️', title: 'Reduce food waste', body: 'Use ingredients before they expire. Save $50–$100/month on wasted food.' },
@@ -181,7 +182,7 @@ export default function SnapAndCookPage() {
                 <div className="rounded-2xl bg-neutral-900 border border-[#D97757]/30 p-7">
                   <p className="text-xs font-semibold uppercase tracking-widest text-[#D97757] mb-4">Plus</p>
                   <ul className="space-y-3 text-sm text-neutral-300">
-                    {['Unlimited scans', 'Pantry + fridge combined', 'Ingredient preferences remembered', 'Pantry deductions for grocery lists', 'Estimated cost and store grouping', 'Checked shopping progress'].map((f) => (
+                    {['Unlimited scans', 'Pantry + fridge combined', 'Ask Copilot to adjust the result', 'Ingredient preferences remembered', 'Pantry deductions for grocery lists', 'Estimated cost and store grouping', 'Checked shopping progress'].map((f) => (
                       <li key={f} className="flex items-start gap-2"><span className="text-[#D97757] mt-0.5">✓</span>{f}</li>
                     ))}
                   </ul>

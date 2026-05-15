@@ -37,7 +37,11 @@ const faqCategories = [
       },
       {
         q: 'What is MealEase Copilot?',
-        a: 'Copilot is not a generic chatbot. It is a conversational layer over your household food system. Free users get basic reactive meal assists. Plus users unlock voice, memory, proactive nudges, plan refinements, budget-aware swaps, grocery actions, schedule learning, and household preference learning.',
+        a: 'Copilot is not a generic chatbot. It is the action layer over your household food system. Free users get basic reactive meal assists. Plus users unlock weekly briefings, voice, memory, proactive nudges, plan refinements, budget-aware swaps, leftover monitoring, grocery actions, schedule learning, and household preference learning.',
+      },
+      {
+        q: 'Is MealEase Copilot like ChatGPT?',
+        a: 'No. ChatGPT can brainstorm meal ideas, but MealEase Copilot is connected to MealEase. It can route actions across your plan, groceries, leftovers, budget, schedule patterns, and household memory so you are not rebuilding context from a blank prompt.',
       },
       {
         q: 'How much does Plus cost?',

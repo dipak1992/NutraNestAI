@@ -28,8 +28,8 @@ export const faqs = [
     a: 'Plus unlocks the full connected system: 7-day Planner / Weekly Autopilot, unlimited swaps and scans, pantry-aware grocery lists, supported grocery handoff tools, Budget Intelligence, Leftovers AI, household memory, and post-cook follow-ups.',
   },
   {
-    q: 'Can I just use ChatGPT for meal ideas?',
-    a: 'Yes, and it can be useful for brainstorming. MealEase is different because it is built specifically for meal planning: it remembers your household preferences, helps you swap meals quickly, creates grocery-ready plans, and supports a weekly routine instead of making you start from a blank prompt every night.',
+    q: 'Is MealEase Copilot like ChatGPT?',
+    a: 'No. ChatGPT can brainstorm meal ideas, but MealEase Copilot is connected to the MealEase food system. It can route actions across your plan, groceries, leftovers, budget, schedule patterns, and household memory so you are not rebuilding context from a blank prompt.',
   },
   {
     q: 'How is MealEase different from a recipe generator?',

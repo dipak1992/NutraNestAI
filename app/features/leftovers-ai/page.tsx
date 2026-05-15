@@ -39,7 +39,7 @@ const steps = [
 const benefits = [
   { icon: '🍱', title: 'Zero food waste', body: 'Every leftover becomes an opportunity. Stop throwing away $1,500/year in food.' },
   { icon: '🔄', title: 'Never eat the same thing twice', body: 'We transform leftovers into completely different meals — not just reheated versions.' },
-  { icon: '⏰', title: 'Expiry tracking', body: 'We track when your leftovers expire and remind you before they go bad.' },
+  { icon: '⏰', title: 'Copilot expiry monitoring', body: 'Ask Copilot what to use before it expires and turn leftovers into dinner or lunch before they go bad.' },
   { icon: '💡', title: 'Creative suggestions', body: 'Chicken becomes tacos, stir-fry, salad, or soup. We find the best use for what you have.' },
   { icon: '💰', title: 'Budget stays aware', body: 'Mark cooked can update weekly spend and show how leftovers reduce future grocery needs.' },
   { icon: '🧠', title: 'MealEase remembers', body: 'The meals you finish, repeat, or skip make future leftover ideas more personal.' },
@@ -144,7 +144,7 @@ export default function LeftoversAIPage() {
                 Leftovers AI is included in MealEase Plus
               </h2>
               <p className="text-neutral-400 text-lg mb-8">
-                Unlock Leftovers AI, Weekly Autopilot, Budget Intelligence, and more — for less than a single takeout order per month.
+                Unlock Leftovers AI, Weekly Autopilot, Budget Intelligence, and Copilot leftover monitoring so expiring food gets used first.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link

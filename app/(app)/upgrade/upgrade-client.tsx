@@ -13,12 +13,14 @@ import posthog from 'posthog-js'
 /* ─────────────────────── DATA ─────────────────────── */
 
 const BENEFITS = [
-  { icon: '🗓️', title: 'Full Planner', desc: 'Seven dinners connected to groceries and budget' },
-  { icon: '🌙', title: 'Unlimited swaps', desc: 'Change dinner until tonight fits' },
-  { icon: '🍱', title: 'Post-cook loop', desc: 'Track leftovers and suggest the next meal' },
-  { icon: '💰', title: 'Budget clarity', desc: 'Catch expensive weeks before checkout' },
-  { icon: '🛒', title: 'Premium groceries', desc: 'Pantry deductions, cost, and store format' },
-  { icon: '👨‍👩‍👧‍👦', title: 'Household memory', desc: 'Likes and dislikes remembered everywhere' },
+  { icon: '✨', title: 'Weekly Copilot briefing', desc: 'Plan gaps, budget risk, groceries, leftovers, and schedule fixes in one view' },
+  { icon: '🎙️', title: 'Voice Copilot', desc: 'Ask hands-free while cooking, shopping, or planning' },
+  { icon: '👨‍👩‍👧‍👦', title: 'Household memory', desc: 'Likes, dislikes, time limits, and food rules remembered everywhere' },
+  { icon: '🗓️', title: 'Plan refinement', desc: 'Ask Copilot to fix Thursday or rebalance the week' },
+  { icon: '💰', title: 'Budget swaps', desc: 'Find lower-cost changes before checkout hurts' },
+  { icon: '🍱', title: 'Leftover monitoring', desc: 'Use what expires soon before it becomes waste' },
+  { icon: '🛒', title: 'Grocery actions', desc: 'Prepare grocery workflows from your plan and pantry' },
+  { icon: '🏃', title: 'Schedule learning', desc: 'Plan around practice nights, late workdays, and busy evenings' },
 ]
 
 const TRUST_SIGNALS = [
@@ -128,7 +130,7 @@ export function UpgradeClient({ isAuthenticated }: Props) {
         )}
         {!feature && (
           <p className="mt-3 text-base text-neutral-600 dark:text-neutral-400 max-w-md mx-auto">
-            Stop stressing about dinner. Get personalized meals, smart planning, and budget tracking.
+            Turn Copilot into your household food operating layer: brief the week, refine plans, monitor leftovers, lower budget pressure, and keep groceries ready.
           </p>
         )}
       </section>

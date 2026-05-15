@@ -16,9 +16,9 @@ export function generateChips(ctx: ChipContext): CopilotChip[] {
   switch (ctx.screen) {
     case 'tonight':
       chips.push(
-        { id: 'swap', label: 'Swap for something quicker', icon: '⚡', action: { type: 'trigger', feature: 'tonight-swap', params: { mode: 'quick' } } },
-        { id: 'veggie', label: 'Make it vegetarian', icon: '🥬', action: { type: 'trigger', feature: 'tonight-swap', params: { mode: 'vegetarian' } } },
-        { id: 'budget', label: 'Something cheaper', icon: '💰', action: { type: 'trigger', feature: 'tonight-swap', params: { mode: 'budget' } } },
+        { id: 'swap', label: 'Make tonight quicker', icon: '⚡', action: { type: 'trigger', feature: 'tonight-swap', params: { mode: 'quick' } } },
+        { id: 'veggie', label: 'Swap to vegetarian', icon: '🥬', action: { type: 'trigger', feature: 'tonight-swap', params: { mode: 'vegetarian' } } },
+        { id: 'budget', label: 'Lower tonight’s cost', icon: '💰', action: { type: 'trigger', feature: 'tonight-swap', params: { mode: 'budget' } } },
       )
       break
     case 'cook':
@@ -31,25 +31,30 @@ export function generateChips(ctx: ChipContext): CopilotChip[] {
       break
     case 'plan':
       if (!ctx.hasWeeklyPlan) {
-        chips.push({ id: 'generate-plan', label: 'Generate my weekly plan', icon: '📅', action: { type: 'trigger', feature: 'autopilot' } })
+        chips.push(
+          { id: 'generate-plan', label: 'Plan my week', icon: '📅', action: { type: 'trigger', feature: 'autopilot' } },
+          { id: 'weekly-briefing', label: 'Brief my food week', icon: '✨', action: { type: 'trigger', feature: 'weekly-briefing' } },
+        )
       } else {
         chips.push(
-          { id: 'grocery', label: 'Build grocery list', icon: '🛒', action: { type: 'navigate', href: '/grocery-list' } },
-          { id: 'swap-day', label: 'Swap a meal this week', icon: '🔄', action: { type: 'trigger', feature: 'plan-swap' } },
+          { id: 'grocery', label: 'Review grocery list', icon: '🛒', action: { type: 'navigate', href: '/grocery-list' } },
+          { id: 'swap-day', label: 'Fix one night', icon: '🔄', action: { type: 'trigger', feature: 'plan-swap' } },
+          { id: 'weekly-briefing', label: 'Brief my week', icon: '✨', action: { type: 'trigger', feature: 'weekly-briefing' } },
         )
       }
       break
     case 'leftovers':
       chips.push(
-        { id: 'use-leftovers', label: 'Use my leftovers tonight', icon: '♻️', action: { type: 'trigger', feature: 'leftover-suggest' } },
+        { id: 'use-leftovers', label: 'Use leftovers tonight', icon: '♻️', action: { type: 'trigger', feature: 'leftover-suggest' } },
+        { id: 'leftover-risk', label: 'Check expiry risk', icon: '⏱️', action: { type: 'trigger', feature: 'weekly-briefing', params: { focus: 'leftovers' } } },
       )
       break
     case 'budget':
       chips.push(
-        { id: 'cheaper-swaps', label: 'Find cheaper swaps', icon: '💡', action: { type: 'trigger', feature: 'budget-swap' } },
+        { id: 'cheaper-swaps', label: 'Optimize this week', icon: '💡', action: { type: 'trigger', feature: 'budget-swap' } },
       )
       if (ctx.budgetRemaining !== null && ctx.budgetRemaining < 20) {
-        chips.push({ id: 'budget-meals', label: 'Budget-friendly meals only', icon: '🏷️', action: { type: 'trigger', feature: 'budget-filter' } })
+        chips.push({ id: 'budget-meals', label: 'Keep plan under budget', icon: '🏷️', action: { type: 'trigger', feature: 'budget-filter' } })
       }
       break
   }
@@ -62,7 +67,7 @@ export function generateChips(ctx: ChipContext): CopilotChip[] {
     chips.push({ id: 'plan-week', label: 'Plan this week', icon: '📅', action: { type: 'navigate', href: '/dashboard' } })
   }
   if (ctx.hasLeftovers && ctx.screen !== 'leftovers') {
-    chips.push({ id: 'leftover-nudge', label: 'Use leftovers tonight', icon: '♻️', action: { type: 'navigate', href: '/leftovers' } })
+    chips.push({ id: 'leftover-nudge', label: 'Use leftovers first', icon: '♻️', action: { type: 'navigate', href: '/leftovers' } })
   }
 
   return chips.slice(0, 5) // Max 5 chips

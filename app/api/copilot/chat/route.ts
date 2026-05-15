@@ -28,6 +28,7 @@ import {
   buildFreeLimitMessage,
   filterCopilotToolsForPlan,
   getFreeCopilotUpgradeMessage,
+  PLUS_ONLY_COPILOT_TOOL_NAMES,
 } from '@/lib/copilot/access'
 import { buildConversationMemory, shouldResetCopilotSession } from '@/lib/copilot/session'
 import { recordCopilotLearning } from '@/lib/copilot/learning'
@@ -62,9 +63,9 @@ async function executeFunctionCall(
   userId: string,
   isPlus: boolean,
 ): Promise<{ result: string; action?: { type: string; payload: unknown } }> {
-  if (!isPlus && ['add_to_grocery_list', 'generate_weekly_plan', 'refine_weekly_plan'].includes(name)) {
+  if (!isPlus && PLUS_ONLY_COPILOT_TOOL_NAMES.has(name)) {
     return {
-      result: 'That Copilot action is included in Plus. Free Copilot can answer basic meal questions; Plus unlocks plan refinements, grocery actions, budget swaps, memory, voice, and proactive nudges.',
+      result: 'That Copilot action is included in Plus. Free Copilot can answer basic meal questions; Plus turns Copilot into the household food operating layer with plan, budget, grocery, leftover, memory, voice, and proactive actions.',
       action: { type: 'navigate', payload: { href: '/upgrade?feature=copilot' } },
     }
   }
@@ -115,6 +116,26 @@ async function executeFunctionCall(
       }
     }
 
+    case 'optimize_weekly_budget': {
+      const targetBudget = typeof args.targetBudget === 'number' ? args.targetBudget : null
+      const constraint = typeof args.constraint === 'string' ? args.constraint : ''
+      const params = new URLSearchParams({
+        source: 'copilot',
+        refine: 'budget_optimize',
+      })
+      if (targetBudget !== null) params.set('budget', String(targetBudget))
+      if (constraint) params.set('constraint', constraint)
+      return {
+        result: targetBudget
+          ? `I can optimize the week toward $${targetBudget}. I’ll open budget swaps so you can review each change before applying it.`
+          : `I can look for cheaper swaps across the week and show you what changes before anything is applied.`,
+        action: {
+          type: 'navigate',
+          payload: { href: `/budget?${params.toString()}` },
+        },
+      }
+    }
+
     case 'generate_weekly_plan': {
       const preferences = (args.preferences as string) || ''
       return {
@@ -147,6 +168,52 @@ async function executeFunctionCall(
         action: {
           type: 'navigate',
           payload: { href: '/leftovers', params: { ingredients: leftovers } },
+        },
+      }
+    }
+
+    case 'monitor_leftovers': {
+      const focus = typeof args.focus === 'string' ? args.focus : 'expiring'
+      const params = new URLSearchParams({ source: 'copilot', focus })
+      return {
+        result: `I’ll check leftover risk and help you turn what should be used next into a practical meal. You’ll review the suggestion before saving anything.`,
+        action: {
+          type: 'navigate',
+          payload: { href: `/leftovers?${params.toString()}` },
+        },
+      }
+    }
+
+    case 'save_household_preference': {
+      const preference = typeof args.preference === 'string' ? args.preference.trim() : ''
+      const category = typeof args.category === 'string' ? args.category : 'household_rule'
+      if (!preference) return { result: 'Tell me the preference you want saved and I’ll remember it for Plus planning.' }
+
+      try {
+        await recordCopilotLearning(
+          await createClient(),
+          userId,
+          `${category}: ${preference}`,
+          `tool:${Date.now()}`,
+        )
+      } catch {
+        return { result: 'I could not save that preference yet, but I can still use it in this conversation.' }
+      }
+
+      return {
+        result: `Saved for future planning: ${preference}. I’ll use that when shaping dinners, swaps, and weekly plans.`,
+        action: { type: 'toast', payload: { message: 'Copilot memory saved' } },
+      }
+    }
+
+    case 'build_weekly_briefing': {
+      const focus = typeof args.focus === 'string' ? args.focus : 'full_week'
+      const params = new URLSearchParams({ source: 'copilot', briefing: focus })
+      return {
+        result: `I’ll build a weekly food briefing: plan gaps, grocery readiness, budget pressure, leftover priorities, and schedule risks in one place.`,
+        action: {
+          type: 'navigate',
+          payload: { href: `/dashboard?${params.toString()}` },
         },
       }
     }

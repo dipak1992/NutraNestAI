@@ -21,24 +21,41 @@ export const PLUS_ONLY_COPILOT_FEATURES = new Set([
   'plan-swap',
   'budget-swap',
   'budget-filter',
+  'weekly-briefing',
+  'schedule-plan',
+  'grocery-action',
+])
+
+export const PLUS_ONLY_COPILOT_TOOL_NAMES = new Set([
+  'add_to_grocery_list',
+  'generate_weekly_plan',
+  'refine_weekly_plan',
+  'optimize_weekly_budget',
+  'monitor_leftovers',
+  'save_household_preference',
+  'build_weekly_briefing',
 ])
 
 const PLUS_INTENT_PATTERNS = [
   {
     pattern: /\b(under|below|less than|save|cheap|cheaper|budget|cost|over budget|\$\d+)/i,
-    message: 'Budget-aware swaps are a Plus feature. Plus can scan your week, find expensive meals, and suggest lower-cost replacements.',
+    message: 'Plus unlocks budget optimization. Copilot can scan the whole week, explain the savings, and route you to lower-cost swaps without breaking the plan.',
   },
   {
     pattern: /\b(keep|change|swap|replace|regenerate|rebalance|fill|plan|generate|create|make).*\b(monday|tuesday|wednesday|thursday|friday|saturday|sunday|mon|tue|wed|thu|fri|sat|sun|week|weekly|nights|plan)\b/i,
-    message: 'Plan-wide refinements are included in Plus. Plus can keep the meals you like, change the rest, and update the week in one flow.',
+    message: 'Plus unlocks plan-wide Copilot actions. It can keep meals you like, change the rest, rebalance busy nights, and send you to the exact week update flow.',
   },
   {
     pattern: /\b(add|remove|update|check off).*\b(grocery|groceries|shopping list|list)\b/i,
-    message: 'Grocery list actions are included in Plus. Free Copilot can answer simple meal questions, but Plus can update your list for you.',
+    message: 'Plus unlocks grocery actions. Free Copilot can answer simple meal questions; Plus can update the grocery workflow around your plan and pantry.',
   },
   {
     pattern: /\b(remember|always|every|usually|soccer|practice|date night|schedule)\b/i,
-    message: 'Household memory is a Plus feature. Plus can remember recurring schedule patterns and use them when planning meals.',
+    message: 'Plus unlocks household memory. Copilot can remember recurring schedule patterns, dislikes, budget rules, and weeknight limits when planning.',
+  },
+  {
+    pattern: /\b(brief|briefing|recap|run my week|fix my week|handle my week|food operating system)\b/i,
+    message: 'Plus unlocks the weekly Copilot briefing: plan risks, grocery readiness, leftover priorities, budget pressure, and schedule-aware fixes in one view.',
   },
 ]
 

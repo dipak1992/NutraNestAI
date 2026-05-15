@@ -52,7 +52,7 @@ const FREE_FEATURES: FeatureItem[] = [
 
 const PLUS_FEATURES: FeatureItem[] = [
   { icon: Sparkles, text: 'Everything in Free, connected across your week', highlight: false },
-  { icon: Bot, text: 'Unlimited Copilot with voice, memory, and proactive nudges', highlight: true },
+  { icon: Bot, text: 'Copilot weekly briefings, voice, memory, and proactive nudges', highlight: true },
   { icon: CalendarDays, text: 'Smart weekly plans for all 7 dinners', highlight: true },
   { icon: ShoppingCart, text: 'Auto grocery list + faster shopping workflow', highlight: true },
   { icon: ShoppingCart, text: 'One-tap grocery exports where supported', highlight: true },
@@ -74,7 +74,7 @@ const REASSURANCE = [
 
 const PLAN_COMPARISON = [
   ['Tonight dinner help', 'Included', 'Unlimited use with household memory'],
-  ['MealEase Copilot', '3 basic meal assists/day', 'Unlimited/fair-use Copilot with voice, memory, and actions'],
+  ['MealEase Copilot', '3 basic meal assists/day', 'Food operating layer with briefings, voice, memory, and actions'],
   ['Weekly planning', '3-day preview', 'Full 7-day week plan'],
   ['Grocery list', 'Basic preview/manual items', 'Auto-built, editable, export-ready list'],
   ['Fridge and pantry scan', 'Basic demo/free usage', 'Higher limits and saved context'],
@@ -136,8 +136,8 @@ const PLUS_UNLOCKS = [
   },
   {
     icon: Bot,
-    title: 'Copilot that runs the system',
-    desc: 'Ask for swaps, budget fixes, leftover ideas, grocery actions, or schedule-aware planning without rebuilding context.',
+    title: 'Copilot that operates the system',
+    desc: 'Ask it to brief the week, fix a busy night, lower grocery cost, use leftovers first, or remember household rules without rebuilding context.',
   },
   {
     icon: ShoppingCart,
@@ -153,7 +153,7 @@ const FAQ = [
       },
       {
         q: 'What does MealEase Copilot do?',
-        a: 'Copilot is the conversational layer for your household food system. Free users get basic reactive meal assists. Plus unlocks voice, memory, proactive nudges, plan refinements, budget-aware swaps, grocery actions, and schedule learning.',
+        a: 'Copilot is the action layer for your household food system. Free users get basic reactive meal assists. Plus unlocks weekly briefings, voice, memory, proactive nudges, plan refinements, budget-aware swaps, grocery actions, leftover monitoring, and schedule learning.',
       },
   {
     q: 'What is a household profile?',
@@ -311,7 +311,7 @@ export function PricingContent() {
             Start free. Try Plus when you want the full week.
           </h1>
           <p className="mx-auto mt-3 max-w-[280px] text-base text-white/82 sm:max-w-xl sm:text-lg">
-            Free includes 3 Copilot meal assists/day. Plus unlocks voice, memory, proactive nudges, and action-taking Copilot.
+            Free includes 3 Copilot meal assists/day. Plus unlocks weekly briefings, voice, memory, proactive nudges, and action-taking Copilot.
           </p>
         </div>
       </section>

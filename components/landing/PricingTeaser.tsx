@@ -26,7 +26,7 @@ const plans = [
     period: '/month · or $79/yr (save 34%)',
     description: 'Everything you need to stop the dinner spiral.',
     features: [
-      'Unlimited Copilot with voice, memory, and nudges',
+      'Copilot weekly briefings, voice, memory, and nudges',
       'Full 7-day Planner / Weekly Autopilot',
       'Pantry-aware grocery list with estimated cost',
       'Budget-aware swaps before checkout',
@@ -58,7 +58,7 @@ export function PricingTeaser() {
               <span className="italic text-[#D97757]">No surprises.</span>
             </h2>
             <p className="mt-4 text-lg text-neutral-600 dark:text-neutral-400">
-              Start with basic Copilot. Upgrade when you want it to act across the full household food system.
+              Start with basic Copilot. Upgrade when you want it to run the plan, grocery, budget, leftover, and schedule workflows together.
             </p>
           </div>
         </FadeIn>

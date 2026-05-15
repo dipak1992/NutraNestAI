@@ -123,6 +123,26 @@ export const COPILOT_TOOLS: ChatCompletionTool[] = [
   {
     type: 'function',
     function: {
+      name: 'optimize_weekly_budget',
+      description: 'Find budget-saving opportunities across the weekly plan and route the user to the budget swap workflow',
+      parameters: {
+        type: 'object',
+        properties: {
+          targetBudget: {
+            type: 'number',
+            description: 'Weekly food budget target mentioned by the user',
+          },
+          constraint: {
+            type: 'string',
+            description: 'Budget constraint or preference, such as keep Friday, save $15, or avoid repeats',
+          },
+        },
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
       name: 'suggest_leftover_meal',
       description: 'Suggest a meal using leftover ingredients',
       parameters: {
@@ -135,6 +155,62 @@ export const COPILOT_TOOLS: ChatCompletionTool[] = [
           },
         },
         required: ['leftovers'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'monitor_leftovers',
+      description: 'Review leftover risk and route the user to leftover monitoring or reuse workflow',
+      parameters: {
+        type: 'object',
+        properties: {
+          focus: {
+            type: 'string',
+            enum: ['expiring', 'lunch', 'dinner', 'freeze'],
+            description: 'What the user wants to do with leftovers',
+          },
+        },
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'save_household_preference',
+      description: 'Save a household preference, dislike, schedule pattern, or planning rule from the conversation',
+      parameters: {
+        type: 'object',
+        properties: {
+          preference: {
+            type: 'string',
+            description: 'The household memory to save',
+          },
+          category: {
+            type: 'string',
+            enum: ['like', 'dislike', 'schedule', 'budget', 'cooking_time', 'household_rule'],
+            description: 'The type of household memory',
+          },
+        },
+        required: ['preference', 'category'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'build_weekly_briefing',
+      description: 'Create a concise weekly food operating briefing that summarizes plan, groceries, budget, leftovers, and schedule risks',
+      parameters: {
+        type: 'object',
+        properties: {
+          focus: {
+            type: 'string',
+            enum: ['sunday_plan', 'budget', 'leftovers', 'schedule', 'full_week'],
+            description: 'What the weekly briefing should emphasize',
+          },
+        },
       },
     },
   },

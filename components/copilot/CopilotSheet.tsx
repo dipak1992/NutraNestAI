@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { motion, AnimatePresence, useDragControls, type PanInfo } from 'framer-motion'
-import { X, Send, ArrowRight, Lightbulb, Check, Ban } from 'lucide-react'
+import { X, Send, ArrowRight, Lightbulb, Check, Ban, Crown, ShieldCheck } from 'lucide-react'
 import { useCopilotStore, type CopilotScreen, type CopilotChip, type CopilotMessage, type CopilotNudge } from '@/stores/copilotStore'
 import { generateChips } from '@/lib/copilot/chips'
 import { useWeeklyPlanStore } from '@/lib/planner/store'
@@ -47,8 +47,63 @@ function triggerToMessage(chip: CopilotChip): string {
       return 'Find cheaper swaps for my plan.'
     case 'budget-filter':
       return 'Show me budget-friendly meals only.'
+    case 'weekly-briefing':
+      return `Brief my food week${params?.focus ? ` with focus on ${String(params.focus)}` : ''}.`
+    case 'schedule-plan':
+      return 'Plan around my household schedule.'
+    case 'grocery-action':
+      return 'Update the grocery workflow for my plan.'
     default:
       return chip.label
+  }
+}
+
+function actionCopy(href: string) {
+  if (href.includes('/upgrade')) {
+    return {
+      eyebrow: 'Plus unlock',
+      title: 'Upgrade to use this Copilot action',
+      body: 'Free Copilot gives basic meal assists. Plus lets Copilot operate across plans, groceries, budget, leftovers, memory, nudges, and voice.',
+      cta: 'See Plus',
+    }
+  }
+  if (href.includes('/budget')) {
+    return {
+      eyebrow: 'Review before applying',
+      title: 'Open budget swaps',
+      body: 'Copilot will show lower-cost options and the reason for each swap before you change the week.',
+      cta: 'Review swaps',
+    }
+  }
+  if (href.includes('/leftovers')) {
+    return {
+      eyebrow: 'Use-first workflow',
+      title: 'Open leftovers',
+      body: 'Copilot will help prioritize what expires soon and turn it into dinner or lunch before anything is wasted.',
+      cta: 'Check leftovers',
+    }
+  }
+  if (href.includes('/grocery')) {
+    return {
+      eyebrow: 'Shopping workflow',
+      title: 'Open grocery list',
+      body: 'Review what the plan needs, what pantry already covers, and what should go on the shopping list.',
+      cta: 'Review list',
+    }
+  }
+  if (href.includes('/dashboard')) {
+    return {
+      eyebrow: 'Plan workflow',
+      title: 'Open weekly plan',
+      body: 'Copilot will take you to the planner so you can review and apply changes instead of accepting a black-box edit.',
+      cta: 'Review plan',
+    }
+  }
+  return {
+    eyebrow: 'Next step',
+    title: 'Open workflow',
+    body: 'Copilot will take you to the right MealEase screen so you stay in control.',
+    cta: 'Continue',
   }
 }
 
@@ -74,15 +129,32 @@ function MessageBubble({
       >
         <p className="whitespace-pre-wrap">{message.content}</p>
 
-        {/* Navigate action button */}
         {!isUser && message.action?.type === 'navigate' && (
-          <button
-            onClick={() => onActionClick((message.action as { type: 'navigate'; href: string }).href)}
-            className="mt-2 flex items-center gap-1 rounded-xl bg-white px-3 py-1.5 text-xs font-medium text-[#D97757] shadow-sm transition-all hover:shadow-md active:scale-[0.97]"
-          >
-            <span>Take me there</span>
-            <ArrowRight size={12} />
-          </button>
+          (() => {
+            const href = (message.action as { type: 'navigate'; href: string }).href
+            const copy = actionCopy(href)
+            return (
+              <div className="mt-3 rounded-2xl border border-white/80 bg-white p-3 text-neutral-800 shadow-sm">
+                <div className="flex items-start gap-2">
+                  <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden />
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#D97757]">
+                      {copy.eyebrow}
+                    </p>
+                    <p className="mt-1 text-xs font-bold text-neutral-900">{copy.title}</p>
+                    <p className="mt-1 text-xs leading-5 text-neutral-600">{copy.body}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => onActionClick(href)}
+                  className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#D97757] px-3 py-2 text-xs font-semibold text-white transition-all hover:bg-[#c96847] active:scale-[0.97]"
+                >
+                  <span>{copy.cta}</span>
+                  <ArrowRight size={12} />
+                </button>
+              </div>
+            )
+          })()
         )}
       </div>
     </div>
@@ -145,6 +217,29 @@ function NudgeCard({
           </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+function ModeStrip({ isPlus }: { isPlus: boolean }) {
+  const modes = [
+    { label: 'Plan', text: 'fix the week' },
+    { label: 'Grocery', text: 'ready the list' },
+    { label: 'Leftovers', text: 'use food first' },
+    { label: 'Budget', text: 'lower cost' },
+  ]
+
+  return (
+    <div className="mb-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+      {modes.map((mode) => (
+        <div key={mode.label} className="rounded-2xl border border-orange-100 bg-white px-3 py-2 shadow-sm">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs font-bold text-neutral-900">{mode.label}</p>
+            {isPlus && <Crown className="h-3.5 w-3.5 text-[#D97757]" aria-hidden />}
+          </div>
+          <p className="mt-0.5 text-[11px] leading-4 text-neutral-500">{mode.text}</p>
+        </div>
+      ))}
     </div>
   )
 }
@@ -248,7 +343,7 @@ export function CopilotSheet({ isPlus }: { isPlus: boolean }) {
       if (!isPlus && isPlusOnlyCopilotChip(chip)) {
         addMessage({
           role: 'assistant',
-          content: getFreeCopilotUpgradeMessage(triggerToMessage(chip)) ?? 'That Copilot action is included in Plus. Free Copilot can help with basic dinner and leftover questions; Plus unlocks plan refinements, budget swaps, grocery actions, voice, memory, and proactive nudges.',
+          content: getFreeCopilotUpgradeMessage(triggerToMessage(chip)) ?? 'That Copilot action is included in Plus. Free Copilot handles basic meal assists; Plus lets Copilot operate across the whole food week with memory, nudges, plan refinements, budget swaps, grocery actions, leftovers, and voice.',
           action: { type: 'navigate', href: '/upgrade?feature=copilot' },
         })
         return
@@ -310,7 +405,7 @@ export function CopilotSheet({ isPlus }: { isPlus: boolean }) {
     if (!isPlus) {
       addMessage({
         role: 'assistant',
-        content: 'Voice Copilot is included in Plus for hands-busy cooking. Free Copilot still includes basic typed meal assists.',
+        content: 'Voice Copilot is included in Plus for hands-busy cooking and quick plan changes. Free Copilot still includes basic typed meal assists.',
         action: { type: 'navigate', href: '/upgrade?feature=copilot' },
       })
       return
@@ -371,14 +466,18 @@ export function CopilotSheet({ isPlus }: { isPlus: boolean }) {
             {/* Header (expanded only) */}
             {state === 'expanded' && (
               <div className="shrink-0 px-5 pb-3 flex items-center justify-between">
-                <p className="text-base font-semibold text-neutral-800">
-                  {getGreeting(hour)}
-                </p>
-                {!isPlus && (
-                  <span className="rounded-full bg-white px-2.5 py-1 text-xs font-medium text-neutral-500 shadow-sm">
-                    {FREE_COPILOT_DAILY_ASSISTS}/day free
-                  </span>
-                )}
+                <div>
+                  <p className="text-base font-semibold text-neutral-800">
+                    MealEase Copilot
+                  </p>
+                  <p className="text-xs text-neutral-500">
+                    {isPlus ? 'Food operating layer active' : `${getGreeting(hour)} Basic meal assists`}
+                  </p>
+                </div>
+                <span className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 text-xs font-medium text-neutral-500 shadow-sm">
+                  {isPlus ? <Crown className="h-3 w-3 text-[#D97757]" aria-hidden /> : null}
+                  {isPlus ? 'Plus' : `${FREE_COPILOT_DAILY_ASSISTS}/day free`}
+                </span>
                 <button
                   onClick={close}
                   className="rounded-full p-1.5 text-neutral-500 transition-colors hover:bg-neutral-100 active:bg-neutral-200"
@@ -398,6 +497,7 @@ export function CopilotSheet({ isPlus }: { isPlus: boolean }) {
                   onDismiss={dismissNudge}
                 />
               )}
+              {state === 'expanded' && <ModeStrip isPlus={isPlus} />}
               <div
                 className={
                   state === 'expanded'
@@ -413,6 +513,11 @@ export function CopilotSheet({ isPlus }: { isPlus: boolean }) {
                   >
                     {chip.icon && <span className="text-base">{chip.icon}</span>}
                     <span>{chip.label}</span>
+                    {!isPlus && isPlusOnlyCopilotChip(chip) && (
+                      <span className="rounded-full bg-orange-50 px-1.5 py-0.5 text-[10px] font-bold text-[#D97757]">
+                        Plus
+                      </span>
+                    )}
                   </button>
                 ))}
               </div>
@@ -424,9 +529,14 @@ export function CopilotSheet({ isPlus }: { isPlus: boolean }) {
                 {/* Message list */}
                 <div className="min-h-0 flex-1 overflow-y-auto px-5 py-1">
                   {!hasMessages && !isStreaming && (
-                    <p className="py-4 text-center text-sm text-neutral-400">
-                      Ask MealEase anything about dinner, planning, or groceries 🍽️
-                    </p>
+                    <div className="py-4 text-center">
+                      <p className="text-sm font-semibold text-neutral-700">
+                        Tell Copilot what to change, use, save, or plan.
+                      </p>
+                      <p className="mx-auto mt-1 max-w-sm text-xs leading-5 text-neutral-500">
+                        Try “fix Thursday,” “use chicken before it expires,” “keep this under $90,” or “brief my week.”
+                      </p>
+                    </div>
                   )}
 
                   {messages.map((msg) => (
@@ -462,7 +572,7 @@ export function CopilotSheet({ isPlus }: { isPlus: boolean }) {
                         value={inputText}
                         onChange={(e) => setInputText(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        placeholder="Ask MealEase…"
+                        placeholder={isPlus ? 'Ask Copilot to plan, swap, save, or brief…' : 'Ask for a basic meal assist…'}
                         rows={1}
                         disabled={isStreaming}
                         className="w-full resize-none rounded-2xl border border-neutral-200 bg-white px-4 py-2.5 pr-12 text-sm text-neutral-800 placeholder-neutral-400 outline-none transition-colors focus:border-[#D97757]/40 focus:ring-2 focus:ring-[#D97757]/10 disabled:opacity-50"

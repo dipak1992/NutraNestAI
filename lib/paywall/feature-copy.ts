@@ -74,9 +74,9 @@ const FEATURE_COPY: Record<string, FeatureCopy> = {
   },
   copilot: {
     eyebrow: 'Household food system',
-    title: 'Turn Copilot into your food operating system',
-    description: 'Plus unlocks voice, household memory, proactive nudges, plan refinements, budget swaps, and grocery actions.',
-    bullets: ['Unlimited Copilot assists', 'Voice, memory, and proactive nudges', 'Plan, budget, grocery, and leftover actions'],
+    title: 'Let Copilot operate the whole food week',
+    description: 'Plus turns Copilot from basic meal help into the action layer for planning, groceries, leftovers, budget, schedule, and household memory.',
+    bullets: ['Weekly food briefings and proactive nudges', 'Voice plus household memory', 'Plan, budget, grocery, leftover, and schedule actions'],
   },
 }
 

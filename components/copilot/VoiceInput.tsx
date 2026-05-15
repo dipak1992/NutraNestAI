@@ -6,6 +6,7 @@ import { Mic, MicOff } from 'lucide-react'
 interface VoiceInputProps {
   onTranscript: (text: string) => void
   disabled?: boolean
+  locked?: boolean
 }
 
 // Web Speech API type declarations (not in all TS lib versions)
@@ -42,7 +43,7 @@ declare global {
  * On speech end, sends the transcript as a message.
  * Gracefully hidden if not supported.
  */
-export function VoiceInput({ onTranscript, disabled = false }: VoiceInputProps) {
+export function VoiceInput({ onTranscript, disabled = false, locked = false }: VoiceInputProps) {
   const [isListening, setIsListening] = useState(false)
   const [isSupported, setIsSupported] = useState(false)
   const recognitionRef = useRef<ISpeechRecognition | null>(null)
@@ -87,6 +88,10 @@ export function VoiceInput({ onTranscript, disabled = false }: VoiceInputProps) 
   }, [])
 
   const toggleListening = useCallback(() => {
+    if (locked) {
+      onTranscript('')
+      return
+    }
     if (!recognitionRef.current) return
 
     if (isListening) {
@@ -96,7 +101,7 @@ export function VoiceInput({ onTranscript, disabled = false }: VoiceInputProps) 
       recognitionRef.current.start()
       setIsListening(true)
     }
-  }, [isListening])
+  }, [isListening, locked, onTranscript])
 
   // Don't render if not supported
   if (!isSupported) return null
@@ -105,13 +110,16 @@ export function VoiceInput({ onTranscript, disabled = false }: VoiceInputProps) 
     <button
       type="button"
       onClick={toggleListening}
-      disabled={disabled}
+      disabled={disabled && !locked}
       className={`relative flex h-9 w-9 items-center justify-center rounded-full transition-all ${
+        locked
+          ? 'bg-amber-100 text-amber-700'
+          :
         isListening
           ? 'bg-red-100 text-red-600 shadow-md'
           : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200'
       } ${disabled ? 'cursor-not-allowed opacity-50' : ''}`}
-      aria-label={isListening ? 'Stop recording' : 'Start voice input'}
+      aria-label={locked ? 'Voice Copilot requires Plus' : isListening ? 'Stop recording' : 'Start voice input'}
     >
       {isListening ? (
         <>

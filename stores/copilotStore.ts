@@ -222,12 +222,20 @@ export const useCopilotStore = create<CopilotStore>()(
       })
 
       if (!response.ok) {
-        const err = await response.json().catch(() => ({ error: 'Request failed' }))
+        const err = await response.json().catch(() => ({ error: 'Request failed' })) as {
+          error?: string
+          action?: { type: string; payload?: unknown }
+        }
+        let chipAction: CopilotChipAction | undefined
+        if (err.action?.type === 'navigate') {
+          const payload = err.action.payload as { href?: string } | undefined
+          chipAction = { type: 'navigate', href: payload?.href ?? '/upgrade?feature=copilot' }
+        }
         // Update assistant message with error
         set((s) => ({
           messages: s.messages.map((m) =>
             m.id === assistantId
-              ? { ...m, content: err.error || 'Something went wrong. Please try again.' }
+              ? { ...m, content: err.error || 'Something went wrong. Please try again.', action: chipAction }
               : m,
           ),
         }))

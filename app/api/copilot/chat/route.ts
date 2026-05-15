@@ -4,7 +4,9 @@
  * POST /api/copilot/chat
  * Body: { messages: Array<{role, content}>, screen: string }
  *
- * - Requires auth (Plus users only)
+ * - Requires auth
+ * - Free users get 3 basic reactive meal assists/day
+ * - Plus users get voice, memory, nudges, plan refinements, budget swaps, and actions
  * - Builds context from buildUserContext() and getCrossFeatureSignals()
  * - Sends to gpt-4o-mini with function calling tools
  * - Streams the response back
@@ -16,10 +18,17 @@ import OpenAI from 'openai'
 import { createClient } from '@/lib/supabase/server'
 import { getPaywallStatus } from '@/lib/paywall/server'
 import { rateLimit } from '@/lib/rate-limit'
+import { enforceFeatureQuota, incrementFeatureQuota } from '@/lib/usage/feature-quota'
 import { buildUserContext, formatCompactContext } from '@/lib/ai/context'
 import { getCrossFeatureSignals } from '@/lib/ai/cross-feature'
 import { buildCopilotSystemPrompt } from '@/lib/copilot/system-prompt'
 import { COPILOT_TOOLS, SCREEN_ROUTES } from '@/lib/copilot/tools'
+import {
+  FREE_COPILOT_QUOTA,
+  buildFreeLimitMessage,
+  filterCopilotToolsForPlan,
+  getFreeCopilotUpgradeMessage,
+} from '@/lib/copilot/access'
 import { buildConversationMemory, shouldResetCopilotSession } from '@/lib/copilot/session'
 import { recordCopilotLearning } from '@/lib/copilot/learning'
 import { buildPlanRefinement, type PlanRefinementRequest } from '@/lib/copilot/plan-refinement'
@@ -51,7 +60,15 @@ async function executeFunctionCall(
   name: string,
   args: Record<string, unknown>,
   userId: string,
+  isPlus: boolean,
 ): Promise<{ result: string; action?: { type: string; payload: unknown } }> {
+  if (!isPlus && ['add_to_grocery_list', 'generate_weekly_plan', 'refine_weekly_plan'].includes(name)) {
+    return {
+      result: 'That Copilot action is included in Plus. Free Copilot can answer basic meal questions; Plus unlocks plan refinements, grocery actions, budget swaps, memory, voice, and proactive nudges.',
+      action: { type: 'navigate', payload: { href: '/upgrade?feature=copilot' } },
+    }
+  }
+
   switch (name) {
     case 'suggest_tonight_dinner': {
       const mode = (args.mode as string) || 'quick'
@@ -159,19 +176,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // 2. Paywall check (Plus only)
+    // 2. Paywall + quota
     const paywall = await getPaywallStatus()
-    if (!paywall.isPro) {
-      return NextResponse.json(
-        { error: 'Copilot requires MealEase Plus' },
-        { status: 403 },
-      )
-    }
+    const isPlus = paywall.isPro
 
-    // 3. Rate limit (20 messages/hour)
+    // 3. Rate limit
     const rl = await rateLimit({
       key: `copilot:${user.id}`,
-      limit: 20,
+      limit: isPlus ? 100 : 20,
       windowMs: 60 * 60 * 1000, // 1 hour
     })
     if (!rl.success) {
@@ -192,17 +204,45 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    const latestRawUserMessage = [...messages].reverse().find((m) => m.role === 'user')?.content ?? ''
+    if (!isPlus) {
+      const upgradeMessage = getFreeCopilotUpgradeMessage(latestRawUserMessage)
+      if (upgradeMessage) {
+        return NextResponse.json(
+          {
+            error: upgradeMessage,
+            action: { type: 'navigate', payload: { href: '/upgrade?feature=copilot' } },
+          },
+          { status: 402 },
+        )
+      }
+
+      const quotaResponse = await enforceFeatureQuota(supabase, user.id, FREE_COPILOT_QUOTA)
+      if (quotaResponse) {
+        return NextResponse.json(
+          {
+            error: buildFreeLimitMessage(),
+            action: { type: 'navigate', payload: { href: '/upgrade?feature=copilot' } },
+          },
+          { status: 429 },
+        )
+      }
+      await incrementFeatureQuota(supabase, FREE_COPILOT_QUOTA)
+    }
+
     // Limit conversation history to last 10 messages for token efficiency
-    const recentMessages = shouldResetCopilotSession(session) ? messages.slice(-4) : messages.slice(-10)
+    const recentMessages = !isPlus
+      ? messages.slice(-4).filter((m) => m.role === 'user')
+      : shouldResetCopilotSession(session) ? messages.slice(-4) : messages.slice(-10)
     const latestUserMessage = [...recentMessages].reverse().find((m) => m.role === 'user')?.content
 
     // 5. Build context
     const [userContext, crossSignals] = await Promise.all([
-      buildUserContext(supabase, user.id, { includeLearning: true }),
+      buildUserContext(supabase, user.id, { includeLearning: isPlus }),
       getCrossFeatureSignals(supabase, user.id),
     ])
 
-    if (latestUserMessage) {
+    if (isPlus && latestUserMessage) {
       recordCopilotLearning(supabase, user.id, latestUserMessage, session?.id).catch((error) => {
         logger.warn('[copilot/chat] Learning capture skipped', {
           error: error instanceof Error ? error.message : String(error),
@@ -211,12 +251,14 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    const { data: scheduleRows } = await supabase
-      .from('copilot_schedule_constraints')
-      .select('day_of_week, constraint_label')
-      .eq('user_id', user.id)
-      .order('updated_at', { ascending: false })
-      .limit(8)
+    const { data: scheduleRows } = isPlus
+      ? await supabase
+          .from('copilot_schedule_constraints')
+          .select('day_of_week, constraint_label')
+          .eq('user_id', user.id)
+          .order('updated_at', { ascending: false })
+          .limit(8)
+      : { data: [] }
 
     const scheduleConstraints = (scheduleRows ?? []).map((row) => ({
       dayOfWeek: String(row.day_of_week),
@@ -236,7 +278,7 @@ export async function POST(req: NextRequest) {
       budgetRemaining: userContext.budget.remainingBudget,
       currentScreen: screen,
       timeOfDay,
-      conversationMemory: buildConversationMemory(session, recentMessages),
+      conversationMemory: isPlus ? buildConversationMemory(session, recentMessages) : undefined,
       scheduleConstraints,
     })
 
@@ -266,7 +308,7 @@ export async function POST(req: NextRequest) {
       max_tokens: 500,
       temperature: 0.7,
       messages: openaiMessages,
-      tools: COPILOT_TOOLS,
+      tools: filterCopilotToolsForPlan(COPILOT_TOOLS, isPlus),
       stream: true,
     })
 
@@ -315,6 +357,7 @@ export async function POST(req: NextRequest) {
                 functionCallName,
                 parsedArgs,
                 user.id,
+                isPlus,
               )
 
               // Send function result as text

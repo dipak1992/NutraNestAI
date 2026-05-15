@@ -72,6 +72,12 @@ const FEATURE_COPY: Record<string, FeatureCopy> = {
     description: 'Plus turns meal history into patterns: cuisines, cook times, household fit, and weekly progress.',
     bullets: ['Weekly insights', 'Household trends', 'Progress recaps'],
   },
+  copilot: {
+    eyebrow: 'Household food system',
+    title: 'Turn Copilot into your food operating system',
+    description: 'Plus unlocks voice, household memory, proactive nudges, plan refinements, budget swaps, and grocery actions.',
+    bullets: ['Unlimited Copilot assists', 'Voice, memory, and proactive nudges', 'Plan, budget, grocery, and leftover actions'],
+  },
 }
 
 export function getUpgradeFeatureCopy(feature?: string | null): FeatureCopy {

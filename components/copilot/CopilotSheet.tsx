@@ -9,6 +9,7 @@ import { generateChips } from '@/lib/copilot/chips'
 import { useWeeklyPlanStore } from '@/lib/planner/store'
 import { useLeftoversStore } from '@/stores/leftoversStore'
 import { useBudgetStore } from '@/stores/budgetStore'
+import { FREE_COPILOT_DAILY_ASSISTS, getFreeCopilotUpgradeMessage, isPlusOnlyCopilotChip } from '@/lib/copilot/access'
 import { VoiceInput } from './VoiceInput'
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
@@ -150,7 +151,7 @@ function NudgeCard({
 
 // ── Component ────────────────────────────────────────────────────────────────
 
-export function CopilotSheet() {
+export function CopilotSheet({ isPlus }: { isPlus: boolean }) {
   const router = useRouter()
   const pathname = usePathname()
   const {
@@ -163,6 +164,7 @@ export function CopilotSheet() {
     messages,
     isStreaming,
     sendMessage,
+    addMessage,
     activeNudge,
     setActiveNudge,
     acceptNudge,
@@ -205,6 +207,10 @@ export function CopilotSheet() {
   }, [currentScreen, hasPantryItems, hasWeeklyPlan, hasLeftovers, budgetRemaining, setScreen, setChips])
 
   useEffect(() => {
+    if (!isPlus) {
+      setActiveNudge(null)
+      return
+    }
     let ignore = false
     fetch(`/api/copilot/nudges?screen=${encodeURIComponent(currentScreen)}`)
       .then((res) => res.ok ? res.json() : { nudges: [] })
@@ -216,7 +222,7 @@ export function CopilotSheet() {
     return () => {
       ignore = true
     }
-  }, [currentScreen, setActiveNudge])
+  }, [currentScreen, isPlus, setActiveNudge])
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
@@ -239,13 +245,21 @@ export function CopilotSheet() {
       close()
     } else if (chip.action.type === 'trigger') {
       open()
+      if (!isPlus && isPlusOnlyCopilotChip(chip)) {
+        addMessage({
+          role: 'assistant',
+          content: getFreeCopilotUpgradeMessage(triggerToMessage(chip)) ?? 'That Copilot action is included in Plus. Free Copilot can help with basic dinner and leftover questions; Plus unlocks plan refinements, budget swaps, grocery actions, voice, memory, and proactive nudges.',
+          action: { type: 'navigate', href: '/upgrade?feature=copilot' },
+        })
+        return
+      }
       sendMessage(triggerToMessage(chip), currentScreen)
     } else if (chip.action.type === 'message') {
       // Phase 2: send as a message
       open()
       sendMessage(chip.action.text, currentScreen)
     }
-  }, [router, open, close, sendMessage, currentScreen])
+  }, [router, open, close, isPlus, addMessage, sendMessage, currentScreen])
 
   const handleNudgeAccept = useCallback(async (nudge: CopilotNudge) => {
     await acceptNudge()
@@ -269,9 +283,19 @@ export function CopilotSheet() {
   const handleSend = useCallback(() => {
     const text = inputText.trim()
     if (!text || isStreaming) return
+    const freeUpgradeMessage = !isPlus ? getFreeCopilotUpgradeMessage(text) : null
     setInputText('')
+    if (freeUpgradeMessage) {
+      addMessage({ role: 'user', content: text })
+      addMessage({
+        role: 'assistant',
+        content: freeUpgradeMessage,
+        action: { type: 'navigate', href: '/upgrade?feature=copilot' },
+      })
+      return
+    }
     sendMessage(text, currentScreen)
-  }, [inputText, isStreaming, sendMessage, currentScreen])
+  }, [inputText, isStreaming, isPlus, addMessage, sendMessage, currentScreen])
 
   // Handle keyboard submit
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -283,8 +307,16 @@ export function CopilotSheet() {
 
   // Handle voice transcript
   const handleVoiceTranscript = useCallback((text: string) => {
+    if (!isPlus) {
+      addMessage({
+        role: 'assistant',
+        content: 'Voice Copilot is included in Plus for hands-busy cooking. Free Copilot still includes basic typed meal assists.',
+        action: { type: 'navigate', href: '/upgrade?feature=copilot' },
+      })
+      return
+    }
     sendMessage(text, currentScreen)
-  }, [sendMessage, currentScreen])
+  }, [isPlus, addMessage, sendMessage, currentScreen])
 
   // Handle drag end
   const handleDragEnd = useCallback((_: unknown, info: PanInfo) => {
@@ -342,6 +374,11 @@ export function CopilotSheet() {
                 <p className="text-base font-semibold text-neutral-800">
                   {getGreeting(hour)}
                 </p>
+                {!isPlus && (
+                  <span className="rounded-full bg-white px-2.5 py-1 text-xs font-medium text-neutral-500 shadow-sm">
+                    {FREE_COPILOT_DAILY_ASSISTS}/day free
+                  </span>
+                )}
                 <button
                   onClick={close}
                   className="rounded-full p-1.5 text-neutral-500 transition-colors hover:bg-neutral-100 active:bg-neutral-200"
@@ -414,7 +451,8 @@ export function CopilotSheet() {
                     {/* Voice input */}
                     <VoiceInput
                       onTranscript={handleVoiceTranscript}
-                      disabled={isStreaming}
+                      disabled={isStreaming || !isPlus}
+                      locked={!isPlus}
                     />
 
                     {/* Text input */}

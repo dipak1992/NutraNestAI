@@ -20,6 +20,9 @@ import { buildUserContext, formatCompactContext } from '@/lib/ai/context'
 import { getCrossFeatureSignals } from '@/lib/ai/cross-feature'
 import { buildCopilotSystemPrompt } from '@/lib/copilot/system-prompt'
 import { COPILOT_TOOLS, SCREEN_ROUTES } from '@/lib/copilot/tools'
+import { buildConversationMemory, shouldResetCopilotSession } from '@/lib/copilot/session'
+import { recordCopilotLearning } from '@/lib/copilot/learning'
+import { buildPlanRefinement, type PlanRefinementRequest } from '@/lib/copilot/plan-refinement'
 import { getModelForTask } from '@/lib/ai/model-router'
 import logger from '@/lib/logger'
 
@@ -33,6 +36,13 @@ interface ChatMessage {
 interface ChatRequestBody {
   messages: ChatMessage[]
   screen: string
+  session?: {
+    id?: string
+    turnCount?: number
+    summary?: string
+    intent?: string
+    updatedAt?: number
+  }
 }
 
 // ── Function Call Executors ────────────────────────────────────────────────────
@@ -95,6 +105,17 @@ async function executeFunctionCall(
         action: {
           type: 'navigate',
           payload: { href: '/dashboard', params: { autoGenerate: true, preferences } },
+        },
+      }
+    }
+
+    case 'refine_weekly_plan': {
+      const refinement = buildPlanRefinement(args as unknown as PlanRefinementRequest)
+      return {
+        result: refinement.message,
+        action: {
+          type: 'navigate',
+          payload: { href: refinement.href, params: refinement.params },
         },
       }
     }
@@ -162,7 +183,7 @@ export async function POST(req: NextRequest) {
 
     // 4. Parse body
     const body = (await req.json()) as ChatRequestBody
-    const { messages, screen } = body
+    const { messages, screen, session } = body
 
     if (!messages?.length || !screen) {
       return NextResponse.json(
@@ -172,13 +193,35 @@ export async function POST(req: NextRequest) {
     }
 
     // Limit conversation history to last 10 messages for token efficiency
-    const recentMessages = messages.slice(-10)
+    const recentMessages = shouldResetCopilotSession(session) ? messages.slice(-4) : messages.slice(-10)
+    const latestUserMessage = [...recentMessages].reverse().find((m) => m.role === 'user')?.content
 
     // 5. Build context
     const [userContext, crossSignals] = await Promise.all([
       buildUserContext(supabase, user.id, { includeLearning: true }),
       getCrossFeatureSignals(supabase, user.id),
     ])
+
+    if (latestUserMessage) {
+      recordCopilotLearning(supabase, user.id, latestUserMessage, session?.id).catch((error) => {
+        logger.warn('[copilot/chat] Learning capture skipped', {
+          error: error instanceof Error ? error.message : String(error),
+          userId: user.id,
+        })
+      })
+    }
+
+    const { data: scheduleRows } = await supabase
+      .from('copilot_schedule_constraints')
+      .select('day_of_week, constraint')
+      .eq('user_id', user.id)
+      .order('updated_at', { ascending: false })
+      .limit(8)
+
+    const scheduleConstraints = (scheduleRows ?? []).map((row) => ({
+      dayOfWeek: String(row.day_of_week),
+      constraint: String(row.constraint),
+    }))
 
     // Determine time of day
     const hour = new Date().getHours()
@@ -193,6 +236,8 @@ export async function POST(req: NextRequest) {
       budgetRemaining: userContext.budget.remainingBudget,
       currentScreen: screen,
       timeOfDay,
+      conversationMemory: buildConversationMemory(session, recentMessages),
+      scheduleConstraints,
     })
 
     // Append compact context + cross-feature signals

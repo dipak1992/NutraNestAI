@@ -1,9 +1,10 @@
 'use client'
 import { create } from 'zustand'
-import { useRouter } from 'next/navigation'
+import { persist, createJSONStorage, type StateStorage } from 'zustand/middleware'
 
 export type CopilotState = 'collapsed' | 'peek' | 'expanded'
 export type CopilotScreen = 'tonight' | 'cook' | 'plan' | 'leftovers' | 'budget' | 'grocery' | 'home'
+export type CopilotNudgeStatus = 'active' | 'accepted' | 'dismissed'
 
 export interface CopilotChip {
   id: string
@@ -27,6 +28,28 @@ export interface CopilotMessage {
   action?: CopilotChipAction // If the response triggers an action
 }
 
+export interface CopilotNudge {
+  id: string
+  type: string
+  title: string
+  body: string
+  ctaLabel: string
+  priority: number
+  action: CopilotChipAction
+  expiresAt?: string | null
+  variant?: string
+  status?: CopilotNudgeStatus
+}
+
+export interface CopilotSession {
+  id: string
+  startedAt: number
+  updatedAt: number
+  turnCount: number
+  summary: string
+  intent?: string
+}
+
 // ── Store interface ───────────────────────────────────────────────────────────
 
 interface CopilotStore {
@@ -34,20 +57,27 @@ interface CopilotStore {
   state: CopilotState
   screen: CopilotScreen
   chips: CopilotChip[]
+  activeNudge: CopilotNudge | null
   // Phase 2
   messages: CopilotMessage[]
   isStreaming: boolean
+  // Phase 4
+  session: CopilotSession
   // Actions — Phase 1
   open: () => void
   peek: () => void
   close: () => void
   setScreen: (screen: CopilotScreen) => void
   setChips: (chips: CopilotChip[]) => void
+  setActiveNudge: (nudge: CopilotNudge | null) => void
+  acceptNudge: () => Promise<void>
+  dismissNudge: () => Promise<void>
   // Actions — Phase 2
   addMessage: (msg: Omit<CopilotMessage, 'id' | 'timestamp'>) => void
   setStreaming: (v: boolean) => void
   clearMessages: () => void
   sendMessage: (text: string, screen: string) => Promise<void>
+  startNewSession: () => void
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -56,40 +86,106 @@ function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
 }
 
+function makeSession(): CopilotSession {
+  const now = Date.now()
+  return {
+    id: `copilot-${now}-${Math.random().toString(36).slice(2, 8)}`,
+    startedAt: now,
+    updatedAt: now,
+    turnCount: 0,
+    summary: '',
+  }
+}
+
+const noopStorage: StateStorage = {
+  getItem: () => null,
+  setItem: () => undefined,
+  removeItem: () => undefined,
+}
+
+function inferIntent(text: string): string | undefined {
+  const lower = text.toLowerCase()
+  if (/(swap|replace|change).*(monday|tuesday|wednesday|thursday|friday|saturday|sunday|mon|tue|wed|thu|fri|sat|sun)/.test(lower)) return 'plan_refinement'
+  if (/(grocery|shopping|add .*list|buy)/.test(lower)) return 'grocery'
+  if (/(leftover|expire|freez)/.test(lower)) return 'leftovers'
+  if (/(budget|cheap|cost|under \$|save)/.test(lower)) return 'budget'
+  if (/(dinner|tonight|cook|meal)/.test(lower)) return 'tonight'
+  return undefined
+}
+
+function compactSummary(messages: CopilotMessage[], currentSummary: string): string {
+  const recent = messages.slice(-6)
+  const facts = recent
+    .filter((m) => m.content.trim())
+    .map((m) => `${m.role}: ${m.content.trim().replace(/\s+/g, ' ')}`)
+    .join(' | ')
+
+  const combined = [currentSummary, facts].filter(Boolean).join(' | ')
+  return combined.length <= 900 ? combined : combined.slice(combined.length - 900)
+}
+
+async function trackNudge(nudge: CopilotNudge, event: 'accepted' | 'dismissed') {
+  await fetch('/api/copilot/nudges', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nudgeId: nudge.id, event }),
+  }).catch(() => undefined)
+}
+
 // ── Store ─────────────────────────────────────────────────────────────────────
 
-export const useCopilotStore = create<CopilotStore>((set, get) => ({
-  // Phase 1 state
-  state: 'collapsed',
-  screen: 'home',
-  chips: [],
-  // Phase 2 state
-  messages: [],
-  isStreaming: false,
+export const useCopilotStore = create<CopilotStore>()(
+  persist(
+    (set, get) => ({
+      // Phase 1 state
+      state: 'collapsed',
+      screen: 'home',
+      chips: [],
+      activeNudge: null,
+      // Phase 2 state
+      messages: [],
+      isStreaming: false,
+      // Phase 4 state
+      session: makeSession(),
 
-  // Phase 1 actions
-  open: () => set({ state: 'expanded' }),
-  peek: () => set({ state: 'peek' }),
-  close: () => set({ state: 'collapsed' }),
-  setScreen: (screen) => set({ screen }),
-  setChips: (chips) => set({ chips }),
+      // Phase 1 actions
+      open: () => set({ state: 'expanded' }),
+      peek: () => set({ state: 'peek' }),
+      close: () => set({ state: 'collapsed' }),
+      setScreen: (screen) => set({ screen }),
+      setChips: (chips) => set({ chips }),
+      setActiveNudge: (nudge) => set({ activeNudge: nudge }),
+      acceptNudge: async () => {
+        const nudge = get().activeNudge
+        if (!nudge) return
+        set({ activeNudge: { ...nudge, status: 'accepted' } })
+        await trackNudge(nudge, 'accepted')
+      },
+      dismissNudge: async () => {
+        const nudge = get().activeNudge
+        if (!nudge) return
+        set({ activeNudge: null })
+        await trackNudge(nudge, 'dismissed')
+      },
 
-  // Phase 2 actions
-  addMessage: (msg) => {
-    const message: CopilotMessage = {
-      ...msg,
-      id: generateId(),
-      timestamp: Date.now(),
-    }
-    set((s) => ({ messages: [...s.messages, message] }))
-  },
+      // Phase 2 actions
+      addMessage: (msg) => {
+        const message: CopilotMessage = {
+          ...msg,
+          id: generateId(),
+          timestamp: Date.now(),
+        }
+        set((s) => ({ messages: [...s.messages, message] }))
+      },
 
-  setStreaming: (v) => set({ isStreaming: v }),
+      setStreaming: (v) => set({ isStreaming: v }),
 
-  clearMessages: () => set({ messages: [] }),
+      clearMessages: () => set({ messages: [], session: makeSession() }),
 
-  sendMessage: async (text: string, screen: string) => {
-    const { messages, addMessage, setStreaming } = get()
+      startNewSession: () => set({ messages: [], session: makeSession() }),
+
+      sendMessage: async (text: string, screen: string) => {
+        const { messages, addMessage, setStreaming, session } = get()
 
     // 1. Add user message
     addMessage({ role: 'user', content: text })
@@ -122,7 +218,7 @@ export const useCopilotStore = create<CopilotStore>((set, get) => ({
       const response = await fetch('/api/copilot/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: history, screen }),
+        body: JSON.stringify({ messages: history, screen, session }),
       })
 
       if (!response.ok) {
@@ -217,7 +313,28 @@ export const useCopilotStore = create<CopilotStore>((set, get) => ({
         ),
       }))
     } finally {
-      setStreaming(false)
+      const nextMessages = get().messages
+      set((s) => ({
+        isStreaming: false,
+        session: {
+          ...s.session,
+          updatedAt: Date.now(),
+          turnCount: Math.min(99, s.session.turnCount + 1),
+          intent: s.session.intent ?? inferIntent(text),
+          summary: compactSummary(nextMessages, s.session.summary),
+        },
+      }))
     }
-  },
-}))
+      },
+    }),
+    {
+      name: 'nutrinest-copilot-session',
+      storage: createJSONStorage(() => (typeof window === 'undefined' ? noopStorage : sessionStorage)),
+      partialize: (state) => ({
+        messages: state.messages.slice(-12),
+        session: state.session,
+        activeNudge: state.activeNudge,
+      }),
+    },
+  ),
+)

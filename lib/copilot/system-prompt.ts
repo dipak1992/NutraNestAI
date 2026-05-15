@@ -13,6 +13,8 @@ export function buildCopilotSystemPrompt(context: {
   budgetRemaining?: number | null
   currentScreen: string
   timeOfDay: string // 'morning' | 'afternoon' | 'evening'
+  conversationMemory?: string
+  scheduleConstraints?: Array<{ dayOfWeek: string; constraint: string }>
 }): string {
   return `You are MealEase, a friendly household food assistant. You help families with dinner decisions, meal planning, grocery lists, leftovers, and food budgeting.
 
@@ -44,6 +46,13 @@ ${context.pantryItems?.length ? `- Pantry has: ${context.pantryItems.slice(0, 10
 ${context.budgetRemaining !== null && context.budgetRemaining !== undefined ? `- Budget remaining: $${context.budgetRemaining}` : ''}
 - Current screen: ${context.currentScreen}
 - Time: ${context.timeOfDay}
+${context.scheduleConstraints?.length ? `- Recurring schedule: ${context.scheduleConstraints.map((c) => `${c.dayOfWeek}=${c.constraint}`).join(', ')}` : ''}
+${context.conversationMemory ? `\nCONVERSATION MEMORY:\n${context.conversationMemory}` : ''}
+
+PLAN REFINEMENT:
+- If the user asks to swap, keep, fill, simplify, rebalance, theme, or budget-optimize the week, use refine_weekly_plan.
+- Preserve named days when the user says to keep them.
+- Convert recurring schedule constraints into practical meal-planning constraints.
 
 When you can fulfill a request, use the available tools. Always prefer taking action over just explaining.`
 }

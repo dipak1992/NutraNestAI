@@ -3,10 +3,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { motion, AnimatePresence, useDragControls, type PanInfo } from 'framer-motion'
-import { X, Send, ArrowRight } from 'lucide-react'
-import { useCopilotStore, type CopilotScreen, type CopilotChip, type CopilotMessage } from '@/stores/copilotStore'
+import { X, Send, ArrowRight, Lightbulb, Check, Ban } from 'lucide-react'
+import { useCopilotStore, type CopilotScreen, type CopilotChip, type CopilotMessage, type CopilotNudge } from '@/stores/copilotStore'
 import { generateChips } from '@/lib/copilot/chips'
 import { useWeeklyPlanStore } from '@/lib/planner/store'
+import { useLeftoversStore } from '@/stores/leftoversStore'
+import { useBudgetStore } from '@/stores/budgetStore'
 import { VoiceInput } from './VoiceInput'
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
@@ -14,7 +16,7 @@ import { VoiceInput } from './VoiceInput'
 function pathnameToScreen(pathname: string): CopilotScreen {
   if (pathname.startsWith('/dashboard/tonight')) return 'tonight'
   if (pathname.startsWith('/dashboard/cook')) return 'cook'
-  if (pathname === '/dashboard' || pathname === '/dashboard/') return 'plan'
+  if (pathname === '/dashboard' || pathname === '/dashboard/' || pathname.startsWith('/planner')) return 'plan'
   if (pathname.startsWith('/leftovers')) return 'leftovers'
   if (pathname.startsWith('/budget')) return 'budget'
   if (pathname.startsWith('/grocery')) return 'grocery'
@@ -25,6 +27,28 @@ function getGreeting(hour: number): string {
   if (hour < 12) return 'Good morning! ☀️'
   if (hour < 17) return 'Good afternoon! 🌤️'
   return 'Good evening! 🌙'
+}
+
+function triggerToMessage(chip: CopilotChip): string {
+  const params = chip.action.type === 'trigger' ? chip.action.params : undefined
+  switch (chip.action.type === 'trigger' ? chip.action.feature : '') {
+    case 'tonight-swap':
+      return `Swap tonight's meal for something ${String(params?.mode ?? 'better')}.`
+    case 'pantry-match':
+      return 'What can I cook from my pantry?'
+    case 'autopilot':
+      return 'Generate my weekly plan.'
+    case 'plan-swap':
+      return 'Help me swap a meal this week.'
+    case 'leftover-suggest':
+      return 'Use my leftovers for dinner tonight.'
+    case 'budget-swap':
+      return 'Find cheaper swaps for my plan.'
+    case 'budget-filter':
+      return 'Show me budget-friendly meals only.'
+    default:
+      return chip.label
+  }
 }
 
 // ── Message Bubble ───────────────────────────────────────────────────────────
@@ -84,6 +108,46 @@ function TypingDots() {
   )
 }
 
+function NudgeCard({
+  nudge,
+  onAccept,
+  onDismiss,
+}: {
+  nudge: CopilotNudge
+  onAccept: (nudge: CopilotNudge) => void
+  onDismiss: () => void
+}) {
+  return (
+    <div className="mb-3 rounded-2xl border border-[#D97757]/20 bg-white px-4 py-3 shadow-sm">
+      <div className="flex items-start gap-3">
+        <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#D97757]/10 text-[#D97757]">
+          <Lightbulb size={16} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold text-neutral-900">{nudge.title}</p>
+          <p className="mt-0.5 text-sm text-neutral-600">{nudge.body}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button
+              onClick={() => onAccept(nudge)}
+              className="inline-flex items-center gap-1.5 rounded-xl bg-[#D97757] px-3 py-1.5 text-xs font-semibold text-white transition-transform active:scale-[0.97]"
+            >
+              <Check size={13} />
+              {nudge.ctaLabel}
+            </button>
+            <button
+              onClick={onDismiss}
+              className="inline-flex items-center gap-1.5 rounded-xl bg-neutral-100 px-3 py-1.5 text-xs font-medium text-neutral-600 transition-colors hover:bg-neutral-200"
+            >
+              <Ban size={13} />
+              Not now
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Component ────────────────────────────────────────────────────────────────
 
 export function CopilotSheet() {
@@ -91,14 +155,18 @@ export function CopilotSheet() {
   const pathname = usePathname()
   const {
     state,
+    open,
     close,
     setScreen,
     setChips,
     chips,
-    screen,
     messages,
     isStreaming,
     sendMessage,
+    activeNudge,
+    setActiveNudge,
+    acceptNudge,
+    dismissNudge,
   } = useCopilotStore()
   const dragControls = useDragControls()
 
@@ -112,6 +180,14 @@ export function CopilotSheet() {
   // Get user context from stores
   const weeklyPlan = useWeeklyPlanStore((s) => s.plan)
   const hasWeeklyPlan = weeklyPlan?.days?.some((d) => d.meal) ?? false
+  const groceryList = useWeeklyPlanStore((s) => s.groceryList)
+  const leftovers = useLeftoversStore((s) => s.leftovers)
+  const budgetRemaining = useBudgetStore((s) => {
+    if (!s.settings.weeklyLimit) return null
+    return s.settings.weeklyLimit - s.weekSpent - s.weekEstimated
+  })
+  const hasPantryItems = groceryList?.items?.some((item) => item.isInPantry) ?? false
+  const hasLeftovers = leftovers.some((leftover) => leftover.status === 'active')
 
   // Update screen + chips when pathname changes
   useEffect(() => {
@@ -120,13 +196,27 @@ export function CopilotSheet() {
     const newChips = generateChips({
       screen: currentScreen,
       hour,
-      hasPantryItems: false, // TODO: wire to pantry store
+      hasPantryItems,
       hasWeeklyPlan,
-      hasLeftovers: false, // TODO: wire to leftovers store
-      budgetRemaining: null, // TODO: wire to budget store
+      hasLeftovers,
+      budgetRemaining,
     })
     setChips(newChips)
-  }, [currentScreen, hasWeeklyPlan, setScreen, setChips])
+  }, [currentScreen, hasPantryItems, hasWeeklyPlan, hasLeftovers, budgetRemaining, setScreen, setChips])
+
+  useEffect(() => {
+    let ignore = false
+    fetch(`/api/copilot/nudges?screen=${encodeURIComponent(currentScreen)}`)
+      .then((res) => res.ok ? res.json() : { nudges: [] })
+      .then((data: { nudges?: CopilotNudge[] }) => {
+        if (ignore) return
+        setActiveNudge(data.nudges?.[0] ?? null)
+      })
+      .catch(() => undefined)
+    return () => {
+      ignore = true
+    }
+  }, [currentScreen, setActiveNudge])
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
@@ -148,12 +238,26 @@ export function CopilotSheet() {
       router.push(chip.action.href)
       close()
     } else if (chip.action.type === 'trigger') {
-      close()
+      open()
+      sendMessage(triggerToMessage(chip), currentScreen)
     } else if (chip.action.type === 'message') {
       // Phase 2: send as a message
+      open()
       sendMessage(chip.action.text, currentScreen)
     }
-  }, [router, close, sendMessage, currentScreen])
+  }, [router, open, close, sendMessage, currentScreen])
+
+  const handleNudgeAccept = useCallback(async (nudge: CopilotNudge) => {
+    await acceptNudge()
+    if (nudge.action.type === 'navigate') {
+      router.push(nudge.action.href)
+      close()
+    } else if (nudge.action.type === 'message') {
+      sendMessage(nudge.action.text, currentScreen)
+    } else {
+      close()
+    }
+  }, [acceptNudge, router, close, sendMessage, currentScreen])
 
   // Handle action button in message
   const handleActionClick = useCallback((href: string) => {
@@ -250,6 +354,13 @@ export function CopilotSheet() {
 
             {/* Chips row (always visible) */}
             <div className="shrink-0 px-5">
+              {activeNudge && (
+                <NudgeCard
+                  nudge={activeNudge}
+                  onAccept={handleNudgeAccept}
+                  onDismiss={dismissNudge}
+                />
+              )}
               <div
                 className={
                   state === 'expanded'

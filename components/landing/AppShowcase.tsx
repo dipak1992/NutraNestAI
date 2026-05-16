@@ -6,6 +6,7 @@ export function AppShowcase() {
   return (
     <section
       className="relative overflow-hidden bg-gradient-to-b from-white via-[#FDF6F1]/60 to-white dark:from-neutral-950 dark:via-neutral-900/60 dark:to-neutral-950"
+      style={{ position: "relative" }}
       aria-label="App preview"
     >
       <ContainerScroll

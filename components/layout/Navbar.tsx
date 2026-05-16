@@ -27,7 +27,7 @@ import { cn } from '@/lib/utils'
 const coreNav = [
   { href: '/dashboard/tonight', label: 'Tonight', icon: Utensils },
   { href: '/dashboard/cook', label: 'Cook', icon: Camera },
-  { href: '/dashboard', label: 'Plan', icon: CalendarDays },
+  { href: '/planner', label: 'Plan', icon: CalendarDays },
   { href: '/leftovers', label: 'Leftovers', icon: Recycle },
   { href: '/budget', label: 'Budget', icon: DollarSign },
 ] as const
@@ -43,7 +43,6 @@ export function Navbar({ userEmail, subscriptionTier = 'free' }: { userEmail?: s
   const isPaid = isPro
 
   function isNavActive(href: string) {
-    if (href === '/dashboard') return pathname === '/dashboard' || pathname === '/dashboard/'
     return pathname?.startsWith(href)
   }
 

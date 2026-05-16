@@ -1,16 +1,16 @@
 'use client'
 
 import Link from 'next/link'
-import { CalendarDays, Camera, DollarSign, Recycle, Utensils } from 'lucide-react'
+import { CalendarDays, Camera, DollarSign, Recycle, ShoppingCart } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-// Quick actions map directly to the five-job spine
+// Quick actions are task shortcuts, not a duplicate of the bottom navigation.
 const MEAL_TOOLS = [
-  { href: '/dashboard/tonight', label: 'Tonight', icon: Utensils },
-  { href: '/dashboard/cook', label: 'Cook', icon: Camera },
-  { href: '/dashboard', label: 'Plan', icon: CalendarDays },
-  { href: '/leftovers', label: 'Leftovers', icon: Recycle },
-  { href: '/budget', label: 'Budget', icon: DollarSign },
+  { href: '/planner', label: 'Plan week', icon: CalendarDays },
+  { href: '/dashboard/cook', label: 'Scan fridge', icon: Camera },
+  { href: '/grocery-list', label: 'Grocery list', icon: ShoppingCart },
+  { href: '/leftovers', label: 'Use leftovers', icon: Recycle },
+  { href: '/budget', label: 'Set budget', icon: DollarSign },
 ]
 
 export function QuickActions() {

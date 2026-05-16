@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils'
 const TABS = [
   { href: '/dashboard/tonight', label: 'Tonight',   icon: Utensils },
   { href: '/dashboard/cook',    label: 'Cook',      icon: Camera },
-  { href: '/dashboard',         label: 'Plan',      icon: CalendarDays },
+  { href: '/planner',           label: 'Plan',      icon: CalendarDays },
   { href: '/leftovers',         label: 'Leftovers', icon: Recycle },
   { href: '/budget',            label: 'Budget',    icon: DollarSign },
 ]
@@ -18,8 +18,6 @@ export function MobileTabBar() {
   const pathname = usePathname()
 
   function isActive(href: string) {
-    // Exact match for /dashboard (Plan tab) so it doesn't match /dashboard/tonight etc.
-    if (href === '/dashboard') return pathname === '/dashboard' || pathname === '/dashboard/'
     return pathname?.startsWith(href)
   }
 

@@ -10,6 +10,7 @@ import { productStory } from '@/lib/marketing/stats'
 const ConversionStory = dynamic(() => import('@/components/landing/ConversionStory').then(m => m.ConversionStory), { ssr: true })
 const FounderNote = dynamic(() => import('@/components/landing/FounderNote').then(m => m.FounderNote), { ssr: true })
 const HowItWorks = dynamic(() => import('@/components/landing/HowItWorks').then(m => m.HowItWorks), { ssr: true })
+const AppShowcase = dynamic(() => import('@/components/landing/AppShowcase').then(m => m.AppShowcase), { ssr: false })
 const FivePillarsSection = dynamic(() => import('@/components/landing/FivePillarsSection').then(m => m.FivePillarsSection), { ssr: true })
 const AutopilotSection = dynamic(() => import('@/components/landing/AutopilotSection').then(m => m.AutopilotSection), { ssr: true })
 const GroceryCommerceSection = dynamic(() => import('@/components/landing/GroceryCommerceSection').then(m => m.GroceryCommerceSection), { ssr: true })
@@ -65,6 +66,7 @@ export default async function LandingPage() {
         <ConversionStory />
         <FounderNote />
         <HowItWorks />
+        <AppShowcase />
         <FivePillarsSection />
         <AutopilotSection />
         <GroceryCommerceSection />

@@ -4,6 +4,7 @@ import { Container } from './shared/Container'
 import { Button } from './shared/Button'
 import { FadeIn } from './shared/FadeIn'
 import { MotionFloat } from './shared/MotionFloat'
+import { MealEaseLoop } from './shared/MealEaseLoop'
 import { socialProof } from '@/config/social-proof'
 import { LandingTonightPreview } from './LandingTonightPreview'
 import { LandingScanDemoButton } from './LandingScanDemoButton'
@@ -61,9 +62,8 @@ export function Hero() {
 
             <FadeIn delay={0.08} direction="left">
               <p className="mt-4 sm:mt-6 max-w-xl text-base sm:text-lg leading-[1.6] text-neutral-600 dark:text-neutral-300 md:text-xl">
-                MealEase learns your household, checks what you already have,
-                and turns tonight&apos;s dinner into a shopping-ready list before
-                the day gets away from you.
+                Tell MealEase what&apos;s in the fridge. It returns tonight&apos;s dinner,
+                pantry notes, and the grocery list to finish the week.
               </p>
             </FadeIn>
 
@@ -87,20 +87,21 @@ export function Hero() {
             </FadeIn>
 
             <FadeIn delay={0.24} direction="left">
-              <div className="mt-5 grid max-w-xl gap-2 rounded-2xl border border-orange-100 bg-white/78 p-3 shadow-sm shadow-orange-100/40 backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/78 sm:grid-cols-3">
+              <div className="mt-5 flex max-w-xl flex-wrap gap-2">
                 {trustItems.map((item, i) => (
-                  <span key={item} className="inline-flex items-center gap-2 text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                  <span key={item} className="inline-flex items-center gap-2 rounded-full border border-orange-100 bg-white/78 px-3 py-2 text-xs font-semibold text-neutral-700 shadow-sm shadow-orange-100/30 backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/78 dark:text-neutral-300">
                     <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" aria-hidden />
                     {item}
                     {i === 0 && <span className="sr-only">.</span>}
                   </span>
                 ))}
               </div>
+              <MealEaseLoop />
             </FadeIn>
 
             {/* Social proof row */}
             <FadeIn delay={0.32} direction="left">
-              <div className="mt-6 sm:mt-8 flex max-w-[270px] sm:max-w-xl flex-row items-center gap-3 sm:gap-4">
+              <div className="mt-6 sm:mt-8 flex max-w-xl flex-row items-center gap-3 sm:gap-4">
                 {/* Avatar stack — real photos */}
                 <div className="flex -space-x-1.5 shrink-0" aria-hidden>
                   {socialProof.testimonials.slice(0, 5).map((t, i) => (
@@ -125,7 +126,7 @@ export function Hero() {
                     <span className="font-medium text-neutral-700 dark:text-neutral-300">{socialProof.rating}</span>
                   </div>
                   <div className="text-xs sm:text-sm font-medium text-neutral-600 dark:text-neutral-400 leading-tight mt-0.5">
-                    {socialProof.householdCount} · built with early households
+                    {socialProof.householdCount} homes · built for real dinner weeks
                   </div>
                 </div>
               </div>
@@ -151,7 +152,7 @@ export function Hero() {
                       First useful output
                     </p>
                     <p className="mt-1 text-sm font-bold text-neutral-950">
-                      Dinner, pantry check, and grocery list in one loop.
+                      The same household loop, every dinner night.
                     </p>
                     <div className="mt-3 grid gap-2 text-[11px] font-semibold text-neutral-600">
                       <span className="inline-flex items-center gap-1">

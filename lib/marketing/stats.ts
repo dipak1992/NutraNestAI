@@ -4,8 +4,8 @@ export const marketingStats = {
   householdCount: '1–8+ members',
   dinnersPlannedLabel: 'Recipe library',
   dinnersPlanned: '500+ curated recipes',
-  ratingLabel: 'Decision speed',
-  rating: 'Dinner in 3 sec',
+  ratingLabel: 'Household feedback',
+  rating: 'Early households',
   hoursSavedPerWeekLabel: 'Planning time saved',
   hoursSavedPerWeek: '~4',
   savingsLabel: 'Grocery savings',
@@ -20,7 +20,6 @@ export const productStoryShort =
 
 export const trustCopy = [
   'Free to start',
-  '3 Copilot assists/day included',
   'No card required',
-  'Built for real household dinners',
+  'Built for household dinners',
 ] as const

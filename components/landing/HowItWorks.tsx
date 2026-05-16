@@ -1,8 +1,5 @@
-'use client'
-
-import { ScrollReveal, StaggerGroup, HoverCard } from '@/components/motion'
-import { Section } from '@/components/ui/Section'
-import { SectionHeader } from '@/components/ui/SectionHeader'
+import { Container } from './shared/Container'
+import { FadeIn } from './shared/FadeIn'
 
 const steps = [
   {
@@ -24,44 +21,51 @@ const steps = [
 
 export function HowItWorks() {
   return (
-    <Section
+    <section
       id="how-it-works"
-      background="cream"
-      padding="lg"
-      className="me-defer-section"
+      className="py-16 md:py-20 bg-[#FDF6F1] dark:bg-neutral-900"
+      aria-labelledby="how-heading"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <ScrollReveal>
-          <SectionHeader
-            title="Get your first dinner in 60 seconds."
-            align="center"
-          />
-        </ScrollReveal>
+      <Container>
+        <FadeIn>
+          <div className="text-center max-w-2xl mx-auto mb-12 md:mb-14">
+            <h2
+              id="how-heading"
+              className="font-serif text-4xl md:text-5xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50"
+            >
+              Get your first dinner in{' '}
+              <span className="italic text-[#D97757]">60 seconds.</span>
+            </h2>
+            <p className="mt-4 text-lg leading-relaxed text-neutral-600 dark:text-neutral-400">
+              The first session should produce dinner, not another setup chore.
+            </p>
+          </div>
+        </FadeIn>
 
-        <div className="relative">
+        <div className="grid md:grid-cols-3 gap-8 md:gap-12 relative">
           {/* Dotted connector (desktop only) */}
           <div
             aria-hidden
             className="hidden md:block absolute top-10 left-[16%] right-[16%] h-px border-t-2 border-dashed border-[#D97757]/30"
           />
 
-          <StaggerGroup className="grid md:grid-cols-3 gap-8 md:gap-12" staggerDelay={0.12}>
-            {steps.map((s) => (
-              <HoverCard key={s.n} className="relative text-center md:text-left">
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white dark:bg-neutral-800 ring-1 ring-[#D97757]/20 shadow-subtle font-serif text-2xl font-bold text-[#D97757] mb-6 relative z-10">
+          {steps.map((s, i) => (
+            <FadeIn key={s.n} delay={i * 0.12}>
+              <div className="relative text-center md:text-left">
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white dark:bg-neutral-800 ring-1 ring-[#D97757]/20 font-serif text-2xl font-bold text-[#D97757] mb-6 relative z-10">
                   {s.n}
                 </div>
                 <h3 className="font-serif text-2xl font-bold text-neutral-900 dark:text-neutral-50 mb-3">
                   {s.title}
                 </h3>
-                <p className="text-neutral-500 dark:text-neutral-400 leading-relaxed">
+                <p className="text-neutral-600 dark:text-neutral-400 leading-relaxed">
                   {s.body}
                 </p>
-              </HoverCard>
-            ))}
-          </StaggerGroup>
+              </div>
+            </FadeIn>
+          ))}
         </div>
-      </div>
-    </Section>
+      </Container>
+    </section>
   )
 }

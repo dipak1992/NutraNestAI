@@ -1,9 +1,7 @@
-'use client'
-
 import Image from 'next/image'
 import { CheckCircle2, RefreshCcw, ShoppingCart, Sparkles } from 'lucide-react'
-import { ScrollReveal, StaggerGroup, HoverCard } from '@/components/motion'
-import { Section } from '@/components/ui/Section'
+import { Container } from './shared/Container'
+import { FadeIn } from './shared/FadeIn'
 import conversionStoryImage from '@/public/landing/optimized/conversion-story.webp'
 
 const workflow = [
@@ -15,22 +13,29 @@ const workflow = [
 
 export function ConversionStory() {
   return (
-    <Section background="white" padding="lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="relative overflow-hidden bg-white py-16 dark:bg-neutral-950 md:py-20">
+      <Container>
         <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-14">
-          <ScrollReveal direction="left" className="lg:col-span-5">
-            <span className="inline-block mb-3 px-3 py-1 text-xs font-medium uppercase tracking-wider text-[#D97757] bg-[#D97757]/8 rounded-full">
+          <FadeIn className="lg:col-span-5">
+            <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#D97757]">
               Built for the dinner moment
-            </span>
+            </p>
             <h2 className="mt-4 font-serif text-4xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50 md:text-5xl">
-              From blank fridge stare to grocery-ready plan.
+              From blank fridge stare to a plan your household will eat.
             </h2>
-            <p className="mt-5 text-lg leading-relaxed text-neutral-500 dark:text-neutral-300">
+            <p className="mt-5 text-lg leading-relaxed text-neutral-600 dark:text-neutral-300">
               MealEase keeps the household context generic AI forgets: what you like, what you have, what you spent, and what needs to happen next.
             </p>
-          </ScrollReveal>
+            <div className="mt-6 grid gap-3 text-sm font-semibold text-neutral-700 dark:text-neutral-300 sm:grid-cols-3">
+              {['Uses pantry first', 'Respects dislikes', 'Builds groceries'].map((item) => (
+                <div key={item} className="rounded-2xl bg-[#FBFAF3] px-4 py-3 ring-1 ring-orange-100 dark:bg-neutral-900 dark:ring-neutral-800">
+                  {item}
+                </div>
+              ))}
+            </div>
+          </FadeIn>
 
-          <ScrollReveal direction="right" delay={0.1} className="lg:col-span-7">
+          <FadeIn delay={0.1} className="lg:col-span-7">
             <div className="relative overflow-hidden rounded-[2rem] bg-neutral-950 p-5 text-white shadow-2xl shadow-neutral-950/10">
               <div className="absolute inset-0">
                 <Image
@@ -39,17 +44,16 @@ export function ConversionStory() {
                   fill
                   sizes="(max-width: 1024px) 100vw, 58vw"
                   placeholder="blur"
-                  loading="lazy"
                   className="object-cover opacity-65"
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-neutral-950/85 via-neutral-950/55 to-neutral-950/20" />
               </div>
-              <StaggerGroup className="relative grid gap-4 sm:grid-cols-4" staggerDelay={0.08}>
+              <div className="relative grid gap-4 sm:grid-cols-4">
                 {workflow.map((step, index) => {
                   const Icon = step.icon
 
                   return (
-                    <HoverCard key={step.label} className="rounded-2xl border border-white/12 bg-white/10 p-4 backdrop-blur transition-shadow hover:shadow-medium">
+                    <div key={step.label} className="rounded-2xl border border-white/12 bg-white/10 p-4 backdrop-blur">
                       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#D97757] text-white">
                         <Icon className="h-5 w-5" aria-hidden />
                       </div>
@@ -57,14 +61,14 @@ export function ConversionStory() {
                         Step {index + 1}
                       </p>
                       <p className="mt-1 font-semibold">{step.label}</p>
-                    </HoverCard>
+                    </div>
                   )
                 })}
-              </StaggerGroup>
+              </div>
             </div>
-          </ScrollReveal>
+          </FadeIn>
         </div>
-      </div>
-    </Section>
+      </Container>
+    </section>
   )
 }

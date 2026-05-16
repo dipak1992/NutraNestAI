@@ -1,22 +1,28 @@
-'use client'
-
-import { ScrollReveal } from '@/components/motion'
-import { Section } from '@/components/ui/Section'
-import { SectionHeader } from '@/components/ui/SectionHeader'
+import { Container } from './shared/Container'
+import { FadeIn } from './shared/FadeIn'
 import { faqs } from '@/config/faqs'
 
 export function FAQ() {
   return (
-    <Section id="faq" background="white" padding="lg" className="me-defer-section">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <ScrollReveal>
-          <SectionHeader
-            title="Questions? Answered."
-            align="center"
-          />
-        </ScrollReveal>
+    <section
+      id="faq"
+      className="py-20 md:py-28 bg-white dark:bg-neutral-950"
+      aria-labelledby="faq-heading"
+    >
+      <Container>
+        <FadeIn>
+          <div className="text-center max-w-2xl mx-auto mb-14">
+            <h2
+              id="faq-heading"
+              className="font-serif text-4xl md:text-5xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50"
+            >
+              Questions?{' '}
+              <span className="italic text-[#D97757]">Answered.</span>
+            </h2>
+          </div>
+        </FadeIn>
 
-        <ScrollReveal delay={0.1}>
+        <FadeIn delay={0.1}>
           <div className="max-w-2xl mx-auto divide-y divide-neutral-200 dark:divide-neutral-800">
             {faqs.map((item, i) => (
               <details
@@ -36,14 +42,14 @@ export function FAQ() {
                     +
                   </span>
                 </summary>
-                <p className="pt-4 text-sm leading-relaxed text-neutral-500 dark:text-neutral-400">
+                <p className="pt-4 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
                   {item.a}
                 </p>
               </details>
             ))}
           </div>
-        </ScrollReveal>
-      </div>
-    </Section>
+        </FadeIn>
+      </Container>
+    </section>
   )
 }

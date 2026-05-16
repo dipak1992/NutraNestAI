@@ -1,228 +1,200 @@
-'use client'
+import Image from 'next/image'
+import { CheckCircle2, Clock, ShoppingCart } from 'lucide-react'
+import { Container } from './shared/Container'
+import { Button } from './shared/Button'
+import { FadeIn } from './shared/FadeIn'
+import { socialProof } from '@/config/social-proof'
+import { LandingTonightPreview } from './LandingTonightPreview'
+import { LandingScanDemoButton } from './LandingScanDemoButton'
+import { trustCopy } from '@/lib/marketing/stats'
 
-import Link from 'next/link'
-import { motion, useReducedMotion } from 'framer-motion'
-import { easing } from '@/lib/motion/variants'
-import { CheckIcon } from 'lucide-react'
+const trustItems = trustCopy
 
-// Properly typed easing for Framer Motion
-const smoothEase = easing.smooth as [number, number, number, number]
-
-// ─── Floating food icons for the visual element ────────────────────────────────
-function FloatingFoodVisual() {
-  const shouldReduceMotion = useReducedMotion()
-
-  const foods = [
-    { emoji: '🥑', x: '20%', y: '18%', delay: 0, size: 'text-4xl' },
-    { emoji: '🍋', x: '70%', y: '12%', delay: 0.8, size: 'text-3xl' },
-    { emoji: '🥕', x: '75%', y: '55%', delay: 1.2, size: 'text-4xl' },
-    { emoji: '🍅', x: '15%', y: '65%', delay: 0.4, size: 'text-3xl' },
-    { emoji: '🫐', x: '55%', y: '75%', delay: 1.6, size: 'text-2xl' },
-    { emoji: '🥦', x: '40%', y: '30%', delay: 0.6, size: 'text-2xl' },
-  ]
-
-  return (
-    <div className="relative w-full aspect-square max-w-[420px] mx-auto">
-      {/* Soft radial glow behind the visual */}
-      <div
-        aria-hidden
-        className="absolute inset-0 rounded-full bg-gradient-to-br from-[#D97757]/8 via-transparent to-[#D97757]/4 blur-3xl scale-90"
-      />
-
-      {/* Central card — "Tonight's Suggestion" */}
-      <motion.div
-        initial={shouldReduceMotion ? undefined : { opacity: 0, scale: 0.92 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.5, duration: 0.6, ease: smoothEase }}
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[240px] sm:w-[280px] bg-white rounded-3xl p-6 ring-1 ring-black/[0.04]"
-        style={{ boxShadow: 'var(--shadow-elevated)' }}
-      >
-        <div className="text-xs font-medium text-neutral-400 uppercase tracking-wider mb-2">
-          Tonight
-        </div>
-        <div className="text-lg font-semibold text-neutral-900 mb-1">
-          Lemon Herb Chicken
-        </div>
-        <div className="text-sm text-neutral-500 mb-3">
-          with roasted vegetables &amp; quinoa
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
-            <span aria-hidden>⏱</span> 25 min
-          </span>
-          <span className="inline-flex items-center gap-1 text-xs font-medium text-[#D97757] bg-[#D97757]/8 px-2 py-0.5 rounded-full">
-            <span aria-hidden>👨‍👩‍👧</span> Family
-          </span>
-        </div>
-      </motion.div>
-
-      {/* Floating food icons */}
-      {foods.map((food, i) => (
-        <motion.span
-          key={i}
-          aria-hidden
-          className={`absolute ${food.size} select-none`}
-          style={{ left: food.x, top: food.y }}
-          initial={shouldReduceMotion ? undefined : { opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{
-            delay: 0.6 + food.delay * 0.3,
-            duration: 0.5,
-            ease: smoothEase,
-          }}
-        >
-          <motion.span
-            className="inline-block"
-            animate={
-              shouldReduceMotion
-                ? undefined
-                : { y: [0, -6, 0] }
-            }
-            transition={{
-              duration: 3 + food.delay,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
-          >
-            {food.emoji}
-          </motion.span>
-        </motion.span>
-      ))}
-    </div>
-  )
-}
-
-// ─── Hero Section ──────────────────────────────────────────────────────────────
 export function Hero() {
-  const shouldReduceMotion = useReducedMotion()
-
-  const fadeUpProps = (delay: number) => {
-    if (shouldReduceMotion) return {}
-    return {
-      initial: { opacity: 0, y: 24, filter: 'blur(4px)' } as const,
-      animate: { opacity: 1, y: 0, filter: 'blur(0px)' } as const,
-      transition: { delay, duration: 0.6, ease: smoothEase } as const,
-    }
-  }
-
-  const trustSignals = [
-    'Free forever',
-    'No credit card',
-    '2-minute setup',
-  ]
-
   return (
     <section
-      className="relative min-h-[90vh] flex items-center overflow-hidden pt-20 pb-16 sm:pt-24 sm:pb-20 lg:pt-0 lg:pb-0"
+      className="relative overflow-hidden pt-14 pb-16 sm:pt-16 sm:pb-20 md:pt-24 md:pb-32"
       aria-labelledby="hero-heading"
     >
-      {/* Background: warm gradient */}
+      {/* Base warm gradient — always present */}
       <div
         aria-hidden
-        className="absolute inset-0 -z-20 bg-gradient-to-b from-[#FDF6F1] via-white to-white"
+        className="absolute inset-0 -z-10 bg-gradient-to-b from-[#FDF6F1] via-white to-white dark:from-neutral-900 dark:via-neutral-950 dark:to-neutral-950"
       />
 
-      {/* Subtle radial coral accent at top-left */}
-      <div
-        aria-hidden
-        className="absolute -top-32 -left-32 w-[600px] h-[600px] -z-10 rounded-full bg-[radial-gradient(circle,rgba(217,119,87,0.06)_0%,transparent_70%)]"
-      />
+      {/* Art-directed hero background: one responsive request, no hidden priority image. */}
+      <div className="absolute inset-0 -z-10">
+        <picture>
+          <source media="(max-width: 639px)" srcSet="/landing/optimized/hero-section-mobile.avif" type="image/avif" />
+          <source media="(max-width: 639px)" srcSet="/landing/optimized/hero-section-mobile.webp" type="image/webp" />
+          <source srcSet="/landing/optimized/hero-section.avif" type="image/avif" />
+          <source srcSet="/landing/optimized/hero-section.webp" type="image/webp" />
+          <img
+            src="/landing/optimized/hero-section.webp"
+            alt=""
+            fetchPriority="high"
+            decoding="async"
+            className="h-full w-full object-cover object-right opacity-100 sm:object-center sm:opacity-25"
+          />
+        </picture>
+        <div className="absolute inset-0 hidden bg-gradient-to-r from-white via-white/88 to-white/45 dark:from-neutral-950 dark:via-neutral-950/88 dark:to-neutral-950/56 sm:block" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.97)_0%,rgba(255,255,255,0.92)_40%,rgba(255,255,255,0.62)_65%,rgba(255,255,255,0.14)_100%)] dark:bg-[linear-gradient(to_right,rgba(10,10,10,0.97)_0%,rgba(10,10,10,0.92)_40%,rgba(10,10,10,0.62)_65%,rgba(10,10,10,0.14)_100%)] sm:hidden" />
+        <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#FDF6F1]/90 to-transparent dark:from-neutral-950/90 sm:hidden" />
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white/80 to-transparent dark:from-neutral-950/80 sm:hidden" />
+      </div>
 
-      {/* Noise texture overlay */}
-      <div aria-hidden className="noise-overlay absolute inset-0 -z-10 pointer-events-none" />
-
-      {/* Content */}
-      <div className="w-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          {/* Left column: Text content */}
-          <div className="max-w-xl">
-            {/* Badge */}
-            <motion.div {...fadeUpProps(0)}>
-              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium bg-[#D97757]/8 text-[#D97757] ring-1 ring-[#D97757]/15">
-                <span
-                  aria-hidden
-                  className="w-1.5 h-1.5 rounded-full bg-[#D97757] animate-pulse-soft"
-                />
-                AI-Powered Meal Intelligence
-              </span>
-            </motion.div>
-
-            {/* Headline */}
-            <motion.h1
-              {...fadeUpProps(0.1)}
-              id="hero-heading"
-              className="mt-6 text-neutral-900 font-bold"
-              style={{
-                fontSize: 'var(--font-size-display-xl)',
-                lineHeight: 'var(--font-size-display-xl--line-height)',
-                letterSpacing: 'var(--font-size-display-xl--letter-spacing)',
-              }}
-            >
-              Dinner decided in{' '}
-              <span className="text-gradient-coral">seconds</span>,{' '}
-              not stress
-            </motion.h1>
-
-            {/* Subheadline */}
-            <motion.p
-              {...fadeUpProps(0.2)}
-              className="mt-5 text-neutral-500 max-w-md"
-              style={{
-                fontSize: 'var(--font-size-body-lg)',
-                lineHeight: 'var(--font-size-body-lg--line-height)',
-              }}
-            >
-              MealEase uses AI to understand your pantry, preferences, and
-              family — then suggests exactly what to cook tonight.
-            </motion.p>
-
-            {/* CTA Buttons */}
-            <motion.div
-              {...fadeUpProps(0.3)}
-              className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4"
-            >
-              <Link
-                href="/start"
-                className="inline-flex items-center justify-center px-7 py-3 rounded-full bg-[#D97757] text-white font-medium text-sm shadow-md transition-all duration-200 hover:shadow-[var(--shadow-glow-coral)] hover:brightness-105 active:scale-[0.97] focus-ring"
+      <Container wide>
+        <div className="grid lg:grid-cols-12 gap-8 lg:gap-14 items-center">
+          {/* Left: copy */}
+          <div className="lg:col-span-6">
+            <FadeIn>
+              <h1
+                id="hero-heading"
+                className="font-serif text-[38px] leading-[1.05] sm:text-5xl md:text-6xl lg:text-[62px] font-bold tracking-tight text-neutral-900 dark:text-neutral-50"
               >
-                Get Started Free
-              </Link>
-              <Link
-                href="#how-it-works"
-                className="inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-medium text-neutral-600 ring-1 ring-neutral-200 transition-all duration-200 hover:ring-neutral-300 hover:text-neutral-900 active:scale-[0.97] focus-ring"
-              >
-                See how it works
-              </Link>
-            </motion.div>
+                Dinner planned.
+                <br />
+                <span className="italic text-[#D97757]">Grocery list built.</span>
+              </h1>
+            </FadeIn>
 
-            {/* Trust signals */}
-            <motion.div
-              {...fadeUpProps(0.35)}
-              className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2"
-            >
-              {trustSignals.map((signal) => (
-                <span
-                  key={signal}
-                  className="inline-flex items-center gap-1.5 text-xs sm:text-sm text-neutral-400"
+            <FadeIn delay={0.1}>
+              <p className="mt-4 sm:mt-6 max-w-xl text-base sm:text-lg leading-[1.6] text-neutral-600 dark:text-neutral-300 md:text-xl">
+                MealEase learns your household, checks what you already have,
+                and turns tonight&apos;s dinner into a shopping-ready list before
+                the day gets away from you.
+              </p>
+            </FadeIn>
+
+            <FadeIn delay={0.2}>
+              <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+                {/* CTA: slightly narrower on mobile, premium shadow, active press state */}
+                <Button
+                  href="/start"
+                  className="w-[88%] sm:w-auto text-center shadow-md shadow-[#D97757]/20 hover:shadow-lg hover:shadow-[#D97757]/28 active:shadow-sm active:scale-[0.98] transition-all duration-150"
                 >
-                  <CheckIcon className="w-3.5 h-3.5 text-[#D97757]/60" aria-hidden />
-                  {signal}
-                </span>
-              ))}
-            </motion.div>
+                  Plan dinner free
+                </Button>
+                <LandingScanDemoButton />
+                <a
+                  href="#how-it-works"
+                  className="text-neutral-600 dark:text-neutral-300 hover:text-[#D97757] underline-offset-4 hover:underline text-sm font-medium transition-colors"
+                >
+                  See how it works ↓
+                </a>
+              </div>
+            </FadeIn>
+
+            <FadeIn delay={0.3}>
+              <div className="mt-5 grid max-w-xl gap-2 rounded-2xl border border-orange-100 bg-white/78 p-3 shadow-sm shadow-orange-100/40 backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/78 sm:grid-cols-3">
+                {trustItems.map((item, i) => (
+                  <span key={item} className="inline-flex items-center gap-2 text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                    <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" aria-hidden />
+                    {item}
+                    {i === 0 && <span className="sr-only">.</span>}
+                  </span>
+                ))}
+              </div>
+            </FadeIn>
+
+            {/* Social proof row */}
+            <FadeIn delay={0.4}>
+              <div className="mt-6 sm:mt-8 flex max-w-[270px] sm:max-w-xl flex-row items-center gap-3 sm:gap-4">
+                {/* Avatar stack — real photos */}
+                <div className="flex -space-x-1.5 shrink-0" aria-hidden>
+                  {socialProof.testimonials.slice(0, 5).map((t, i) => (
+                    <div
+                      key={t.name}
+                      className="relative h-8 w-8 sm:h-9 sm:w-9 overflow-hidden rounded-full ring-2 ring-white dark:ring-neutral-950 shadow-sm"
+                      style={{ transform: `translateY(${i % 2 === 0 ? 0 : 1}px)` }}
+                    >
+                      <Image
+                        src={t.photo}
+                        alt={t.name}
+                        fill
+                        sizes="36px"
+                        className="object-cover object-top"
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div className="min-w-0">
+                  <div className="text-xs sm:text-sm font-semibold text-neutral-900 dark:text-neutral-100 leading-tight">
+                    <span className="text-amber-500">★★★★★</span>{' '}
+                    <span className="font-medium text-neutral-700 dark:text-neutral-300">{socialProof.rating}</span>
+                  </div>
+                  <div className="text-xs sm:text-sm font-medium text-neutral-600 dark:text-neutral-400 leading-tight mt-0.5">
+                    {socialProof.householdCount} · built with early households
+                  </div>
+                </div>
+              </div>
+            </FadeIn>
           </div>
 
-          {/* Right column: Visual element */}
-          <motion.div
-            className="relative flex justify-center lg:justify-end"
-            initial={shouldReduceMotion ? undefined : { opacity: 0, x: 32, scale: 0.96 }}
-            animate={{ opacity: 1, x: 0, scale: 1 }}
-            transition={{ delay: 0.4, duration: 0.7, ease: smoothEase }}
-          >
-            <FloatingFoodVisual />
-          </motion.div>
+          {/* Right: product and household proof */}
+          <div className="lg:col-span-6 relative flex justify-center -mt-4 sm:mt-0">
+            <FadeIn delay={0.2}>
+              <div className="relative mx-auto w-full max-w-[600px] sm:min-h-[470px]">
+                <div className="relative hidden min-h-[430px] overflow-hidden rounded-[2rem] bg-neutral-950 shadow-2xl shadow-neutral-950/15 ring-1 ring-black/10 sm:block">
+                  <Image
+                    src="/landing/optimized/hero-section.webp"
+                    alt="Warm household dinner ingredients ready for a MealEase plan"
+                    fill
+                    sizes="(min-width: 1024px) 360px, 40vw"
+                    className="object-cover"
+                    priority
+                  />
+                  <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(23,18,15,0.72)_0%,rgba(23,18,15,0.22)_48%,rgba(255,255,255,0.18)_100%)]" />
+                  <div className="absolute bottom-5 left-5 w-[260px] rounded-2xl bg-white/94 p-4 shadow-xl backdrop-blur">
+                    <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#D97757]">
+                      First useful output
+                    </p>
+                    <p className="mt-1 text-sm font-bold text-neutral-950">
+                      Dinner, pantry check, and grocery list in one loop.
+                    </p>
+                    <div className="mt-3 grid gap-2 text-[11px] font-semibold text-neutral-600">
+                      <span className="inline-flex items-center gap-1">
+                        <Clock className="h-3.5 w-3.5 text-[#D97757]" aria-hidden />
+                        25 min
+                      </span>
+                      <span className="inline-flex items-center gap-1">
+                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" aria-hidden />
+                        Pantry used
+                      </span>
+                      <span className="inline-flex items-center gap-1">
+                        <ShoppingCart className="h-3.5 w-3.5 text-[#D97757]" aria-hidden />
+                        List ready
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Phone frame */}
+                <div className="relative mx-auto aspect-[9/19.5] w-[min(235px,calc(100vw-96px))] rounded-[2.6rem] bg-neutral-900 p-2.5 shadow-2xl shadow-neutral-900/25 ring-1 ring-black/8 sm:absolute sm:right-8 sm:top-10 sm:mx-0 sm:w-[245px]">
+                  <div className="relative w-full h-full rounded-[2.3rem] overflow-hidden bg-[#FBFAF3]">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(16,185,129,0.14),transparent_34%),radial-gradient(circle_at_100%_20%,rgba(217,119,87,0.14),transparent_32%)]" />
+                    <LandingTonightPreview />
+                  </div>
+                  {/* Notch */}
+                  <div
+                    aria-hidden
+                    className="absolute top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-neutral-900 rounded-b-2xl"
+                  />
+                </div>
+
+                {/* Floating "budget" card */}
+                <div className="hidden md:flex absolute right-2 bottom-16 bg-white dark:bg-neutral-800 rounded-2xl shadow-xl p-4 items-center gap-3 ring-1 ring-black/5">
+                  <ShoppingCart className="h-6 w-6 text-[#D97757]" aria-hidden />
+                  <div>
+                    <div className="text-xs text-neutral-500 dark:text-neutral-400">Grocery preview</div>
+                    <div className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">$87 estimated</div>
+                  </div>
+                </div>
+              </div>
+            </FadeIn>
+          </div>
         </div>
-      </div>
+      </Container>
     </section>
   )
 }

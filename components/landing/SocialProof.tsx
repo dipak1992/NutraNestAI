@@ -1,11 +1,8 @@
-'use client'
-
 import Image from 'next/image'
 import { ArrowRight, Check, Repeat2, ShoppingCart, Sparkles, Star } from 'lucide-react'
-import { ScrollReveal, StaggerGroup, HoverCard } from '@/components/motion'
-import { Section } from '@/components/ui/Section'
-import { SectionHeader } from '@/components/ui/SectionHeader'
+import { Container } from './shared/Container'
 import { Button } from './shared/Button'
+import { FadeIn } from './shared/FadeIn'
 import { socialProof } from '@/config/social-proof'
 import { groceryBeforeAfterExamples } from '@/lib/proof-assets'
 
@@ -39,21 +36,33 @@ const flow = [
 
 export function SocialProof() {
   return (
-    <Section background="white" padding="lg" className="me-defer-section">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <ScrollReveal>
-          <SectionHeader
-            title="From &ldquo;what&rsquo;s for dinner?&rdquo; to done in minutes."
-            subtitle="MealEase turns scattered dinner decisions into one simple flow your household can repeat every week."
-            align="center"
-          />
-        </ScrollReveal>
+    <section
+      className="py-20 md:py-28 bg-white dark:bg-neutral-950"
+      aria-labelledby="social-proof-heading"
+    >
+      <Container>
+        <FadeIn>
+          <div className="text-center max-w-2xl mx-auto mb-14">
+            <h2
+              id="social-proof-heading"
+              className="font-serif text-4xl md:text-5xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50"
+            >
+              From &ldquo;what&rsquo;s for dinner?&rdquo;{' '}
+              <span className="italic text-[#D97757]">to done in minutes.</span>
+            </h2>
+            <p className="mt-4 text-lg text-neutral-600 dark:text-neutral-400">
+              MealEase turns scattered dinner decisions into one simple flow your
+              household can repeat every week.
+            </p>
+          </div>
+        </FadeIn>
 
-        <ScrollReveal delay={0.1}>
+        <FadeIn delay={0.1}>
           <div className="mb-20 md:mb-28 rounded-3xl bg-neutral-950 p-5 md:p-7 text-white shadow-xl">
             <div className="grid gap-3 md:grid-cols-5 md:gap-0">
               {flow.map((step, i) => {
                 const Icon = step.icon
+
                 return (
                   <div key={step.title} className="relative">
                     <div className="h-full rounded-2xl bg-white/6 p-5 ring-1 ring-white/10 md:rounded-none md:bg-transparent md:ring-0">
@@ -82,12 +91,12 @@ export function SocialProof() {
               </Button>
             </div>
           </div>
-        </ScrollReveal>
+        </FadeIn>
 
-        <ScrollReveal delay={0.12}>
-          <div className="mb-20 grid gap-4 rounded-3xl border border-neutral-200 bg-[#FDF6F1]/60 p-4 dark:border-neutral-800 dark:bg-neutral-900 md:grid-cols-2 md:p-6">
+        <FadeIn delay={0.12}>
+          <div className="mb-20 grid gap-4 rounded-3xl border border-neutral-200 bg-[#FBFAF3] p-4 dark:border-neutral-800 dark:bg-neutral-900 md:grid-cols-2 md:p-6">
             {groceryBeforeAfterExamples.map((example) => (
-              <HoverCard key={example.title} className="rounded-2xl bg-white p-6 ring-1 ring-neutral-200 shadow-subtle hover:shadow-medium dark:bg-neutral-950 dark:ring-neutral-800">
+              <div key={example.title} className="rounded-2xl bg-white p-5 ring-1 ring-neutral-200 dark:bg-neutral-950 dark:ring-neutral-800">
                 <h3 className="font-serif text-2xl font-bold text-neutral-950 dark:text-neutral-50">
                   {example.title}
                 </h3>
@@ -99,37 +108,37 @@ export function SocialProof() {
                     </li>
                   ))}
                 </ul>
-              </HoverCard>
+              </div>
             ))}
           </div>
-        </ScrollReveal>
+        </FadeIn>
 
         {/* Stats row */}
-        <ScrollReveal>
+        <FadeIn>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 text-center mb-20 md:mb-28">
-            {[
-              { value: socialProof.householdCount, label: 'household sizes supported' },
-              { value: socialProof.dinnersPlanned, label: 'AI-personalized to your taste' },
-              { value: socialProof.rating, label: 'from fridge to plan' },
-              { value: socialProof.hoursSavedPerWeek, label: 'hours saved per week' },
+              {[
+              { value: socialProof.householdCount, label: 'household feedback program' },
+              { value: socialProof.dinnersPlanned, label: 'dinner-plan data under review' },
+              { value: socialProof.rating, label: 'feedback stage' },
+              { value: socialProof.hoursSavedPerWeek, label: 'time-saved study status' },
             ].map((stat) => (
               <div key={stat.label}>
                 <div className="font-serif text-4xl md:text-5xl font-bold text-[#D97757]">
                   {stat.value}
                 </div>
-                <div className="mt-2 text-sm text-neutral-400 leading-snug">
+                <div className="mt-2 text-sm text-neutral-500 dark:text-neutral-400 leading-snug">
                   {stat.label}
                 </div>
               </div>
             ))}
           </div>
-        </ScrollReveal>
+        </FadeIn>
 
         {/* Testimonials grid */}
-        <StaggerGroup className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6" staggerDelay={0.08}>
-          {socialProof.testimonials.map((t) => (
-            <HoverCard key={t.name} className="h-full">
-              <figure className="flex flex-col h-full bg-[#FDF6F1] dark:bg-neutral-900 rounded-2xl p-6 ring-1 ring-black/5 dark:ring-white/5 shadow-subtle hover:shadow-medium transition-shadow duration-300">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {socialProof.testimonials.map((t, i) => (
+            <FadeIn key={t.name} delay={i * 0.08}>
+              <figure className="flex flex-col h-full bg-[#FDF6F1] dark:bg-neutral-900 rounded-2xl p-6 ring-1 ring-black/5 dark:ring-white/5">
                 {/* Stars */}
                 <div className="text-[#D97757] text-sm mb-4" aria-label="5 stars">
                   ★★★★★
@@ -146,7 +155,6 @@ export function SocialProof() {
                       alt={t.name}
                       fill
                       sizes="44px"
-                      loading="lazy"
                       className="object-cover object-top"
                     />
                   </div>
@@ -154,16 +162,16 @@ export function SocialProof() {
                     <div className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
                       {t.name}
                     </div>
-                    <div className="text-xs text-neutral-400 dark:text-neutral-400">
+                    <div className="text-xs text-neutral-500 dark:text-neutral-400">
                       {t.city}
                     </div>
                   </div>
                 </figcaption>
               </figure>
-            </HoverCard>
+            </FadeIn>
           ))}
-        </StaggerGroup>
-      </div>
-    </Section>
+        </div>
+      </Container>
+    </section>
   )
 }

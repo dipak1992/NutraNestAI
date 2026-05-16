@@ -5,12 +5,10 @@ export const site = {
   tagline: productStory,
   url: 'https://mealease.ai',
   nav: [
-    { label: 'Compare', href: '/compare' },
-    { label: 'Free tools', href: '/tools' },
-    { label: 'Blog', href: '/blog' },
     { label: 'How it works', href: '/#how-it-works' },
-    { label: 'About', href: '/about' },
+    { label: 'Compare', href: '/compare' },
     { label: 'Pricing', href: '/pricing' },
+    { label: 'Blog', href: '/blog' },
     { label: 'Log in', href: '/login' },
   ],
   features: [

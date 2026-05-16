@@ -321,8 +321,8 @@
 }
 
 .me-defer-section {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 760px;
+  content-visibility: visible;
+  contain-intrinsic-size: auto;
 }
 
 @media (prefers-reduced-motion: reduce) {

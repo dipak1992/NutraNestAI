@@ -1,5 +1,3 @@
-'use client'
-
 import Image from 'next/image'
 import {
   Brain,
@@ -7,14 +5,12 @@ import {
   CheckCircle2,
   ChefHat,
   DollarSign,
-  MessageSquareText,
   Refrigerator,
   ShoppingCart,
   Sparkles,
 } from 'lucide-react'
-import { ScrollReveal, StaggerGroup, HoverCard } from '@/components/motion'
-import { Section } from '@/components/ui/Section'
-import { SectionHeader } from '@/components/ui/SectionHeader'
+import { Container } from './shared/Container'
+import { FadeIn } from './shared/FadeIn'
 import afterDinnerImage from '@/public/landing/optimized/after-dinner.webp'
 import memoryImage from '@/public/landing/optimized/memory.webp'
 
@@ -44,12 +40,6 @@ const systemSteps = [
     body: 'Over budget? AI suggests cheaper alternatives that respect your dietary needs.',
   },
   {
-    icon: MessageSquareText,
-    label: 'Copilot',
-    title: 'Brief and review',
-    body: 'Plus can brief the week, suggest changes, and send every action to a review-before-applying workflow.',
-  },
-  {
     icon: Refrigerator,
     label: 'Leftovers',
     title: 'Use what remains',
@@ -61,9 +51,6 @@ const memoryItems = [
   'Tonight never repeats what\u2019s already planned this week',
   'Liked dinners become stronger future picks',
   'Budget swaps use real AI to find cheaper alternatives',
-  'Copilot remembers schedule patterns like practice nights',
-  'Weekly briefings surface plan gaps, budget risk, and expiring leftovers',
-  'Copilot actions are reviewed before they change your week',
   'Every feature shares context — nothing works in isolation',
 ]
 
@@ -76,24 +63,33 @@ const postCookItems = [
 
 export function ConnectedSystem() {
   return (
-    <Section background="dark" padding="lg" className="me-defer-section">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <ScrollReveal>
-          <SectionHeader
-            badge="Calm food operating system"
-            title="Dinner, groceries, leftovers, and budget update each other."
-            subtitle="MealEase is strongest when every action moves the next one forward: tonight feeds the planner, the planner feeds the grocery list, cooking feeds leftovers, and budget stays visible the whole time. Plus Copilot can brief the week and route plan changes, budget swaps, grocery actions, and leftover fixes into review-before-applying workflows."
-            align="center"
-            className="text-white [&_h2]:text-white [&_p]:text-neutral-300"
-          />
-        </ScrollReveal>
+    <section className="bg-[#17120f] py-16 text-white md:py-22" aria-labelledby="system-heading">
+      <Container>
+        <FadeIn>
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#F3B18E]">
+              Household memory
+            </p>
+            <h2
+              id="system-heading"
+              className="mt-4 font-serif text-4xl font-bold tracking-tight md:text-5xl"
+            >
+              MealEase gets less generic every time your household cooks.
+            </h2>
+            <p className="mt-5 text-lg leading-relaxed text-neutral-300">
+              Every action moves the next one forward: tonight feeds the planner,
+              the planner feeds groceries, cooking feeds leftovers, and budget stays visible.
+            </p>
+          </div>
+        </FadeIn>
 
-        <StaggerGroup className="mt-14 grid gap-4 lg:grid-cols-6" staggerDelay={0.06}>
-          {systemSteps.map((step) => {
+        <div className="mt-14 grid gap-4 lg:grid-cols-5">
+          {systemSteps.map((step, index) => {
             const Icon = step.icon
+
             return (
-              <HoverCard key={step.label} className="h-full">
-                <article className="h-full rounded-2xl border border-white/10 bg-white/[0.06] p-5 transition-all duration-300 hover:bg-white/[0.1] hover:border-[#D97757]/30">
+              <FadeIn key={step.label} delay={index * 0.06}>
+                <article className="h-full rounded-2xl border border-white/10 bg-white/[0.06] p-5">
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-xs font-bold uppercase tracking-[0.16em] text-[#F3B18E]">
                       {step.label}
@@ -105,14 +101,15 @@ export function ConnectedSystem() {
                   <h3 className="mt-5 text-lg font-semibold text-white">{step.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-neutral-400">{step.body}</p>
                 </article>
-              </HoverCard>
+              </FadeIn>
             )
           })}
-        </StaggerGroup>
+        </div>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
-          <ScrollReveal delay={0.18}>
+          <FadeIn delay={0.18}>
             <article className="relative h-full overflow-hidden rounded-3xl border border-white/10 shadow-2xl shadow-black/40">
+              {/* Background image */}
               <Image
                 src={memoryImage}
                 alt=""
@@ -122,9 +119,12 @@ export function ConnectedSystem() {
                 className="object-cover object-center"
                 placeholder="blur"
               />
+              {/* Dark gradient overlay — top lighter, bottom denser for text safety */}
               <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(5,10,20,0.42)_0%,rgba(5,10,20,0.65)_100%)]" />
+              {/* Subtle warm tint at bottom */}
               <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#0d0a08]/60 to-transparent" />
 
+              {/* Content */}
               <div className="relative z-10 p-6 md:p-8">
                 <div className="flex items-start gap-4">
                   <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm ring-1 ring-white/20 text-[#F3B18E]">
@@ -149,10 +149,11 @@ export function ConnectedSystem() {
                 </ul>
               </div>
             </article>
-          </ScrollReveal>
+          </FadeIn>
 
-          <ScrollReveal delay={0.24}>
+          <FadeIn delay={0.24}>
             <article className="relative h-full overflow-hidden rounded-3xl border border-white/10 shadow-2xl shadow-black/40">
+              {/* Background image */}
               <Image
                 src={afterDinnerImage}
                 alt=""
@@ -162,9 +163,12 @@ export function ConnectedSystem() {
                 className="object-cover object-center"
                 placeholder="blur"
               />
+              {/* Dark gradient overlay — top lighter, bottom denser for text safety */}
               <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(10,5,2,0.40)_0%,rgba(10,5,2,0.68)_100%)]" />
+              {/* Subtle warm tint at bottom */}
               <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#0d0805]/60 to-transparent" />
 
+              {/* Content */}
               <div className="relative z-10 p-6 md:p-8">
                 <div className="flex items-start gap-4">
                   <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm ring-1 ring-white/20 text-[#F3B18E]">
@@ -179,19 +183,19 @@ export function ConnectedSystem() {
                     </h3>
                   </div>
                 </div>
-                <StaggerGroup className="mt-7 grid gap-3 sm:grid-cols-4" staggerDelay={0.06}>
+                <div className="mt-7 grid gap-3 sm:grid-cols-4">
                   {postCookItems.map((item, index) => (
                     <div key={item} className="rounded-2xl bg-black/40 backdrop-blur-sm ring-1 ring-white/15 p-4">
                       <p className="text-xs font-bold text-[#F3B18E]">0{index + 1}</p>
                       <p className="mt-2 text-sm font-semibold text-white">{item}</p>
                     </div>
                   ))}
-                </StaggerGroup>
+                </div>
               </div>
             </article>
-          </ScrollReveal>
+          </FadeIn>
         </div>
-      </div>
-    </Section>
+      </Container>
+    </section>
   )
 }

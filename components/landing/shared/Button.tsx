@@ -1,4 +1,7 @@
+'use client'
+
 import Link from 'next/link'
+import { motion, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
 type Props = {
@@ -18,6 +21,7 @@ export function Button({
   ariaLabel,
   prefetch = false,
 }: Props) {
+  const shouldReduceMotion = useReducedMotion()
   const base =
     'inline-flex items-center justify-center gap-2 rounded-full font-medium transition-all duration-200 min-h-[48px] px-6 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#D97757]'
 
@@ -30,14 +34,27 @@ export function Button({
       'text-neutral-800 dark:text-neutral-100 hover:text-[#D97757] underline-offset-4 hover:underline',
   }
 
+  const linkProps = {
+    href,
+    'aria-label': ariaLabel,
+    prefetch,
+    className: cn(base, styles[variant], className),
+  }
+
+  if (shouldReduceMotion) {
+    return <Link {...linkProps}>{children}</Link>
+  }
+
+  const MotionLink = motion.create(Link)
+
   return (
-    <Link
-      href={href}
-      aria-label={ariaLabel}
-      prefetch={prefetch}
-      className={cn(base, styles[variant], className)}
+    <MotionLink
+      {...linkProps}
+      whileHover={{ y: -2, scale: 1.015 }}
+      whileTap={{ y: 0, scale: 0.975 }}
+      transition={{ type: 'spring', stiffness: 420, damping: 28 }}
     >
       {children}
-    </Link>
+    </MotionLink>
   )
 }

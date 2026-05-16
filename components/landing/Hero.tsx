@@ -3,6 +3,7 @@ import { CheckCircle2, Clock, ShoppingCart } from 'lucide-react'
 import { Container } from './shared/Container'
 import { Button } from './shared/Button'
 import { FadeIn } from './shared/FadeIn'
+import { MotionFloat } from './shared/MotionFloat'
 import { socialProof } from '@/config/social-proof'
 import { LandingTonightPreview } from './LandingTonightPreview'
 import { LandingScanDemoButton } from './LandingScanDemoButton'
@@ -47,7 +48,7 @@ export function Hero() {
         <div className="grid lg:grid-cols-12 gap-8 lg:gap-14 items-center">
           {/* Left: copy */}
           <div className="lg:col-span-6">
-            <FadeIn>
+            <FadeIn direction="left">
               <h1
                 id="hero-heading"
                 className="font-serif text-[38px] leading-[1.05] sm:text-5xl md:text-6xl lg:text-[62px] font-bold tracking-tight text-neutral-900 dark:text-neutral-50"
@@ -58,7 +59,7 @@ export function Hero() {
               </h1>
             </FadeIn>
 
-            <FadeIn delay={0.1}>
+            <FadeIn delay={0.08} direction="left">
               <p className="mt-4 sm:mt-6 max-w-xl text-base sm:text-lg leading-[1.6] text-neutral-600 dark:text-neutral-300 md:text-xl">
                 MealEase learns your household, checks what you already have,
                 and turns tonight&apos;s dinner into a shopping-ready list before
@@ -66,7 +67,7 @@ export function Hero() {
               </p>
             </FadeIn>
 
-            <FadeIn delay={0.2}>
+            <FadeIn delay={0.16} direction="left">
               <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
                 {/* CTA: slightly narrower on mobile, premium shadow, active press state */}
                 <Button
@@ -85,7 +86,7 @@ export function Hero() {
               </div>
             </FadeIn>
 
-            <FadeIn delay={0.3}>
+            <FadeIn delay={0.24} direction="left">
               <div className="mt-5 grid max-w-xl gap-2 rounded-2xl border border-orange-100 bg-white/78 p-3 shadow-sm shadow-orange-100/40 backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/78 sm:grid-cols-3">
                 {trustItems.map((item, i) => (
                   <span key={item} className="inline-flex items-center gap-2 text-xs font-semibold text-neutral-700 dark:text-neutral-300">
@@ -98,7 +99,7 @@ export function Hero() {
             </FadeIn>
 
             {/* Social proof row */}
-            <FadeIn delay={0.4}>
+            <FadeIn delay={0.32} direction="left">
               <div className="mt-6 sm:mt-8 flex max-w-[270px] sm:max-w-xl flex-row items-center gap-3 sm:gap-4">
                 {/* Avatar stack — real photos */}
                 <div className="flex -space-x-1.5 shrink-0" aria-hidden>
@@ -133,9 +134,9 @@ export function Hero() {
 
           {/* Right: product and household proof */}
           <div className="lg:col-span-6 relative flex justify-center -mt-4 sm:mt-0">
-            <FadeIn delay={0.2}>
+            <FadeIn delay={0.14} direction="right">
               <div className="relative mx-auto w-full max-w-[600px] sm:min-h-[470px]">
-                <div className="relative hidden min-h-[430px] overflow-hidden rounded-[2rem] bg-neutral-950 shadow-2xl shadow-neutral-950/15 ring-1 ring-black/10 sm:block">
+                <MotionFloat intensity={0.45} className="relative hidden min-h-[430px] overflow-hidden rounded-[2rem] bg-neutral-950 shadow-2xl shadow-neutral-950/15 ring-1 ring-black/10 sm:block">
                   <Image
                     src="/landing/optimized/hero-section.webp"
                     alt="Warm household dinner ingredients ready for a MealEase plan"
@@ -145,7 +146,7 @@ export function Hero() {
                     priority
                   />
                   <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(23,18,15,0.72)_0%,rgba(23,18,15,0.22)_48%,rgba(255,255,255,0.18)_100%)]" />
-                  <div className="absolute bottom-5 left-5 w-[260px] rounded-2xl bg-white/94 p-4 shadow-xl backdrop-blur">
+                  <MotionFloat intensity={0.75} delay={0.35} className="absolute bottom-5 left-5 w-[260px] rounded-2xl bg-white/94 p-4 shadow-xl backdrop-blur">
                     <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#D97757]">
                       First useful output
                     </p>
@@ -166,11 +167,11 @@ export function Hero() {
                         List ready
                       </span>
                     </div>
-                  </div>
-                </div>
+                  </MotionFloat>
+                </MotionFloat>
 
                 {/* Phone frame */}
-                <div className="relative mx-auto aspect-[9/19.5] w-[min(235px,calc(100vw-96px))] rounded-[2.6rem] bg-neutral-900 p-2.5 shadow-2xl shadow-neutral-900/25 ring-1 ring-black/8 sm:absolute sm:right-8 sm:top-10 sm:mx-0 sm:w-[245px]">
+                <MotionFloat intensity={1} delay={0.2} className="relative mx-auto aspect-[9/19.5] w-[min(235px,calc(100vw-96px))] rounded-[2.6rem] bg-neutral-900 p-2.5 shadow-2xl shadow-neutral-900/25 ring-1 ring-black/8 sm:absolute sm:right-8 sm:top-10 sm:mx-0 sm:w-[245px]">
                   <div className="relative w-full h-full rounded-[2.3rem] overflow-hidden bg-[#FBFAF3]">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(16,185,129,0.14),transparent_34%),radial-gradient(circle_at_100%_20%,rgba(217,119,87,0.14),transparent_32%)]" />
                     <LandingTonightPreview />
@@ -180,16 +181,16 @@ export function Hero() {
                     aria-hidden
                     className="absolute top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-neutral-900 rounded-b-2xl"
                   />
-                </div>
+                </MotionFloat>
 
                 {/* Floating "budget" card */}
-                <div className="hidden md:flex absolute right-2 bottom-16 bg-white dark:bg-neutral-800 rounded-2xl shadow-xl p-4 items-center gap-3 ring-1 ring-black/5">
+                <MotionFloat intensity={1.2} delay={0.55} className="hidden md:flex absolute right-2 bottom-16 bg-white dark:bg-neutral-800 rounded-2xl shadow-xl p-4 items-center gap-3 ring-1 ring-black/5">
                   <ShoppingCart className="h-6 w-6 text-[#D97757]" aria-hidden />
                   <div>
                     <div className="text-xs text-neutral-500 dark:text-neutral-400">Grocery preview</div>
                     <div className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">$87 estimated</div>
                   </div>
-                </div>
+                </MotionFloat>
               </div>
             </FadeIn>
           </div>

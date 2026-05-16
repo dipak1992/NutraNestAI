@@ -357,7 +357,7 @@ function TonightPageInner() {
     setGuestSwipesUsed(readGuestSwipeCount())
   }, [])
 
-  const fetchMeal = useCallback(async (ingredientText?: string) => {
+  const fetchMeal = useCallback(async (ingredientText?: string, countsAsTonightSwap = false) => {
     setLoading(true)
     setAuthRequired(false)
     animationDoneRef.current = false
@@ -379,6 +379,7 @@ function TonightPageInner() {
           lowEnergy: mode === 'tired',
           maxCookTime: mode === 'quick' ? 30 : mode === 'tired' ? 20 : undefined,
           excludeIds: seenIdsRef.current,
+          mode: countsAsTonightSwap ? 'tonight-swap' : 'tonight',
           ...(boosts ? { learnedBoosts: boosts } : {}),
         }
         if (mode === 'pantry' && ingredientText) {
@@ -404,6 +405,9 @@ function TonightPageInner() {
       } else {
         fetchPendingRef.current = false
         setLoading(false)
+        if (res.status === 402) {
+          setPaywallOpen(true)
+        }
       }
     } catch {
       fetchPendingRef.current = false
@@ -443,12 +447,12 @@ function TonightPageInner() {
       }
       writeGuestSwipeCount(nextGuestCount)
       setGuestSwipesUsed(nextGuestCount)
-      fetchMeal(userInput || undefined)
+      fetchMeal(userInput || undefined, true)
       return
     }
 
     if (status.isPro) {
-      fetchMeal(userInput || undefined)
+      fetchMeal(userInput || undefined, true)
       return
     }
 
@@ -460,7 +464,7 @@ function TonightPageInner() {
 
     writeSwipeCount(nextSwipeCount)
     setSwipesUsed(nextSwipeCount)
-    fetchMeal(userInput || undefined)
+    fetchMeal(userInput || undefined, true)
   }, [status.isAuthenticated, status.freeTonightSwipeLimit, status.isPro, swipesUsed, guestSwipesUsed, fetchMeal, userInput])
 
   const swipesRemaining = status.isPro

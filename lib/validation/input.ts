@@ -83,6 +83,7 @@ export const smartMealRequestSchema = z.object({
   maxCookTime: z.coerce.number().int().min(5).max(240).optional(),
   preferredProteins: stringArraySchema(30, 60).optional(),
   excludeIds: stringArraySchema(100, 80).optional(),
+  mode: z.enum(['tonight', 'tonight-swap']).optional(),
 }).strict()
 
 export const aiGenerationRequestSchema = z.object({

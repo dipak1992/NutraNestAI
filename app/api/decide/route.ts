@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { rateLimit, rateLimitKeyFromRequest } from '@/lib/rate-limit'
 import { apiError, apiRateLimited, apiSuccess } from '@/lib/api-response'
 import logger from '@/lib/logger'
+import { enforceTonightSwapQuota, incrementTonightSwapQuota } from '@/lib/paywall/tonight-quota'
 import type { SmartMealRequest } from '@/lib/engine/types'
 import type { LearnedBoosts } from '@/lib/learning/types'
 import { buildFamilyEngineOverrides, getFamilyMembers, getUserTier, mergeUnique } from '@/lib/family/service'
@@ -12,6 +13,7 @@ type Mode = 'tonight' | 'surprise' | 'swap'
 
 interface DecideBody extends SmartMealRequest {
   mode?: Mode
+  countsAsTonightSwap?: boolean
   learnedBoosts?: LearnedBoosts
   /** Client-side excludes (e.g. meal currently shown, for swap). */
   excludeIds?: string[]
@@ -84,11 +86,18 @@ export async function POST(req: NextRequest) {
     ...serverExcludes,
   ]))
 
+  const countsAsTonightSwap = mode === 'tonight'
+    && (body.countsAsTonightSwap || (body.excludeIds?.length ?? 0) > 0)
+
   let familyOverrides: ReturnType<typeof buildFamilyEngineOverrides> | null = null
+  let supabaseForQuota: Awaited<ReturnType<typeof createClient>> | null = null
+  let userIdForQuota: string | null = null
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (user) {
+      supabaseForQuota = supabase
+      userIdForQuota = user.id
       const tier = await getUserTier(supabase as any, user.id)
       if (tier === 'pro') {
         const members = await getFamilyMembers(supabase as any, user.id)
@@ -101,8 +110,13 @@ export async function POST(req: NextRequest) {
     // Non-fatal: keep existing request behavior when family lookup fails.
   }
 
-  const { learnedBoosts, mode: _mode, excludeIds: _ex, ...rest } = body
-  void _mode; void _ex
+  if (countsAsTonightSwap && supabaseForQuota && userIdForQuota) {
+    const quotaResponse = await enforceTonightSwapQuota(supabaseForQuota, userIdForQuota)
+    if (quotaResponse) return quotaResponse
+  }
+
+  const { learnedBoosts, mode: _mode, excludeIds: _ex, countsAsTonightSwap: _countsAsTonightSwap, ...rest } = body
+  void _mode; void _ex; void _countsAsTonightSwap
 
   const mealRequest: SmartMealRequest = {
     ...rest,
@@ -123,6 +137,9 @@ export async function POST(req: NextRequest) {
 
   try {
     const result = generateSmartMeal(mealRequest, learnedBoosts)
+    if (countsAsTonightSwap && supabaseForQuota && userIdForQuota) {
+      await incrementTonightSwapQuota(supabaseForQuota)
+    }
     return apiSuccess({
       meal: result,
       context: {

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { enforceTonightSwapQuota, incrementTonightSwapQuota, isTonightSwapUnlimited } from '@/lib/paywall/tonight-quota'
 import { getSwapSuggestion } from '@/lib/tonight/engine'
 import type { Plan } from '@/lib/dashboard/types'
 
@@ -50,10 +51,20 @@ export async function POST(req: Request) {
     plus: 'plus',
     free: 'free',
   }
-  const plan =
-    tierMap[profile?.subscription_tier ?? 'free'] ??
-    tierMap[profile?.plan ?? 'free'] ??
-    'free'
+  const isUnlimited = await isTonightSwapUnlimited(supabase, user.id)
+  const plan = isUnlimited
+    ? 'plus'
+    : (
+        tierMap[profile?.subscription_tier ?? 'free'] ??
+        tierMap[profile?.plan ?? 'free'] ??
+        'free'
+      )
+
+  if (!isUnlimited) {
+    const quotaResponse = await enforceTonightSwapQuota(supabase, user.id)
+    if (quotaResponse) return quotaResponse
+  }
+
   const body = await readBody(req)
   const excludeIds = Array.from(
     new Set([
@@ -110,6 +121,7 @@ export async function POST(req: Request) {
   }
 
   const suggestion = getSwapSuggestion(user.id, excludeIds, plan, prefContext)
+  if (!isUnlimited) await incrementTonightSwapQuota(supabase)
 
   return NextResponse.json(suggestion, {
     headers: {

@@ -6,6 +6,7 @@ export type DecideMode = 'tonight' | 'surprise' | 'swap'
 
 export interface DecideRequest {
   mode: DecideMode
+  countsAsTonightSwap?: boolean
   household: {
     adultsCount: number
     kidsCount: number
@@ -45,7 +46,13 @@ export async function decideMeal(body: DecideRequest): Promise<DecideResponse> {
     body: JSON.stringify(body),
   })
   const json = await res.json()
-  if (!res.ok || !json.success) throw new Error(json.error ?? 'decide failed')
+  if (!res.ok || !json.success) {
+    throw Object.assign(new Error(json.error ?? 'decide failed'), {
+      status: res.status,
+      code: json.code,
+      quota: json.quota,
+    })
+  }
   return json.data as DecideResponse
 }
 

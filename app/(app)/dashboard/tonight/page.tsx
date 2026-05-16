@@ -197,7 +197,7 @@ export default function TonightPillarPage() {
       : fallbackHousehold(light.householdType, light.hasKids, light.kidsAgeGroup),
     [members, light.householdType, light.hasKids, light.kidsAgeGroup])
 
-  const fetchMeal = useCallback(async (chipMode: TonightMode) => {
+  const fetchMeal = useCallback(async (chipMode: TonightMode, countsAsTonightSwap = false) => {
     setLoading(true)
     animationDoneRef.current = false
     fetchPendingRef.current = true
@@ -211,6 +211,7 @@ export default function TonightPillarPage() {
         excludeIds: seenIdsRef.current,
         learnedBoosts: getBoosts() ?? undefined,
         mode: 'tonight',
+        countsAsTonightSwap,
       }
 
       // Mode-specific overrides
@@ -221,9 +222,12 @@ export default function TonightPillarPage() {
       seenIdsRef.current = [...seenIdsRef.current, res.meal.id].slice(-15)
       fetchPendingRef.current = false
       if (animationDoneRef.current) setLoading(false)
-    } catch {
+    } catch (error) {
       fetchPendingRef.current = false
       setLoading(false)
+      if ((error as { status?: number; code?: string }).status === 402) {
+        setPaywallOpen(true)
+      }
     }
   }, [getHousehold, light.cuisines, getBoosts])
 
@@ -243,7 +247,7 @@ export default function TonightPillarPage() {
   }, [status.tier, fetchMeal])
 
   const handleTryAnother = useCallback(() => {
-    fetchMeal(activeChip)
+    fetchMeal(activeChip, true)
   }, [activeChip, fetchMeal])
 
   return (

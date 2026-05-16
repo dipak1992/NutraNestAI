@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { rateLimit, rateLimitKeyFromRequest } from '@/lib/rate-limit'
 import { apiError, apiRateLimited } from '@/lib/api-response'
 import { generateText } from '@/lib/ai/service'
+import { enforceTonightSwapQuota, incrementTonightSwapQuota } from '@/lib/paywall/tonight-quota'
 import logger from '@/lib/logger'
 import { generateSlug } from '@/lib/content/types'
 import { promptInjectionIssue, smartMealRequestSchema, validationError } from '@/lib/validation/input'
@@ -63,6 +64,9 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) return NextResponse.json({ error: validationError(parsed.error) }, { status: 400 })
     const injectionIssue = promptInjectionIssue(parsed.data)
     if (injectionIssue) return NextResponse.json({ error: injectionIssue }, { status: 400 })
+    const rawMode = (rawBody as { mode?: string }).mode
+    const countsAsTonightSwap = rawMode === 'tonight-swap'
+      || (rawMode === 'tonight' && Array.isArray(parsed.data.excludeIds) && parsed.data.excludeIds.length > 0)
     const body = { ...parsed.data, learnedBoosts: (rawBody as { learnedBoosts?: LearnedBoosts }).learnedBoosts } as SmartMealRequest & { learnedBoosts?: LearnedBoosts }
 
     const { adultsCount = 0, kidsCount = 0, toddlersCount = 0, babiesCount = 0 } = body.household
@@ -73,7 +77,13 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const { learnedBoosts, ...mealRequest } = body
+    const { learnedBoosts, mode: _mode, ...mealRequest } = body as typeof body & { mode?: string }
+    void _mode
+
+    if (countsAsTonightSwap) {
+      const quotaResponse = await enforceTonightSwapQuota(supabase, user.id)
+      if (quotaResponse) return quotaResponse
+    }
 
     let historyExcludeIds: string[] = []
     try {
@@ -143,6 +153,7 @@ export async function POST(req: NextRequest) {
           is_public: false,
         })
 
+        if (countsAsTonightSwap) await incrementTonightSwapQuota(supabase)
         return NextResponse.json(aiMeal)
       } catch (aiError) {
         logger.warn('[smart-meal] AI fallback failed, returning engine result', {
@@ -152,6 +163,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    if (countsAsTonightSwap) await incrementTonightSwapQuota(supabase)
     return NextResponse.json(result)
   } catch (error) {
     logger.error('[smart-meal] Engine error', { error: error instanceof Error ? error.message : String(error) })

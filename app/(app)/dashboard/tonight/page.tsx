@@ -116,12 +116,12 @@ function VariationCard({ variation, index }: { variation: VariationProps; index:
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.6 + index * 0.1 }}
-      className="rounded-xl border border-border/60 overflow-hidden bg-white"
+      transition={{ delay: 0.6 + index * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+      className="rounded-2xl border border-neutral-100 overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow duration-200"
     >
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-3.5 text-left hover:bg-muted/30 transition-colors"
+        className="w-full flex items-center justify-between p-3.5 text-left hover:bg-neutral-50/80 transition-colors"
       >
         <div className="flex items-center gap-3">
           <span className="text-xl">{variation.emoji}</span>
@@ -254,7 +254,7 @@ export default function TonightPillarPage() {
     <div
       className="min-h-screen"
       style={{
-        background: 'linear-gradient(180deg, #fef7f0 0%, #fff7ed 15%, #ffffff 40%, #ffffff 100%)',
+        background: 'linear-gradient(180deg, #FDF6F1 0%, #fef3e8 15%, #ffffff 40%, #ffffff 100%)',
       }}
     >
       <div className="mx-auto max-w-lg px-5 pb-16 pt-6">
@@ -285,12 +285,12 @@ export default function TonightPillarPage() {
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleChipSelect(chip.id)}
                 className={cn(
-                  'inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all border',
+                  'inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 border',
                   isActive
-                    ? 'bg-primary text-white border-primary shadow-md'
+                    ? 'bg-[#D97757] text-white border-[#D97757] shadow-sm'
                     : locked
                       ? 'bg-white text-gray-500 border-amber-200 ring-1 ring-amber-100'
-                      : 'bg-white text-foreground border-border/60 hover:border-primary/40 hover:shadow-sm',
+                      : 'bg-neutral-100 text-neutral-600 border-transparent hover:bg-neutral-200',
                 )}
               >
                 {chip.emoji} {chip.label}
@@ -323,9 +323,9 @@ export default function TonightPillarPage() {
               transition={{ duration: 0.3 }}
             >
               {/* Meal card */}
-              <div className="rounded-2xl border border-border/60 bg-white overflow-hidden shadow-sm">
+              <div className="rounded-3xl border border-neutral-100 bg-white overflow-hidden shadow-md">
                 <div className="p-5">
-                  <Badge variant="outline" className="mb-3 text-xs">
+                  <Badge variant="outline" className="mb-3 text-xs border-[#D97757]/30 text-[#D97757] bg-[#D97757]/5">
                     {TONIGHT_CHIPS.find(c => c.id === activeChip)?.emoji}{' '}
                     {TONIGHT_CHIPS.find(c => c.id === activeChip)?.label} Mode
                   </Badge>
@@ -335,19 +335,19 @@ export default function TonightPillarPage() {
                   {/* Stats */}
                   <div className="flex flex-wrap gap-3 mt-4">
                     <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                      <Clock className="h-3.5 w-3.5 text-primary" />
+                      <Clock className="h-3.5 w-3.5 text-[#D97757]" />
                       {meal.prepTime + meal.cookTime}m
                     </span>
                     <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                      <ChefHat className="h-3.5 w-3.5 text-primary" />
+                      <ChefHat className="h-3.5 w-3.5 text-[#D97757]" />
                       {meal.difficulty}
                     </span>
                     <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                      <DollarSign className="h-3.5 w-3.5 text-primary" />
+                      <DollarSign className="h-3.5 w-3.5 text-[#D97757]" />
                       ~${meal.estimatedCost.toFixed(0)}
                     </span>
                     <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                      <Users className="h-3.5 w-3.5 text-primary" />
+                      <Users className="h-3.5 w-3.5 text-[#D97757]" />
                       Serves {meal.servings}
                     </span>
                   </div>
@@ -355,9 +355,9 @@ export default function TonightPillarPage() {
                   {/* Tags */}
                   <div className="flex flex-wrap gap-1.5 mt-3">
                     {meal.tags.map((tag) => (
-                      <Badge key={tag} variant="secondary" className="text-[11px] font-normal">
+                      <span key={tag} className="inline-flex items-center rounded-full bg-[#D97757]/8 text-[#D97757] border border-[#D97757]/20 px-2.5 py-0.5 text-[11px] font-medium">
                         {tag}
-                      </Badge>
+                      </span>
                     ))}
                   </div>
 
@@ -368,14 +368,14 @@ export default function TonightPillarPage() {
                 </div>
 
                 {/* Actions */}
-                <div className="border-t border-border/60 px-5 py-3 flex items-center gap-2">
-                  <SaveMealButton meal={meal} source="tonight" className="h-9 w-9 rounded-md border border-border/60" />
-                  <ShareMealButton meal={meal} className="h-9 w-9 rounded-md border border-border/60" />
+                <div className="border-t border-neutral-100 px-5 py-3 flex items-center gap-2 bg-neutral-50/50">
+                  <SaveMealButton meal={meal} source="tonight" className="h-9 w-9 rounded-xl border border-neutral-200" />
+                  <ShareMealButton meal={meal} className="h-9 w-9 rounded-xl border border-neutral-200" />
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={handleTryAnother}
-                    className="gap-1.5 ml-auto"
+                    className="gap-1.5 ml-auto rounded-full border-neutral-200 hover:border-[#D97757]/40 hover:text-[#D97757]"
                   >
                     <RefreshCw className="h-3.5 w-3.5" /> Try another
                   </Button>
@@ -386,7 +386,7 @@ export default function TonightPillarPage() {
               {meal.variations && meal.variations.length > 0 && (
                 <div className="mt-6">
                   <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
-                    <ShieldCheck className="h-4 w-4 text-primary" />
+                    <ShieldCheck className="h-4 w-4 text-[#D97757]" />
                     Family-Safe Variations
                   </h3>
                   <div className="space-y-2">
@@ -400,13 +400,13 @@ export default function TonightPillarPage() {
               {/* Steps */}
               <div className="mt-6">
                 <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
-                  <ChefHat className="h-4 w-4 text-primary" />
+                  <ChefHat className="h-4 w-4 text-[#D97757]" />
                   How to Make It
                 </h3>
                 <div className="space-y-2">
                   {meal.steps.map((step, i) => (
-                    <div key={i} className="rounded-lg border border-border/40 bg-white p-3 flex items-start gap-3">
-                      <span className="flex-shrink-0 flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-bold">
+                    <div key={i} className="rounded-xl border border-neutral-100 bg-white p-3 flex items-start gap-3 shadow-sm">
+                      <span className="flex-shrink-0 flex h-6 w-6 items-center justify-center rounded-full bg-[#D97757]/10 text-[#D97757] text-xs font-bold">
                         {i + 1}
                       </span>
                       <p className="text-sm leading-relaxed">{step}</p>
@@ -436,7 +436,7 @@ export default function TonightPillarPage() {
               <Button
                 size="sm"
                 onClick={() => handleChipSelect('fast')}
-                className="gap-1.5"
+                className="gap-1.5 bg-[#D97757] hover:bg-[#C86646] text-white rounded-full px-5"
               >
                 <Sparkles className="h-3.5 w-3.5" /> Get a fast meal
               </Button>

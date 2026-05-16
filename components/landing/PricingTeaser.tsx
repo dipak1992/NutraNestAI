@@ -1,6 +1,9 @@
-import { Container } from './shared/Container'
+'use client'
+
+import { ScrollReveal, StaggerGroup, HoverCard } from '@/components/motion'
+import { Section } from '@/components/ui/Section'
+import { SectionHeader } from '@/components/ui/SectionHeader'
 import { Button } from './shared/Button'
-import { FadeIn } from './shared/FadeIn'
 
 const plans = [
   {
@@ -42,48 +45,37 @@ const plans = [
 
 export function PricingTeaser() {
   return (
-    <section
-      id="pricing"
-      className="me-defer-section py-20 md:py-28 bg-white dark:bg-neutral-950"
-      aria-labelledby="pricing-heading"
-    >
-      <Container>
-        <FadeIn>
-          <div className="text-center max-w-2xl mx-auto mb-14">
-            <h2
-              id="pricing-heading"
-              className="font-serif text-4xl md:text-5xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50"
-            >
-              Simple pricing.{' '}
-              <span className="italic text-[#D97757]">No surprises.</span>
-            </h2>
-            <p className="mt-4 text-lg text-neutral-600 dark:text-neutral-400">
-              Start with basic Copilot. Upgrade when you want it to run the plan, grocery, budget, leftover, and schedule workflows together.
-            </p>
-          </div>
-        </FadeIn>
+    <Section id="pricing" background="white" padding="lg" className="me-defer-section">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <ScrollReveal>
+          <SectionHeader
+            title="Simple pricing. No surprises."
+            subtitle="Start with basic Copilot. Upgrade when you want it to run the plan, grocery, budget, leftover, and schedule workflows together."
+            align="center"
+          />
+        </ScrollReveal>
 
-        <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-          {plans.map((plan, i) => (
-            <FadeIn key={plan.name} delay={i * 0.1}>
+        <StaggerGroup className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto" staggerDelay={0.1}>
+          {plans.map((plan) => (
+            <HoverCard key={plan.name} className="h-full" lift={plan.highlight ? 4 : 2}>
               <div
                 className={[
-                  'relative flex flex-col h-full rounded-2xl p-8',
+                  'relative flex flex-col h-full rounded-3xl p-8 transition-shadow duration-300',
                   plan.highlight
-                    ? 'bg-neutral-900 dark:bg-neutral-800 text-white ring-2 ring-[#D97757]'
-                    : 'bg-[#FDF6F1] dark:bg-neutral-900 ring-1 ring-black/5 dark:ring-white/5',
+                    ? 'bg-neutral-900 dark:bg-neutral-800 text-white ring-2 ring-[#D97757] shadow-xl shadow-[#D97757]/10'
+                    : 'bg-[#FDF6F1] dark:bg-neutral-900 ring-1 ring-black/5 dark:ring-white/5 shadow-subtle hover:shadow-medium',
                 ].join(' ')}
               >
                 {plan.highlight && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="bg-[#D97757] text-white text-xs font-semibold px-4 py-1 rounded-full">
+                    <span className="bg-[#D97757] text-white text-xs font-semibold px-4 py-1 rounded-full shadow-md shadow-[#D97757]/30">
                       Most popular
                     </span>
                   </div>
                 )}
 
                 <div className="mb-6">
-                  <div className={`text-sm font-semibold uppercase tracking-widest mb-2 ${plan.highlight ? 'text-[#D97757]' : 'text-neutral-500 dark:text-neutral-400'}`}>
+                  <div className={`text-sm font-semibold uppercase tracking-widest mb-2 ${plan.highlight ? 'text-[#D97757]' : 'text-neutral-400 dark:text-neutral-400'}`}>
                     {plan.name}
                   </div>
                   <div className="flex items-baseline gap-1">
@@ -118,16 +110,16 @@ export function PricingTeaser() {
                   {plan.cta}
                 </Button>
               </div>
-            </FadeIn>
+            </HoverCard>
           ))}
-        </div>
+        </StaggerGroup>
 
-        <FadeIn delay={0.3}>
-          <p className="text-center text-sm text-neutral-500 dark:text-neutral-400 mt-8">
+        <ScrollReveal delay={0.3}>
+          <p className="text-center text-sm text-neutral-400 dark:text-neutral-400 mt-8">
             No credit card required. Cancel anytime.
           </p>
-        </FadeIn>
-      </Container>
-    </section>
+        </ScrollReveal>
+      </div>
+    </Section>
   )
 }

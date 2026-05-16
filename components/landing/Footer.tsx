@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { Container } from './shared/Container'
 import { MealEaseLogo } from '@/components/ui/MealEaseLogo'
 import { productStory } from '@/lib/marketing/stats'
 
@@ -36,15 +35,15 @@ export function Footer() {
       className="bg-neutral-950 text-neutral-400 pt-16 pb-10"
       aria-label="Site footer"
     >
-      <Container>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top: brand + nav */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-10 mb-14">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <Link href="/" prefetch={false} aria-label="MealEase home" className="inline-flex items-center">
-                <MealEaseLogo size="md" invertText showBadge />
-              </Link>
-            <p className="mt-3 text-sm leading-relaxed">
+              <MealEaseLogo size="md" invertText showBadge />
+            </Link>
+            <p className="mt-3 text-sm leading-relaxed text-neutral-400">
               {productStory}
             </p>
             <p className="mt-3 text-xs leading-relaxed text-neutral-500">
@@ -80,7 +79,7 @@ export function Footer() {
           <p suppressHydrationWarning>© {new Date().getFullYear()} DDS Supply LLC. All rights reserved.</p>
           <p>Made with ♥ for households everywhere.</p>
         </div>
-      </Container>
+      </div>
     </footer>
   )
 }

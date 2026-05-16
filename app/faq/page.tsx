@@ -5,6 +5,9 @@ import Link from 'next/link'
 import { Nav } from '@/components/landing/Nav'
 import { Footer } from '@/components/landing/Footer'
 import { Container } from '@/components/landing/shared/Container'
+import { ScrollReveal, StaggerGroup, HoverCard } from '@/components/motion'
+import { Section } from '@/components/ui/Section'
+import { SectionHeader } from '@/components/ui/SectionHeader'
 
 const faqCategories = [
   {
@@ -143,7 +146,7 @@ function FAQItem({ q, a, index }: { q: string; a: string; index: number }) {
   const id = `faq-item-${index}`
 
   return (
-    <div className="border-b border-neutral-200 last:border-0">
+    <div className="border-b border-neutral-200/80 last:border-0">
       <button
         type="button"
         aria-expanded={open}
@@ -164,10 +167,11 @@ function FAQItem({ q, a, index }: { q: string; a: string; index: number }) {
       <div
         id={id}
         role="region"
-        hidden={!open}
-        className="pb-5 text-neutral-600 leading-relaxed text-sm"
+        className={`overflow-hidden transition-all duration-300 ease-in-out ${open ? 'max-h-96 opacity-100 pb-5' : 'max-h-0 opacity-0'}`}
       >
-        {a}
+        <p className="text-neutral-600 leading-relaxed text-sm">
+          {a}
+        </p>
       </div>
     </div>
   )
@@ -179,99 +183,107 @@ export default function FAQPage() {
       <Nav />
       <main id="main">
         {/* Hero */}
-        <section className="relative overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(217,119,87,0.10),transparent_40%),linear-gradient(180deg,#fff7ed_0%,#fefce8_40%,#f8fafc_100%)] pt-20 pb-14 md:pt-28 md:pb-20">
+        <Section background="gradient" padding="lg">
           <Container>
-            <div className="max-w-2xl mx-auto text-center">
-              <h1 className="font-serif text-5xl md:text-6xl font-bold tracking-tight text-neutral-900 mb-5">
-                Questions?{' '}
-                <span className="italic text-[#D97757]">Answered.</span>
-              </h1>
-              <p className="text-xl text-neutral-600 leading-relaxed">
-                Everything you need to know about MealEase — from getting started to what Plus unlocks.
-              </p>
-            </div>
+            <ScrollReveal>
+              <div className="max-w-2xl mx-auto text-center">
+                <SectionHeader
+                  badge="FAQ"
+                  title="Questions? Answered."
+                  subtitle="Everything you need to know about MealEase — from getting started to what Plus unlocks."
+                />
+              </div>
+            </ScrollReveal>
           </Container>
-        </section>
+        </Section>
 
         {/* FAQ sections */}
-        <section className="py-12 md:py-20 bg-white">
+        <Section background="white" padding="md">
           <Container>
             <div className="max-w-3xl mx-auto space-y-14">
               {faqCategories.map((cat, ci) => (
-                <div key={cat.category}>
-                  <h2 className="text-xs font-semibold uppercase tracking-widest text-[#D97757] mb-6">
-                    {cat.category}
-                  </h2>
-                  <div className="rounded-2xl border border-neutral-200 bg-neutral-50 px-6">
-                    {cat.items.map((item, i) => (
-                      <FAQItem
-                        key={item.q}
-                        q={item.q}
-                        a={item.a}
-                        index={ci * 100 + i}
-                      />
-                    ))}
+                <ScrollReveal key={cat.category} delay={ci * 0.05}>
+                  <div>
+                    <h2 className="text-xs font-semibold uppercase tracking-widest text-[#D97757] mb-6">
+                      {cat.category}
+                    </h2>
+                    <HoverCard className="rounded-2xl border border-neutral-200 bg-neutral-50/80 px-6 shadow-subtle hover:shadow-medium transition-shadow">
+                      {cat.items.map((item, i) => (
+                        <FAQItem
+                          key={item.q}
+                          q={item.q}
+                          a={item.a}
+                          index={ci * 100 + i}
+                        />
+                      ))}
+                    </HoverCard>
                   </div>
-                </div>
+                </ScrollReveal>
               ))}
             </div>
           </Container>
-        </section>
+        </Section>
 
         {/* Still have questions */}
-        <section className="py-16 md:py-20 bg-neutral-50">
+        <Section background="cream" padding="md">
           <Container>
-            <div className="max-w-2xl mx-auto text-center">
-              <h2 className="font-serif text-3xl font-bold text-neutral-900 mb-4">
-                Still have questions?
-              </h2>
-              <p className="text-neutral-600 mb-8">
-                Our support team typically responds within a few hours.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Link
-                  href="/contact"
-                  className="inline-flex items-center justify-center rounded-xl border border-neutral-300 bg-white px-7 py-3.5 text-base font-semibold text-neutral-700 hover:bg-neutral-50 transition-colors"
-                >
-                  Contact support
-                </Link>
-                <Link
-                  href="/help"
-                  className="inline-flex items-center justify-center rounded-xl border border-neutral-300 bg-white px-7 py-3.5 text-base font-semibold text-neutral-700 hover:bg-neutral-50 transition-colors"
-                >
-                  Browse help center
-                </Link>
+            <ScrollReveal>
+              <div className="max-w-2xl mx-auto text-center">
+                <h2 className="font-serif text-3xl font-bold text-neutral-900 mb-4">
+                  Still have questions?
+                </h2>
+                <p className="text-neutral-600 mb-8">
+                  Our support team typically responds within a few hours.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Link
+                    href="/contact"
+                    className="inline-flex items-center justify-center rounded-xl border border-neutral-300 bg-white px-7 py-3.5 text-base font-semibold text-neutral-700 hover:bg-neutral-50 hover:shadow-medium transition-all"
+                  >
+                    Contact support
+                  </Link>
+                  <Link
+                    href="/help"
+                    className="inline-flex items-center justify-center rounded-xl border border-neutral-300 bg-white px-7 py-3.5 text-base font-semibold text-neutral-700 hover:bg-neutral-50 hover:shadow-medium transition-all"
+                  >
+                    Browse help center
+                  </Link>
+                </div>
               </div>
-            </div>
+            </ScrollReveal>
           </Container>
-        </section>
+        </Section>
 
         {/* CTA */}
-        <section className="py-20 md:py-28 bg-neutral-950 text-white text-center">
+        <Section background="dark" padding="lg">
           <Container>
-            <h2 className="font-serif text-4xl md:text-5xl font-bold mb-4">
-              Ready to stop asking{' '}
-              <span className="italic text-[#D97757]">&ldquo;what&rsquo;s for dinner?&rdquo;</span>
-            </h2>
-            <p className="text-neutral-400 text-lg mb-8 max-w-xl mx-auto">
-              Build a dinner routine that feels easier to repeat.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link
-                href="/signup"
-                className="inline-flex items-center justify-center rounded-xl bg-[#D97757] px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-[#D97757]/25 hover:bg-[#c4664a] transition-colors"
-              >
-                Start free today
-              </Link>
-              <Link
-                href="/pricing"
-                className="inline-flex items-center justify-center rounded-xl border border-neutral-700 px-8 py-3.5 text-base font-semibold text-neutral-300 hover:border-neutral-500 hover:text-white transition-colors"
-              >
-                See pricing
-              </Link>
-            </div>
+            <ScrollReveal>
+              <div className="text-center">
+                <h2 className="font-serif text-4xl md:text-5xl font-bold mb-4">
+                  Ready to stop asking{' '}
+                  <span className="italic text-[#D97757]">&ldquo;what&rsquo;s for dinner?&rdquo;</span>
+                </h2>
+                <p className="text-neutral-400 text-lg mb-8 max-w-xl mx-auto">
+                  Build a dinner routine that feels easier to repeat.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Link
+                    href="/signup"
+                    className="inline-flex items-center justify-center rounded-xl bg-[#D97757] px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-[#D97757]/25 hover:bg-[#c4664a] hover:shadow-glow-coral transition-all"
+                  >
+                    Start free today
+                  </Link>
+                  <Link
+                    href="/pricing"
+                    className="inline-flex items-center justify-center rounded-xl border border-neutral-700 px-8 py-3.5 text-base font-semibold text-neutral-300 hover:border-neutral-500 hover:text-white transition-colors"
+                  >
+                    See pricing
+                  </Link>
+                </div>
+              </div>
+            </ScrollReveal>
           </Container>
-        </section>
+        </Section>
       </main>
       <Footer />
     </>

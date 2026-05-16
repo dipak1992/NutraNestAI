@@ -13,6 +13,7 @@ import { WeekPlanStrip } from '@/components/dashboard/WeekPlanStrip'
 import { QuickActions } from '@/components/dashboard/QuickActions'
 import { NextBestActionCard } from '@/components/dashboard/NextBestActionCard'
 import { WeeklyReminderNudge } from '@/components/shared/SaveReminderCard'
+import { StaggerGroup } from '@/components/motion'
 import type { DashboardPayload } from '@/lib/dashboard/types'
 
 const REFRESH_INTERVAL_MS = 300_000 // 5 minutes
@@ -84,12 +85,13 @@ export function NewDashboardClient({ initial }: { initial: DashboardPayload }) {
       <div
         id="main"
         className="max-w-[1400px] mx-auto px-4 md:px-8 py-6 md:py-10 pb-28 md:pb-16 space-y-6 md:space-y-8"
+        style={{ background: 'linear-gradient(180deg, #FDF6F1 0%, #ffffff 15%, #ffffff 100%)' }}
       >
         {/* Non-blocking error banner — shown when background refresh fails */}
         {error && (
           <div
             role="alert"
-            className="flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800/50 dark:bg-red-950/30 dark:text-red-400"
+            className="flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800/50 dark:bg-red-950/30 dark:text-red-400"
           >
             <span className="shrink-0 text-base">⚠️</span>
             <span>
@@ -106,14 +108,14 @@ export function NewDashboardClient({ initial }: { initial: DashboardPayload }) {
 
         <GreetingHeader firstName={displayUser.firstName} budget={budget} />
 
-        <div className="grid xl:grid-cols-[minmax(0,1fr)_22rem] gap-4 md:gap-6 items-start">
+        <StaggerGroup className="grid xl:grid-cols-[minmax(0,1fr)_22rem] gap-4 md:gap-6 items-start" staggerDelay={0.1}>
           <div>
             <TonightCard state={displayTonight} />
           </div>
           <div className="hidden xl:block">
             <LeftoversCard state={displayLeftovers} />
           </div>
-        </div>
+        </StaggerGroup>
 
         <NextBestActionCard user={displayUser} retention={displayRetention} nudge={displayNudge} />
 

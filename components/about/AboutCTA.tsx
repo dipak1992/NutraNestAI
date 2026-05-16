@@ -1,6 +1,8 @@
+'use client'
+
+import Link from 'next/link'
 import { Container } from '@/components/landing/shared/Container'
-import { Button } from '@/components/landing/shared/Button'
-import { FadeIn } from '@/components/landing/shared/FadeIn'
+import { ScrollReveal } from '@/components/motion'
 
 export function AboutCTA() {
   return (
@@ -15,7 +17,7 @@ export function AboutCTA() {
       />
 
       <Container className="relative">
-        <FadeIn>
+        <ScrollReveal>
           <div className="max-w-2xl mx-auto text-center text-white">
             <h2 className="font-serif text-3xl md:text-5xl font-bold tracking-tight">
               Cook dinner with us tonight.
@@ -25,15 +27,15 @@ export function AboutCTA() {
               start, no card required.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-              <Button
+              <Link
                 href="/signup"
-                className="bg-white text-[#D97757] hover:bg-neutral-50 hover:text-[#C86646]"
+                className="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-all duration-200 min-h-[48px] px-8 text-base bg-white text-[#D97757] hover:bg-neutral-50 hover:text-[#C86646] shadow-lg"
               >
                 Plan tonight&apos;s dinner — free
-              </Button>
+              </Link>
               <a
                 href="mailto:hello@mealeaseai.com"
-                className="inline-flex items-center justify-center gap-2 rounded-full font-medium transition-all duration-200 min-h-[48px] px-6 text-base text-white hover:bg-white/10 border border-white/30"
+                className="inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-all duration-200 min-h-[48px] px-6 text-base text-white hover:bg-white/10 border border-white/30"
               >
                 Say hi to the founders
               </a>
@@ -43,7 +45,7 @@ export function AboutCTA() {
               read every email.
             </p>
           </div>
-        </FadeIn>
+        </ScrollReveal>
       </Container>
     </section>
   )

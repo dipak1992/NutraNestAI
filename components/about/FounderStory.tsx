@@ -1,6 +1,8 @@
+'use client'
+
 import Image from 'next/image'
 import { Container } from '@/components/landing/shared/Container'
-import { FadeIn } from '@/components/landing/shared/FadeIn'
+import { ScrollReveal } from '@/components/motion'
 
 export function FounderStory() {
   return (
@@ -9,9 +11,9 @@ export function FounderStory() {
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-16 items-start">
           {/* Photo + caption (sticky on desktop) */}
           <aside className="lg:col-span-5 lg:sticky lg:top-24">
-            <FadeIn>
+            <ScrollReveal direction="left">
               <figure>
-                <div className="relative aspect-[4/5] rounded-3xl overflow-hidden bg-neutral-100 dark:bg-neutral-800 ring-1 ring-neutral-200 dark:ring-neutral-800">
+                <div className="relative aspect-[4/5] rounded-3xl overflow-hidden bg-neutral-100 dark:bg-neutral-800 ring-1 ring-neutral-200 dark:ring-neutral-800 shadow-elevated">
                   <Image
                     src="/images/founders-family.jpg"
                     alt="Dipak and Suprabha, co-founders of MealEase, with their two young children"
@@ -29,18 +31,18 @@ export function FounderStory() {
                   and 1), and a very full fridge.
                 </figcaption>
               </figure>
-            </FadeIn>
+            </ScrollReveal>
           </aside>
 
           {/* Long-form story */}
           <div className="lg:col-span-7 space-y-8 text-lg leading-relaxed text-neutral-700 dark:text-neutral-300">
-            <FadeIn>
+            <ScrollReveal>
               <h2 className="font-serif text-3xl md:text-4xl font-bold text-neutral-900 dark:text-neutral-50 tracking-tight">
                 Hi, we&apos;re Dipak and Suprabha.
               </h2>
-            </FadeIn>
+            </ScrollReveal>
 
-            <FadeIn delay={0.05}>
+            <ScrollReveal delay={0.05}>
               <p>
                 We&apos;re married. We live in a house that, most evenings, smells
                 like something good is happening — and sometimes like something
@@ -48,9 +50,9 @@ export function FounderStory() {
                 strong opinions about what <em>isn&apos;t</em> dinner, and a
                 1-year-old who&apos;d happily eat the same banana three times a day.
               </p>
-            </FadeIn>
+            </ScrollReveal>
 
-            <FadeIn delay={0.1}>
+            <ScrollReveal delay={0.1}>
               <p>
                 Dipak builds software. Suprabha is a CPA — which means when
                 groceries crept past $1,200 a month, she noticed first. We
@@ -61,9 +63,9 @@ export function FounderStory() {
                   &ldquo;What&apos;s for dinner?&rdquo;
                 </span>
               </p>
-            </FadeIn>
+            </ScrollReveal>
 
-            <FadeIn delay={0.15}>
+            <ScrollReveal delay={0.15}>
               <div className="border-l-4 border-[#D97757] pl-6 py-2">
                 <p className="font-serif text-xl md:text-2xl italic text-neutral-900 dark:text-neutral-50 leading-snug">
                   We had a fridge full of food and still ordered takeout three
@@ -71,9 +73,9 @@ export function FounderStory() {
                   and it wasn&apos;t us.
                 </p>
               </div>
-            </FadeIn>
+            </ScrollReveal>
 
-            <FadeIn delay={0.2}>
+            <ScrollReveal delay={0.2}>
               <h3 className="font-serif text-2xl font-bold text-neutral-900 dark:text-neutral-50 mt-12">
                 We tried everything.
               </h3>
@@ -87,9 +89,9 @@ export function FounderStory() {
                 Thursday. None of them knew we had a toddler who&apos;d riot over
                 mushrooms.
               </p>
-            </FadeIn>
+            </ScrollReveal>
 
-            <FadeIn delay={0.25}>
+            <ScrollReveal delay={0.25}>
               <h3 className="font-serif text-2xl font-bold text-neutral-900 dark:text-neutral-50 mt-12">
                 So Dipak started building. Suprabha started breaking it.
               </h3>
@@ -105,9 +107,9 @@ export function FounderStory() {
                 The first version was for us. Then a few friends asked if they
                 could use it. Then their friends. Here we are.
               </p>
-            </FadeIn>
+            </ScrollReveal>
 
-            <FadeIn delay={0.3}>
+            <ScrollReveal delay={0.3}>
               <h3 className="font-serif text-2xl font-bold text-neutral-900 dark:text-neutral-50 mt-12">
                 What we&apos;re actually trying to do.
               </h3>
@@ -126,15 +128,15 @@ export function FounderStory() {
                 cooking for one — we built this for you. The same way we built
                 it for us.
               </p>
-            </FadeIn>
+            </ScrollReveal>
 
-            <FadeIn delay={0.35}>
+            <ScrollReveal delay={0.35}>
               <p className="mt-8 font-serif text-xl text-neutral-900 dark:text-neutral-50">
                 Thanks for being here.
                 <br />
                 <span className="text-[#D97757]">— Dipak &amp; Suprabha</span>
               </p>
-            </FadeIn>
+            </ScrollReveal>
           </div>
         </div>
       </Container>

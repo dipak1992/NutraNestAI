@@ -55,10 +55,10 @@ function SectionCard({
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.08 * index, duration: 0.3 }}
+      transition={{ delay: 0.08 * index, duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
       className={cn(
-        'rounded-2xl border border-border/60 bg-white p-5 transition-all',
-        (href || onClick) && !locked && 'hover:shadow-md hover:border-violet-300/60 cursor-pointer',
+        'rounded-2xl border border-neutral-100 bg-white p-5 shadow-sm transition-all duration-200',
+        (href || onClick) && !locked && 'hover:shadow-md hover:border-[#D97757]/30 cursor-pointer',
         locked && 'opacity-60',
       )}
       onClick={locked ? undefined : onClick}
@@ -110,7 +110,7 @@ function MemberChip({ member }: { member: FamilyMemberRecord }) {
   }
 
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full bg-violet-50 border border-violet-200/60 px-2.5 py-1 text-xs text-violet-900">
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-neutral-100 border border-neutral-200 px-2.5 py-1 text-xs text-neutral-700 font-medium">
       {roleEmoji[member.role] ?? '👤'} {member.first_name}
       {member.allergies_json?.length > 0 && (
         <AlertTriangle className="h-2.5 w-2.5 text-amber-500" />
@@ -201,7 +201,7 @@ export default function HouseholdPillarPage() {
     <div
       className="min-h-screen"
       style={{
-        background: 'linear-gradient(180deg, #f5f3ff 0%, #ede9fe 15%, #ffffff 40%, #ffffff 100%)',
+        background: 'linear-gradient(180deg, #FDF6F1 0%, #fef3e8 15%, #ffffff 40%, #ffffff 100%)',
       }}
     >
       <div className="mx-auto max-w-lg px-5 pb-16 pt-6">
@@ -235,7 +235,8 @@ export default function HouseholdPillarPage() {
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-2xl border border-violet-200/60 bg-gradient-to-br from-violet-50 to-purple-50/80 p-5 mb-6"
+          transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+          className="rounded-2xl border border-[#D97757]/15 bg-gradient-to-br from-[#D97757]/5 to-white p-5 mb-6 shadow-sm"
         >
           <div className="flex items-center justify-between mb-3">
             <div>
@@ -251,8 +252,8 @@ export default function HouseholdPillarPage() {
               className={cn(
                 'text-xs border-0',
                 status.isPro
-                  ? 'bg-amber-100 text-amber-700'
-                  : 'bg-violet-100 text-violet-700',
+                  ? 'bg-[#D97757]/10 text-[#D97757]'
+                  : 'bg-neutral-100 text-neutral-600',
               )}
             >
               {status.isPro && <Crown className="h-3 w-3 mr-1" />}
@@ -263,7 +264,7 @@ export default function HouseholdPillarPage() {
           {/* Trait badges */}
           <div className="flex flex-wrap gap-1.5">
             {light.cuisines.length > 0 && (
-              <Badge className="bg-white/80 text-foreground border border-border/40 text-[11px]">
+              <Badge className="bg-white text-neutral-700 border border-neutral-200 text-[11px]">
                 🍽️ {light.cuisines.slice(0, 3).join(', ')}
                 {light.cuisines.length > 3 && ` +${light.cuisines.length - 3}`}
               </Badge>
@@ -282,7 +283,7 @@ export default function HouseholdPillarPage() {
 
           {/* Household members preview */}
           {status.isPro && members.length > 0 && (
-            <div className="mt-3 pt-3 border-t border-violet-200/40">
+            <div className="mt-3 pt-3 border-t border-[#D97757]/15">
               <p className="text-[11px] font-medium text-muted-foreground mb-2">
                 Household Members ({members.length})
               </p>
@@ -383,25 +384,25 @@ export default function HouseholdPillarPage() {
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.3 }}
+            transition={{ delay: 0.5, duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
             className="mt-6"
           >
             <Link
               href="/upgrade?feature=household"
-              className="block rounded-2xl border border-amber-200/60 bg-gradient-to-r from-amber-50 to-orange-50/80 p-4 hover:shadow-md transition-all"
+              className="block rounded-2xl border border-[#D97757]/25 bg-gradient-to-r from-[#D97757]/8 to-[#D97757]/3 p-4 hover:shadow-md hover:border-[#D97757]/40 transition-all duration-200"
             >
               <div className="flex items-start gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-100 flex-shrink-0">
-                  <Sparkles className="h-4 w-4 text-amber-600" />
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#D97757]/15 flex-shrink-0">
+                  <Sparkles className="h-4 w-4 text-[#D97757]" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-amber-900">
+                  <p className="text-sm font-semibold text-neutral-800">
                     Unlock Household Memory & more
                   </p>
-                  <p className="text-xs text-amber-700 mt-0.5">
+                  <p className="text-xs text-neutral-500 mt-0.5">
                     Plus remembers your preferences and adds profiles for everyone.
                   </p>
-                  <p className="text-xs font-medium text-amber-700 mt-1.5 flex items-center gap-1">
+                  <p className="text-xs font-semibold text-[#D97757] mt-1.5 flex items-center gap-1">
                     See plans <ChevronRight className="h-3 w-3" />
                   </p>
                 </div>
@@ -415,13 +416,13 @@ export default function HouseholdPillarPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.4 }}
-          className="mt-8 flex items-center justify-center gap-2 text-xs text-muted-foreground/60"
+          className="mt-8 flex items-center justify-center gap-2 text-xs text-neutral-400"
         >
           <span className={cn(
             'w-1.5 h-1.5 rounded-full',
             features.householdMemory
               ? 'bg-emerald-400 animate-pulse'
-              : 'bg-gray-300',
+              : 'bg-neutral-300',
           )} />
           <span>
             {features.householdMemory

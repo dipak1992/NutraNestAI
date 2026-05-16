@@ -108,36 +108,41 @@ export function SaveReminderCard({
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 12 }}
-        transition={{ duration: 0.35, delay: 1.5 }}
-        className="relative mt-5 rounded-xl border border-border/60 bg-gradient-to-br from-orange-50/60 to-white p-4 shadow-sm dark:from-neutral-900/40 dark:to-neutral-950"
+        transition={{ duration: 0.35, delay: 1.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+        className="relative mt-5 rounded-2xl border border-[#D97757]/20 bg-[#D97757]/5 p-4 shadow-sm"
       >
         {/* Dismiss X */}
         <button
           onClick={handleDismiss}
-          className="absolute top-3 right-3 text-muted-foreground hover:text-foreground transition-colors"
+          className="absolute top-3 right-3 text-neutral-400 hover:text-neutral-600 transition-colors"
           aria-label="Dismiss"
         >
           <X className="h-4 w-4" />
         </button>
 
-        {/* Content */}
-        <div className="pr-6">
-          <p className="text-sm text-muted-foreground">{VARIANT_COPY[variant]}</p>
-          <p className="font-semibold text-foreground mt-0.5 text-sm leading-snug line-clamp-1">
-            {mealName}
-          </p>
+        {/* Icon + Content */}
+        <div className="flex items-start gap-3 pr-6">
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#D97757]/15 flex-shrink-0 mt-0.5">
+            <Bookmark className="h-4 w-4 text-[#D97757]" />
+          </div>
+          <div>
+            <p className="text-sm text-neutral-500">{VARIANT_COPY[variant]}</p>
+            <p className="font-semibold text-neutral-800 mt-0.5 text-sm leading-snug line-clamp-1">
+              {mealName}
+            </p>
+          </div>
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2 mt-3">
+        <div className="flex items-center gap-2 mt-3 pl-11">
           <button
             onClick={handleSave}
             disabled={saved}
             className={cn(
-              'inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all border',
+              'inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition-all border',
               saved
-                ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-800'
-                : 'bg-white text-foreground border-border/60 hover:border-primary/40 hover:bg-primary/5 dark:bg-neutral-900 dark:hover:bg-neutral-800',
+                ? 'bg-green-50 text-green-700 border-green-200'
+                : 'bg-white text-neutral-700 border-neutral-200 hover:border-[#D97757]/40 hover:text-[#D97757]',
             )}
           >
             <Bookmark className={cn('h-3.5 w-3.5', saved && 'fill-current')} />
@@ -148,10 +153,10 @@ export function SaveReminderCard({
             onClick={handleRemind}
             disabled={reminded}
             className={cn(
-              'inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all',
+              'inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition-all',
               reminded
-                ? 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800'
-                : 'bg-primary text-white hover:bg-primary/90 shadow-sm',
+                ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                : 'bg-[#D97757] text-white hover:bg-[#C86646] shadow-sm',
             )}
           >
             <Bell className={cn('h-3.5 w-3.5', reminded && 'fill-current')} />
@@ -162,7 +167,7 @@ export function SaveReminderCard({
         {/* Not now link */}
         <button
           onClick={handleDismiss}
-          className="mt-2.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          className="mt-2.5 pl-11 text-xs text-neutral-400 hover:text-neutral-600 transition-colors"
         >
           Not now
         </button>
@@ -209,12 +214,12 @@ export function WeeklyReminderNudge() {
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 8 }}
-        transition={{ duration: 0.3, delay: 2 }}
-        className="flex items-center justify-between gap-3 rounded-xl border border-border/60 bg-blue-50/50 px-4 py-3 dark:bg-blue-950/20 dark:border-blue-900/40"
+        transition={{ duration: 0.3, delay: 2, ease: [0.25, 0.46, 0.45, 0.94] }}
+        className="flex items-center justify-between gap-3 rounded-2xl border border-[#D97757]/15 bg-[#D97757]/5 px-4 py-3"
       >
         <div className="flex items-center gap-2 min-w-0">
           <span className="text-base shrink-0">🔔</span>
-          <p className="text-sm text-foreground truncate">
+          <p className="text-sm text-neutral-700 truncate">
             {reminded ? 'Reminder set for Sunday!' : 'Get reminded to prep on Sunday?'}
           </p>
         </div>
@@ -223,7 +228,7 @@ export function WeeklyReminderNudge() {
           {!reminded && (
             <button
               onClick={handleRemind}
-              className="inline-flex items-center gap-1 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-white hover:bg-primary/90 transition-colors"
+              className="inline-flex items-center gap-1 rounded-full bg-[#D97757] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#C86646] transition-colors"
             >
               <Bell className="h-3 w-3" />
               Yes
@@ -231,7 +236,7 @@ export function WeeklyReminderNudge() {
           )}
           <button
             onClick={handleDismiss}
-            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            className="text-xs text-neutral-400 hover:text-neutral-600 transition-colors"
           >
             {reminded ? 'Close' : 'Skip'}
           </button>

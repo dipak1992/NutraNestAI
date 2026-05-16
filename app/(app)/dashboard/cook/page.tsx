@@ -279,7 +279,7 @@ export default function CookPillarPage() {
   }, [])
 
   return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, #ecfdf5 0%, #f0fdf4 15%, #ffffff 40%, #ffffff 100%)' }}>
+    <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, #f0fdf4 0%, #f7fef9 15%, #ffffff 40%, #ffffff 100%)' }}>
       <div className="mx-auto max-w-lg px-5 pb-16 pt-6">
         {/* Header */}
         <div className="mb-6">
@@ -302,10 +302,10 @@ export default function CookPillarPage() {
                   whileTap={{ scale: 0.95 }}
                   onClick={() => handleChipSelect(chip.id)}
                   className={cn(
-                    'relative inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all border',
-                    isActive ? 'bg-emerald-600 text-white border-emerald-600 shadow-md'
+                    'relative inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 border',
+                    isActive ? 'bg-[#D97757] text-white border-[#D97757] shadow-sm'
                       : locked ? 'bg-white text-gray-500 border-amber-200 ring-1 ring-amber-100'
-                      : 'bg-white text-foreground border-border/60 hover:border-emerald-400/40 hover:shadow-sm',
+                      : 'bg-neutral-100 text-neutral-600 border-transparent hover:bg-neutral-200',
                   )}
                 >
                   {showNew && (
@@ -332,7 +332,7 @@ export default function CookPillarPage() {
             <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16">
               <p className="text-4xl mb-3">📸</p>
               <p className="text-sm text-muted-foreground mb-4">Choose a mode above — scan menus, check food, or cook from what you have</p>
-              <Button size="sm" onClick={() => handleChipSelect('snap')} className="gap-1.5 bg-emerald-600 hover:bg-emerald-700">
+              <Button size="sm" onClick={() => handleChipSelect('snap')} className="gap-1.5 bg-[#D97757] hover:bg-[#C86646] text-white rounded-full px-5">
                 <Camera className="h-3.5 w-3.5" /> Snap &amp; Cook
               </Button>
             </motion.div>
@@ -363,7 +363,7 @@ export default function CookPillarPage() {
 
               {loading ? (
                 <div className="flex flex-col items-center justify-center py-16">
-                  <Loader2 className="h-10 w-10 text-emerald-600 animate-spin mb-4" />
+                  <Loader2 className="h-10 w-10 text-[#D97757] animate-spin mb-4" />
                   <p className="text-sm font-semibold text-foreground">
                     {activeChip === 'snap' ? 'Building meals from your fridge + pantry…' : 'Finding meals from your pantry…'}
                   </p>
@@ -375,10 +375,10 @@ export default function CookPillarPage() {
                   <p className="text-sm font-semibold text-foreground">We found ingredients, but couldn&apos;t build a meal yet</p>
                   <p className="text-xs text-muted-foreground mt-1 mb-4">{snapError}</p>
                   <div className="flex flex-col gap-2">
-                    <Button size="sm" onClick={() => { setSnapError(null); if (lastConfirmedItemsRef.current.length > 0) handleSnapConfirm(lastConfirmedItemsRef.current) }} className="gap-1.5 bg-emerald-600 hover:bg-emerald-700">
+                    <Button size="sm" onClick={() => { setSnapError(null); if (lastConfirmedItemsRef.current.length > 0) handleSnapConfirm(lastConfirmedItemsRef.current) }} className="gap-1.5 bg-[#D97757] hover:bg-[#C86646] text-white rounded-full">
                       <RefreshCw className="h-3.5 w-3.5" /> Try Again
                     </Button>
-                    <Button size="sm" variant="outline" onClick={handleErrorBoundaryEditIngredients} className="gap-1.5">Edit Ingredients</Button>
+                    <Button size="sm" variant="outline" onClick={handleErrorBoundaryEditIngredients} className="gap-1.5 rounded-full">Edit Ingredients</Button>
                   </div>
                 </div>
               ) : pantryMatches.length > 0 ? (
@@ -386,24 +386,24 @@ export default function CookPillarPage() {
                   <>
                     <PantryMatchList matches={pantryMatches} onCook={handleCook} onSwap={handleSwap} onOrder={() => {}} source="snap" />
                     <div className="mt-4 flex gap-2">
-                      <Button variant="outline" size="sm" onClick={() => { setPantryPhase('capture'); setPantryMatches([]); setSnapError(null) }} className="gap-1.5">
-                        <Camera className="h-3.5 w-3.5" /> Scan again
-                      </Button>
-                      <Button variant="outline" size="sm" disabled={loading} onClick={() => activeChip === 'pantry' ? handlePantryFetch() : setPantryPhase('capture')} className="gap-1.5 ml-auto">
-                        <RefreshCw className="h-3.5 w-3.5" /> Refresh
-                      </Button>
-                    </div>
+                        <Button variant="outline" size="sm" onClick={() => { setPantryPhase('capture'); setPantryMatches([]); setSnapError(null) }} className="gap-1.5 rounded-full border-neutral-200">
+                          <Camera className="h-3.5 w-3.5" /> Scan again
+                        </Button>
+                        <Button variant="outline" size="sm" disabled={loading} onClick={() => activeChip === 'pantry' ? handlePantryFetch() : setPantryPhase('capture')} className="gap-1.5 ml-auto rounded-full border-neutral-200">
+                          <RefreshCw className="h-3.5 w-3.5" /> Refresh
+                        </Button>
+                      </div>
                   </>
                 </SnapCookErrorBoundary>
               ) : (
-                <div className="rounded-2xl border border-border/60 bg-white p-6 text-center">
+                <div className="rounded-2xl border border-neutral-100 bg-white p-6 text-center shadow-sm">
                   <span className="text-3xl block mb-2">🥫</span>
                   <p className="text-sm font-semibold text-foreground">{activeChip === 'pantry' ? 'Your pantry is empty' : 'No matches found'}</p>
                   <p className="text-xs text-muted-foreground mt-1 mb-4">{activeChip === 'pantry' ? 'Add items to your pantry first to see what you can cook.' : 'Try scanning again with a clearer photo or more items.'}</p>
                   {activeChip === 'pantry' ? (
-                    <Button size="sm" variant="outline" onClick={() => router.push('/pantry')} className="gap-1.5">Go to Pantry</Button>
+                    <Button size="sm" variant="outline" onClick={() => router.push('/pantry')} className="gap-1.5 rounded-full border-neutral-200">Go to Pantry</Button>
                   ) : (
-                    <Button size="sm" variant="outline" onClick={() => { setPantryPhase('capture'); setPantryMatches([]); setSnapError(null) }} className="gap-1.5">
+                    <Button size="sm" variant="outline" onClick={() => { setPantryPhase('capture'); setPantryMatches([]); setSnapError(null) }} className="gap-1.5 rounded-full border-neutral-200">
                       <Camera className="h-3.5 w-3.5" /> Try again
                     </Button>
                   )}
@@ -430,25 +430,25 @@ export default function CookPillarPage() {
                     <input type="text" value={leftoverInput} onChange={e => setLeftoverInput(e.target.value)}
                       onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addLeftoverItem() } }}
                       placeholder="e.g. leftover rice, roasted chicken"
-                      className="flex-1 rounded-xl border border-border/60 bg-white px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500/60 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                      className="flex-1 rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-sm focus:outline-none focus:border-[#D97757]/60 focus:ring-2 focus:ring-[#D97757]/20 transition-all"
                       autoFocus
                     />
                     <button onClick={addLeftoverItem} disabled={!leftoverInput.trim()}
-                      className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex-shrink-0">
+                      className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#D97757] text-white hover:bg-[#C86646] disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex-shrink-0">
                       +
                     </button>
                   </div>
                   {leftoverItems.length > 0 && (
                     <div className="flex flex-wrap gap-2 mb-4">
                       {leftoverItems.map(item => (
-                        <span key={item} className="inline-flex items-center gap-1.5 pl-3 pr-1.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-sm text-emerald-900">
+                        <span key={item} className="inline-flex items-center gap-1.5 pl-3 pr-1.5 py-1.5 rounded-full bg-[#D97757]/8 border border-[#D97757]/20 text-sm text-[#D97757]">
                           {item}
-                          <button onClick={() => removeLeftoverItem(item)} className="flex h-5 w-5 items-center justify-center rounded-full hover:bg-emerald-200 transition-colors text-xs">✕</button>
+                          <button onClick={() => removeLeftoverItem(item)} className="flex h-5 w-5 items-center justify-center rounded-full hover:bg-[#D97757]/20 transition-colors text-xs">✕</button>
                         </span>
                       ))}
                     </div>
                   )}
-                  <Button onClick={handleLeftoverGenerate} disabled={leftoverItems.length === 0 || loading} className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700">
+                  <Button onClick={handleLeftoverGenerate} disabled={leftoverItems.length === 0 || loading} className="w-full gap-2 bg-[#D97757] hover:bg-[#C86646] text-white rounded-full">
                     {loading ? (<><Loader2 className="h-4 w-4 animate-spin" /> Building your meal…</>) : (<><Sparkles className="h-4 w-4" /> Transform my leftovers</>)}
                   </Button>
                   <button onClick={() => setActiveChip(null)} className="mt-3 w-full text-center text-sm text-muted-foreground hover:text-foreground transition-colors py-2">Cancel</button>
@@ -461,14 +461,14 @@ export default function CookPillarPage() {
                 >
                   <div>
                     <div className="mb-4">
-                      <Badge variant="outline" className="mb-2 text-xs">♻️ Leftover Transformation</Badge>
+                      <Badge variant="outline" className="mb-2 text-xs border-[#D97757]/30 text-[#D97757] bg-[#D97757]/5">♻️ Leftover Transformation</Badge>
                       <h2 className="text-lg font-bold text-foreground">{leftoverMeal.title}</h2>
                       <p className="text-xs text-muted-foreground mt-0.5">Made from: {leftoverItems.join(', ')}</p>
                     </div>
                     <MealCard meal={leftoverMeal} onCook={() => handleCook(leftoverMeal)} onSwap={() => { setLeftoverMeal(null); handleLeftoverGenerate() }} onOrder={() => {}} source="leftovers" />
                     <div className="mt-4 flex gap-2">
-                      <Button variant="outline" size="sm" onClick={() => { setLeftoverMeal(null); setLeftoverItems([]) }} className="gap-1.5">Start over</Button>
-                      <Button variant="outline" size="sm" disabled={loading} onClick={() => { setLeftoverMeal(null); handleLeftoverGenerate() }} className="gap-1.5 ml-auto">
+                      <Button variant="outline" size="sm" onClick={() => { setLeftoverMeal(null); setLeftoverItems([]) }} className="gap-1.5 rounded-full border-neutral-200">Start over</Button>
+                      <Button variant="outline" size="sm" disabled={loading} onClick={() => { setLeftoverMeal(null); handleLeftoverGenerate() }} className="gap-1.5 ml-auto rounded-full border-neutral-200">
                         <RefreshCw className="h-3.5 w-3.5" /> Try another
                       </Button>
                     </div>

@@ -3,6 +3,9 @@ import { Nav } from '@/components/landing/Nav'
 import { Footer } from '@/components/landing/Footer'
 import { Container } from '@/components/landing/shared/Container'
 import { FeatureHero } from '@/components/features/FeatureHero'
+import { FeatureMotionSections } from '@/components/features/FeatureMotionSections'
+import { ScrollReveal, StaggerGroup, HoverCard } from '@/components/motion'
+import { Section } from '@/components/ui/Section'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -67,150 +70,58 @@ export default function TonightSuggestionsPage() {
           mockup="tonight"
         />
 
-        {/* Problem → Solution */}
-        <section className="py-16 md:py-20 bg-white">
-          <Container>
-            <div className="max-w-3xl mx-auto">
-              <div className="grid md:grid-cols-2 gap-8">
-                <div className="rounded-2xl bg-red-50 border border-red-100 p-7">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-red-400 mb-3">The problem</p>
-                  <h2 className="font-serif text-2xl font-bold text-neutral-900 mb-3">Decision fatigue is real</h2>
-                  <p className="text-neutral-600 leading-relaxed">
-                    The average household spends 30+ minutes every evening deciding what to cook. That&rsquo;s 180+ hours a year lost to &ldquo;I don&rsquo;t know, what do you want?&rdquo;
-                  </p>
+        <FeatureMotionSections
+          problemTitle="Decision fatigue is real"
+          problemBody={"The average household spends 30+ minutes every evening deciding what to cook. That\u2019s 180+ hours a year lost to \u201cI don\u2019t know, what do you want?\u201d"}
+          solutionTitle="One tap. One great dinner."
+          solutionBody="MealEase surfaces the perfect dinner for your household the moment you open the app. No searching, no scrolling, no arguing."
+          howItWorksSubtitle="Three steps. Dinner on the table."
+          steps={steps}
+          benefitsTitle="Why households love it"
+          benefits={benefits}
+          relatedFeatures={relatedFeatures}
+          ctaTitle={<>Dinner, <span className="italic text-[#D97757]">decided.</span></>}
+          ctaSubtitle="Get a dinner answer that fits what your household actually eats."
+          ctaPrimaryHref="/signup"
+          ctaPrimaryLabel="Start free today"
+          ctaSecondaryHref="/upgrade"
+          ctaSecondaryLabel="Upgrade to Plus"
+        >
+          {/* Free vs Plus */}
+          <Section background="cream" padding="md">
+            <Container>
+              <ScrollReveal>
+                <div className="max-w-3xl mx-auto">
+                  <h2 className="font-serif text-3xl font-bold text-neutral-900 mb-8 text-center">Free vs Plus</h2>
+                  <StaggerGroup className="grid md:grid-cols-2 gap-6" staggerDelay={0.15}>
+                    <HoverCard className="rounded-2xl bg-white border border-neutral-200 p-7 shadow-subtle hover:shadow-medium transition-shadow">
+                      <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500 mb-4">Free</p>
+                      <ul className="space-y-3 text-sm text-neutral-700">
+                        {['1 tonight suggestion per day', 'Step-by-step cook mode', 'Basic dietary filters', '3 recipe swaps per day'].map((f) => (
+                          <li key={f} className="flex items-start gap-2"><span className="text-green-500 mt-0.5">✓</span>{f}</li>
+                        ))}
+                      </ul>
+                    </HoverCard>
+                    <HoverCard className="rounded-2xl bg-neutral-900 border border-[#D97757]/30 p-7 shadow-subtle hover:shadow-medium transition-shadow">
+                      <p className="text-xs font-semibold uppercase tracking-widest text-[#D97757] mb-4">Plus</p>
+                      <ul className="space-y-3 text-sm text-neutral-300">
+                        {['Everything in Free', 'Unlimited swaps', 'AI learns your taste over time', 'Audio cook mode narration', 'Fridge-aware suggestions', 'Priority support'].map((f) => (
+                          <li key={f} className="flex items-start gap-2"><span className="text-[#D97757] mt-0.5">✓</span>{f}</li>
+                        ))}
+                      </ul>
+                      <Link
+                        href="/upgrade"
+                        className="mt-6 block text-center rounded-xl bg-[#D97757] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#c4664a] transition-colors"
+                      >
+                        Upgrade to Plus →
+                      </Link>
+                    </HoverCard>
+                  </StaggerGroup>
                 </div>
-                <div className="rounded-2xl bg-[#FDF6F1] border border-[#D97757]/20 p-7">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-[#D97757] mb-3">The solution</p>
-                  <h2 className="font-serif text-2xl font-bold text-neutral-900 mb-3">One tap. One great dinner.</h2>
-                  <p className="text-neutral-600 leading-relaxed">
-                    MealEase surfaces the perfect dinner for your household the moment you open the app. No searching, no scrolling, no arguing.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </Container>
-        </section>
-
-        {/* How it works */}
-        <section className="py-16 md:py-24 bg-neutral-50">
-          <Container>
-            <div className="text-center max-w-2xl mx-auto mb-14">
-              <h2 className="font-serif text-4xl font-bold tracking-tight text-neutral-900 mb-4">
-                How it works
-              </h2>
-              <p className="text-lg text-neutral-600">Three steps. Dinner on the table.</p>
-            </div>
-            <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-              {steps.map((s) => (
-                <div key={s.n} className="relative rounded-2xl bg-white border border-neutral-200 p-7 shadow-sm">
-                  <span className="text-5xl font-bold text-[#D97757]/15 font-serif absolute top-5 right-6 select-none">{s.n}</span>
-                  <h3 className="font-semibold text-lg text-neutral-900 mb-2">{s.title}</h3>
-                  <p className="text-neutral-600 text-sm leading-relaxed">{s.body}</p>
-                </div>
-              ))}
-            </div>
-          </Container>
-        </section>
-
-        {/* Benefits */}
-        <section className="py-16 md:py-24 bg-white">
-          <Container>
-            <div className="text-center max-w-2xl mx-auto mb-14">
-              <h2 className="font-serif text-4xl font-bold tracking-tight text-neutral-900 mb-4">
-                Why households love it
-              </h2>
-            </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl mx-auto">
-              {benefits.map((b) => (
-                <div key={b.title} className="rounded-2xl bg-neutral-50 border border-neutral-200 p-6">
-                  <div className="text-3xl mb-3">{b.icon}</div>
-                  <h3 className="font-semibold text-neutral-900 mb-1">{b.title}</h3>
-                  <p className="text-sm text-neutral-600 leading-relaxed">{b.body}</p>
-                </div>
-              ))}
-            </div>
-          </Container>
-        </section>
-
-        {/* Free vs Plus */}
-        <section className="py-16 md:py-20 bg-[#FDF6F1]">
-          <Container>
-            <div className="max-w-3xl mx-auto">
-              <h2 className="font-serif text-3xl font-bold text-neutral-900 mb-8 text-center">Free vs Plus</h2>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="rounded-2xl bg-white border border-neutral-200 p-7">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500 mb-4">Free</p>
-                  <ul className="space-y-3 text-sm text-neutral-700">
-                    {['1 tonight suggestion per day', 'Step-by-step cook mode', 'Basic dietary filters', '3 recipe swaps per day'].map((f) => (
-                      <li key={f} className="flex items-start gap-2"><span className="text-green-500 mt-0.5">✓</span>{f}</li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="rounded-2xl bg-neutral-900 border border-[#D97757]/30 p-7">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-[#D97757] mb-4">Plus</p>
-                  <ul className="space-y-3 text-sm text-neutral-300">
-                    {['Everything in Free', 'Unlimited swaps', 'AI learns your taste over time', 'Audio cook mode narration', 'Fridge-aware suggestions', 'Priority support'].map((f) => (
-                      <li key={f} className="flex items-start gap-2"><span className="text-[#D97757] mt-0.5">✓</span>{f}</li>
-                    ))}
-                  </ul>
-                  <Link
-                    href="/upgrade"
-                    className="mt-6 block text-center rounded-xl bg-[#D97757] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#c4664a] transition-colors"
-                  >
-                    Upgrade to Plus →
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </Container>
-        </section>
-
-        {/* Related features */}
-        <section className="py-16 md:py-20 bg-white">
-          <Container>
-            <div className="max-w-3xl mx-auto">
-              <h2 className="font-serif text-3xl font-bold text-neutral-900 mb-8 text-center">Explore more features</h2>
-              <div className="grid sm:grid-cols-3 gap-4">
-                {relatedFeatures.map((f) => (
-                  <Link
-                    key={f.href}
-                    href={f.href}
-                    className="group rounded-2xl border border-neutral-200 bg-neutral-50 p-5 hover:border-[#D97757]/40 hover:bg-[#FDF6F1] transition-all"
-                  >
-                    <p className="font-semibold text-neutral-900 group-hover:text-[#D97757] transition-colors mb-1">{f.label}</p>
-                    <p className="text-sm text-neutral-500">{f.desc}</p>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </Container>
-        </section>
-
-        {/* CTA */}
-        <section className="py-20 md:py-28 bg-neutral-950 text-white text-center">
-          <Container>
-            <h2 className="font-serif text-4xl md:text-5xl font-bold mb-4">
-              Dinner, <span className="italic text-[#D97757]">decided.</span>
-            </h2>
-            <p className="text-neutral-400 text-lg mb-8 max-w-xl mx-auto">
-              Get a dinner answer that fits what your household actually eats.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link
-                href="/signup"
-                className="inline-flex items-center justify-center rounded-xl bg-[#D97757] px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-[#D97757]/25 hover:bg-[#c4664a] transition-colors"
-              >
-                Start free today
-              </Link>
-              <Link
-                href="/upgrade"
-                className="inline-flex items-center justify-center rounded-xl border border-neutral-700 px-8 py-3.5 text-base font-semibold text-neutral-300 hover:border-neutral-500 hover:text-white transition-colors"
-              >
-                Upgrade to Plus
-              </Link>
-            </div>
-          </Container>
-        </section>
+              </ScrollReveal>
+            </Container>
+          </Section>
+        </FeatureMotionSections>
       </main>
       <Footer />
     </>

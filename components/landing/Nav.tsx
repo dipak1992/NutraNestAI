@@ -38,7 +38,7 @@ export function Nav() {
   }, [])
 
   return (
-    <header className="sticky top-0 z-50 bg-white/80 dark:bg-neutral-950/80 backdrop-blur-md border-b border-neutral-200/60 dark:border-neutral-800/60">
+    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-neutral-100/60 dark:bg-neutral-950/80 dark:border-neutral-800/60 transition-colors duration-300">
       <Container>
         <nav
           className="flex items-center justify-between h-16"
@@ -50,7 +50,7 @@ export function Nav() {
           </Link>
 
           {/* Desktop nav */}
-          <div className="hidden lg:flex items-center gap-4 xl:gap-8">
+          <div className="hidden lg:flex items-center gap-6 xl:gap-8">
             <div
               ref={featuresRef}
               className="group relative"
@@ -62,12 +62,12 @@ export function Nav() {
                 aria-expanded={featuresOpen}
                 aria-haspopup="menu"
                 onClick={() => setFeaturesOpen((value) => !value)}
-                className="inline-flex min-h-10 items-center gap-1 text-sm text-neutral-700 transition-colors hover:text-[#D97757] dark:text-neutral-300"
+                className="inline-flex min-h-10 items-center gap-1 text-sm font-medium text-neutral-600 transition-colors duration-200 hover:text-[#D97757] dark:text-neutral-300 dark:hover:text-[#D97757] focus-visible:outline-none focus-ring rounded-md px-1"
               >
                 Features
                 <ChevronDown
                   className={cn(
-                    'h-4 w-4 transition-transform',
+                    'h-3.5 w-3.5 transition-transform duration-200',
                     featuresOpen && 'rotate-180'
                   )}
                   aria-hidden
@@ -75,7 +75,7 @@ export function Nav() {
               </button>
               <div
                 className={cn(
-                  'absolute left-1/2 top-full z-50 w-[440px] -translate-x-1/2 pt-3 transition-all',
+                  'absolute left-1/2 top-full z-50 w-[440px] -translate-x-1/2 pt-3 transition-all duration-200',
                   featuresOpen
                     ? 'visible translate-y-0 opacity-100'
                     : 'invisible -translate-y-1 opacity-0'
@@ -83,7 +83,7 @@ export function Nav() {
               >
                 <div
                   role="menu"
-                  className="rounded-2xl border border-neutral-200 bg-white p-3 shadow-2xl shadow-neutral-950/10 dark:border-neutral-800 dark:bg-neutral-950"
+                  className="rounded-2xl border border-neutral-200/80 bg-white/95 backdrop-blur-xl p-3 shadow-2xl shadow-neutral-950/8 dark:border-neutral-800 dark:bg-neutral-950/95"
                 >
                   <div className="grid gap-1">
                     {site.features.map((feature) => (
@@ -93,7 +93,7 @@ export function Nav() {
                         prefetch={false}
                         role="menuitem"
                         onClick={() => setFeaturesOpen(false)}
-                        className="rounded-xl px-4 py-3 transition-colors hover:bg-[#FDF6F1] focus:bg-[#FDF6F1] focus:outline-none dark:hover:bg-neutral-900 dark:focus:bg-neutral-900"
+                        className="rounded-xl px-4 py-3 transition-colors duration-150 hover:bg-[#FDF6F1] focus:bg-[#FDF6F1] focus:outline-none focus-ring dark:hover:bg-neutral-900 dark:focus:bg-neutral-900"
                       >
                         <span className="block text-sm font-semibold text-neutral-900 dark:text-neutral-100">
                           {feature.label}
@@ -112,30 +112,46 @@ export function Nav() {
                 key={item.href}
                 href={item.href}
                 prefetch={false}
-                className="text-sm text-neutral-700 dark:text-neutral-300 hover:text-[#D97757] transition-colors"
+                className="text-sm font-medium text-neutral-600 dark:text-neutral-300 hover:text-[#D97757] dark:hover:text-[#D97757] transition-colors duration-200 focus-visible:outline-none focus-ring rounded-md px-1"
               >
                 {item.label}
               </Link>
             ))}
-            <Button href="/signup" className="h-10 min-h-[40px] px-5 text-sm">
-              Start Free
-            </Button>
+            <Link
+              href="/signup"
+              className="inline-flex h-9 items-center justify-center rounded-full bg-[#D97757] px-5 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-[#c4684a] hover:shadow-md active:scale-[0.97] focus-visible:outline-none focus-ring"
+            >
+              Get Started
+            </Link>
           </div>
 
-          {/* Mobile toggle */}
-          <button
-            className="lg:hidden p-2 -mr-2 min-h-[48px] min-w-[48px] flex items-center justify-center"
-            onClick={() => setOpen(!open)}
-            aria-label={open ? 'Close menu' : 'Open menu'}
-            aria-expanded={open}
-          >
-            {open ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          {/* Mobile: logo + CTA + hamburger */}
+          <div className="flex items-center gap-3 lg:hidden">
+            <Link
+              href="/signup"
+              className="inline-flex h-8 items-center justify-center rounded-full bg-[#D97757] px-4 text-xs font-medium text-white shadow-sm transition-all duration-200 hover:bg-[#c4684a] active:scale-[0.97]"
+            >
+              Get Started
+            </Link>
+            <button
+              className="p-2 -mr-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg transition-colors duration-150 hover:bg-neutral-100 dark:hover:bg-neutral-800 focus-visible:outline-none focus-ring"
+              onClick={() => setOpen(!open)}
+              aria-label={open ? 'Close menu' : 'Open menu'}
+              aria-expanded={open}
+            >
+              {open ? <X size={22} /> : <Menu size={22} />}
+            </button>
+          </div>
         </nav>
 
         {/* Mobile menu */}
-        {open && (
-          <div className="lg:hidden pb-6 border-t border-neutral-200 dark:border-neutral-800 pt-4 flex flex-col gap-4">
+        <div
+          className={cn(
+            'lg:hidden overflow-hidden transition-all duration-300 ease-out',
+            open ? 'max-h-[600px] opacity-100 pb-6' : 'max-h-0 opacity-0'
+          )}
+        >
+          <div className="border-t border-neutral-200/60 dark:border-neutral-800 pt-4 flex flex-col gap-4">
             <div className="rounded-2xl bg-[#FDF6F1] p-3 dark:bg-neutral-900">
               <p className="px-2 pb-2 text-xs font-bold uppercase tracking-[0.18em] text-[#D97757]">
                 Features
@@ -147,7 +163,7 @@ export function Nav() {
                     href={feature.href}
                     prefetch={false}
                     onClick={() => setOpen(false)}
-                    className="rounded-xl px-2 py-2.5"
+                    className="rounded-xl px-2 py-2.5 transition-colors duration-150 hover:bg-white/60 dark:hover:bg-neutral-800"
                   >
                     <span className="block text-sm font-semibold text-neutral-900 dark:text-neutral-100">
                       {feature.label}
@@ -165,7 +181,7 @@ export function Nav() {
                 href={item.href}
                 prefetch={false}
                 onClick={() => setOpen(false)}
-                className="text-base text-neutral-800 dark:text-neutral-200 py-2 min-h-[48px] flex items-center"
+                className="text-base font-medium text-neutral-800 dark:text-neutral-200 py-2 min-h-[48px] flex items-center transition-colors duration-150 hover:text-[#D97757]"
               >
                 {item.label}
               </Link>
@@ -174,7 +190,7 @@ export function Nav() {
               Start Free
             </Button>
           </div>
-        )}
+        </div>
       </Container>
     </header>
   )

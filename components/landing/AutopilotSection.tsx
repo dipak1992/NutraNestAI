@@ -1,3 +1,5 @@
+'use client'
+
 import Image from 'next/image'
 import Link from 'next/link'
 import {
@@ -12,8 +14,8 @@ import {
   Sparkles,
   Utensils,
 } from 'lucide-react'
-import { Container } from './shared/Container'
-import { FadeIn } from './shared/FadeIn'
+import { ScrollReveal, StaggerGroup, HoverCard } from '@/components/motion'
+import { Section } from '@/components/ui/Section'
 import smartAutopilotImage from '@/public/landing/optimized/smartautopilot.webp'
 import familyDinnerImage from '@/public/landing/optimized/family-dinner.webp'
 
@@ -59,37 +61,32 @@ const smartSignals = [
 
 export function AutopilotSection() {
   return (
-    <section
-      className="me-defer-section relative overflow-hidden bg-[#FDF6F1] py-20 dark:bg-neutral-950 md:py-28"
-      aria-labelledby="autopilot-heading"
+    <Section
+      background="gradient"
+      padding="lg"
+      className="me-defer-section"
     >
-      <div
-        aria-hidden
-        className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(253,246,241,1)_0%,rgba(255,255,255,0.76)_56%,rgba(255,255,255,1)_100%)] dark:bg-[linear-gradient(to_bottom,rgba(10,10,10,1)_0%,rgba(23,23,23,0.88)_56%,rgba(10,10,10,1)_100%)]"
-      />
-
-      <Container className="relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid items-center gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
-          <FadeIn>
+          <ScrollReveal direction="left">
             <div className="max-w-xl">
-              <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-1.5 text-sm font-semibold text-[#D97757] shadow-sm ring-1 ring-[#D97757]/20 dark:bg-neutral-900">
+              <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-1.5 text-sm font-semibold text-[#D97757] shadow-subtle ring-1 ring-[#D97757]/20 dark:bg-neutral-900">
                 <Sparkles className="h-4 w-4" aria-hidden />
                 AI Autopilot
               </div>
 
               <h2
-                id="autopilot-heading"
                 className="mt-5 font-serif text-4xl font-bold tracking-tight text-neutral-900 dark:text-white md:text-5xl"
               >
                 Your whole dinner week, planned before the coffee cools.
               </h2>
 
-              <p className="mt-5 text-lg leading-relaxed text-neutral-600 dark:text-neutral-300">
+              <p className="mt-5 text-lg leading-relaxed text-neutral-500 dark:text-neutral-300">
                 MealEase reads pantry, leftovers, budget, dietary needs, and the season,
                 then builds a week that feels planned by someone who actually lives with you.
               </p>
 
-              <div className="mt-7 grid gap-3 sm:grid-cols-3">
+              <StaggerGroup className="mt-7 grid gap-3 sm:grid-cols-3" staggerDelay={0.06}>
                 {[
                   { value: '7', label: 'dinners generated' },
                   { value: '$18', label: 'under demo budget' },
@@ -97,7 +94,7 @@ export function AutopilotSection() {
                 ].map((stat) => (
                   <div
                     key={stat.label}
-                    className="rounded-2xl bg-white/80 p-4 shadow-sm ring-1 ring-neutral-200/70 dark:bg-neutral-900/80 dark:ring-neutral-800"
+                    className="rounded-2xl bg-white/80 p-4 shadow-subtle ring-1 ring-neutral-200/70 dark:bg-neutral-900/80 dark:ring-neutral-800"
                   >
                     <p className="font-serif text-3xl font-bold text-[#D97757]">{stat.value}</p>
                     <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-neutral-500 dark:text-neutral-400">
@@ -105,7 +102,7 @@ export function AutopilotSection() {
                     </p>
                   </div>
                 ))}
-              </div>
+              </StaggerGroup>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
                 <Link
@@ -123,13 +120,13 @@ export function AutopilotSection() {
                 </Link>
               </div>
 
-              <p className="mt-3 text-sm text-neutral-500 dark:text-neutral-400">
+              <p className="mt-3 text-sm text-neutral-400 dark:text-neutral-400">
                 No credit card required. Preview 3 days free, unlock the full week with Plus.
               </p>
             </div>
-          </FadeIn>
+          </ScrollReveal>
 
-          <FadeIn delay={0.1}>
+          <ScrollReveal direction="right" delay={0.1}>
             <div className="relative">
               <div className="relative overflow-hidden rounded-[1.75rem] bg-white p-2 shadow-2xl shadow-neutral-900/15 ring-1 ring-neutral-200/80 dark:bg-neutral-900 dark:ring-white/10 sm:rounded-[2rem] sm:p-3">
                 <div className="relative overflow-hidden rounded-[1.25rem] bg-[#FBFAF3] sm:rounded-[1.5rem]">
@@ -145,7 +142,7 @@ export function AutopilotSection() {
 
                 <div className="grid gap-2 border-t border-neutral-100 bg-white px-3 py-3 dark:border-neutral-800 dark:bg-neutral-900 sm:grid-cols-2 sm:px-4 lg:grid-cols-4">
                   {smartSignals.map((signal) => (
-                    <span key={signal} className="inline-flex items-center gap-2 text-xs font-medium text-neutral-600 dark:text-neutral-400">
+                    <span key={signal} className="inline-flex items-center gap-2 text-xs font-medium text-neutral-500 dark:text-neutral-400">
                       <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-600 dark:text-emerald-400" aria-hidden />
                       {signal}
                     </span>
@@ -177,15 +174,15 @@ export function AutopilotSection() {
                 </div>
               </div>
             </div>
-          </FadeIn>
+          </ScrollReveal>
         </div>
 
-        <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {autopilotFeatures.map((feature, i) => {
+        <StaggerGroup className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" staggerDelay={0.06}>
+          {autopilotFeatures.map((feature) => {
             const Icon = feature.icon
             return (
-              <FadeIn key={feature.title} delay={0.04 * i}>
-                <article className="group h-full rounded-2xl bg-white p-5 shadow-sm ring-1 ring-neutral-200/70 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:ring-[#D97757]/30 dark:bg-neutral-900 dark:ring-neutral-800">
+              <HoverCard key={feature.title} className="h-full">
+                <article className="group h-full rounded-2xl bg-white p-6 shadow-subtle ring-1 ring-neutral-200/70 transition-all duration-300 hover:shadow-medium hover:ring-[#D97757]/30 dark:bg-neutral-900 dark:ring-neutral-800">
                   <div className="flex items-center gap-3">
                     <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#D97757]/10 text-[#D97757] transition-colors group-hover:bg-[#D97757] group-hover:text-white">
                       <Icon className="h-5 w-5" aria-hidden />
@@ -194,16 +191,16 @@ export function AutopilotSection() {
                       {feature.title}
                     </h3>
                   </div>
-                  <p className="mt-3 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
+                  <p className="mt-3 text-sm leading-relaxed text-neutral-500 dark:text-neutral-400">
                     {feature.body}
                   </p>
                 </article>
-              </FadeIn>
+              </HoverCard>
             )
           })}
-        </div>
+        </StaggerGroup>
 
-        <FadeIn delay={0.2}>
+        <ScrollReveal delay={0.2}>
           <div className="mx-auto mt-14 max-w-4xl overflow-hidden rounded-[1.75rem] bg-neutral-950 shadow-2xl shadow-neutral-900/20 ring-1 ring-neutral-900/10 dark:ring-white/10">
             <div className="grid md:grid-cols-[0.9fr_1.1fr]">
               <div className="relative min-h-[280px]">
@@ -245,8 +242,8 @@ export function AutopilotSection() {
               </div>
             </div>
           </div>
-        </FadeIn>
-      </Container>
-    </section>
+        </ScrollReveal>
+      </div>
+    </Section>
   )
 }

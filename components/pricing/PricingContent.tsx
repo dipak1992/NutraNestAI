@@ -30,6 +30,9 @@ import { toast } from 'sonner'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
 import { PRICING_TIERS, PRO_ANNUAL_SAVINGS } from '@/lib/paywall/config'
 import { cn } from '@/lib/utils'
+import { ScrollReveal, StaggerGroup, HoverCard } from '@/components/motion'
+import { Section } from '@/components/ui/Section'
+import { SectionHeader } from '@/components/ui/SectionHeader'
 
 /* ─────────────────────── DATA ─────────────────────── */
 
@@ -304,15 +307,17 @@ export function PricingContent() {
           className="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_0%,rgba(217,119,87,0.28),transparent_55%)]"
         />
         <div className="relative z-10">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-[#FFD2BD] backdrop-blur">
-            Simple pricing · Copilot included
-          </div>
-          <h1 className="mx-auto mt-4 max-w-[300px] font-serif text-4xl font-bold tracking-tight text-white [text-shadow:0_2px_12px_rgba(0,0,0,0.45)] sm:max-w-4xl md:text-5xl">
-            Start free. Try Plus when you want the full week.
-          </h1>
-          <p className="mx-auto mt-3 max-w-[280px] text-base text-white/82 sm:max-w-xl sm:text-lg">
-            Free includes 3 Copilot meal assists/day. Plus unlocks weekly briefings, voice, memory, proactive nudges, and action-taking Copilot.
-          </p>
+          <ScrollReveal>
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-[#FFD2BD] backdrop-blur">
+              Simple pricing · Copilot included
+            </div>
+            <h1 className="mx-auto mt-4 max-w-[300px] font-serif text-4xl font-bold tracking-tight text-white [text-shadow:0_2px_12px_rgba(0,0,0,0.45)] sm:max-w-4xl md:text-5xl">
+              Start free. Try Plus when you want the full week.
+            </h1>
+            <p className="mx-auto mt-3 max-w-[280px] text-base text-white/82 sm:max-w-xl sm:text-lg">
+              Free includes 3 Copilot meal assists/day. Plus unlocks weekly briefings, voice, memory, proactive nudges, and action-taking Copilot.
+            </p>
+          </ScrollReveal>
         </div>
       </section>
 
@@ -368,10 +373,10 @@ export function PricingContent() {
 
       {/* ── PRICING CARDS ── */}
       <section className="pb-16 px-4">
-        <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+        <StaggerGroup className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto" staggerDelay={0.15}>
 
           {/* FREE */}
-          <div className="relative flex flex-col h-full rounded-2xl p-8 bg-[#FDF6F1] dark:bg-neutral-900 ring-1 ring-black/5 dark:ring-white/5">
+          <HoverCard className="relative flex flex-col h-full rounded-3xl p-8 bg-[#FDF6F1] dark:bg-neutral-900 ring-1 ring-black/5 dark:ring-white/5 shadow-subtle hover:shadow-medium transition-shadow">
             <div className="mb-6">
               <div className="text-sm font-semibold uppercase tracking-widest mb-2 text-neutral-500 dark:text-neutral-400">
                 Free
@@ -406,10 +411,10 @@ export function PricingContent() {
             >
               Start free
             </Link>
-          </div>
+          </HoverCard>
 
           {/* PLUS — premium dark card */}
-          <div className="relative flex flex-col h-full rounded-2xl overflow-hidden ring-2 ring-[#D97757]">
+          <HoverCard className="relative flex flex-col h-full rounded-3xl overflow-hidden ring-2 ring-[#D97757] shadow-glow-coral">
             {/* Layered gradient background */}
             <div className="absolute inset-0 bg-gradient-to-br from-[#1a0e06] via-[#1e1208] to-neutral-900" />
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_100%_0%,_rgba(217,119,87,0.25),_transparent)]" />
@@ -497,9 +502,9 @@ export function PricingContent() {
                 Beta feedback points to grocery convenience as a key upgrade reason.
               </p>
             </div>
-          </div>
-        </div>
-        <div className="mx-auto mt-5 max-w-3xl overflow-hidden rounded-2xl border border-neutral-200 bg-white text-sm dark:border-neutral-800 dark:bg-neutral-900">
+          </HoverCard>
+        </StaggerGroup>
+        <ScrollReveal className="mx-auto mt-5 max-w-3xl overflow-hidden rounded-2xl border border-neutral-200 bg-white text-sm dark:border-neutral-800 dark:bg-neutral-900">
           <div className="grid grid-cols-[1.2fr_1fr_1fr] bg-neutral-50 text-xs font-bold uppercase tracking-wide text-neutral-500 dark:bg-neutral-950">
             <div className="p-3">Limit</div>
             <div className="p-3">Free</div>
@@ -512,8 +517,8 @@ export function PricingContent() {
               <div className="p-3 font-medium text-neutral-800 dark:text-neutral-200">{plus}</div>
             </div>
           ))}
-        </div>
-        <div className="mx-auto mt-8 grid max-w-3xl gap-3 md:grid-cols-3">
+        </ScrollReveal>
+        <StaggerGroup className="mx-auto mt-8 grid max-w-3xl gap-3 md:grid-cols-3" staggerDelay={0.1}>
           {TRUST_NOTES.map((note) => {
             const Icon = note.icon
             return (
@@ -524,11 +529,11 @@ export function PricingContent() {
               </div>
             )
           })}
-        </div>
+        </StaggerGroup>
       </section>
 
       <section className="pb-16 px-4">
-        <div className="mx-auto mb-6 grid max-w-3xl gap-4 md:grid-cols-3">
+        <StaggerGroup className="mx-auto mb-6 grid max-w-3xl gap-4 md:grid-cols-3" staggerDelay={0.1}>
           {BETA_QUOTES.map((quote) => (
             <figure key={quote.name} className="rounded-2xl border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900">
               <blockquote className="text-sm font-medium leading-6 text-neutral-800 dark:text-neutral-200">
@@ -539,8 +544,8 @@ export function PricingContent() {
               </figcaption>
             </figure>
           ))}
-        </div>
-        <div className="mx-auto grid max-w-3xl overflow-hidden rounded-3xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900 md:grid-cols-[0.7fr_1.3fr]">
+        </StaggerGroup>
+        <ScrollReveal className="mx-auto grid max-w-3xl overflow-hidden rounded-3xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900 md:grid-cols-[0.7fr_1.3fr]">
           <div className="relative min-h-56">
             <Image
               src="/founders/dipak-suprabha.jpg"
@@ -575,16 +580,18 @@ export function PricingContent() {
               </div>
             </div>
           </div>
-        </div>
+        </ScrollReveal>
       </section>
 
       {/* ── FEATURE HIGHLIGHTS ── */}
       <section className="pb-16 px-4">
         <div className="max-w-3xl mx-auto">
-          <h2 className="font-serif text-2xl font-bold text-neutral-900 dark:text-neutral-50 text-center mb-8">
-            What you unlock with Plus
-          </h2>
-          <div className="grid sm:grid-cols-2 gap-4">
+          <ScrollReveal>
+            <h2 className="font-serif text-2xl font-bold text-neutral-900 dark:text-neutral-50 text-center mb-8">
+              What you unlock with Plus
+            </h2>
+          </ScrollReveal>
+          <StaggerGroup className="grid sm:grid-cols-2 gap-4" staggerDelay={0.1}>
             {PLUS_UNLOCKS.map((item) => {
               const Icon = item.icon
 
@@ -603,16 +610,18 @@ export function PricingContent() {
               </div>
               )
             })}
-          </div>
+          </StaggerGroup>
         </div>
       </section>
 
       {/* ── FAQ ── */}
       <section className="py-16 px-4 bg-[#FDF6F1] dark:bg-neutral-900">
         <div className="max-w-2xl mx-auto">
-          <h2 className="font-serif text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50 text-center mb-10">
-            Common questions
-          </h2>
+          <ScrollReveal>
+            <h2 className="font-serif text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50 text-center mb-10">
+              Common questions
+            </h2>
+          </ScrollReveal>
           <div className="space-y-3">
             {FAQ.map(({ q, a }, i) => (
               <div
@@ -639,6 +648,7 @@ export function PricingContent() {
 
       {/* ── BOTTOM CTA ── */}
       <section className="py-16 px-4 text-center">
+        <ScrollReveal>
         <h3 className="font-serif text-2xl font-bold text-neutral-900 dark:text-neutral-50 mb-3">
           Ready to simplify dinner?
         </h3>
@@ -674,6 +684,7 @@ export function PricingContent() {
             hello@mealeaseai.com
           </a>
         </p>
+        </ScrollReveal>
       </section>
     </div>
   )

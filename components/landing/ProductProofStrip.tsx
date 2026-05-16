@@ -1,6 +1,9 @@
+'use client'
+
 import Image from 'next/image'
 import { ArrowRight, Camera, CheckCircle2, ShoppingCart } from 'lucide-react'
-import { Container } from './shared/Container'
+import { ScrollReveal, StaggerGroup, HoverCard } from '@/components/motion'
+import { Section } from '@/components/ui/Section'
 
 const proofSteps = [
   {
@@ -22,60 +25,59 @@ const proofSteps = [
 
 export function ProductProofStrip() {
   return (
-    <section className="border-y border-orange-100 bg-white py-10 dark:border-neutral-800 dark:bg-neutral-950">
-      <Container>
-        <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
-          <div>
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#D97757]">
-              First useful output
-            </p>
-            <h2 className="mt-2 font-serif text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50">
-              From fridge photo to dinner and groceries.
-            </h2>
-            <p className="mt-2 max-w-xl text-sm leading-6 text-neutral-600 dark:text-neutral-400">
-              The core MealEase loop is now available before account creation:
-              scan or choose a sample, answer three preferences, then save the plan.
-            </p>
-            <blockquote className="mt-5 rounded-2xl border border-orange-100 bg-[#FBFAF3] p-4 text-sm leading-6 text-neutral-700 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300">
-              &ldquo;The week plan plus grocery list is the part I would come back for.&rdquo;
-              <footer className="mt-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#D97757]">
-                Priya S. · early household
-              </footer>
-            </blockquote>
-            <div className="mt-5 grid gap-3">
-              {proofSteps.map((step, index) => {
-                const Icon = step.icon
-                return (
-                  <div
-                    key={step.label}
-                    className="relative rounded-2xl border border-orange-100 bg-[#FBFAF3] p-4 dark:border-neutral-800 dark:bg-neutral-900"
-                  >
-                    <div className="flex gap-3">
-                      <div className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-[#D97757] shadow-sm dark:bg-neutral-950">
-                        <Icon className="h-4 w-4" aria-hidden />
+    <Section background="white" padding="md" className="border-y border-orange-100 dark:border-neutral-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid gap-8 lg:grid-cols-2 lg:items-start lg:gap-12">
+          <ScrollReveal direction="left">
+            <div>
+              <span className="inline-block mb-3 px-3 py-1 text-xs font-medium uppercase tracking-wider text-[#D97757] bg-[#D97757]/8 rounded-full">
+                First useful output
+              </span>
+              <h2 className="mt-2 font-serif text-3xl md:text-4xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50">
+                From fridge photo to dinner and groceries.
+              </h2>
+              <p className="mt-3 max-w-xl text-body-lg leading-relaxed text-neutral-500 dark:text-neutral-400">
+                The core MealEase loop is now available before account creation:
+                scan or choose a sample, answer three preferences, then save the plan.
+              </p>
+              <blockquote className="mt-6 rounded-2xl border border-orange-100 bg-[#FDF6F1]/60 p-5 text-sm leading-6 text-neutral-700 shadow-subtle dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300">
+                &ldquo;The week plan plus grocery list is the part I would come back for.&rdquo;
+                <footer className="mt-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#D97757]">
+                  Priya S. · early household
+                </footer>
+              </blockquote>
+              <StaggerGroup className="mt-6 grid gap-3" staggerDelay={0.08}>
+                {proofSteps.map((step, index) => {
+                  const Icon = step.icon
+                  return (
+                    <HoverCard key={step.label} className="relative rounded-2xl border border-orange-100 bg-[#FDF6F1]/60 p-4 shadow-subtle transition-shadow hover:shadow-medium dark:border-neutral-800 dark:bg-neutral-900">
+                      <div className="flex gap-3">
+                        <div className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-[#D97757] shadow-sm dark:bg-neutral-950">
+                          <Icon className="h-4 w-4" aria-hidden />
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-bold text-neutral-900 dark:text-neutral-100">
+                            {step.label}
+                          </h3>
+                          <p className="mt-1 text-xs leading-5 text-neutral-500 dark:text-neutral-400">
+                            {step.body}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="text-sm font-bold text-neutral-900 dark:text-neutral-100">
-                          {step.label}
-                        </h3>
-                        <p className="mt-1 text-xs leading-5 text-neutral-600 dark:text-neutral-400">
-                          {step.body}
-                        </p>
-                      </div>
-                    </div>
-                    {index < proofSteps.length - 1 && (
-                      <ArrowRight
-                        className="absolute -bottom-3 left-6 h-5 w-5 rotate-90 text-[#D97757]"
-                        aria-hidden
-                      />
-                    )}
-                  </div>
-                )
-              })}
+                      {index < proofSteps.length - 1 && (
+                        <ArrowRight
+                          className="absolute -bottom-3 left-6 h-5 w-5 rotate-90 text-[#D97757]"
+                          aria-hidden
+                        />
+                      )}
+                    </HoverCard>
+                  )
+                })}
+              </StaggerGroup>
             </div>
-          </div>
-          <div>
+          </ScrollReveal>
 
+          <ScrollReveal direction="right" delay={0.1}>
             <div className="overflow-hidden rounded-3xl border border-orange-100 bg-white shadow-xl shadow-orange-100/45 dark:border-neutral-800 dark:bg-neutral-900 dark:shadow-none">
               <div className="relative aspect-[556/520] bg-[#FBFAF3]">
                 <Image
@@ -115,9 +117,9 @@ export function ProductProofStrip() {
                 </div>
               </div>
             </div>
-          </div>
+          </ScrollReveal>
         </div>
-      </Container>
-    </section>
+      </div>
+    </Section>
   )
 }

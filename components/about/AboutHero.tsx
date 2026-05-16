@@ -1,15 +1,14 @@
+'use client'
+
 import { Container } from '@/components/landing/shared/Container'
-import { FadeIn } from '@/components/landing/shared/FadeIn'
+import { ScrollReveal } from '@/components/motion'
+import { Section } from '@/components/ui/Section'
 
 export function AboutHero() {
   return (
-    <section className="relative pt-16 pb-12 md:pt-24 md:pb-16">
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-gradient-to-b from-[#FDF6F1] via-white to-white dark:from-neutral-900 dark:via-neutral-950 dark:to-neutral-950"
-      />
+    <Section background="gradient" padding="lg">
       <Container>
-        <FadeIn>
+        <ScrollReveal>
           <div className="max-w-3xl">
             <p className="text-sm font-medium text-[#D97757] uppercase tracking-wider mb-4">
               Our story
@@ -28,8 +27,8 @@ export function AboutHero() {
               months — and couldn&apos;t find a tool that actually finished the job.
             </p>
           </div>
-        </FadeIn>
+        </ScrollReveal>
       </Container>
-    </section>
+    </Section>
   )
 }

@@ -1,14 +1,13 @@
-import { Container } from './shared/Container'
+'use client'
+
+import { ScrollReveal } from '@/components/motion'
+import { Section } from '@/components/ui/Section'
 import { Button } from './shared/Button'
-import { FadeIn } from './shared/FadeIn'
 import { productStory, trustCopy } from '@/lib/marketing/stats'
 
 export function FinalCTA() {
   return (
-    <section
-      className="me-defer-section relative overflow-hidden py-24 md:py-32"
-      aria-labelledby="final-cta-heading"
-    >
+    <Section padding="xl" className="me-defer-section !bg-transparent relative">
       <div className="absolute inset-0 -z-10">
         <picture>
           <source media="(max-width: 639px)" srcSet="/landing/optimized/join-us-mobile.avif" type="image/avif" />
@@ -31,24 +30,20 @@ export function FinalCTA() {
         />
       </div>
 
-      <Container className="relative z-10">
-        <FadeIn>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <ScrollReveal>
           <div className="text-center max-w-3xl mx-auto">
-            {/* Headline: text-shadow for premium depth */}
             <h2
-              id="final-cta-heading"
               className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-white leading-[1.05] [text-shadow:0_2px_16px_rgba(0,0,0,0.55)]"
             >
               Dinner + groceries are{' '}
               <span className="italic text-[#D97757]">handled this week.</span>
             </h2>
 
-            {/* Paragraph: brighter white for readability */}
             <p className="mt-5 text-lg md:text-xl text-white/85 leading-relaxed max-w-xl mx-auto font-medium">
               {productStory}
             </p>
 
-            {/* Tighter gap between paragraph and CTA */}
             <div className="mt-7 flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button href="/signup" className="text-lg px-8 min-h-[56px] shadow-lg shadow-[#D97757]/30">
                 Plan tonight&rsquo;s dinner — free
@@ -65,8 +60,8 @@ export function FinalCTA() {
               {trustCopy.join(' · ')}
             </p>
           </div>
-        </FadeIn>
-      </Container>
-    </section>
+        </ScrollReveal>
+      </div>
+    </Section>
   )
 }

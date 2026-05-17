@@ -17,6 +17,7 @@ import {
 import { Container } from './shared/Container'
 import { FadeIn } from './shared/FadeIn'
 import { MobileCarouselRail } from './shared/MobileCarouselRail'
+import { WarmAuroraGlow } from './shared/WarmAuroraGlow'
 import smartAutopilotImage from '@/public/landing/optimized/smartautopilot.webp'
 import familyDinnerImage from '@/public/landing/optimized/family-dinner.webp'
 
@@ -246,8 +247,9 @@ export function AutopilotSection() {
         </div>
 
         <FadeIn delay={0.14}>
-          <div className="mt-12 rounded-[1.75rem] bg-neutral-950 p-5 text-white shadow-2xl shadow-neutral-900/15 ring-1 ring-neutral-900/10 dark:ring-white/10 md:p-7">
-            <div className="mb-6 max-w-2xl">
+          <div className="relative mt-12 overflow-hidden rounded-[1.75rem] bg-neutral-950 p-5 text-white shadow-2xl shadow-neutral-900/15 ring-1 ring-neutral-900/10 dark:ring-white/10 md:p-7">
+            <WarmAuroraGlow />
+            <div className="relative z-10 mb-6 max-w-2xl">
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#F3B18E]">
                 Household intelligence system
               </p>
@@ -256,7 +258,7 @@ export function AutopilotSection() {
               </h3>
             </div>
 
-            <MobileCarouselRail className="lg:hidden" itemClassName="min-w-[82%]" dotTone="light" ariaLabel="Swipe through connected MealEase features">
+            <MobileCarouselRail className="relative z-10 lg:hidden" itemClassName="min-w-[82%]" dotTone="light" ariaLabel="Swipe through connected MealEase features">
               {systemSteps.map((step) => {
                 const Icon = step.icon
                 return (
@@ -276,7 +278,7 @@ export function AutopilotSection() {
               })}
             </MobileCarouselRail>
 
-            <div className="hidden gap-4 lg:grid lg:grid-cols-5">
+            <div className="relative z-10 hidden gap-4 lg:grid lg:grid-cols-5">
               {systemSteps.map((step, index) => {
                 const Icon = step.icon
                 return (

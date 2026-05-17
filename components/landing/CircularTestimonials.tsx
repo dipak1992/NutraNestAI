@@ -22,8 +22,8 @@ type CircularTestimonialsProps = {
 function calculateGap(width: number) {
   const minWidth = 320
   const maxWidth = 960
-  const minGap = 32
-  const maxGap = 82
+  const minGap = 28
+  const maxGap = 72
 
   if (width <= minWidth) return minGap
   if (width >= maxWidth) return maxGap
@@ -142,7 +142,7 @@ export function CircularTestimonials({
       <div className="grid items-center gap-8 md:grid-cols-[0.95fr_1.05fr] md:gap-12 lg:gap-16">
         <div
           ref={imageContainerRef}
-          className="relative mx-auto h-[18rem] w-full max-w-[23rem] perspective-[1000px] sm:h-[22rem] sm:max-w-[28rem] md:h-[24rem] md:max-w-none lg:h-[26rem]"
+          className="relative mx-auto h-[17rem] w-full max-w-[23rem] perspective-[1000px] sm:h-[20rem] sm:max-w-[28rem] md:h-[22rem] md:max-w-none lg:h-[24rem]"
         >
           {testimonials.map((testimonial, index) => (
             <button
@@ -153,19 +153,28 @@ export function CircularTestimonials({
                 stopAutoplay()
                 setActiveIndex(index)
               }}
-              className="absolute inset-0 mx-auto h-full w-[76%] overflow-hidden rounded-[1.4rem] border border-white/70 bg-neutral-200 shadow-2xl shadow-neutral-900/18 transition-all duration-700 ease-[cubic-bezier(.4,2,.3,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97757] focus-visible:ring-offset-2 dark:border-white/10 dark:bg-neutral-800 sm:w-[72%] md:w-[76%]"
+              className="absolute inset-0 mx-auto flex h-full w-[74%] flex-col items-center justify-center overflow-hidden rounded-[1.4rem] border border-white/70 bg-[radial-gradient(circle_at_30%_18%,rgba(243,177,142,0.34),transparent_30%),linear-gradient(145deg,#fffaf4,#f6eadf)] px-5 text-center shadow-2xl shadow-neutral-900/16 transition-all duration-700 ease-[cubic-bezier(.4,2,.3,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97757] focus-visible:ring-offset-2 dark:border-white/10 dark:bg-[radial-gradient(circle_at_30%_18%,rgba(217,119,87,0.24),transparent_30%),linear-gradient(145deg,#171717,#0f0f0f)] sm:w-[68%] md:w-[72%]"
               style={getImageStyle(index)}
             >
-              <Image
-                src={testimonial.src}
-                alt={testimonial.name}
-                fill
-                sizes="(max-width: 768px) 280px, 360px"
-                className="object-cover object-top"
-              />
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-neutral-950/62 to-transparent p-4 text-left">
-                <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#F3B18E]">
+              <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.42),transparent_38%,rgba(217,119,87,0.12))] dark:bg-[linear-gradient(120deg,rgba(255,255,255,0.08),transparent_38%,rgba(217,119,87,0.14))]" />
+              <div className="relative z-10">
+                <div className="mx-auto rounded-full bg-white p-2 shadow-xl shadow-neutral-900/12 ring-1 ring-orange-100 dark:bg-neutral-950 dark:ring-white/10">
+                  <div className="relative h-24 w-24 overflow-hidden rounded-full sm:h-28 sm:w-28 md:h-32 md:w-32">
+                    <Image
+                      src={testimonial.src}
+                      alt={testimonial.name}
+                      fill
+                      sizes="(max-width: 768px) 112px, 128px"
+                      quality={100}
+                      className="object-cover object-top"
+                    />
+                  </div>
+                </div>
+                <p className="mt-5 text-[11px] font-bold uppercase tracking-[0.2em] text-[#B85F43] dark:text-[#F3B18E]">
                   Household feedback
+                </p>
+                <p className="mt-2 font-serif text-xl font-bold text-neutral-950 dark:text-neutral-50">
+                  {testimonial.name}
                 </p>
               </div>
             </button>

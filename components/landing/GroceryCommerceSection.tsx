@@ -1,7 +1,5 @@
 import Image from 'next/image'
-import Link from 'next/link'
 import {
-  ArrowRight,
   CheckCircle2,
   ClipboardList,
   FileDown,
@@ -91,18 +89,9 @@ export function GroceryCommerceSection() {
                 ))}
               </div>
 
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-                <Link
-                  href="/signup"
-                  className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-[#D97757] px-6 text-base font-medium text-white shadow-md shadow-[#D97757]/20 transition-all duration-200 hover:bg-[#C86646] hover:shadow-lg hover:shadow-[#D97757]/28 active:scale-[0.98]"
-                >
-                  Plan groceries free
-                  <ArrowRight className="h-4 w-4" aria-hidden />
-                </Link>
-                <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400">
-                  Copy, PDF, or supported store handoff where available.
-                </p>
-              </div>
+              <p className="mt-8 text-sm font-medium text-neutral-500 dark:text-neutral-400">
+                Copy, PDF, or supported store handoff where available.
+              </p>
             </div>
           </FadeIn>
 
@@ -208,18 +197,11 @@ export function GroceryCommerceSection() {
               </div>
             </div>
 
-            <div className="flex flex-col gap-4 border-t border-white/10 px-6 py-5 sm:flex-row sm:items-center sm:justify-between md:px-8">
+            <div className="border-t border-white/10 px-6 py-5 md:px-8">
               <div className="flex items-center gap-2 text-sm text-neutral-300">
                 <MapPin className="h-4 w-4 text-[#F3B18E]" aria-hidden />
                 Availability depends on region and store coverage.
               </div>
-              <Link
-                href="/signup"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-neutral-950 transition-colors hover:bg-[#FDF6F1]"
-              >
-                Start with tonight&apos;s plan
-                <ArrowRight className="h-4 w-4" aria-hidden />
-              </Link>
             </div>
           </div>
         </FadeIn>

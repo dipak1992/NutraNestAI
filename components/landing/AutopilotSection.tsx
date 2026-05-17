@@ -1,14 +1,16 @@
 import Image from 'next/image'
-import Link from 'next/link'
 import {
   Recycle,
-  ArrowRight,
   Brain,
+  CalendarDays,
   CheckCircle2,
+  ChefHat,
   Clock,
   DollarSign,
   Leaf,
   Lock,
+  Refrigerator,
+  ShoppingCart,
   Sparkles,
   Utensils,
 } from 'lucide-react'
@@ -56,6 +58,39 @@ const smartSignals = [
   '3 pantry items already owned',
   '1 leftover repurposed',
   '$62 estimated, $18 under budget',
+]
+
+const systemSteps = [
+  {
+    icon: ChefHat,
+    label: 'Tonight',
+    title: 'Pick dinner',
+    body: 'AI checks your week, avoids repeats, and chooses a dinner that fits tonight.',
+  },
+  {
+    icon: CalendarDays,
+    label: 'Planner',
+    title: 'Shape the week',
+    body: 'Weekly Autopilot reads pantry, budget, leftovers, and family signals together.',
+  },
+  {
+    icon: ShoppingCart,
+    label: 'Grocery',
+    title: 'Build the list',
+    body: 'Ingredients consolidate into a store-ready list with pantry deductions.',
+  },
+  {
+    icon: DollarSign,
+    label: 'Budget',
+    title: 'Suggest swaps',
+    body: 'If the plan runs high, MealEase finds cheaper changes before checkout.',
+  },
+  {
+    icon: Refrigerator,
+    label: 'Leftovers',
+    title: 'Use what remains',
+    body: 'Cooking feeds leftover tracking, so food gets reused before it expires.',
+  },
 ]
 
 export function AutopilotSection() {
@@ -108,23 +143,7 @@ export function AutopilotSection() {
                 ))}
               </div>
 
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-                <Link
-                  href="/signup"
-                  className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-[#D97757] px-6 text-base font-medium text-white shadow-md shadow-[#D97757]/20 transition-all duration-200 hover:bg-[#C86646] hover:shadow-lg hover:shadow-[#D97757]/28 active:scale-[0.98]"
-                >
-                  Try Autopilot free
-                  <ArrowRight className="h-4 w-4" aria-hidden />
-                </Link>
-                <Link
-                  href="/features/weekly-autopilot"
-                  className="inline-flex min-h-[48px] items-center justify-center rounded-full px-4 text-sm font-semibold text-neutral-700 underline-offset-4 transition-colors hover:text-[#D97757] hover:underline dark:text-neutral-300"
-                >
-                  See Weekly Autopilot
-                </Link>
-              </div>
-
-              <p className="mt-3 text-sm text-neutral-500 dark:text-neutral-400">
+              <p className="mt-8 text-sm text-neutral-500 dark:text-neutral-400">
                 Preview the plan first. Upgrade when you want the full week, memory, and grocery workflow.
               </p>
             </div>
@@ -225,6 +244,61 @@ export function AutopilotSection() {
             )
           })}
         </div>
+
+        <FadeIn delay={0.14}>
+          <div className="mt-12 rounded-[1.75rem] bg-neutral-950 p-5 text-white shadow-2xl shadow-neutral-900/15 ring-1 ring-neutral-900/10 dark:ring-white/10 md:p-7">
+            <div className="mb-6 max-w-2xl">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#F3B18E]">
+                Household intelligence system
+              </p>
+              <h3 className="mt-2 font-serif text-2xl font-bold md:text-3xl">
+                Tonight, planner, groceries, budget, and leftovers share the same memory.
+              </h3>
+            </div>
+
+            <MobileCarouselRail className="lg:hidden" itemClassName="min-w-[82%]" dotTone="light" ariaLabel="Swipe through connected MealEase features">
+              {systemSteps.map((step) => {
+                const Icon = step.icon
+                return (
+                  <article key={step.label} className="h-full rounded-2xl border border-white/10 bg-white/[0.06] p-5">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-xs font-bold uppercase tracking-[0.16em] text-[#F3B18E]">
+                        {step.label}
+                      </span>
+                      <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#D97757] text-white">
+                        <Icon className="h-5 w-5" aria-hidden />
+                      </span>
+                    </div>
+                    <h4 className="mt-5 text-lg font-semibold text-white">{step.title}</h4>
+                    <p className="mt-2 text-sm leading-relaxed text-neutral-400">{step.body}</p>
+                  </article>
+                )
+              })}
+            </MobileCarouselRail>
+
+            <div className="hidden gap-4 lg:grid lg:grid-cols-5">
+              {systemSteps.map((step, index) => {
+                const Icon = step.icon
+                return (
+                  <FadeIn key={step.label} delay={index * 0.04}>
+                    <article className="h-full rounded-2xl border border-white/10 bg-white/[0.06] p-5">
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-xs font-bold uppercase tracking-[0.16em] text-[#F3B18E]">
+                          {step.label}
+                        </span>
+                        <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#D97757] text-white">
+                          <Icon className="h-5 w-5" aria-hidden />
+                        </span>
+                      </div>
+                      <h4 className="mt-5 text-lg font-semibold text-white">{step.title}</h4>
+                      <p className="mt-2 text-sm leading-relaxed text-neutral-400">{step.body}</p>
+                    </article>
+                  </FadeIn>
+                )
+              })}
+            </div>
+          </div>
+        </FadeIn>
 
         <FadeIn delay={0.2}>
           <div className="mx-auto mt-8 rounded-2xl bg-[#17120f] p-5 text-white shadow-xl shadow-neutral-900/15 ring-1 ring-neutral-900/10 md:hidden">

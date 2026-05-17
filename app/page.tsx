@@ -10,11 +10,9 @@ import { productStory } from '@/lib/marketing/stats'
 // SSR is kept so the HTML is still rendered server-side for SEO
 const ConversionStory = dynamic(() => import('@/components/landing/ConversionStory').then(m => m.ConversionStory), { ssr: true })
 const FounderNote = dynamic(() => import('@/components/landing/FounderNote').then(m => m.FounderNote), { ssr: true })
-const HowItWorks = dynamic(() => import('@/components/landing/HowItWorks').then(m => m.HowItWorks), { ssr: true })
 const FivePillarsSection = dynamic(() => import('@/components/landing/FivePillarsSection').then(m => m.FivePillarsSection), { ssr: true })
 const AutopilotSection = dynamic(() => import('@/components/landing/AutopilotSection').then(m => m.AutopilotSection), { ssr: true })
 const GroceryCommerceSection = dynamic(() => import('@/components/landing/GroceryCommerceSection').then(m => m.GroceryCommerceSection), { ssr: true })
-const ConnectedSystem = dynamic(() => import('@/components/landing/ConnectedSystem').then(m => m.ConnectedSystem), { ssr: true })
 const SocialProof = dynamic(() => import('@/components/landing/SocialProof').then(m => m.SocialProof), { ssr: true })
 const ComparisonTable = dynamic(() => import('@/components/landing/ComparisonTable').then(m => m.ComparisonTable), { ssr: true })
 const PricingTeaser = dynamic(() => import('@/components/landing/PricingTeaser').then(m => m.PricingTeaser), { ssr: true })
@@ -65,14 +63,12 @@ export default async function LandingPage() {
         <MobileStickyCTA />
         <ProductProofStrip />
         <ConversionStory />
-        <FounderNote />
-        <HowItWorks />
         <FivePillarsSection />
         <AutopilotSection />
         <GroceryCommerceSection />
-        <ConnectedSystem />
         <ComparisonTable />
         <SocialProof />
+        <FounderNote />
         <PricingTeaser />
         <FAQ />
         <FinalCTA />

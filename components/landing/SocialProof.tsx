@@ -1,8 +1,14 @@
-import Image from 'next/image'
 import { Container } from './shared/Container'
 import { FadeIn } from './shared/FadeIn'
-import { MobileCarouselRail } from './shared/MobileCarouselRail'
+import { CircularTestimonials } from './CircularTestimonials'
 import { socialProof } from '@/config/social-proof'
+
+const carouselTestimonials = socialProof.testimonials.map((testimonial) => ({
+  quote: `“${testimonial.quote}”`,
+  name: testimonial.name,
+  designation: testimonial.city,
+  src: testimonial.photo,
+}))
 
 export function SocialProof() {
   return (
@@ -27,7 +33,7 @@ export function SocialProof() {
         </FadeIn>
 
         <FadeIn>
-          <div className="mb-12 grid grid-cols-2 gap-8 text-center md:mb-20 md:grid-cols-4 md:gap-12">
+          <div className="mb-10 grid grid-cols-2 gap-x-4 gap-y-8 text-center md:mb-14 md:grid-cols-4 md:gap-12">
             {[
               { value: socialProof.householdCount, label: 'household feedback program' },
               { value: socialProof.dinnersPlanned, label: 'dinner-plan data under review' },
@@ -35,10 +41,10 @@ export function SocialProof() {
               { value: socialProof.hoursSavedPerWeek, label: 'time-saved study status' },
             ].map((stat) => (
               <div key={stat.label}>
-                <div className="font-serif text-4xl font-bold text-[#D97757] md:text-5xl">
+                <div className="font-serif text-[2.15rem] font-bold leading-[0.95] text-[#D97757] md:text-5xl md:leading-none">
                   {stat.value}
                 </div>
-                <div className="mt-2 text-sm leading-snug text-neutral-500 dark:text-neutral-400">
+                <div className="mx-auto mt-2 max-w-[9rem] text-xs leading-snug text-neutral-500 dark:text-neutral-400 md:text-sm">
                   {stat.label}
                 </div>
               </div>
@@ -46,60 +52,10 @@ export function SocialProof() {
           </div>
         </FadeIn>
 
-        <MobileCarouselRail className="md:hidden" itemClassName="min-w-full" ariaLabel="Swipe through MealEase reviews">
-          {socialProof.testimonials.map((t) => (
-            <div key={t.name}>
-              <TestimonialCard testimonial={t} />
-            </div>
-          ))}
-        </MobileCarouselRail>
-
-        <div className="hidden gap-6 md:grid md:grid-cols-2 lg:grid-cols-3">
-          {socialProof.testimonials.map((t, i) => (
-            <FadeIn key={t.name} delay={i * 0.08}>
-              <TestimonialCard testimonial={t} />
-            </FadeIn>
-          ))}
-        </div>
+        <FadeIn delay={0.08}>
+          <CircularTestimonials testimonials={carouselTestimonials} />
+        </FadeIn>
       </Container>
     </section>
-  )
-}
-
-function TestimonialCard({
-  testimonial,
-}: {
-  testimonial: (typeof socialProof.testimonials)[number]
-}) {
-  return (
-    <figure className="flex h-full flex-col rounded-2xl bg-[#FDF6F1] p-6 ring-1 ring-black/5 dark:bg-neutral-900 dark:ring-white/5">
-      <div className="mb-4 text-sm text-[#D97757]" aria-label="5 stars">
-        ★★★★★
-      </div>
-      <blockquote className="flex-1">
-        <p className="leading-relaxed text-neutral-800 dark:text-neutral-200">
-          &ldquo;{testimonial.quote}&rdquo;
-        </p>
-      </blockquote>
-      <figcaption className="mt-6 flex items-center gap-3">
-        <div className="relative h-11 w-11 flex-shrink-0 overflow-hidden rounded-full shadow-sm ring-2 ring-[#D97757]/25">
-          <Image
-            src={testimonial.photo}
-            alt={testimonial.name}
-            fill
-            sizes="44px"
-            className="object-cover object-top"
-          />
-        </div>
-        <div>
-          <div className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-            {testimonial.name}
-          </div>
-          <div className="text-xs text-neutral-500 dark:text-neutral-400">
-            {testimonial.city}
-          </div>
-        </div>
-      </figcaption>
-    </figure>
   )
 }

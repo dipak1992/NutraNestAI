@@ -5,6 +5,7 @@ import { Button } from './shared/Button'
 import { FadeIn } from './shared/FadeIn'
 import { MotionFloat } from './shared/MotionFloat'
 import { MealEaseLoop } from './shared/MealEaseLoop'
+import { RotatingHeroWord } from './shared/RotatingHeroWord'
 import { socialProof } from '@/config/social-proof'
 import { LandingTonightPreview } from './LandingTonightPreview'
 import { LandingScanDemoButton } from './LandingScanDemoButton'
@@ -54,9 +55,11 @@ export function Hero() {
                 id="hero-heading"
                 className="font-serif text-[38px] leading-[1.05] sm:text-5xl md:text-6xl lg:text-[62px] font-bold tracking-tight text-neutral-900 dark:text-neutral-50"
               >
-                Dinner planned.
+                Dinner planned for
                 <br />
-                <span className="italic text-[#D97757]">Grocery list built.</span>
+                <RotatingHeroWord />
+                <br />
+                <span>Grocery list built.</span>
               </h1>
             </FadeIn>
 
@@ -78,10 +81,10 @@ export function Hero() {
                 </Button>
                 <LandingScanDemoButton />
                 <a
-                  href="#how-it-works"
+                  href="#pillars"
                   className="text-neutral-600 dark:text-neutral-300 hover:text-[#D97757] underline-offset-4 hover:underline text-sm font-medium transition-colors"
                 >
-                  See how it works ↓
+                  See the dinner loop ↓
                 </a>
               </div>
             </FadeIn>

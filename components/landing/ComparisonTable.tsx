@@ -34,7 +34,7 @@ const workflowProof = [
 export function ComparisonTable() {
   return (
     <section
-      className="py-16 md:py-22 bg-[#FDF6F1] dark:bg-neutral-900"
+      className="py-10 md:py-22 bg-[#FDF6F1] dark:bg-neutral-900"
       aria-labelledby="comparison-heading"
     >
       <Container>
@@ -55,7 +55,32 @@ export function ComparisonTable() {
         </FadeIn>
 
         <FadeIn delay={0.1}>
-          <div className="mb-8 grid gap-4 rounded-3xl bg-white p-4 ring-1 ring-black/5 dark:bg-neutral-950 dark:ring-white/5 md:grid-cols-[1fr_auto_1fr] md:items-center">
+          <div className="rounded-3xl bg-white p-4 ring-1 ring-black/5 dark:bg-neutral-950 dark:ring-white/5 md:hidden">
+            <div className="grid gap-3">
+              <div className="rounded-2xl bg-neutral-100 p-4 dark:bg-neutral-900">
+                <div className="flex items-center gap-2 text-sm font-bold text-neutral-900 dark:text-neutral-100">
+                  <XCircle className="h-4 w-4 text-neutral-400" aria-hidden />
+                  Generic AI
+                </div>
+                <p className="mt-2 text-sm leading-6 text-neutral-600 dark:text-neutral-400">
+                  You rebuild diet, budget, pantry, leftovers, and recent meals every time you ask.
+                </p>
+              </div>
+              <div className="rounded-2xl bg-neutral-900 p-4 text-white">
+                <div className="flex items-center gap-2 text-sm font-bold">
+                  <Sparkles className="h-4 w-4 text-[#F3B18E]" aria-hidden />
+                  MealEase
+                </div>
+                <p className="mt-2 text-sm leading-6 text-neutral-300">
+                  Household profile, this-week instructions, grocery list, leftovers, and budget stay connected.
+                </p>
+              </div>
+            </div>
+          </div>
+        </FadeIn>
+
+        <FadeIn delay={0.1}>
+          <div className="mb-8 hidden gap-4 rounded-3xl bg-white p-4 ring-1 ring-black/5 dark:bg-neutral-950 dark:ring-white/5 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center">
             {workflowProof.slice(0, 1).map((item) => (
               <div key={item.label} className="rounded-2xl bg-[#FBFAF3] p-5 dark:bg-neutral-900">
                 <div className="flex items-center gap-2 text-sm font-bold text-neutral-900 dark:text-neutral-100">
@@ -83,7 +108,7 @@ export function ComparisonTable() {
               </div>
             ))}
           </div>
-          <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
+          <div className="hidden gap-6 md:grid md:grid-cols-2 lg:gap-8">
             <ComparisonBlock
               title="Generic AI"
               description="A blank chat box is useful for brainstorming, but dinner still depends on you rebuilding the context."

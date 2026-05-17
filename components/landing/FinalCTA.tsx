@@ -6,7 +6,7 @@ import { productStory, trustCopy } from '@/lib/marketing/stats'
 export function FinalCTA() {
   return (
     <section
-      className="relative overflow-hidden py-24 md:py-32"
+      className="relative overflow-hidden py-12 pb-28 md:py-32"
       aria-labelledby="final-cta-heading"
     >
       <div className="absolute inset-0 -z-10">

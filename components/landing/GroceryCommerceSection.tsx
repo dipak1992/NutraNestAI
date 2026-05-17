@@ -48,7 +48,7 @@ const exportOptions = [
 export function GroceryCommerceSection() {
   return (
     <section
-      className="relative overflow-hidden bg-white py-16 dark:bg-neutral-950 md:py-22"
+      className="relative overflow-hidden bg-white py-10 dark:bg-neutral-950 md:py-22"
       aria-labelledby="grocery-commerce-heading"
     >
       <div
@@ -139,7 +139,16 @@ export function GroceryCommerceSection() {
           </FadeIn>
         </div>
 
-        <div className="mx-auto mt-12 grid max-w-5xl gap-4 md:grid-cols-3">
+        <div className="mx-auto mt-8 grid max-w-5xl gap-2 md:hidden">
+          {['Plan becomes one grocery list', 'Pantry items are deducted first', 'Copy, PDF, or supported store handoff'].map((item) => (
+            <div key={item} className="flex items-center gap-3 rounded-2xl bg-[#FDF6F1] px-4 py-3 text-sm font-semibold text-neutral-800 ring-1 ring-[#D97757]/15 dark:bg-neutral-900 dark:text-neutral-200 dark:ring-neutral-800">
+              <CheckCircle2 className="h-4 w-4 shrink-0 text-[#D97757]" aria-hidden />
+              {item}
+            </div>
+          ))}
+        </div>
+
+        <div className="mx-auto mt-12 hidden max-w-5xl gap-4 md:grid md:grid-cols-3">
           {steps.map((step, index) => {
             const Icon = step.icon
 

@@ -42,7 +42,7 @@ export function PricingTeaser() {
   return (
     <section
       id="pricing"
-      className="py-16 md:py-22 bg-white dark:bg-neutral-950"
+      className="py-10 md:py-22 bg-white dark:bg-neutral-950"
       aria-labelledby="pricing-heading"
     >
       <Container>

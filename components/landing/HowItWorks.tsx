@@ -23,7 +23,7 @@ export function HowItWorks() {
   return (
     <section
       id="how-it-works"
-      className="py-16 md:py-20 bg-[#FDF6F1] dark:bg-neutral-900"
+      className="py-10 md:py-20 bg-[#FDF6F1] dark:bg-neutral-900"
       aria-labelledby="how-heading"
     >
       <Container>

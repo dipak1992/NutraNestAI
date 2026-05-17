@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { Container } from './shared/Container'
 import { FadeIn } from './shared/FadeIn'
 import { faqs } from '@/config/faqs'
@@ -6,7 +7,7 @@ export function FAQ() {
   return (
     <section
       id="faq"
-      className="py-20 md:py-28 bg-white dark:bg-neutral-950"
+      className="py-10 md:py-28 bg-white dark:bg-neutral-950"
       aria-labelledby="faq-heading"
     >
       <Container>
@@ -27,9 +28,8 @@ export function FAQ() {
             {faqs.map((item, i) => (
               <details
                 key={item.q}
-                className="group border-neutral-200 py-5 dark:border-neutral-800"
+                className={`group border-neutral-200 py-5 dark:border-neutral-800 ${i >= 4 ? 'hidden md:block' : ''}`}
                 name="landing-faq"
-                open={i === 0}
               >
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left [&::-webkit-details-marker]:hidden">
                   <span className="font-medium text-neutral-900 transition-colors group-hover:text-[#D97757] dark:text-neutral-100">
@@ -47,6 +47,14 @@ export function FAQ() {
                 </p>
               </details>
             ))}
+          </div>
+          <div className="mt-6 text-center md:hidden">
+            <Link
+              href="/faq"
+              className="inline-flex min-h-11 items-center justify-center rounded-full border border-neutral-200 px-5 text-sm font-semibold text-neutral-800 transition-colors hover:border-[#D97757] hover:text-[#D97757] dark:border-neutral-800 dark:text-neutral-100"
+            >
+              View all FAQs
+            </Link>
           </div>
         </FadeIn>
       </Container>

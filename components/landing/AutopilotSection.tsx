@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { Container } from './shared/Container'
 import { FadeIn } from './shared/FadeIn'
+import { MobileCarouselRail } from './shared/MobileCarouselRail'
 import smartAutopilotImage from '@/public/landing/optimized/smartautopilot.webp'
 import familyDinnerImage from '@/public/landing/optimized/family-dinner.webp'
 
@@ -60,7 +61,7 @@ const smartSignals = [
 export function AutopilotSection() {
   return (
     <section
-      className="relative overflow-hidden bg-[#FDF6F1] py-16 dark:bg-neutral-950 md:py-22"
+      className="relative overflow-hidden bg-[#FDF6F1] py-10 dark:bg-neutral-950 md:py-22"
       aria-labelledby="autopilot-heading"
     >
       <div
@@ -179,7 +180,30 @@ export function AutopilotSection() {
           </FadeIn>
         </div>
 
-        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <MobileCarouselRail className="mt-10 md:hidden" itemClassName="min-w-[82%]" ariaLabel="Swipe through Autopilot features">
+          {autopilotFeatures.map((feature) => {
+            const Icon = feature.icon
+            return (
+              <div key={feature.title}>
+                <article className="group h-full rounded-2xl bg-white p-5 shadow-sm ring-1 ring-neutral-200/70 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:ring-[#D97757]/30 dark:bg-neutral-900 dark:ring-neutral-800">
+                  <div className="flex items-center gap-3">
+                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#D97757]/10 text-[#D97757] transition-colors group-hover:bg-[#D97757] group-hover:text-white">
+                      <Icon className="h-5 w-5" aria-hidden />
+                    </span>
+                    <h3 className="text-sm font-semibold text-neutral-900 dark:text-white">
+                      {feature.title}
+                    </h3>
+                  </div>
+                  <p className="mt-3 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
+                    {feature.body}
+                  </p>
+                </article>
+              </div>
+            )
+          })}
+        </MobileCarouselRail>
+
+        <div className="mt-12 hidden gap-4 md:grid md:grid-cols-2 lg:grid-cols-3">
           {autopilotFeatures.map((feature, i) => {
             const Icon = feature.icon
             return (
@@ -203,7 +227,22 @@ export function AutopilotSection() {
         </div>
 
         <FadeIn delay={0.2}>
-          <div className="mx-auto mt-12 max-w-4xl overflow-hidden rounded-[1.75rem] bg-[#17120f] shadow-2xl shadow-neutral-900/20 ring-1 ring-neutral-900/10 dark:ring-white/10">
+          <div className="mx-auto mt-8 rounded-2xl bg-[#17120f] p-5 text-white shadow-xl shadow-neutral-900/15 ring-1 ring-neutral-900/10 md:hidden">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#F3B18E]">
+              How Autopilot works
+            </p>
+            <h3 className="mt-2 font-serif text-2xl font-bold">
+              Plans like a system. Leaves you in control.
+            </h3>
+            <div className="mt-4 grid gap-2 text-sm text-neutral-300">
+              {['Reads pantry, leftovers, budget, and time', 'Balances variety and prep effort', 'Lets you lock, swap, rerun, or shop'].map((item) => (
+                <div key={item} className="rounded-xl bg-white/[0.07] px-3 py-2 ring-1 ring-white/10">
+                  {item}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="mx-auto mt-12 hidden max-w-4xl overflow-hidden rounded-[1.75rem] bg-[#17120f] shadow-2xl shadow-neutral-900/20 ring-1 ring-neutral-900/10 dark:ring-white/10 md:block">
             <div className="grid md:grid-cols-[0.9fr_1.1fr]">
               <div className="relative min-h-[280px]">
                 <Image

@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { Container } from './shared/Container'
 import { FadeIn } from './shared/FadeIn'
+import { MobileCarouselRail } from './shared/MobileCarouselRail'
 import afterDinnerImage from '@/public/landing/optimized/after-dinner.webp'
 import memoryImage from '@/public/landing/optimized/memory.webp'
 
@@ -63,7 +64,7 @@ const postCookItems = [
 
 export function ConnectedSystem() {
   return (
-    <section className="bg-[#17120f] py-16 text-white md:py-22" aria-labelledby="system-heading">
+    <section className="bg-[#17120f] py-10 text-white md:py-22" aria-labelledby="system-heading">
       <Container>
         <FadeIn>
           <div className="mx-auto max-w-3xl text-center">
@@ -83,7 +84,28 @@ export function ConnectedSystem() {
           </div>
         </FadeIn>
 
-        <div className="mt-14 grid gap-4 lg:grid-cols-5">
+        <MobileCarouselRail className="mt-10 lg:hidden" itemClassName="min-w-[82%]" dotTone="light" ariaLabel="Swipe through connected MealEase features">
+          {systemSteps.map((step) => {
+            const Icon = step.icon
+
+            return (
+              <article key={step.label} className="h-full rounded-2xl border border-white/10 bg-white/[0.06] p-5">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-xs font-bold uppercase tracking-[0.16em] text-[#F3B18E]">
+                    {step.label}
+                  </span>
+                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#D97757] text-white">
+                    <Icon className="h-5 w-5" aria-hidden />
+                  </span>
+                </div>
+                <h3 className="mt-5 text-lg font-semibold text-white">{step.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-neutral-400">{step.body}</p>
+              </article>
+            )
+          })}
+        </MobileCarouselRail>
+
+        <div className="mt-14 hidden gap-4 lg:grid lg:grid-cols-5">
           {systemSteps.map((step, index) => {
             const Icon = step.icon
 
@@ -151,7 +173,7 @@ export function ConnectedSystem() {
             </article>
           </FadeIn>
 
-          <FadeIn delay={0.24}>
+          <FadeIn delay={0.24} className="hidden md:block">
             <article className="relative h-full overflow-hidden rounded-3xl border border-white/10 shadow-2xl shadow-black/40">
               {/* Background image */}
               <Image

@@ -3,6 +3,7 @@ import { ArrowRight, Check, Repeat2, ShoppingCart, Sparkles, Star } from 'lucide
 import { Container } from './shared/Container'
 import { Button } from './shared/Button'
 import { FadeIn } from './shared/FadeIn'
+import { MobileCarouselRail } from './shared/MobileCarouselRail'
 import { socialProof } from '@/config/social-proof'
 import { groceryBeforeAfterExamples } from '@/lib/proof-assets'
 
@@ -37,7 +38,7 @@ const flow = [
 export function SocialProof() {
   return (
     <section
-      className="py-20 md:py-28 bg-white dark:bg-neutral-950"
+      className="py-10 md:py-28 bg-white dark:bg-neutral-950"
       aria-labelledby="social-proof-heading"
     >
       <Container>
@@ -58,7 +59,7 @@ export function SocialProof() {
         </FadeIn>
 
         <FadeIn delay={0.1}>
-          <div className="mb-20 md:mb-28 rounded-3xl bg-neutral-950 p-5 md:p-7 text-white shadow-xl">
+          <div className="mb-12 rounded-3xl bg-neutral-950 p-5 text-white shadow-xl md:mb-28 md:p-7">
             <div className="grid gap-3 md:grid-cols-5 md:gap-0">
               {flow.map((step, i) => {
                 const Icon = step.icon
@@ -94,7 +95,7 @@ export function SocialProof() {
         </FadeIn>
 
         <FadeIn delay={0.12}>
-          <div className="mb-20 grid gap-4 rounded-3xl border border-neutral-200 bg-[#FBFAF3] p-4 dark:border-neutral-800 dark:bg-neutral-900 md:grid-cols-2 md:p-6">
+          <div className="mb-12 grid gap-4 rounded-3xl border border-neutral-200 bg-[#FBFAF3] p-4 dark:border-neutral-800 dark:bg-neutral-900 md:mb-20 md:grid-cols-2 md:p-6">
             {groceryBeforeAfterExamples.map((example) => (
               <div key={example.title} className="rounded-2xl bg-white p-5 ring-1 ring-neutral-200 dark:bg-neutral-950 dark:ring-neutral-800">
                 <h3 className="font-serif text-2xl font-bold text-neutral-950 dark:text-neutral-50">
@@ -115,7 +116,7 @@ export function SocialProof() {
 
         {/* Stats row */}
         <FadeIn>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 text-center mb-20 md:mb-28">
+          <div className="mb-12 grid grid-cols-2 gap-8 text-center md:mb-28 md:grid-cols-4 md:gap-12">
               {[
               { value: socialProof.householdCount, label: 'household feedback program' },
               { value: socialProof.dinnersPlanned, label: 'dinner-plan data under review' },
@@ -134,44 +135,62 @@ export function SocialProof() {
           </div>
         </FadeIn>
 
-        {/* Testimonials grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Mobile testimonials carousel */}
+        <MobileCarouselRail className="md:hidden" itemClassName="min-w-full" ariaLabel="Swipe through MealEase reviews">
+          {socialProof.testimonials.map((t) => (
+            <div key={t.name}>
+              <TestimonialCard testimonial={t} />
+            </div>
+          ))}
+        </MobileCarouselRail>
+
+        {/* Desktop testimonials grid */}
+        <div className="hidden gap-6 md:grid md:grid-cols-2 lg:grid-cols-3">
           {socialProof.testimonials.map((t, i) => (
             <FadeIn key={t.name} delay={i * 0.08}>
-              <figure className="flex flex-col h-full bg-[#FDF6F1] dark:bg-neutral-900 rounded-2xl p-6 ring-1 ring-black/5 dark:ring-white/5">
-                {/* Stars */}
-                <div className="text-[#D97757] text-sm mb-4" aria-label="5 stars">
-                  ★★★★★
-                </div>
-                <blockquote className="flex-1">
-                  <p className="text-neutral-800 dark:text-neutral-200 leading-relaxed">
-                    &ldquo;{t.quote}&rdquo;
-                  </p>
-                </blockquote>
-                <figcaption className="mt-6 flex items-center gap-3">
-                  <div className="relative h-11 w-11 flex-shrink-0 overflow-hidden rounded-full ring-2 ring-[#D97757]/25 shadow-sm">
-                    <Image
-                      src={t.photo}
-                      alt={t.name}
-                      fill
-                      sizes="44px"
-                      className="object-cover object-top"
-                    />
-                  </div>
-                  <div>
-                    <div className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-                      {t.name}
-                    </div>
-                    <div className="text-xs text-neutral-500 dark:text-neutral-400">
-                      {t.city}
-                    </div>
-                  </div>
-                </figcaption>
-              </figure>
+              <TestimonialCard testimonial={t} />
             </FadeIn>
           ))}
         </div>
       </Container>
     </section>
+  )
+}
+
+function TestimonialCard({
+  testimonial,
+}: {
+  testimonial: (typeof socialProof.testimonials)[number]
+}) {
+  return (
+    <figure className="flex h-full flex-col rounded-2xl bg-[#FDF6F1] p-6 ring-1 ring-black/5 dark:bg-neutral-900 dark:ring-white/5">
+      <div className="mb-4 text-sm text-[#D97757]" aria-label="5 stars">
+        ★★★★★
+      </div>
+      <blockquote className="flex-1">
+        <p className="leading-relaxed text-neutral-800 dark:text-neutral-200">
+          &ldquo;{testimonial.quote}&rdquo;
+        </p>
+      </blockquote>
+      <figcaption className="mt-6 flex items-center gap-3">
+        <div className="relative h-11 w-11 flex-shrink-0 overflow-hidden rounded-full shadow-sm ring-2 ring-[#D97757]/25">
+          <Image
+            src={testimonial.photo}
+            alt={testimonial.name}
+            fill
+            sizes="44px"
+            className="object-cover object-top"
+          />
+        </div>
+        <div>
+          <div className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+            {testimonial.name}
+          </div>
+          <div className="text-xs text-neutral-500 dark:text-neutral-400">
+            {testimonial.city}
+          </div>
+        </div>
+      </figcaption>
+    </figure>
   )
 }

@@ -1,13 +1,14 @@
 import Image from 'next/image'
 import { Container } from './shared/Container'
 import { FadeIn } from './shared/FadeIn'
+import { MobileCarouselRail } from './shared/MobileCarouselRail'
 import { pillars } from '@/config/pillars'
 
 export function FivePillarsSection() {
   return (
     <section
       id="pillars"
-      className="py-16 md:py-22 bg-white dark:bg-neutral-950"
+      className="py-10 md:py-22 bg-white dark:bg-neutral-950"
       aria-labelledby="pillars-heading"
     >
       <Container>
@@ -26,7 +27,13 @@ export function FivePillarsSection() {
           </div>
         </FadeIn>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 lg:gap-6">
+        <MobileCarouselRail className="sm:hidden" itemClassName="min-w-full" ariaLabel="Swipe through MealEase food questions">
+          {pillars.map((p) => (
+            <PillarCard key={p.id} pillar={p} />
+          ))}
+        </MobileCarouselRail>
+
+        <div className="hidden sm:grid sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 lg:gap-6">
           {pillars.map((p, i) => (
             <FadeIn
               key={p.id}

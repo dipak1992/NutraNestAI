@@ -22,7 +22,7 @@ const proofSteps = [
 
 export function ProductProofStrip() {
   return (
-    <section className="border-y border-orange-100 bg-white py-12 dark:border-neutral-800 dark:bg-neutral-950 md:py-14">
+    <section className="border-y border-orange-100 bg-white py-10 dark:border-neutral-800 dark:bg-neutral-950 md:py-14">
       <Container>
         <div className="grid gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">
           <div>

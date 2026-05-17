@@ -13,7 +13,7 @@ const workflow = [
 
 export function ConversionStory() {
   return (
-    <section className="relative overflow-hidden bg-white py-16 dark:bg-neutral-950 md:py-20">
+    <section className="relative overflow-hidden bg-white py-10 dark:bg-neutral-950 md:py-20">
       <Container>
         <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-14">
           <FadeIn className="lg:col-span-5">

@@ -4,7 +4,7 @@ import { FadeIn } from './shared/FadeIn'
 
 export function FounderNote() {
   return (
-    <section className="bg-[#FBFAF3] py-14 dark:bg-neutral-900 md:py-18">
+    <section className="bg-[#FBFAF3] py-10 dark:bg-neutral-900 md:py-18">
       <Container>
         <FadeIn>
           <div className="grid overflow-hidden rounded-[1.75rem] border border-orange-100 bg-white shadow-xl shadow-orange-100/35 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none md:grid-cols-[0.72fr_1.28fr]">

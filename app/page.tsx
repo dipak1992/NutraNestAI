@@ -2,6 +2,7 @@ import dynamic from 'next/dynamic'
 import { Nav } from '@/components/landing/Nav'
 import { Hero } from '@/components/landing/Hero'
 import { ProductProofStrip } from '@/components/landing/ProductProofStrip'
+import { MobileStickyCTA } from '@/components/landing/MobileStickyCTA'
 import { productSchema, softwareAppSchema, faqSchema } from '@/lib/schema'
 import { productStory } from '@/lib/marketing/stats'
 
@@ -61,6 +62,7 @@ export default async function LandingPage() {
 
       <main id="main-content">
         <Hero />
+        <MobileStickyCTA />
         <ProductProofStrip />
         <ConversionStory />
         <FounderNote />

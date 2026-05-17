@@ -1,116 +1,155 @@
-import { getLandingTonightMeal } from '@/lib/tonight/engine'
-import { CheckCircle2, ChevronRight, Clock, Home, ShoppingCart, Sparkles } from 'lucide-react'
+import Image from 'next/image'
+import {
+  Camera,
+  CalendarDays,
+  ChevronRight,
+  Clock3,
+  DollarSign,
+  Home,
+  RefreshCcw,
+  Recycle,
+  ShieldCheck,
+  Sparkles,
+  Utensils,
+  Users,
+} from 'lucide-react'
 
-/**
- * Landing page Tonight preview — shows inside the Hero phone mockup.
- * Server component: renders once per request, stable per day.
- * No hydration mismatch since it's purely server-rendered.
- *
- * Layout: real meal photo → meal name → prep time → benefit tags
- * Goal: appetite + trust + conversion
- */
+const meal = {
+  name: 'Rainbow Buddha Bowl',
+  image: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=900&q=85&fit=crop',
+  cookTime: '25 min',
+  servings: '4 servings',
+  cost: '~$3.25/serving',
+  reason: 'Simple, prep-friendly, and easy to stretch into the week.',
+}
+
+const navItems = [
+  { label: 'Tonight', icon: Utensils, active: true },
+  { label: 'Cook', icon: Camera },
+  { label: 'Plan', icon: CalendarDays },
+  { label: 'Leftovers', icon: Recycle },
+  { label: 'Budget', icon: DollarSign },
+]
+
 export function LandingTonightPreview() {
-  const meal = getLandingTonightMeal()
-
   return (
-    <div className="absolute inset-0 z-20 flex flex-col overflow-hidden">
-      {/* Status bar mock */}
-      <div className="flex items-center justify-between px-5 pt-3 pb-1">
-        <span className="text-[10px] font-semibold text-neutral-500">9:41</span>
-        <div className="flex items-center gap-1" aria-hidden>
-          <span className="text-[10px] text-neutral-400">●●●</span>
+    <div className="absolute inset-0 z-20 flex flex-col overflow-hidden bg-[#FFFDF8]">
+      <div className="flex items-center justify-between px-8 pt-5 text-neutral-950">
+        <span className="text-[13px] font-bold tracking-tight">12:35</span>
+        <div className="flex items-center gap-1.5" aria-hidden>
+          <span className="h-2.5 w-1 rounded-full bg-neutral-300" />
+          <span className="h-3.5 w-1 rounded-full bg-neutral-400" />
+          <span className="h-4.5 w-1 rounded-full bg-neutral-700" />
+          <span className="text-[10px] font-bold">20</span>
         </div>
       </div>
 
-      {/* App header */}
-      <div className="flex items-center justify-between px-5 pb-2">
+      <div className="flex items-start justify-between px-8 pb-2 pt-4">
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-[#D97757]">
+          <p className="text-[14px] font-black uppercase tracking-[0.16em] text-[#D97757]">
             MealEase
           </p>
-          <p className="mt-0.5 text-[10px] font-semibold text-neutral-500">
-            Tonight for your household
-          </p>
+          <h3 className="mt-3 font-serif text-[32px] font-bold leading-[0.98] tracking-tight text-neutral-950">
+            Good afternoon,
+            <br />
+            Foodie!
+          </h3>
         </div>
-        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-orange-100">
-          <Home className="h-3.5 w-3.5 text-[#D97757]" aria-hidden />
+        <span className="mt-1 inline-flex h-11 w-11 items-center justify-center rounded-full bg-white text-[#D97757] shadow-lg shadow-orange-100 ring-1 ring-orange-100">
+          <Home className="h-5 w-5" aria-hidden />
         </span>
       </div>
 
-      <div className="mx-4 overflow-hidden rounded-[1.55rem] bg-white shadow-lg ring-1 ring-orange-100">
-        <div className="relative overflow-hidden bg-[linear-gradient(135deg,#FFF7ED_0%,#F0FDF4_100%)] p-3">
-          <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[#D97757]/10" />
-          <span className="inline-flex items-center gap-1 rounded-full bg-[#D97757] px-2.5 py-1 text-[10px] font-bold text-white shadow-md">
-            <Sparkles className="h-2.5 w-2.5" aria-hidden />
-            Best for tonight
-          </span>
-          <div className="mt-3 rounded-2xl bg-white/82 p-3 shadow-sm ring-1 ring-white/70 backdrop-blur">
-            <p className="text-sm font-bold leading-snug text-neutral-900">
+      <div className="px-8">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FFF6EC] px-3 py-1.5 text-[12px] font-bold text-[#C86646] ring-1 ring-orange-200">
+          <Sparkles className="h-3.5 w-3.5" aria-hidden />
+          5 days strong
+        </span>
+        <p className="mt-3 text-[13px] font-medium text-neutral-500">
+          12:34 PM <span className="px-1">·</span> Starting to think about dinner?
+        </p>
+      </div>
+
+      <div className="mx-6 mt-4 overflow-hidden rounded-[1.75rem] bg-white shadow-xl shadow-neutral-900/10 ring-1 ring-neutral-200">
+        <div className="relative h-56 overflow-hidden bg-neutral-900">
+          <Image
+            src={meal.image}
+            alt=""
+            fill
+            sizes="(max-width: 768px) 260px, 300px"
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-neutral-950/22 via-neutral-950/38 to-neutral-950/72" />
+          <div className="absolute left-4 right-4 top-4 flex gap-1.5">
+            <span className="inline-flex items-center gap-1 rounded-full bg-[#D97757] px-2.5 py-1.5 text-[10px] font-bold text-white shadow-lg">
+              <Sparkles className="h-3.5 w-3.5" aria-hidden />
+              Tonight&apos;s Pick
+            </span>
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-700 px-2.5 py-1.5 text-[10px] font-bold text-white shadow-lg">
+              <ShieldCheck className="h-3.5 w-3.5" aria-hidden />
+              Chef-Verified
+            </span>
+          </div>
+
+          <div className="absolute inset-x-4 bottom-3 text-white">
+            <h4 className="font-serif text-[28px] font-bold leading-[0.98]">
               {meal.name}
-            </p>
-            <p className="mt-1 text-[10px] leading-tight text-neutral-600">
-              {meal.tagline}
-            </p>
-            <div className="mt-3 flex items-center gap-1.5">
-              {['Comfort', 'Saturday', 'Pantry'].map((tag) => (
-                <span key={tag} className="rounded-full bg-white px-2 py-1 text-[9px] font-bold text-[#B85F43] ring-1 ring-orange-100">
-                  {tag}
-                </span>
-              ))}
+            </h4>
+            <div className="mt-3 flex items-center gap-3 text-[12px] font-medium">
+              <span className="inline-flex items-center gap-1">
+                <Clock3 className="h-4 w-4 text-[#F3B18E]" aria-hidden />
+                {meal.cookTime}
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <Users className="h-4 w-4 text-[#F3B18E]" aria-hidden />
+                {meal.servings}
+              </span>
+              <span>Easy</span>
             </div>
+            <span className="mt-2 inline-flex rounded-full bg-emerald-700 px-3 py-1.5 text-[12px] font-bold">
+              {meal.cost}
+            </span>
+            <p className="mt-2 text-[12px] font-semibold text-white/86">3 swaps left today</p>
           </div>
         </div>
 
-        <div className="space-y-3 p-3">
-          <div className="grid grid-cols-2 gap-2">
-            <div className="rounded-2xl bg-[#FBFAF3] p-2.5 ring-1 ring-orange-100">
-              <div className="flex items-center gap-1.5">
-                <Clock className="h-3.5 w-3.5 text-[#D97757]" aria-hidden />
-                <span className="text-xs font-bold text-neutral-800">{meal.cookTimeMin} min</span>
-              </div>
-              <p className="mt-1 text-[10px] font-medium text-neutral-500">{meal.weekdayLabel} dinner</p>
-            </div>
-            <div className="rounded-2xl bg-emerald-50 p-2.5 ring-1 ring-emerald-100">
-              <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" aria-hidden />
-                <span className="text-xs font-bold text-neutral-800">Pantry first</span>
-              </div>
-              <p className="mt-1 text-[10px] font-medium text-emerald-700">Uses what you have</p>
-            </div>
+        <div className="p-4">
+          <div className="border-l-4 border-[#D97757] pl-3">
+            <p className="text-[14px] leading-5 text-neutral-700">
+              <span className="font-bold text-neutral-950">Why this?</span> {meal.reason}
+            </p>
           </div>
 
-          <div className="rounded-2xl bg-neutral-50 p-3 ring-1 ring-neutral-100">
-            <div className="mb-2 flex items-center justify-between">
-              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-500">
-                Grocery handoff
-              </p>
-              <ShoppingCart className="h-3.5 w-3.5 text-[#D97757]" aria-hidden />
-            </div>
-            {['Greek yogurt', 'Scallions', 'Salad greens'].map((item) => (
-              <div key={item} className="flex items-center justify-between border-t border-neutral-200/70 py-1.5 first:border-t-0 first:pt-0">
-                <span className="text-[11px] font-semibold text-neutral-700">{item}</span>
-                <span className="text-[10px] font-bold text-emerald-700">ready</span>
-              </div>
-            ))}
-          </div>
+          <button className="mt-4 flex h-11 w-full items-center justify-center rounded-full bg-gradient-to-r from-[#D97757] to-[#D86B42] text-[15px] font-bold text-white shadow-lg shadow-orange-200/60">
+            Cook this
+            <ChevronRight className="ml-2 h-5 w-5" aria-hidden />
+          </button>
+          <button className="mt-2.5 flex h-10 w-full items-center justify-center rounded-full bg-neutral-50 text-[14px] font-bold text-neutral-800 shadow-inner ring-1 ring-neutral-200">
+            <RefreshCcw className="mr-2 h-4 w-4" aria-hidden />
+            Show another
+          </button>
+
+          <p className="mt-3 max-w-[190px] text-[12px] font-semibold leading-4 text-[#D97757]">
+            Want meals based on your preferences, groceries, and leftovers?
+          </p>
         </div>
       </div>
 
-      {/* Action buttons mock */}
-      <div className="mt-auto px-4 pb-4 pt-3">
-        <div className="flex h-10 items-center justify-center rounded-full bg-gradient-to-r from-[#D97757] to-[#E8895A] shadow-md shadow-orange-200/50">
-          <span className="text-xs font-bold text-white">Review dinner plan</span>
-          <ChevronRight className="ml-1 h-3.5 w-3.5 text-white" aria-hidden />
-        </div>
-        <div className="mt-3 grid grid-cols-3 gap-1.5">
-          {meal.benefits.slice(0, 3).map((benefit) => (
-            <span
-              key={benefit}
-              className="truncate rounded-full bg-orange-50 px-2 py-1 text-center text-[9px] font-semibold text-orange-800 ring-1 ring-orange-100"
-            >
-              {benefit}
-            </span>
-          ))}
+      <div className="mt-auto border-t border-neutral-200 bg-white/92 px-4 pb-4 pt-3 backdrop-blur">
+        <div className="grid grid-cols-5 gap-1 text-center">
+          {navItems.map((item) => {
+            const Icon = item.icon
+            return (
+              <div
+                key={item.label}
+                className={item.active ? 'text-[#D97757]' : 'text-neutral-500'}
+              >
+                <Icon className="mx-auto h-5 w-5" aria-hidden />
+                <p className="mt-1 text-[10px] font-semibold">{item.label}</p>
+              </div>
+            )
+          })}
         </div>
       </div>
     </div>

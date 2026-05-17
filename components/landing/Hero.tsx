@@ -139,7 +139,7 @@ export function Hero() {
           {/* Right: product and household proof */}
           <div className="lg:col-span-6 relative flex justify-center -mt-4 sm:mt-0">
             <FadeIn delay={0.14} direction="right">
-              <div className="relative mx-auto w-full max-w-[600px] sm:min-h-[470px]">
+              <div className="relative mx-auto w-full max-w-[600px] sm:min-h-[560px]">
                 <MotionFloat intensity={0.45} className="relative hidden min-h-[430px] overflow-hidden rounded-[2rem] bg-neutral-950 shadow-2xl shadow-neutral-950/15 ring-1 ring-black/10 sm:block">
                   <Image
                     src="/landing/optimized/hero-section.webp"
@@ -175,20 +175,19 @@ export function Hero() {
                 </MotionFloat>
 
                 {/* Phone frame */}
-                <MotionFloat intensity={1} delay={0.2} className="relative mx-auto aspect-[9/19.5] w-[min(235px,calc(100vw-96px))] rounded-[2.6rem] bg-neutral-900 p-2.5 shadow-2xl shadow-neutral-900/25 ring-1 ring-black/8 sm:absolute sm:right-8 sm:top-10 sm:mx-0 sm:w-[245px]">
-                  <div className="relative w-full h-full rounded-[2.3rem] overflow-hidden bg-[#FBFAF3]">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(16,185,129,0.14),transparent_34%),radial-gradient(circle_at_100%_20%,rgba(217,119,87,0.14),transparent_32%)]" />
+                <MotionFloat intensity={1} delay={0.2} className="relative mx-auto aspect-[9/19.5] w-[min(292px,calc(100vw-68px))] rounded-[2.8rem] bg-neutral-950 p-2.5 shadow-2xl shadow-neutral-900/30 ring-1 ring-black/10 sm:absolute sm:right-8 sm:top-0 sm:mx-0 sm:w-[315px]">
+                  <div className="relative h-full w-full overflow-hidden rounded-[2.4rem] bg-[#FFFDF8]">
                     <LandingTonightPreview />
                   </div>
                   {/* Notch */}
                   <div
                     aria-hidden
-                    className="absolute top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-neutral-900 rounded-b-2xl"
+                    className="absolute left-1/2 top-3 h-7 w-32 -translate-x-1/2 rounded-b-3xl bg-neutral-950"
                   />
                 </MotionFloat>
 
                 {/* Floating "budget" card */}
-                <MotionFloat intensity={1.2} delay={0.55} className="hidden md:flex absolute right-2 bottom-16 bg-white dark:bg-neutral-800 rounded-2xl shadow-xl p-4 items-center gap-3 ring-1 ring-black/5">
+                <MotionFloat intensity={1.2} delay={0.55} className="hidden md:flex absolute right-0 bottom-9 bg-white dark:bg-neutral-800 rounded-2xl shadow-xl p-4 items-center gap-3 ring-1 ring-black/5">
                   <ShoppingCart className="h-6 w-6 text-[#D97757]" aria-hidden />
                   <div>
                     <div className="text-xs text-neutral-500 dark:text-neutral-400">Grocery preview</div>

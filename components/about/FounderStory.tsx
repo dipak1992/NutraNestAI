@@ -1,145 +1,161 @@
 'use client'
 
 import Image from 'next/image'
+import { Baby, Brain, CheckCircle2, HeartHandshake, ReceiptText, ShoppingCart } from 'lucide-react'
 import { Container } from '@/components/landing/shared/Container'
 import { ScrollReveal } from '@/components/motion'
 
+const storySignals = [
+  {
+    icon: HeartHandshake,
+    title: 'Built from real dinner stress',
+    body: 'MealEase started in our own kitchen after too many nights of fridge staring, duplicate groceries, and last-minute takeout.',
+  },
+  {
+    icon: Baby,
+    title: 'Made by parents',
+    body: 'We are building for households where time, energy, picky eaters, and budget all matter at the same time.',
+  },
+  {
+    icon: Brain,
+    title: 'Household memory first',
+    body: 'The product remembers preferences, dislikes, leftovers, pantry context, and this week’s instructions so dinner does not restart from zero.',
+  },
+  {
+    icon: ShoppingCart,
+    title: 'Dinner to groceries',
+    body: 'The goal is not another recipe idea. It is a calm path from what you have to what you cook to what you need to buy.',
+  },
+  {
+    icon: ReceiptText,
+    title: 'Budget-aware by default',
+    body: 'Suprabha is a CPA, so the weekly grocery total is not an afterthought. MealEase keeps cost visible before checkout.',
+  },
+  {
+    icon: CheckCircle2,
+    title: 'Trust over tricks',
+    body: 'No guilt-based food tracking, no fake urgency, no selling grocery data. We want MealEase to feel useful and humane.',
+  },
+]
+
+const facts = [
+  { value: '2', label: 'founders building from home' },
+  { value: '2', label: 'young kids shaping the product' },
+  { value: '500+', label: 'curated dinner ideas under review' },
+  { value: '1', label: 'connected dinner-to-grocery loop' },
+]
+
 export function FounderStory() {
   return (
-    <section className="py-16 md:py-24">
+    <section className="overflow-hidden bg-white py-16 dark:bg-neutral-950 md:py-24">
       <Container>
-        <div className="grid lg:grid-cols-12 gap-10 lg:gap-16 items-start">
-          {/* Photo + caption (sticky on desktop) */}
-          <aside className="lg:col-span-5 lg:sticky lg:top-24">
-            <ScrollReveal direction="left">
-              <figure>
-                <div className="relative aspect-[4/5] rounded-3xl overflow-hidden bg-neutral-100 dark:bg-neutral-800 ring-1 ring-neutral-200 dark:ring-neutral-800 shadow-elevated">
-                  <Image
-                    src="/images/founders-family.jpg"
-                    alt="Dipak and Suprabha, co-founders of MealEase, with their two young children"
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 40vw"
-                    priority
-                    className="object-cover object-top"
-                  />
-                </div>
-                <figcaption className="mt-4 text-sm text-neutral-600 dark:text-neutral-400">
-                  <span className="font-semibold text-neutral-900 dark:text-neutral-100">
-                    Dipak &amp; Suprabha
-                  </span>{' '}
-                  — co-founders. One software engineer, one CPA, two kids (3½
-                  and 1), and a very full fridge.
-                </figcaption>
-              </figure>
-            </ScrollReveal>
-          </aside>
+        <div className="mx-auto max-w-3xl text-center">
+          <ScrollReveal>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#D97757]">
+              Founder-led product
+            </p>
+            <h2 className="mt-4 font-serif text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50 md:text-5xl">
+              A dinner tool built by the people who needed it first.
+            </h2>
+            <p className="mt-5 text-lg leading-relaxed text-neutral-600 dark:text-neutral-300">
+              We are Dipak and Suprabha: one software engineer, one CPA, two little kids,
+              and a real household that needed dinner planning to become calmer,
+              cheaper, and less repetitive.
+            </p>
+          </ScrollReveal>
+        </div>
 
-          {/* Long-form story */}
-          <div className="lg:col-span-7 space-y-8 text-lg leading-relaxed text-neutral-700 dark:text-neutral-300">
-            <ScrollReveal>
-              <h2 className="font-serif text-3xl md:text-4xl font-bold text-neutral-900 dark:text-neutral-50 tracking-tight">
-                Hi, we&apos;re Dipak and Suprabha.
-              </h2>
-            </ScrollReveal>
+        <div className="mt-12 grid items-center gap-6 lg:grid-cols-[1fr_0.9fr_1fr] lg:gap-8">
+          <div className="grid gap-4">
+            {storySignals.slice(0, 3).map((item, index) => (
+              <FounderSignal key={item.title} {...item} delay={0.05 * index} direction="left" />
+            ))}
+          </div>
 
-            <ScrollReveal delay={0.05}>
-              <p>
-                We&apos;re married. We live in a house that, most evenings, smells
-                like something good is happening — and sometimes like something
-                we forgot about. We have two little ones: a 3½-year-old with
-                strong opinions about what <em>isn&apos;t</em> dinner, and a
-                1-year-old who&apos;d happily eat the same banana three times a day.
-              </p>
-            </ScrollReveal>
-
-            <ScrollReveal delay={0.1}>
-              <p>
-                Dipak builds software. Suprabha is a CPA — which means when
-                groceries crept past $1,200 a month, she noticed first. We
-                were both exhausted, both good at our jobs, and somehow still
-                standing in front of an open fridge at 5:47 PM every single
-                night asking each other the same useless question:{' '}
-                <span className="font-serif italic text-[#D97757]">
-                  &ldquo;What&apos;s for dinner?&rdquo;
+          <ScrollReveal delay={0.08}>
+            <figure className="mx-auto max-w-sm">
+              <div className="relative aspect-[4/5] overflow-hidden rounded-[1.75rem] bg-[#FDF6F1] shadow-2xl shadow-neutral-900/12 ring-1 ring-orange-100 dark:bg-neutral-900 dark:ring-neutral-800">
+                <Image
+                  src="/images/founders-family.jpg"
+                  alt="Dipak and Suprabha, co-founders of MealEase, with their two young children"
+                  fill
+                  sizes="(max-width: 1024px) 86vw, 360px"
+                  priority
+                  className="object-cover object-top"
+                />
+              </div>
+              <figcaption className="mt-4 text-center text-sm leading-6 text-neutral-600 dark:text-neutral-400">
+                <span className="font-semibold text-neutral-900 dark:text-neutral-100">
+                  Dipak and Suprabha
                 </span>
-              </p>
-            </ScrollReveal>
+                , co-founders of MealEase.
+              </figcaption>
+            </figure>
+          </ScrollReveal>
 
-            <ScrollReveal delay={0.15}>
-              <div className="border-l-4 border-[#D97757] pl-6 py-2">
-                <p className="font-serif text-xl md:text-2xl italic text-neutral-900 dark:text-neutral-50 leading-snug">
-                  We had a fridge full of food and still ordered takeout three
-                  nights a week. That&apos;s when we knew something was broken —
-                  and it wasn&apos;t us.
+          <div className="grid gap-4">
+            {storySignals.slice(3).map((item, index) => (
+              <FounderSignal key={item.title} {...item} delay={0.05 * index} direction="right" />
+            ))}
+          </div>
+        </div>
+
+        <div className="mx-auto mt-12 grid max-w-5xl gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {facts.map((fact, index) => (
+            <ScrollReveal key={fact.label} delay={0.04 * index}>
+              <div className="h-full rounded-2xl bg-[#FBFAF3] p-5 text-center ring-1 ring-orange-100 dark:bg-neutral-900 dark:ring-neutral-800">
+                <p className="font-serif text-3xl font-bold text-[#D97757]">{fact.value}</p>
+                <p className="mt-2 text-xs font-semibold uppercase tracking-[0.14em] text-neutral-500 dark:text-neutral-400">
+                  {fact.label}
                 </p>
               </div>
             </ScrollReveal>
-
-            <ScrollReveal delay={0.2}>
-              <h3 className="font-serif text-2xl font-bold text-neutral-900 dark:text-neutral-50 mt-12">
-                We tried everything.
-              </h3>
-              <p className="mt-4">
-                Every meal planning app on the App Store. Notion templates.
-                Paper notebooks. A shared Google Doc. A whiteboard on the
-                fridge (that one lasted four days). They all solved 20% of the
-                problem and made the other 80% worse. None of them knew what
-                was actually <em>in</em> our fridge. None of them noticed when
-                the chicken we cooked Monday was still sitting there on
-                Thursday. None of them knew we had a toddler who&apos;d riot over
-                mushrooms.
-              </p>
-            </ScrollReveal>
-
-            <ScrollReveal delay={0.25}>
-              <h3 className="font-serif text-2xl font-bold text-neutral-900 dark:text-neutral-50 mt-12">
-                So Dipak started building. Suprabha started breaking it.
-              </h3>
-              <p className="mt-4">
-                One weekend turned into three months. Dipak wrote the first
-                version on our kitchen counter, testing it against our actual
-                pantry. Suprabha stress-tested the budget math, demanded the
-                leftover logic actually worked, and pointed out — loudly, and
-                correctly — when a &ldquo;recipe suggestion&rdquo; was something no real
-                parent would ever cook on a Tuesday night.
-              </p>
-              <p className="mt-4">
-                The first version was for us. Then a few friends asked if they
-                could use it. Then their friends. Here we are.
-              </p>
-            </ScrollReveal>
-
-            <ScrollReveal delay={0.3}>
-              <h3 className="font-serif text-2xl font-bold text-neutral-900 dark:text-neutral-50 mt-12">
-                What we&apos;re actually trying to do.
-              </h3>
-              <p className="mt-4">
-                MealEase isn&apos;t about becoming a better cook. It&apos;s not about
-                optimizing macros or chasing some Pinterest dinner aesthetic.
-                It&apos;s about{' '}
-                <strong>
-                  taking one decision off your plate every single day
-                </strong>
-                , using what you already have, and not throwing food (or money)
-                in the trash.
-              </p>
-              <p className="mt-4">
-                If you&apos;re a busy parent, a couple figuring it out, someone
-                cooking for one — we built this for you. The same way we built
-                it for us.
-              </p>
-            </ScrollReveal>
-
-            <ScrollReveal delay={0.35}>
-              <p className="mt-8 font-serif text-xl text-neutral-900 dark:text-neutral-50">
-                Thanks for being here.
-                <br />
-                <span className="text-[#D97757]">— Dipak &amp; Suprabha</span>
-              </p>
-            </ScrollReveal>
-          </div>
+          ))}
         </div>
+
+        <ScrollReveal delay={0.12}>
+          <div className="mx-auto mt-12 max-w-3xl rounded-[1.75rem] bg-neutral-950 p-6 text-white shadow-2xl shadow-neutral-900/15 md:p-8">
+            <p className="font-serif text-2xl font-bold leading-snug md:text-3xl">
+              MealEase is not about becoming a perfect cook. It is about taking one
+              daily decision off your plate and turning the food you already have
+              into a plan your household will actually eat.
+            </p>
+            <p className="mt-5 text-[#F3B18E]">— Dipak and Suprabha</p>
+          </div>
+        </ScrollReveal>
       </Container>
     </section>
+  )
+}
+
+function FounderSignal({
+  icon: Icon,
+  title,
+  body,
+  delay,
+  direction,
+}: {
+  icon: typeof HeartHandshake
+  title: string
+  body: string
+  delay: number
+  direction: 'left' | 'right'
+}) {
+  return (
+    <ScrollReveal delay={delay} direction={direction}>
+      <article className="h-full rounded-2xl bg-white p-5 shadow-sm ring-1 ring-neutral-200/70 dark:bg-neutral-900 dark:ring-neutral-800">
+        <div className="flex items-center gap-3">
+          <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#D97757]/10 text-[#D97757]">
+            <Icon className="h-5 w-5" aria-hidden />
+          </span>
+          <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-50">
+            {title}
+          </h3>
+        </div>
+        <p className="mt-3 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
+          {body}
+        </p>
+      </article>
+    </ScrollReveal>
   )
 }

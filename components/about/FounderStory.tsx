@@ -62,6 +62,10 @@ export function FounderStory() {
               and a real household that needed dinner planning to become calmer,
               cheaper, and less repetitive.
             </p>
+            <p className="mx-auto mt-5 max-w-2xl font-serif text-xl leading-relaxed text-neutral-900 dark:text-neutral-100">
+              We had a fridge full of food and still ordered takeout three nights a week.
+              That is when we knew something was broken, and it was not us.
+            </p>
           </ScrollReveal>
         </div>
 

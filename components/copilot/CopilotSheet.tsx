@@ -11,6 +11,7 @@ import { useLeftoversStore } from '@/stores/leftoversStore'
 import { useBudgetStore } from '@/stores/budgetStore'
 import { FREE_COPILOT_DAILY_ASSISTS, getFreeCopilotUpgradeMessage, isPlusOnlyCopilotChip } from '@/lib/copilot/access'
 import { VoiceInput } from './VoiceInput'
+import { InstructionBadge } from './InstructionBadge'
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -487,6 +488,9 @@ export function CopilotSheet({ isPlus }: { isPlus: boolean }) {
                 </button>
               </div>
             )}
+
+            {/* Weekly instruction badges (Plus only, expanded only) */}
+            {state === 'expanded' && <InstructionBadge />}
 
             {/* Chips row (always visible) */}
             <div className="shrink-0 px-5">

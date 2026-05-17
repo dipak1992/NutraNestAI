@@ -232,6 +232,50 @@ export const COPILOT_TOOLS: ChatCompletionTool[] = [
       },
     },
   },
+  {
+    type: 'function' as const,
+    function: {
+      name: 'set_weekly_instruction',
+      description: 'Set a temporary weekly preference/instruction that affects all meal suggestions for the next 7 days. Use when the user expresses a temporary preference like "Thai this week", "quick meals only", "no chicken this week". Do NOT use for permanent preferences.',
+      parameters: {
+        type: 'object',
+        properties: {
+          instruction: {
+            type: 'string',
+            description: 'The instruction in natural language, e.g. "Focus on Thai cuisine", "Only quick meals under 30 minutes", "Avoid chicken"',
+          },
+          category: {
+            type: 'string',
+            enum: ['cuisine', 'speed', 'dietary', 'avoidance', 'general'],
+            description: 'Category of the instruction',
+          },
+          duration_days: {
+            type: 'number',
+            description: 'How many days this instruction should last (default 7, max 14)',
+          },
+        },
+        required: ['instruction', 'category'],
+      },
+    },
+  },
+  {
+    type: 'function' as const,
+    function: {
+      name: 'clear_weekly_instruction',
+      description: 'Clear/remove a weekly instruction. Use when user says "forget that", "nevermind about Thai week", "clear my preferences", "go back to normal".',
+      parameters: {
+        type: 'object',
+        properties: {
+          category: {
+            type: 'string',
+            enum: ['cuisine', 'speed', 'dietary', 'avoidance', 'general', 'all'],
+            description: 'Which category to clear, or "all" to clear everything',
+          },
+        },
+        required: ['category'],
+      },
+    },
+  },
 ]
 
 /**

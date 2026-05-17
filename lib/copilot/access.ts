@@ -34,6 +34,8 @@ export const PLUS_ONLY_COPILOT_TOOL_NAMES = new Set([
   'monitor_leftovers',
   'save_household_preference',
   'build_weekly_briefing',
+  'set_weekly_instruction',
+  'clear_weekly_instruction',
 ])
 
 const PLUS_INTENT_PATTERNS = [

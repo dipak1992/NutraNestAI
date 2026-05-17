@@ -33,6 +33,7 @@ import {
 import { buildConversationMemory, shouldResetCopilotSession } from '@/lib/copilot/session'
 import { recordCopilotLearning } from '@/lib/copilot/learning'
 import { buildPlanRefinement, type PlanRefinementRequest } from '@/lib/copilot/plan-refinement'
+import { getActiveInstructions, setWeeklyInstruction, clearInstructions, formatInstructionsForPrompt } from '@/lib/copilot/weekly-instructions'
 import { getModelForTask } from '@/lib/ai/model-router'
 import logger from '@/lib/logger'
 
@@ -64,6 +65,13 @@ async function executeFunctionCall(
   isPlus: boolean,
 ): Promise<{ result: string; action?: { type: string; payload: unknown } }> {
   if (!isPlus && PLUS_ONLY_COPILOT_TOOL_NAMES.has(name)) {
+    // Specific upgrade message for weekly instruction tools
+    if (name === 'set_weekly_instruction' || name === 'clear_weekly_instruction') {
+      return {
+        result: 'Weekly preferences are a Plus feature. Upgrade to tell MealEase what kind of week you want! 🌟',
+        action: { type: 'navigate', payload: { href: '/upgrade?feature=copilot' } },
+      }
+    }
     return {
       result: 'That Copilot action is included in Plus. Free Copilot can answer basic meal questions; Plus turns Copilot into the household food operating layer with plan, budget, grocery, leftover, memory, voice, and proactive actions.',
       action: { type: 'navigate', payload: { href: '/upgrade?feature=copilot' } },
@@ -227,6 +235,41 @@ async function executeFunctionCall(
       }
     }
 
+    case 'set_weekly_instruction': {
+      const instruction = args.instruction as string
+      const category = args.category as 'cuisine' | 'speed' | 'dietary' | 'avoidance' | 'general'
+      const durationDays = typeof args.duration_days === 'number' ? args.duration_days : 7
+      const result = await setWeeklyInstruction(
+        userId,
+        instruction,
+        category,
+        Math.min(durationDays, 14) // cap at 14 days
+      )
+      if (result) {
+        return {
+          result: JSON.stringify({
+            success: true,
+            message: `Got it! I'll remember "${instruction}" for the next ${durationDays} days.`,
+            expires_at: result.expires_at,
+          }),
+          action: { type: 'toast', payload: { message: `Weekly instruction set: ${instruction}` } },
+        }
+      }
+      return { result: JSON.stringify({ success: false, message: 'Failed to save instruction' }) }
+    }
+
+    case 'clear_weekly_instruction': {
+      const category = args.category as string
+      await clearInstructions(userId, category === 'all' ? undefined : category as 'cuisine' | 'speed' | 'dietary' | 'avoidance' | 'general')
+      const message = category === 'all'
+        ? 'All weekly instructions cleared. Back to your regular preferences!'
+        : `Cleared your ${category} instruction. I'll go back to your usual preferences for that.`
+      return {
+        result: JSON.stringify({ success: true, message }),
+        action: { type: 'toast', payload: { message: 'Weekly instruction cleared' } },
+      }
+    }
+
     default:
       return { result: 'I\'m not sure how to do that yet.' }
   }
@@ -349,12 +392,16 @@ export async function POST(req: NextRequest) {
       scheduleConstraints,
     })
 
-    // Append compact context + cross-feature signals
+    // Fetch active weekly instructions for Plus users
+    const activeInstructions = isPlus ? await getActiveInstructions(user.id) : []
+    const instructionBlock = formatInstructionsForPrompt(activeInstructions)
+
+    // Append compact context + cross-feature signals + weekly instructions
     const contextBlock = formatCompactContext(userContext)
     const signalBlock = crossSignals.reasonHint
       ? `\nINTELLIGENCE: ${crossSignals.reasonHint}`
       : ''
-    const fullSystemPrompt = `${systemPrompt}\n\nADDITIONAL CONTEXT: ${contextBlock}${signalBlock}`
+    const fullSystemPrompt = `${systemPrompt}\n\nADDITIONAL CONTEXT: ${contextBlock}${signalBlock}${instructionBlock}`
 
     // 7. Get model config
     const modelConfig = getModelForTask('copilot')

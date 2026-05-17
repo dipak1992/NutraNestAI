@@ -21,6 +21,7 @@ import {
   getMealDayOfWeek,
 } from './catalog'
 import { getCrossFeatureSignals, applyCrossFeatureFilter } from '@/lib/ai/cross-feature'
+import { getActiveInstructions, type WeeklyInstruction } from '@/lib/copilot/weekly-instructions'
 
 // ─── LANDING PAGE ENGINE ────────────────────────────────────────────────────────
 
@@ -276,6 +277,25 @@ function mealHasProteinMatch(meal: CuratedMeal, pantryProteins: string[]): boole
   )
 }
 
+function extractCuisineNames(instructions: string[]): string[] {
+  const cuisinePatterns = [
+    'thai', 'italian', 'japanese', 'indian', 'mexican', 'chinese',
+    'korean', 'mediterranean', 'french', 'greek', 'vietnamese',
+    'american', 'spanish', 'middle eastern', 'african',
+  ]
+
+  const found: string[] = []
+  for (const instruction of instructions) {
+    const lower = instruction.toLowerCase()
+    for (const cuisine of cuisinePatterns) {
+      if (lower.includes(cuisine)) {
+        found.push(cuisine)
+      }
+    }
+  }
+  return found
+}
+
 function personalizeSelection(
   pool: CuratedMeal[],
   context: PersonalizationContext,
@@ -311,6 +331,19 @@ function personalizeSelection(
     })
     if (multiMatch.length >= 1) {
       pantryPreferredPool = multiMatch
+    }
+  }
+
+  // Priority 0: Weekly instruction cuisine — if set, try to match before other signals
+  if (context.cuisines && context.cuisines.length > 0) {
+    const cuisineMatch = findCuisineMatch(pantryPreferredPool, context.cuisines)
+    if (cuisineMatch) {
+      return {
+        meal: cuisineMatch,
+        reason: `Matches your week's theme: ${context.cuisines.join(', ')}.`,
+        isFromPantry: false,
+        usesLeftover: null,
+      }
     }
   }
 
@@ -642,6 +675,35 @@ async function loadPersonalizationContext(
     .order('created_at', { ascending: false })
     .limit(10)
   context.savedMeals = (saved ?? []).map((item) => item.title as string).filter(Boolean)
+
+  // ── Load active weekly instructions ──
+  try {
+    const instructions = await getActiveInstructions(userId)
+    if (instructions.length > 0) {
+      // Apply cuisine instructions
+      const cuisineInstructions = instructions.filter(i => i.category === 'cuisine')
+      if (cuisineInstructions.length > 0) {
+        const cuisineNames = extractCuisineNames(cuisineInstructions.map(i => i.instruction))
+        context.cuisines = [...(context.cuisines || []), ...cuisineNames]
+      }
+
+      // Apply avoidance instructions
+      const avoidanceInstructions = instructions.filter(i => i.category === 'avoidance')
+      if (avoidanceInstructions.length > 0) {
+        context.dietary = [...(context.dietary || []), ...avoidanceInstructions.map(i => i.instruction)]
+      }
+
+      // Apply speed instructions
+      const speedInstructions = instructions.filter(i => i.category === 'speed')
+      if (speedInstructions.length > 0) {
+        context.maxCookTimeMin = context.maxCookTimeMin
+          ? Math.min(context.maxCookTimeMin, 30)
+          : 30
+      }
+    }
+  } catch (e) {
+    console.error('[tonight] weekly instructions load error:', e)
+  }
 
   return context
 }

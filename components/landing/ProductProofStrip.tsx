@@ -1,18 +1,4 @@
-import Image from 'next/image'
-import {
-  ArrowRight,
-  CalendarDays,
-  Camera,
-  CheckCircle2,
-  Clock3,
-  DollarSign,
-  Home,
-  Lock,
-  Recycle,
-  ShoppingCart,
-  Utensils,
-  Users,
-} from 'lucide-react'
+import { ArrowRight, Camera, CheckCircle2, ShoppingCart } from 'lucide-react'
 import { Container } from './shared/Container'
 
 const proofSteps = [
@@ -127,194 +113,67 @@ export function ProductProofStrip() {
 
 function ProductFirstResultPreview() {
   const groceryItems = [
-    { name: 'Avocado', amount: '1 medium', emoji: '🥑' },
-    { name: 'Ground beef', amount: '1 lb', emoji: '🥩' },
-    { name: 'Sour cream', amount: '1/4 cup', emoji: '🥣' },
-    { name: 'Black beans', amount: '1 can', emoji: '🫘' },
-    { name: 'Shredded cheese', amount: '1 cup', emoji: '🧀' },
-    { name: 'Lettuce', amount: '1 head', emoji: '🥬' },
-  ]
-
-  const navItems = [
-    { label: 'Tonight', icon: Utensils, active: true },
-    { label: 'Cook', icon: Camera },
-    { label: 'Plan', icon: CalendarDays },
-    { label: 'Leftovers', icon: Recycle },
-    { label: 'Budget', icon: DollarSign },
+    { name: 'avocado', amount: '1 medium' },
+    { name: 'ground beef', amount: '1 lb' },
+    { name: 'sour cream', amount: '0.25 cup' },
+    { name: 'canned black beans', amount: '1 can' },
   ]
 
   return (
     <div
-      className="relative overflow-hidden bg-[#FFF4E7] px-4 py-6 dark:bg-neutral-950 sm:px-6 sm:py-8"
+      className="bg-[#F7FBF6] px-4 py-5 dark:bg-neutral-950 sm:px-6 sm:py-6"
       aria-label="MealEase first-use flow showing a generated dinner and grocery list preview"
       role="img"
     >
-      <div
-        aria-hidden
-        className="absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(255,255,255,0.94),transparent_42%),radial-gradient(circle_at_100%_35%,rgba(217,119,87,0.32),transparent_38%),linear-gradient(120deg,rgba(255,255,255,0.82),rgba(255,244,231,0.72))]"
-      />
-      <div className="absolute right-0 top-0 h-full w-1/2 opacity-35 blur-[1px]" aria-hidden>
-        <Image
-          src="/landing/optimized/hero-section.webp"
-          alt=""
-          fill
-          sizes="320px"
-          className="object-cover object-right"
-        />
-      </div>
+      <div className="mx-auto max-w-[560px] rounded-[1.75rem] bg-[#FFFDF8] p-5 shadow-sm ring-1 ring-orange-100 dark:bg-neutral-900 dark:ring-neutral-800 sm:p-7">
+        <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800 ring-1 ring-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 dark:ring-emerald-900/50">
+          <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
+          Dinner picked
+        </div>
 
-      <div className="relative mx-auto max-w-[430px]">
-        <div className="rounded-[2.9rem] bg-neutral-950 p-2.5 shadow-2xl shadow-orange-950/24 ring-1 ring-black/10">
-          <div className="relative h-[760px] overflow-hidden rounded-[2.45rem] bg-[#FFFDF8] sm:h-[790px]">
-            <div className="absolute left-1/2 top-0 z-30 h-8 w-36 -translate-x-1/2 rounded-b-3xl bg-neutral-950" />
+        <h3 className="mt-5 font-serif text-3xl font-bold leading-tight tracking-tight text-neutral-950 dark:text-neutral-50 sm:text-4xl">
+          Beef Taco Bowl
+        </h3>
+        <p className="mt-3 max-w-xl text-sm leading-6 text-neutral-600 dark:text-neutral-300 sm:text-base sm:leading-7">
+          Seasoned ground beef over rice with cheese, salsa, avocado, and sour cream.
+          Easy to build and easy to adapt for every age.
+        </p>
 
-            <div className="flex items-center justify-between px-8 pt-5 text-neutral-950">
-              <span className="text-[14px] font-bold tracking-tight">12:47</span>
-              <div className="flex items-center gap-1.5" aria-hidden>
-                <span className="h-2.5 w-1 rounded-full bg-neutral-300" />
-                <span className="h-3.5 w-1 rounded-full bg-neutral-400" />
-                <span className="h-4.5 w-1 rounded-full bg-neutral-700" />
-                <span className="rounded bg-emerald-500 px-1 text-[10px] font-bold text-white">
-                  30%
+        <div className="mt-5 grid grid-cols-3 gap-2 text-center text-xs font-semibold text-neutral-700 dark:text-neutral-300 sm:text-sm">
+          {['25 min', '4 servings', '$12 est.'].map((stat) => (
+            <div
+              key={stat}
+              className="rounded-2xl bg-white px-2 py-3 shadow-sm ring-1 ring-neutral-100 dark:bg-neutral-950 dark:ring-neutral-800"
+            >
+              {stat}
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-7 rounded-[1.5rem] bg-white p-4 shadow-sm ring-1 ring-emerald-100 dark:bg-neutral-950 dark:ring-neutral-800 sm:p-5">
+          <div className="flex items-center gap-3">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
+              <ShoppingCart className="h-5 w-5" aria-hidden />
+            </span>
+            <h4 className="font-serif text-2xl font-bold text-neutral-950 dark:text-neutral-50">
+              Grocery list preview
+            </h4>
+          </div>
+
+          <div className="mt-4 grid gap-2">
+            {groceryItems.map((item) => (
+              <div
+                key={item.name}
+                className="flex items-center justify-between gap-4 rounded-xl bg-[#F8FAF9] px-3 py-2.5 text-sm dark:bg-neutral-900"
+              >
+                <span className="font-medium text-neutral-700 dark:text-neutral-300">
+                  {item.name}
+                </span>
+                <span className="text-neutral-500 dark:text-neutral-400">
+                  {item.amount}
                 </span>
               </div>
-            </div>
-
-            <div className="flex items-center justify-between px-8 pb-4 pt-7">
-              <p className="font-serif text-[24px] font-bold uppercase tracking-[0.04em] text-[#D97757]">
-                MealEase
-              </p>
-              <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-white text-[#D97757] shadow-lg shadow-orange-100 ring-1 ring-orange-100">
-                <Home className="h-5 w-5" aria-hidden />
-              </span>
-            </div>
-
-            <div className="mx-5 overflow-hidden rounded-[2rem] bg-white shadow-xl shadow-orange-950/10 ring-1 ring-orange-100 sm:mx-7">
-              <div className="relative min-h-[288px] p-5 sm:min-h-[245px]">
-                <div
-                  className="absolute right-3 top-11 hidden overflow-hidden rounded-full border-4 border-white shadow-xl shadow-orange-950/15 sm:block sm:-right-2 sm:top-6"
-                  style={{ width: 'clamp(112px, 16vw, 150px)', height: 'clamp(112px, 16vw, 150px)' }}
-                >
-                  <Image
-                    src="/landing/optimized/dinner-picked-beef-bowl.jpg"
-                    alt="Beef taco bowl with avocado, lettuce, cheese, and salsa"
-                    fill
-                    sizes="170px"
-                    className="object-cover"
-                  />
-                </div>
-                <div className="relative mb-4 h-28 overflow-hidden rounded-2xl shadow-lg shadow-orange-950/10 ring-1 ring-orange-100 sm:hidden">
-                  <Image
-                    src="/landing/optimized/dinner-picked-beef-bowl.jpg"
-                    alt="Beef taco bowl with avocado, lettuce, cheese, and salsa"
-                    fill
-                    sizes="240px"
-                    className="object-cover"
-                  />
-                </div>
-                <div className="relative z-10" style={{ maxWidth: 190 }}>
-                  <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-[11px] font-bold text-emerald-800 ring-1 ring-emerald-100 sm:gap-2 sm:text-xs">
-                    <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
-                    Dinner picked
-                  </div>
-                  <h3 className="mt-5 font-serif text-[28px] font-bold leading-[1.05] tracking-tight text-neutral-950 sm:mt-7 sm:text-[32px] sm:leading-tight">
-                    Beef Taco Bowl
-                  </h3>
-                  <p className="mt-3 text-[13px] leading-5 text-neutral-600 sm:text-[14px] sm:leading-6">
-                    Seasoned ground beef over rice with cheese, salsa, avocado, and sour cream.
-                  </p>
-                </div>
-                <div className="relative z-10 mt-5 grid grid-cols-3 gap-1.5 text-center text-[11px] font-bold text-neutral-700 sm:mt-7 sm:gap-2 sm:text-[12px]">
-                  {[
-                    { icon: Clock3, label: '25 min' },
-                    { icon: Users, label: '4 servings' },
-                    { icon: DollarSign, label: '$12 est.' },
-                  ].map((stat) => {
-                    const Icon = stat.icon
-                    return (
-                      <div
-                        key={stat.label}
-                        className="inline-flex items-center justify-center gap-1 rounded-2xl bg-white px-1.5 py-3 shadow-md shadow-neutral-900/5 ring-1 ring-neutral-100 sm:gap-1.5 sm:px-2"
-                      >
-                        <Icon className="h-4 w-4 text-neutral-500" aria-hidden />
-                        {stat.label}
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            </div>
-
-            <div className="mx-7 mt-5 rounded-[2rem] bg-white/96 p-5 shadow-sm ring-1 ring-emerald-100">
-              <div className="flex items-center gap-3">
-                <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
-                  <ShoppingCart className="h-5 w-5" aria-hidden />
-                </span>
-                <div>
-                  <h4 className="font-serif text-[25px] font-bold leading-tight text-neutral-950">
-                    Grocery list preview
-                  </h4>
-                  <p className="mt-1 text-sm font-medium text-neutral-500">
-                    You likely have 6 of 12 items
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-4 h-2 overflow-hidden rounded-full bg-neutral-100">
-                <div className="h-full w-1/2 rounded-full bg-emerald-700" />
-              </div>
-
-              <div className="mt-4 grid grid-cols-2 gap-x-5 gap-y-3 border-t border-neutral-100 pt-4">
-                {groceryItems.map((item) => (
-                  <div key={item.name} className="flex items-center gap-3">
-                    <span className="text-2xl leading-none" aria-hidden>
-                      {item.emoji}
-                    </span>
-                    <div>
-                      <p className="text-sm font-bold leading-tight text-neutral-950">
-                        {item.name}
-                      </p>
-                      <p className="mt-0.5 text-xs font-medium text-neutral-500">
-                        {item.amount}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <p className="mt-4 text-center text-sm font-bold text-emerald-700">
-                +6 more items
-              </p>
-            </div>
-
-            <div className="mx-7 mt-5 grid grid-cols-2 gap-3">
-              <div className="rounded-full bg-[#D97757] px-5 py-4 text-center text-base font-bold text-white shadow-lg shadow-orange-200">
-                Start free
-              </div>
-              <div className="rounded-full bg-white px-5 py-4 text-center text-base font-bold text-neutral-950 shadow-sm ring-1 ring-neutral-200">
-                See pricing
-              </div>
-            </div>
-            <div className="mt-3 flex items-center justify-center gap-1.5 text-xs font-semibold text-neutral-500">
-              <Lock className="h-3.5 w-3.5" aria-hidden />
-              No credit card required
-            </div>
-
-            <div className="absolute inset-x-0 bottom-0 border-t border-neutral-200 bg-white/94 px-5 pb-4 pt-3 backdrop-blur">
-              <div className="grid grid-cols-5 gap-1 text-center">
-                {navItems.map((item) => {
-                  const Icon = item.icon
-                  return (
-                    <div
-                      key={item.label}
-                      className={item.active ? 'text-[#D97757]' : 'text-neutral-500'}
-                    >
-                      <Icon className="mx-auto h-5 w-5" aria-hidden />
-                      <p className="mt-1 text-[10px] font-semibold">{item.label}</p>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>

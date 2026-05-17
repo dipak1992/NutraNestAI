@@ -29,7 +29,7 @@ const plans = [
       'Pantry-aware grocery list with estimated cost',
       'Budget-aware swaps before checkout',
       'Post-cook leftovers and lunch ideas',
-      'Household memory for likes and dislikes',
+      'Household memory plus weekly Copilot instructions',
       'Unlimited swaps and Snap & Cook usage',
     ],
     cta: 'Start free — upgrade anytime',

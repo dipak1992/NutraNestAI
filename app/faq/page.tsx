@@ -36,11 +36,11 @@ const faqCategories = [
       },
       {
         q: 'What does MealEase Plus unlock?',
-        a: "Plus unlocks the full food operating system: unlimited/fair-use Copilot with voice, memory, proactive nudges, plan refinements, budget swaps, grocery actions, and schedule learning, plus 7-day Planner / Weekly Autopilot, unlimited swaps and Snap & Cook usage, pantry-aware grocery lists with estimated cost, supported grocery handoff tools, Budget Intelligence, Leftovers AI, household memory, saved meal resurfacing, and post-cook follow-ups like leftovers and tomorrow's lunch.",
+        a: "Plus unlocks the full food operating system: unlimited/fair-use Copilot with voice, weekly instructions, memory, proactive nudges, plan refinements, budget swaps, grocery actions, and schedule learning, plus 7-day Planner / Weekly Autopilot, unlimited swaps and Snap & Cook usage, pantry-aware grocery lists with estimated cost, supported grocery handoff tools, Budget Intelligence, Leftovers AI, household memory, saved meal resurfacing, and post-cook follow-ups like leftovers and tomorrow's lunch.",
       },
       {
         q: 'What is MealEase Copilot?',
-        a: 'Copilot is not a generic chatbot. It is the action layer over your household food system. Free users get basic reactive meal assists. Plus users unlock weekly briefings, voice, memory, proactive nudges, plan refinements, budget-aware swaps, leftover monitoring, grocery actions, schedule learning, and household preference learning.',
+        a: 'Copilot is not a generic chatbot. It is the action layer over your household food system. Free users get basic reactive meal assists. Plus users unlock weekly briefings, voice, weekly instructions like “Thai this week,” memory, proactive nudges, plan refinements, budget-aware swaps, leftover monitoring, grocery actions, schedule learning, and household preference learning.',
       },
       {
         q: 'Is MealEase Copilot like ChatGPT?',

@@ -33,7 +33,14 @@ import {
 import { buildConversationMemory, shouldResetCopilotSession } from '@/lib/copilot/session'
 import { recordCopilotLearning } from '@/lib/copilot/learning'
 import { buildPlanRefinement, type PlanRefinementRequest } from '@/lib/copilot/plan-refinement'
-import { getActiveInstructions, setWeeklyInstruction, clearInstructions, formatInstructionsForPrompt } from '@/lib/copilot/weekly-instructions'
+import {
+  clearWeeklyInstructions,
+  extractWeeklyInstruction,
+  formatWeeklyInstructionsForPrompt,
+  loadActiveWeeklyInstructions,
+  saveWeeklyInstruction,
+  type WeeklyInstructionType,
+} from '@/lib/copilot/weekly-instructions'
 import { getModelForTask } from '@/lib/ai/model-router'
 import logger from '@/lib/logger'
 
@@ -150,7 +157,7 @@ async function executeFunctionCall(
         result: `I'll generate a new weekly plan${preferences ? ` with focus on: ${preferences}` : ''}. Heading to the planner now!`,
         action: {
           type: 'navigate',
-          payload: { href: '/dashboard', params: { autoGenerate: true, preferences } },
+          payload: { href: '/planner', params: { autoGenerate: true, preferences } },
         },
       }
     }
@@ -214,6 +221,47 @@ async function executeFunctionCall(
       }
     }
 
+    case 'set_weekly_instruction': {
+      const instructionType = args.instructionType as WeeklyInstructionType
+      const value = typeof args.value === 'string' ? args.value.trim() : ''
+      const label = typeof args.label === 'string' ? args.label.trim() : undefined
+      const emoji = typeof args.emoji === 'string' ? args.emoji.trim() : undefined
+
+      if (!instructionType || !value) {
+        return { result: 'Tell me the weekly instruction, like “Thai this week” or “no spicy this week,” and I’ll keep it active until Sunday night.' }
+      }
+
+      try {
+        const saved = await saveWeeklyInstruction(await createClient(), userId, {
+          instructionType,
+          value,
+          label,
+          emoji,
+        })
+        return {
+          result: `Got it — ${saved.label} is active for this week and resets Sunday night. I’ll use it for tonight picks, swaps, and weekly plan changes.`,
+          action: { type: 'toast', payload: { message: `${saved.label} active this week` } },
+        }
+      } catch {
+        return { result: 'I could not save that weekly instruction yet, but I can still use it in this conversation.' }
+      }
+    }
+
+    case 'clear_weekly_instruction': {
+      const value = typeof args.value === 'string' ? args.value.trim() : undefined
+      try {
+        const cleared = await clearWeeklyInstructions(await createClient(), userId, value)
+        return {
+          result: cleared > 0
+            ? 'Cleared the active weekly instruction. I’ll stop using that temporary theme for this week.'
+            : 'There were no active weekly instructions to clear.',
+          action: { type: 'toast', payload: { message: cleared > 0 ? 'Weekly instruction cleared' : 'No weekly instruction active' } },
+        }
+      } catch {
+        return { result: 'I could not clear that weekly instruction yet. Try again in a moment.' }
+      }
+    }
+
     case 'build_weekly_briefing': {
       const focus = typeof args.focus === 'string' ? args.focus : 'full_week'
       const params = new URLSearchParams({ source: 'copilot', briefing: focus })
@@ -232,41 +280,6 @@ async function executeFunctionCall(
       return {
         result: `Taking you to ${screen}!`,
         action: { type: 'navigate', payload: { href } },
-      }
-    }
-
-    case 'set_weekly_instruction': {
-      const instruction = args.instruction as string
-      const category = args.category as 'cuisine' | 'speed' | 'dietary' | 'avoidance' | 'general'
-      const durationDays = typeof args.duration_days === 'number' ? args.duration_days : 7
-      const result = await setWeeklyInstruction(
-        userId,
-        instruction,
-        category,
-        Math.min(durationDays, 14) // cap at 14 days
-      )
-      if (result) {
-        return {
-          result: JSON.stringify({
-            success: true,
-            message: `Got it! I'll remember "${instruction}" for the next ${durationDays} days.`,
-            expires_at: result.expires_at,
-          }),
-          action: { type: 'toast', payload: { message: `Weekly instruction set: ${instruction}` } },
-        }
-      }
-      return { result: JSON.stringify({ success: false, message: 'Failed to save instruction' }) }
-    }
-
-    case 'clear_weekly_instruction': {
-      const category = args.category as string
-      await clearInstructions(userId, category === 'all' ? undefined : category as 'cuisine' | 'speed' | 'dietary' | 'avoidance' | 'general')
-      const message = category === 'all'
-        ? 'All weekly instructions cleared. Back to your regular preferences!'
-        : `Cleared your ${category} instruction. I'll go back to your usual preferences for that.`
-      return {
-        result: JSON.stringify({ success: true, message }),
-        action: { type: 'toast', payload: { message: 'Weekly instruction cleared' } },
       }
     }
 
@@ -315,7 +328,18 @@ export async function POST(req: NextRequest) {
     }
 
     const latestRawUserMessage = [...messages].reverse().find((m) => m.role === 'user')?.content ?? ''
+    const detectedWeeklyInstruction = extractWeeklyInstruction(latestRawUserMessage)
     if (!isPlus) {
+      if (detectedWeeklyInstruction) {
+        return NextResponse.json(
+          {
+            error: 'Plus unlocks weekly Copilot instructions. Tell MealEase “Thai this week,” “no spicy this week,” or “under 30 minutes this week,” and Copilot keeps that active until Sunday night.',
+            action: { type: 'navigate', payload: { href: '/upgrade?feature=copilot-weekly-instructions' } },
+          },
+          { status: 402 },
+        )
+      }
+
       const upgradeMessage = getFreeCopilotUpgradeMessage(latestRawUserMessage)
       if (upgradeMessage) {
         return NextResponse.json(
@@ -393,8 +417,10 @@ export async function POST(req: NextRequest) {
     })
 
     // Fetch active weekly instructions for Plus users
-    const activeInstructions = isPlus ? await getActiveInstructions(user.id) : []
-    const instructionBlock = formatInstructionsForPrompt(activeInstructions)
+    const activeInstructions = isPlus ? await loadActiveWeeklyInstructions(supabase, user.id).catch(() => []) : []
+    const instructionBlock = activeInstructions.length
+      ? `\nACTIVE WEEKLY INSTRUCTIONS:\n${formatWeeklyInstructionsForPrompt(activeInstructions)}`
+      : ''
 
     // Append compact context + cross-feature signals + weekly instructions
     const contextBlock = formatCompactContext(userContext)

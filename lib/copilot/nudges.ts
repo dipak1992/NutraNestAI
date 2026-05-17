@@ -115,7 +115,7 @@ export function computeCopilotNudges(input: NudgeInput): CopilotNudge[] {
       body: 'Want me to fill the gaps around your preferences and leftovers?',
       ctaLabel: 'Fill plan gaps',
       priority: 65,
-      action: { type: 'navigate', href: '/dashboard?source=copilot-nudge&autopilot=empty' },
+      action: { type: 'navigate', href: '/planner?source=copilot-nudge&autopilot=empty' },
     })
   }
 

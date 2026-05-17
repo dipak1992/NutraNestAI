@@ -56,7 +56,7 @@ export function buildPlanRefinement(request: PlanRefinementRequest): PlanRefinem
         message: day
           ? `I'll help swap ${day} for something ${request.constraint ?? 'that fits better'}.`
           : `I'll help swap that meal for something that fits better.`,
-        href: `/dashboard?${query}`,
+        href: `/planner?${query}`,
         params,
       }
     case 'budget_optimize':
@@ -68,20 +68,20 @@ export function buildPlanRefinement(request: PlanRefinementRequest): PlanRefinem
     case 'fill_gaps':
       return {
         message: `I'll fill the open nights without touching meals you've already picked.`,
-        href: `/dashboard?${query}`,
+        href: `/planner?${query}`,
         params,
       }
     case 'lock_and_regenerate':
       return {
         message: `I'll keep ${request.keepDays?.join(' and ') || 'the meals you named'} and rebuild the rest.`,
-        href: `/dashboard?${query}`,
+        href: `/planner?${query}`,
         params,
       }
     case 'rebalance_week':
     default:
       return {
         message: `I'll rebalance the week around ${request.theme ?? request.constraint ?? 'your new constraints'}.`,
-        href: `/dashboard?${query}`,
+        href: `/planner?${query}`,
         params,
       }
   }

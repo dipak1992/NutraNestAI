@@ -33,6 +33,8 @@ export const PLUS_ONLY_COPILOT_TOOL_NAMES = new Set([
   'optimize_weekly_budget',
   'monitor_leftovers',
   'save_household_preference',
+  'set_weekly_instruction',
+  'clear_weekly_instruction',
   'build_weekly_briefing',
   'set_weekly_instruction',
   'clear_weekly_instruction',
@@ -54,6 +56,10 @@ const PLUS_INTENT_PATTERNS = [
   {
     pattern: /\b(remember|always|every|usually|soccer|practice|date night|schedule)\b/i,
     message: 'Plus unlocks household memory. Copilot can remember recurring schedule patterns, dislikes, budget rules, and weeknight limits when planning.',
+  },
+  {
+    pattern: /\b(this week|weekly|until sunday|next few dinners).*\b(thai|italian|mexican|indian|mediterranean|japanese|korean|nepali|no spicy|quick|under \d{2,3}|budget|no repeat|different cuisine)\b/i,
+    message: 'Plus unlocks weekly Copilot instructions. Tell MealEase what kind of food week you want, like “Thai this week” or “no spicy this week,” and Copilot keeps that instruction active until Sunday night.',
   },
   {
     pattern: /\b(brief|briefing|recap|run my week|fix my week|handle my week|food operating system)\b/i,

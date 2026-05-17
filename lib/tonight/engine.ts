@@ -21,7 +21,7 @@ import {
   getMealDayOfWeek,
 } from './catalog'
 import { getCrossFeatureSignals, applyCrossFeatureFilter } from '@/lib/ai/cross-feature'
-import { getActiveInstructions, type WeeklyInstruction } from '@/lib/copilot/weekly-instructions'
+import { loadActiveWeeklyInstructions, type WeeklyInstruction } from '@/lib/copilot/weekly-instructions'
 
 // ─── LANDING PAGE ENGINE ────────────────────────────────────────────────────────
 
@@ -73,6 +73,7 @@ type PersonalizationContext = {
   weeklyBudget: number | null
   weekSpent: number
   maxCookTimeMin: number | null
+  weeklyInstructions: WeeklyInstruction[]
 }
 
 /** Convert CuratedMeal → TonightState for dashboard consumption */
@@ -277,25 +278,6 @@ function mealHasProteinMatch(meal: CuratedMeal, pantryProteins: string[]): boole
   )
 }
 
-function extractCuisineNames(instructions: string[]): string[] {
-  const cuisinePatterns = [
-    'thai', 'italian', 'japanese', 'indian', 'mexican', 'chinese',
-    'korean', 'mediterranean', 'french', 'greek', 'vietnamese',
-    'american', 'spanish', 'middle eastern', 'african',
-  ]
-
-  const found: string[] = []
-  for (const instruction of instructions) {
-    const lower = instruction.toLowerCase()
-    for (const cuisine of cuisinePatterns) {
-      if (lower.includes(cuisine)) {
-        found.push(cuisine)
-      }
-    }
-  }
-  return found
-}
-
 function personalizeSelection(
   pool: CuratedMeal[],
   context: PersonalizationContext,
@@ -405,7 +387,21 @@ function personalizeSelection(
     }
   }
 
-  // Priority 5: Respect dietary preferences
+  // Priority 5: Temporary weekly Copilot cuisine instruction
+  const weeklyCuisine = context.weeklyInstructions.find((item) => item.instructionType === 'cuisine_boost')
+  if (weeklyCuisine) {
+    const cuisineMeal = findCuisineMatch(pantryPreferredPool, [weeklyCuisine.value])
+    if (cuisineMeal) {
+      return {
+        meal: cuisineMeal,
+        reason: `${weeklyCuisine.label} is active, so tonight leans that direction.`,
+        isFromPantry: false,
+        usesLeftover: null,
+      }
+    }
+  }
+
+  // Priority 6: Respect dietary preferences
   if (context.dietary.length > 0) {
     const dietaryMeal = findDietaryMatch(pantryPreferredPool, context.dietary)
     if (dietaryMeal) {
@@ -418,7 +414,7 @@ function personalizeSelection(
     }
   }
 
-  // Priority 6: Cuisine preference
+  // Priority 7: Cuisine preference
   if (context.cuisines.length > 0) {
     const cuisineMeal = findCuisineMatch(pantryPreferredPool, context.cuisines)
     if (cuisineMeal) {
@@ -431,7 +427,7 @@ function personalizeSelection(
     }
   }
 
-  // Priority 7: Cook time constraint
+  // Priority 8: Cook time constraint
   if (context.maxCookTimeMin != null) {
     const quickMeals = pantryPreferredPool.filter((m) => m.cookTimeMin <= context.maxCookTimeMin!)
     if (quickMeals.length > 0) {
@@ -445,7 +441,7 @@ function personalizeSelection(
     }
   }
 
-  // Priority 8: Budget goal from profile
+  // Priority 9: Budget goal from profile
   if (context.goals.includes('save_money')) {
     const budgetMeal = pantryPreferredPool.find((m) => m.tags.includes('budget'))
     if (budgetMeal) {
@@ -533,6 +529,7 @@ async function loadPersonalizationContext(
     weeklyBudget: null,
     weekSpent: 0,
     maxCookTimeMin: null,
+    weeklyInstructions: [],
   }
 
   // ── Load preferences — try household_preferences first (written by onboarding) ──
@@ -561,6 +558,40 @@ async function loadPersonalizationContext(
     context.goals = Array.isArray(householdPrefs.goals)
       ? (householdPrefs.goals as string[]).filter(Boolean)
       : []
+  }
+
+  // ── Active weekly Copilot instructions — temporary, auto-expiring context ──
+  const weeklyInstructions = await loadActiveWeeklyInstructions(supabase, userId).catch(() => [])
+  context.weeklyInstructions = weeklyInstructions
+  for (const instruction of weeklyInstructions) {
+    if (instruction.instructionType === 'cuisine_boost') {
+      context.cuisines = [
+        instruction.value,
+        ...context.cuisines.filter((item) => item.toLowerCase() !== instruction.value.toLowerCase()),
+      ]
+    }
+    if (instruction.instructionType === 'avoid') {
+      context.dislikes = [
+        instruction.value,
+        ...context.dislikes.filter((item) => item.toLowerCase() !== instruction.value.toLowerCase()),
+      ]
+    }
+    if (instruction.instructionType === 'time_constraint') {
+      const minutes = Number(instruction.value)
+      if (Number.isFinite(minutes) && minutes > 0) {
+        context.maxCookTimeMin = context.maxCookTimeMin == null
+          ? minutes
+          : Math.min(context.maxCookTimeMin, minutes)
+      }
+    }
+    if (instruction.instructionType === 'budget_override') {
+      const budget = Number(instruction.value)
+      if (Number.isFinite(budget) && budget > 0) {
+        context.weeklyBudget = context.weeklyBudget == null
+          ? budget
+          : Math.min(context.weeklyBudget, budget)
+      }
+    }
   }
 
   // ── Fallback: user_dietary_preferences (older table) ──
@@ -675,35 +706,6 @@ async function loadPersonalizationContext(
     .order('created_at', { ascending: false })
     .limit(10)
   context.savedMeals = (saved ?? []).map((item) => item.title as string).filter(Boolean)
-
-  // ── Load active weekly instructions ──
-  try {
-    const instructions = await getActiveInstructions(userId)
-    if (instructions.length > 0) {
-      // Apply cuisine instructions
-      const cuisineInstructions = instructions.filter(i => i.category === 'cuisine')
-      if (cuisineInstructions.length > 0) {
-        const cuisineNames = extractCuisineNames(cuisineInstructions.map(i => i.instruction))
-        context.cuisines = [...(context.cuisines || []), ...cuisineNames]
-      }
-
-      // Apply avoidance instructions
-      const avoidanceInstructions = instructions.filter(i => i.category === 'avoidance')
-      if (avoidanceInstructions.length > 0) {
-        context.dietary = [...(context.dietary || []), ...avoidanceInstructions.map(i => i.instruction)]
-      }
-
-      // Apply speed instructions
-      const speedInstructions = instructions.filter(i => i.category === 'speed')
-      if (speedInstructions.length > 0) {
-        context.maxCookTimeMin = context.maxCookTimeMin
-          ? Math.min(context.maxCookTimeMin, 30)
-          : 30
-      }
-    }
-  } catch (e) {
-    console.error('[tonight] weekly instructions load error:', e)
-  }
 
   return context
 }

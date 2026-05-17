@@ -12,7 +12,7 @@ const genericAi = [
 ]
 
 const mealease = [
-  'Remembers preferences',
+  'Remembers preferences and this-week themes',
   'Connects tonight to the week',
   'Turns plans into grocery lists',
   'Tracks leftovers after cooking',
@@ -27,7 +27,7 @@ const workflowProof = [
   },
   {
     label: 'MealEase saved once',
-    body: 'Household profile, fridge context, weekly plan, grocery list, leftovers, and budget stay connected.',
+    body: 'Household profile, this-week Copilot instructions, fridge context, weekly plan, grocery list, leftovers, and budget stay connected.',
   },
 ] as const
 

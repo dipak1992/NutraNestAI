@@ -48,9 +48,9 @@ const systemSteps = [
 ]
 
 const memoryItems = [
+  'Tell Copilot “Thai this week” or “no spicy this week” once',
   'Tonight never repeats what\u2019s already planned this week',
   'Liked dinners become stronger future picks',
-  'Budget swaps use real AI to find cheaper alternatives',
   'Every feature shares context — nothing works in isolation',
 ]
 

@@ -13,6 +13,11 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { PreferenceSignal } from '@/lib/learning/types'
 import logger from '@/lib/logger'
+import {
+  formatWeeklyInstructionsForPrompt,
+  loadActiveWeeklyInstructions,
+  type WeeklyInstruction,
+} from '@/lib/copilot/weekly-instructions'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -73,6 +78,9 @@ export interface UserContext {
     lockedDays: Array<{ dayAbbrev: string; recipeName: string }>
   } | null
 
+  /** Temporary current-week Copilot instructions */
+  weeklyInstructions: WeeklyInstruction[]
+
   /** Seasonal context */
   season: {
     name: string
@@ -88,6 +96,8 @@ export interface ContextOptions {
   includeLearning?: boolean
   /** Include week plan context */
   includeWeekPlan?: boolean
+  /** Include active current-week instructions */
+  includeWeeklyInstructions?: boolean
   /** Week start date for plan context (ISO string) */
   weekStart?: string
   /** Max pantry items to load */
@@ -138,6 +148,7 @@ export async function buildUserContext(
   const {
     includeLearning = true,
     includeWeekPlan = false,
+    includeWeeklyInstructions = true,
     weekStart,
     maxPantryItems = 30,
     maxLeftovers = 10,
@@ -157,6 +168,7 @@ export async function buildUserContext(
     learningResult,
     weekPlanResult,
     dietaryPrefsResult,
+    weeklyInstructionsResult,
   ] = await Promise.allSettled([
     // 1. Household preferences
     supabase
@@ -237,6 +249,10 @@ export async function buildUserContext(
       .select('eating_style, goals, dislikes, cuisine_preferences')
       .eq('user_id', userId)
       .maybeSingle(),
+
+    includeWeeklyInstructions
+      ? loadActiveWeeklyInstructions(supabase, userId)
+      : Promise.resolve([]),
   ])
 
   // ── Extract results safely ────────────────────────────────────────────────
@@ -251,6 +267,7 @@ export async function buildUserContext(
   const learningRow = extractResult(learningResult)?.data
   const weekPlanRows = extractResult(weekPlanResult)?.data ?? []
   const dietaryPrefsRow = extractResult(dietaryPrefsResult)?.data
+  const weeklyInstructions = extractResult(weeklyInstructionsResult) ?? []
 
   // ── Build household context ───────────────────────────────────────────────
 
@@ -382,6 +399,7 @@ export async function buildUserContext(
     savedMeals: savedRows.map((r: Record<string, unknown>) => r.title as string).filter(Boolean),
     learning,
     weekPlan,
+    weeklyInstructions,
     season: getSeasonContext(),
     builtAt: Date.now(),
   }
@@ -419,6 +437,11 @@ export function formatContextForPrompt(ctx: UserContext): string {
   }
   if (ctx.household.cuisines.length > 0) {
     lines.push(`Preferred cuisines: ${ctx.household.cuisines.join(', ')}`)
+  }
+  if (ctx.weeklyInstructions.length > 0) {
+    lines.push('')
+    lines.push('Active weekly instructions:')
+    lines.push(formatWeeklyInstructionsForPrompt(ctx.weeklyInstructions))
   }
   if (ctx.household.preferredProteins.length > 0) {
     lines.push(`Preferred proteins: ${ctx.household.preferredProteins.join(', ')}`)
@@ -524,6 +547,7 @@ export function formatCompactContext(ctx: UserContext): string {
   if (ctx.household.dietary.length) parts.push(`Diet: ${ctx.household.dietary.join(',')}`)
   if (ctx.household.dislikes.length) parts.push(`Avoid: ${ctx.household.dislikes.join(',')}`)
   if (ctx.household.cuisines.length) parts.push(`Cuisines: ${ctx.household.cuisines.join(',')}`)
+  if (ctx.weeklyInstructions.length) parts.push(`This week: ${ctx.weeklyInstructions.map((item) => item.label).join(',')}`)
   if (ctx.household.lowEnergyMode) parts.push('LOW-ENERGY')
   if (ctx.budget.weeklyLimit) parts.push(`Budget: $${ctx.budget.remainingBudget?.toFixed(0) ?? '?'} left`)
   if (ctx.pantry.length) parts.push(`Pantry: ${ctx.pantry.slice(0, 10).join(',')}`)

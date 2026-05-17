@@ -200,6 +200,52 @@ export const COPILOT_TOOLS: ChatCompletionTool[] = [
   {
     type: 'function',
     function: {
+      name: 'set_weekly_instruction',
+      description: 'Save a temporary current-week instruction such as a cuisine theme, no spicy food, quick meals, budget target, or no repeated cuisines. It expires Sunday night.',
+      parameters: {
+        type: 'object',
+        properties: {
+          instructionType: {
+            type: 'string',
+            enum: ['cuisine_boost', 'avoid', 'time_constraint', 'budget_override', 'variety_rule'],
+            description: 'The type of temporary instruction',
+          },
+          value: {
+            type: 'string',
+            description: 'The instruction value, such as thai, spicy, 30, 80, or no_repeat_cuisine',
+          },
+          label: {
+            type: 'string',
+            description: 'Short human-readable badge label, such as Thai week or No spicy',
+          },
+          emoji: {
+            type: 'string',
+            description: 'Optional badge emoji',
+          },
+        },
+        required: ['instructionType', 'value'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'clear_weekly_instruction',
+      description: 'Clear active current-week Copilot instructions when the user asks to forget, clear, remove, or reset the weekly theme or temporary preferences.',
+      parameters: {
+        type: 'object',
+        properties: {
+          value: {
+            type: 'string',
+            description: 'Optional specific instruction value to clear. Omit to clear all active weekly instructions.',
+          },
+        },
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
       name: 'build_weekly_briefing',
       description: 'Create a concise weekly food operating briefing that summarizes plan, groceries, budget, leftovers, and schedule risks',
       parameters: {
@@ -284,9 +330,9 @@ export const COPILOT_TOOLS: ChatCompletionTool[] = [
 export const SCREEN_ROUTES: Record<string, string> = {
   tonight: '/dashboard/tonight',
   cook: '/dashboard/cook',
-  plan: '/dashboard',
+  plan: '/planner',
   leftovers: '/leftovers',
   budget: '/budget',
-  grocery: '/grocery',
+  grocery: '/grocery-list',
   settings: '/settings',
 }

@@ -64,7 +64,7 @@ export function generateChips(ctx: ChipContext): CopilotChip[] {
     chips.push({ id: 'tonight-quick', label: "What's for dinner?", icon: '🍽️', action: { type: 'navigate', href: '/dashboard/tonight' } })
   }
   if (ctx.hour >= 8 && ctx.hour <= 11 && !ctx.hasWeeklyPlan && ctx.screen !== 'plan') {
-    chips.push({ id: 'plan-week', label: 'Plan this week', icon: '📅', action: { type: 'navigate', href: '/dashboard' } })
+    chips.push({ id: 'plan-week', label: 'Plan this week', icon: '📅', action: { type: 'navigate', href: '/planner' } })
   }
   if (ctx.hasLeftovers && ctx.screen !== 'leftovers') {
     chips.push({ id: 'leftover-nudge', label: 'Use leftovers first', icon: '♻️', action: { type: 'navigate', href: '/leftovers' } })

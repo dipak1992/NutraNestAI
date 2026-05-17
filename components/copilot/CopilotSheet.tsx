@@ -15,6 +15,12 @@ import { InstructionBadge } from './InstructionBadge'
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
+type ActiveInstruction = {
+  id: string
+  label: string
+  emoji: string | null
+}
+
 function pathnameToScreen(pathname: string): CopilotScreen {
   if (pathname.startsWith('/dashboard/tonight')) return 'tonight'
   if (pathname.startsWith('/dashboard/cook')) return 'cook'
@@ -92,7 +98,7 @@ function actionCopy(href: string) {
       cta: 'Review list',
     }
   }
-  if (href.includes('/dashboard')) {
+  if (href.includes('/planner') || href.includes('/dashboard')) {
     return {
       eyebrow: 'Plan workflow',
       title: 'Open weekly plan',
@@ -269,6 +275,7 @@ export function CopilotSheet({ isPlus }: { isPlus: boolean }) {
   const dragControls = useDragControls()
 
   const [inputText, setInputText] = useState('')
+  const [activeInstructions, setActiveInstructions] = useState<ActiveInstruction[]>([])
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -319,6 +326,23 @@ export function CopilotSheet({ isPlus }: { isPlus: boolean }) {
       ignore = true
     }
   }, [currentScreen, isPlus, setActiveNudge])
+
+  const refreshInstructions = useCallback(() => {
+    if (!isPlus) {
+      setActiveInstructions([])
+      return
+    }
+    fetch('/api/copilot/instructions')
+      .then((res) => res.ok ? res.json() : { instructions: [] })
+      .then((data: { instructions?: ActiveInstruction[] }) => {
+        setActiveInstructions(data.instructions ?? [])
+      })
+      .catch(() => undefined)
+  }, [isPlus])
+
+  useEffect(() => {
+    refreshInstructions()
+  }, [refreshInstructions])
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
@@ -391,7 +415,10 @@ export function CopilotSheet({ isPlus }: { isPlus: boolean }) {
       return
     }
     sendMessage(text, currentScreen)
-  }, [inputText, isStreaming, isPlus, addMessage, sendMessage, currentScreen])
+      .finally(() => {
+        refreshInstructions()
+      })
+  }, [inputText, isStreaming, isPlus, addMessage, sendMessage, currentScreen, refreshInstructions])
 
   // Handle keyboard submit
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -412,7 +439,10 @@ export function CopilotSheet({ isPlus }: { isPlus: boolean }) {
       return
     }
     sendMessage(text, currentScreen)
-  }, [isPlus, addMessage, sendMessage, currentScreen])
+      .finally(() => {
+        refreshInstructions()
+      })
+  }, [isPlus, addMessage, sendMessage, currentScreen, refreshInstructions])
 
   // Handle drag end
   const handleDragEnd = useCallback((_: unknown, info: PanInfo) => {
@@ -474,6 +504,24 @@ export function CopilotSheet({ isPlus }: { isPlus: boolean }) {
                   <p className="text-xs text-neutral-500">
                     {isPlus ? 'Food operating layer active' : `${getGreeting(hour)} Basic meal assists`}
                   </p>
+                  {activeInstructions.length > 0 && (
+                    <div className="mt-2 flex max-w-[210px] flex-wrap gap-1.5">
+                      {activeInstructions.slice(0, 2).map((instruction) => (
+                        <span
+                          key={instruction.id}
+                          className="inline-flex items-center gap-1 rounded-full bg-[#D97757]/10 px-2 py-0.5 text-[11px] font-semibold text-[#B85F43]"
+                        >
+                          {instruction.emoji && <span aria-hidden>{instruction.emoji}</span>}
+                          {instruction.label}
+                        </span>
+                      ))}
+                      {activeInstructions.length > 2 && (
+                        <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[11px] font-semibold text-neutral-500">
+                          +{activeInstructions.length - 2}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <span className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 text-xs font-medium text-neutral-500 shadow-sm">
                   {isPlus ? <Crown className="h-3 w-3 text-[#D97757]" aria-hidden /> : null}

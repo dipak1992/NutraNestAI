@@ -30,10 +30,15 @@ export type LandingTonightMeal = {
   name: string
   tagline: string
   cookTimeMin: number
+  servings: number
+  costPerServing: number
+  difficulty: 'easy' | 'medium' | 'hard'
   benefits: string[]
   image: string
   category: string
   weekdayLabel: string
+  reason: string
+  chefVerified: boolean
 }
 
 /**
@@ -52,10 +57,15 @@ export function getLandingTonightMeal(): LandingTonightMeal {
     name: meal.name,
     tagline: meal.tagline,
     cookTimeMin: meal.cookTimeMin,
+    servings: meal.servings,
+    costPerServing: meal.costPerServing,
+    difficulty: meal.difficulty,
     benefits: meal.benefits,
     image: getMealImage(meal),
     category: meal.category,
     weekdayLabel: label,
+    reason: WEEKDAY_THEMES[day].reason,
+    chefVerified: meal.chefVerified ?? true,
   }
 }
 

@@ -13,15 +13,7 @@ import {
   Utensils,
   Users,
 } from 'lucide-react'
-
-const meal = {
-  name: 'Rainbow Buddha Bowl',
-  image: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=900&q=85&fit=crop',
-  cookTime: '25 min',
-  servings: '4 servings',
-  cost: '~$3.25/serving',
-  reason: 'Simple, prep-friendly, and easy to stretch into the week.',
-}
+import { getLandingTonightMeal } from '@/lib/tonight/engine'
 
 const navItems = [
   { label: 'Tonight', icon: Utensils, active: true },
@@ -31,7 +23,15 @@ const navItems = [
   { label: 'Budget', icon: DollarSign },
 ]
 
+function formatDifficulty(difficulty: 'easy' | 'medium' | 'hard') {
+  return difficulty.charAt(0).toUpperCase() + difficulty.slice(1)
+}
+
 export function LandingTonightPreview() {
+  const meal = getLandingTonightMeal()
+  const cost = `~$${meal.costPerServing.toFixed(2)}/serving`
+  const difficulty = formatDifficulty(meal.difficulty)
+
   return (
     <div className="absolute inset-0 z-20 flex flex-col overflow-hidden bg-[#FFFDF8]">
       <div className="flex items-center justify-between px-8 pt-5 text-neutral-950">
@@ -63,7 +63,7 @@ export function LandingTonightPreview() {
       <div className="px-8">
         <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FFF6EC] px-3 py-1.5 text-[12px] font-bold text-[#C86646] ring-1 ring-orange-200">
           <Sparkles className="h-3.5 w-3.5" aria-hidden />
-          5 days strong
+          {meal.weekdayLabel}
         </span>
         <p className="mt-3 text-[13px] font-medium text-neutral-500">
           12:34 PM <span className="px-1">·</span> Starting to think about dinner?
@@ -74,7 +74,7 @@ export function LandingTonightPreview() {
         <div className="relative h-56 overflow-hidden bg-neutral-900">
           <Image
             src={meal.image}
-            alt=""
+            alt={`${meal.name} dinner preview`}
             fill
             sizes="(max-width: 768px) 260px, 300px"
             className="object-cover"
@@ -86,10 +86,12 @@ export function LandingTonightPreview() {
               <Sparkles className="h-3.5 w-3.5" aria-hidden />
               Tonight&apos;s Pick
             </span>
-            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-700 px-2.5 py-1.5 text-[10px] font-bold text-white shadow-lg">
-              <ShieldCheck className="h-3.5 w-3.5" aria-hidden />
-              Chef-Verified
-            </span>
+            {meal.chefVerified && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-700 px-2.5 py-1.5 text-[10px] font-bold text-white shadow-lg">
+                <ShieldCheck className="h-3.5 w-3.5" aria-hidden />
+                Chef-Verified
+              </span>
+            )}
           </div>
 
           <div className="absolute inset-x-4 bottom-3 text-white">
@@ -99,16 +101,16 @@ export function LandingTonightPreview() {
             <div className="mt-3 flex items-center gap-3 text-[12px] font-medium">
               <span className="inline-flex items-center gap-1">
                 <Clock3 className="h-4 w-4 text-[#F3B18E]" aria-hidden />
-                {meal.cookTime}
+                {meal.cookTimeMin} min
               </span>
               <span className="inline-flex items-center gap-1">
                 <Users className="h-4 w-4 text-[#F3B18E]" aria-hidden />
-                {meal.servings}
+                {meal.servings} servings
               </span>
-              <span>Easy</span>
+              <span>{difficulty}</span>
             </div>
             <span className="mt-2 inline-flex rounded-full bg-emerald-700 px-3 py-1.5 text-[12px] font-bold">
-              {meal.cost}
+              {cost}
             </span>
             <p className="mt-2 text-[12px] font-semibold text-white/86">3 swaps left today</p>
           </div>

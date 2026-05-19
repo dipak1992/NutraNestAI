@@ -14,6 +14,7 @@ import { QuickActions } from '@/components/dashboard/QuickActions'
 import { NextBestActionCard } from '@/components/dashboard/NextBestActionCard'
 import { WeeklyImpactCard } from '@/components/dashboard/WeeklyImpactCard'
 import { PredictiveIntelligenceCard } from '@/components/dashboard/PredictiveIntelligenceCard'
+import { AutonomousActionsCard } from '@/components/dashboard/AutonomousActionsCard'
 import { WeeklyReminderNudge } from '@/components/shared/SaveReminderCard'
 import { StaggerGroup } from '@/components/motion'
 import type { DashboardPayload } from '@/lib/dashboard/types'
@@ -30,6 +31,7 @@ export function NewDashboardClient({ initial }: { initial: DashboardPayload }) {
   const budget = useDashboardStore((s) => s.budget)
   const retention = useDashboardStore((s) => s.retention)
   const predictiveInsights = useDashboardStore((s) => s.predictiveInsights)
+  const autonomousActions = useDashboardStore((s) => s.autonomousActions)
   const nudge = useDashboardStore((s) => s.nudge)
   const error = useDashboardStore((s) => s.error)
 
@@ -84,6 +86,9 @@ export function NewDashboardClient({ initial }: { initial: DashboardPayload }) {
   const displayPredictiveInsights = predictiveInsights.length > 0
     ? predictiveInsights
     : initial.predictiveInsights
+  const displayAutonomousActions = autonomousActions.length > 0
+    ? autonomousActions
+    : initial.autonomousActions
   const displayNudge = nudge ?? initial.nudge
 
   return (
@@ -128,6 +133,8 @@ export function NewDashboardClient({ initial }: { initial: DashboardPayload }) {
         <WeeklyImpactCard retention={displayRetention} />
 
         <PredictiveIntelligenceCard insights={displayPredictiveInsights} />
+
+        <AutonomousActionsCard actions={displayAutonomousActions} />
 
         <div className="xl:hidden">
           <LeftoversCard state={displayLeftovers} />

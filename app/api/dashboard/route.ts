@@ -9,6 +9,7 @@ import { loadBudgetPayload } from '@/app/(app)/budget/loader'
 import { getDaysUntilExpiry, getUrgency } from '@/lib/leftovers/expiration-calculator'
 import type {
   DashboardPayload,
+  AutonomousAction,
   Leftover,
   Plan,
   PredictiveInsight,
@@ -144,6 +145,17 @@ export async function getDashboardPayload(
     behaviorSignalsLearned,
     now: _now,
   })
+  const autonomousActions = await loadAutonomousActions({
+    userId,
+    weekStart,
+    plannedDays,
+    budget,
+    leftovers,
+    predictiveInsights,
+    householdMemberCount: household.memberCount,
+    estimatedSavedThisWeek,
+    now: _now,
+  })
 
   const base: DashboardPayload = {
     user: {
@@ -179,12 +191,160 @@ export async function getDashboardPayload(
     household,
     limits,
     predictiveInsights,
+    autonomousActions,
   }
 
   const nudges = buildNudgeCandidates(base)
   base.nudge = pickNudge(nudges)
 
   return base
+}
+
+async function loadAutonomousActions({
+  userId,
+  weekStart,
+  plannedDays,
+  budget,
+  leftovers,
+  predictiveInsights,
+  householdMemberCount,
+  estimatedSavedThisWeek,
+  now,
+}: {
+  userId: string
+  weekStart: string
+  plannedDays: number
+  budget: DashboardPayload['budget']
+  leftovers: Leftover[]
+  predictiveInsights: PredictiveInsight[]
+  householdMemberCount: number
+  estimatedSavedThisWeek: number
+  now: Date
+}): Promise<AutonomousAction[]> {
+  const persisted = await loadPersistedAutonomousActions(userId, weekStart)
+  if (persisted.length > 0) return persisted
+
+  const actions: AutonomousAction[] = []
+  const createdAt = now.toISOString()
+  const budgetRemaining =
+    budget.weeklyLimit != null ? budget.weeklyLimit - budget.weekSpent : null
+
+  if (budgetRemaining != null && budgetRemaining < 0) {
+    actions.push({
+      id: `budget-rebalance-${weekStart}`,
+      actionType: 'budget_rebalance',
+      title: `You are $${Math.abs(Math.round(budgetRemaining))} over budget this week`,
+      body: 'MealEase can rebalance the remaining dinners toward cheaper pantry-heavy meals before the next grocery run.',
+      ctaLabel: 'Review budget swaps',
+      ctaHref: '/budget?tab=swaps&source=autonomous',
+      status: 'proposed',
+      impactUsd: Math.abs(Math.round(budgetRemaining)),
+      confidence: 'high',
+      createdAt,
+    })
+  }
+
+  const urgentLeftover = leftovers.find((leftover) => leftover.daysUntilExpiry <= 1)
+  if (urgentLeftover) {
+    actions.push({
+      id: `leftover-rescue-${urgentLeftover.id}`,
+      actionType: 'leftover_rescue',
+      title: `Rescue ${urgentLeftover.name.toLowerCase()} before it expires`,
+      body: 'MealEase can bias tonight and tomorrow lunch around this leftover instead of letting it become waste.',
+      ctaLabel: 'Use leftovers',
+      ctaHref: '/leftovers?source=autonomous',
+      status: 'proposed',
+      impactUsd: Math.max(6, urgentLeftover.servingsRemaining * 4),
+      confidence: 'high',
+      createdAt,
+    })
+  }
+
+  const quickDinnerPrediction = predictiveInsights.find((insight) => insight.type === 'quick_dinner_night')
+  if (quickDinnerPrediction) {
+    actions.push({
+      id: `timing-adjustment-${weekStart}`,
+      actionType: 'timing_adjustment',
+      title: 'I can make the late-week dinner lighter',
+      body: 'Thursday or Friday should be a quick dinner slot based on your current plan gaps. Review the adjustment before it changes the week.',
+      ctaLabel: 'Adjust planner',
+      ctaHref: '/planner?mode=quick&source=autonomous',
+      status: 'proposed',
+      impactUsd: null,
+      confidence: 'medium',
+      createdAt,
+    })
+  }
+
+  if (plannedDays >= 3 && predictiveInsights.some((insight) => insight.type === 'grocery_budget')) {
+    actions.push({
+      id: `grocery-prepare-${weekStart}`,
+      actionType: 'grocery_prepare',
+      title: 'Your grocery handoff is ready to prepare',
+      body: 'MealEase can move this week from plan to store-ready list with pantry deductions, provider comparison, and household visibility.',
+      ctaLabel: 'Prepare groceries',
+      ctaHref: '/grocery-list?source=autonomous',
+      status: 'proposed',
+      impactUsd: estimatedSavedThisWeek > 0 ? estimatedSavedThisWeek : null,
+      confidence: 'medium',
+      createdAt,
+    })
+  }
+
+  if (householdMemberCount > 1) {
+    actions.push({
+      id: `collaboration-${weekStart}`,
+      actionType: 'collaboration_prompt',
+      title: 'Ask the household to approve the week',
+      body: `${householdMemberCount} profiles can coordinate meal approvals, grocery changes, and handoffs from the same workspace.`,
+      ctaLabel: 'Open household',
+      ctaHref: '/dashboard/household?source=autonomous',
+      status: 'proposed',
+      impactUsd: null,
+      confidence: 'medium',
+      createdAt,
+    })
+  }
+
+  return actions
+    .sort((a, b) => (b.impactUsd ?? 0) - (a.impactUsd ?? 0))
+    .slice(0, 3)
+}
+
+async function loadPersistedAutonomousActions(
+  userId: string,
+  weekStart: string,
+): Promise<AutonomousAction[]> {
+  const supabase = await createClient()
+
+  try {
+    const { data, error } = await supabase
+      .from('household_autonomous_actions')
+      .select('id, action_type, title, body, cta_label, cta_href, status, impact_usd, confidence, created_at')
+      .eq('user_id', userId)
+      .eq('week_start', weekStart)
+      .eq('status', 'proposed')
+      .order('priority', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(3)
+
+    if (error) return []
+
+    return (data ?? []).map((row: any) => ({
+      id: String(row.id),
+      actionType: row.action_type as AutonomousAction['actionType'],
+      title: String(row.title ?? 'Review autonomous action'),
+      body: String(row.body ?? ''),
+      ctaLabel: String(row.cta_label ?? 'Review'),
+      ctaHref: String(row.cta_href ?? '/dashboard'),
+      status: row.status as AutonomousAction['status'],
+      impactUsd: row.impact_usd == null ? null : Number(row.impact_usd),
+      confidence: row.confidence as AutonomousAction['confidence'],
+      createdAt: String(row.created_at ?? new Date().toISOString()),
+    }))
+  } catch {
+    return []
+  }
 }
 
 async function loadHouseholdSummary(userId: string): Promise<DashboardPayload['household']> {

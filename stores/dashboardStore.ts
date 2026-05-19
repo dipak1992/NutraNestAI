@@ -19,6 +19,7 @@ type DashboardStore = {
   budget: BudgetState | null
   retention: RetentionState | null
   predictiveInsights: DashboardPayload['predictiveInsights']
+  autonomousActions: DashboardPayload['autonomousActions']
   quickActions: QuickAction[]
   nudge: Nudge | null
   household: DashboardPayload['household'] | null
@@ -52,6 +53,7 @@ export const useDashboardStore = create<DashboardStore>()(
       budget: null,
       retention: null,
       predictiveInsights: [],
+      autonomousActions: [],
       quickActions: [],
       nudge: null,
       household: null,
@@ -71,6 +73,7 @@ export const useDashboardStore = create<DashboardStore>()(
           budget: payload.budget,
           retention: payload.retention,
           predictiveInsights: payload.predictiveInsights,
+          autonomousActions: payload.autonomousActions,
           quickActions: payload.quickActions,
           nudge: payload.nudge,
           household: payload.household,
@@ -97,6 +100,7 @@ export const useDashboardStore = create<DashboardStore>()(
             budget: payload.budget,
             retention: payload.retention,
             predictiveInsights: payload.predictiveInsights,
+            autonomousActions: payload.autonomousActions,
             quickActions: payload.quickActions,
             nudge: payload.nudge,
             household: payload.household,

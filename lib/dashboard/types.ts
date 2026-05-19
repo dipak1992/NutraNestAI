@@ -142,6 +142,24 @@ export type PredictiveInsight = {
   priority: number
 }
 
+export type AutonomousAction = {
+  id: string
+  actionType:
+    | 'budget_rebalance'
+    | 'leftover_rescue'
+    | 'grocery_prepare'
+    | 'timing_adjustment'
+    | 'collaboration_prompt'
+  title: string
+  body: string
+  ctaLabel: string
+  ctaHref: string
+  status: 'proposed' | 'applied' | 'dismissed'
+  impactUsd: number | null
+  confidence: 'high' | 'medium' | 'low'
+  createdAt: string
+}
+
 export type DashboardPayload = {
   user: {
     id: string
@@ -165,4 +183,5 @@ export type DashboardPayload = {
   limits: UsageLimits
   retention: RetentionState
   predictiveInsights: PredictiveInsight[]
+  autonomousActions: AutonomousAction[]
 }

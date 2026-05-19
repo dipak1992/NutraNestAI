@@ -12,6 +12,7 @@ export const NUDGE_PRIORITY: Record<Nudge['type'], number> = {
   weekday_dinner_reminder: 57,
   pantry_scan_reminder: 55,
   weekly_savings_recap: 54,
+  predictive_household_intelligence: 53,
   referral: 50,
 }
 
@@ -27,6 +28,7 @@ const NUDGE_VARIANT: Record<Nudge['type'], NudgeVariant> = {
   weekday_dinner_reminder: 'info',
   pantry_scan_reminder: 'info',
   weekly_savings_recap: 'success',
+  predictive_household_intelligence: 'info',
   referral: 'success',
 }
 
@@ -48,6 +50,7 @@ export function selectNudge(
   ctx: Pick<
     DashboardPayload,
     'user' | 'leftovers' | 'budget' | 'limits' | 'household' | 'retention'
+    | 'predictiveInsights'
   >,
   dismissed: string[] = []
 ): Nudge | null {
@@ -59,6 +62,7 @@ export function buildNudgeCandidates(
   ctx: Pick<
     DashboardPayload,
     'user' | 'leftovers' | 'budget' | 'limits' | 'household' | 'retention'
+    | 'predictiveInsights'
   >
 ): Nudge[] {
   const candidates: Nudge[] = []
@@ -229,7 +233,23 @@ export function buildNudgeCandidates(
     })
   }
 
-  // 11. Referral (plus users who have been active for 14+ days)
+  // 11. Predictive household intelligence
+  const topPrediction = ctx.predictiveInsights[0]
+  if (topPrediction && ctx.user.plan !== 'free') {
+    candidates.push({
+      id: `nudge-predictive-${topPrediction.id}`,
+      type: 'predictive_household_intelligence',
+      priority: NUDGE_PRIORITY.predictive_household_intelligence,
+      title: topPrediction.title,
+      body: topPrediction.body,
+      ctaLabel: topPrediction.ctaLabel,
+      ctaHref: topPrediction.ctaHref,
+      dismissible: true,
+      variant: NUDGE_VARIANT.predictive_household_intelligence,
+    })
+  }
+
+  // 12. Referral (plus users who have been active for 14+ days)
   if (ctx.user.plan === 'plus') {
     const createdAt = new Date(ctx.user.createdAt)
     const daysSinceJoin = Math.floor(

@@ -85,6 +85,7 @@ export type ContextualNudgeType =
   | 'sunday_plan_ritual'
   | 'weekday_dinner_reminder'
   | 'weekly_savings_recap'
+  | 'predictive_household_intelligence'
   | 'referral'
 
 export type NudgeVariant = 'info' | 'warning' | 'danger' | 'success' | 'promo'
@@ -122,6 +123,22 @@ export type RetentionState = {
   estimatedSavedThisWeek: number
 }
 
+export type PredictiveInsight = {
+  id: string
+  type:
+    | 'low_pantry'
+    | 'quick_dinner_night'
+    | 'grocery_budget'
+    | 'pantry_expiry'
+    | 'memory'
+  title: string
+  body: string
+  ctaLabel: string
+  ctaHref: string
+  confidence: 'high' | 'medium' | 'low'
+  priority: number
+}
+
 export type DashboardPayload = {
   user: {
     id: string
@@ -144,4 +161,5 @@ export type DashboardPayload = {
   household: { memberCount: number; maxMembers: number }
   limits: UsageLimits
   retention: RetentionState
+  predictiveInsights: PredictiveInsight[]
 }

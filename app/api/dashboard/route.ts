@@ -11,7 +11,9 @@ import type {
   DashboardPayload,
   Leftover,
   Plan,
+  PredictiveInsight,
 } from '@/lib/dashboard/types'
+import { getHouseholdForUser } from '@/lib/family/service'
 
 export async function GET() {
   const supabase = await createClient()
@@ -92,7 +94,7 @@ export async function getDashboardPayload(
     // Honest fallback: no budget data connected yet.
   }
 
-  const household = { memberCount: 1, maxMembers: 6 }
+  const household = await loadHouseholdSummary(userId)
   const scansLimit = plan === 'free' ? 5 : 999
   const scansUsed = await loadScanCount(userId)
   const limits = {
@@ -121,6 +123,15 @@ export async function getDashboardPayload(
     budget.weeklyLimit != null
       ? Math.max(0, budget.weeklyLimit - budget.weekSpent)
       : null
+
+  const predictiveInsights = await loadPredictiveInsights({
+    userId,
+    weekStart,
+    plannedDays,
+    budget,
+    leftovers,
+    now: _now,
+  })
 
   const base: DashboardPayload = {
     user: {
@@ -154,12 +165,225 @@ export async function getDashboardPayload(
     nudge: null,
     household,
     limits,
+    predictiveInsights,
   }
 
   const nudges = buildNudgeCandidates(base)
   base.nudge = pickNudge(nudges)
 
   return base
+}
+
+async function loadHouseholdSummary(userId: string): Promise<DashboardPayload['household']> {
+  const supabase = await createClient()
+
+  try {
+    const household = await getHouseholdForUser(supabase as any, userId)
+    if (!household?.id) return { memberCount: 1, maxMembers: 6 }
+
+    const { count, error } = await supabase
+      .from('household_members')
+      .select('id', { count: 'exact', head: true })
+      .eq('household_id', household.id)
+
+    if (error) return { memberCount: 1, maxMembers: Number(household.max_members ?? 6) || 6 }
+    return {
+      memberCount: Math.max(1, count ?? 1),
+      maxMembers: Number(household.max_members ?? 6) || 6,
+    }
+  } catch {
+    return { memberCount: 1, maxMembers: 6 }
+  }
+}
+
+async function loadPredictiveInsights({
+  userId,
+  weekStart,
+  plannedDays,
+  budget,
+  leftovers,
+  now,
+}: {
+  userId: string
+  weekStart: string
+  plannedDays: number
+  budget: DashboardPayload['budget']
+  leftovers: Leftover[]
+  now: Date
+}): Promise<PredictiveInsight[]> {
+  const [pantryItems, grocerySummary, memoryCount] = await Promise.all([
+    loadPantrySignals(userId),
+    loadGrocerySummary(userId, weekStart),
+    loadMemoryCount(userId),
+  ])
+
+  const insights: PredictiveInsight[] = []
+  const lowStaple = pantryItems.find((item) => {
+    const name = item.name.toLowerCase()
+    return item.quantity <= 1 && /milk|egg|bread|rice|yogurt|cheese|oat|banana/.test(name)
+  })
+  if (lowStaple) {
+    insights.push({
+      id: `low-${lowStaple.id}`,
+      type: 'low_pantry',
+      title: `You may be low on ${lowStaple.name}`,
+      body: `Only ${formatQuantity(lowStaple.quantity, lowStaple.unit)} is logged. Add it before the next grocery handoff or pick a dinner that avoids it.`,
+      ctaLabel: 'Open grocery list',
+      ctaHref: '/grocery-list',
+      confidence: 'medium',
+      priority: 92,
+    })
+  }
+
+  const expiringPantry = pantryItems.find((item) => item.daysUntilExpiry != null && item.daysUntilExpiry <= 2)
+  if (expiringPantry) {
+    insights.push({
+      id: `expiry-${expiringPantry.id}`,
+      type: 'pantry_expiry',
+      title: `Use ${expiringPantry.name} soon`,
+      body: expiringPantry.daysUntilExpiry === 0
+        ? `${expiringPantry.name} expires today. Prioritize it in Tonight or Leftovers before buying more.`
+        : `${expiringPantry.name} expires in ${expiringPantry.daysUntilExpiry} days. MealEase can bias the next plan around it.`,
+      ctaLabel: 'Cook from pantry',
+      ctaHref: '/dashboard/cook',
+      confidence: 'high',
+      priority: 90,
+    })
+  }
+
+  const thursdayIsAhead = now.getDay() <= 4
+  if (thursdayIsAhead && plannedDays < 4) {
+    insights.push({
+      id: 'quick-thursday',
+      type: 'quick_dinner_night',
+      title: 'Thursday should be a quick dinner night',
+      body: 'Your week is not fully planned yet. Reserve one 20-minute meal before the late-week dinner scramble starts.',
+      ctaLabel: 'Plan quick dinner',
+      ctaHref: '/planner?mode=quick',
+      confidence: 'medium',
+      priority: 82,
+    })
+  }
+
+  if (grocerySummary && grocerySummary.totalEstimatedCost > 0) {
+    const budgetLimit = budget.weeklyLimit
+    const pressure =
+      budgetLimit != null && grocerySummary.totalEstimatedCost + budget.weekSpent > budgetLimit
+    insights.push({
+      id: 'grocery-cost',
+      type: 'grocery_budget',
+      title: pressure ? 'Grocery list may push the week over budget' : 'Your grocery cost is ready to compare',
+      body: pressure
+        ? `This list is estimated at $${grocerySummary.totalEstimatedCost.toFixed(0)} before checkout. Compare retailers or swap expensive dinners first.`
+        : `$${grocerySummary.totalEstimatedCost.toFixed(0)} estimated across ${grocerySummary.itemCount} item${grocerySummary.itemCount === 1 ? '' : 's'}, with pantry items deducted where marked.`,
+      ctaLabel: 'Compare stores',
+      ctaHref: '/grocery-list',
+      confidence: 'high',
+      priority: pressure ? 88 : 72,
+    })
+  }
+
+  if (memoryCount > 0) {
+    insights.push({
+      id: 'memory-active',
+      type: 'memory',
+      title: 'Household memory is active',
+      body: `${memoryCount} saved household signal${memoryCount === 1 ? '' : 's'} can guide dinners, grocery choices, timing, and repeats automatically.`,
+      ctaLabel: 'Review household',
+      ctaHref: '/dashboard/household',
+      confidence: 'high',
+      priority: leftovers.length > 0 ? 62 : 70,
+    })
+  }
+
+  return insights
+    .sort((a, b) => b.priority - a.priority)
+    .slice(0, 3)
+}
+
+type PantrySignal = {
+  id: string
+  name: string
+  quantity: number
+  unit: string
+  daysUntilExpiry: number | null
+}
+
+async function loadPantrySignals(userId: string): Promise<PantrySignal[]> {
+  const supabase = await createClient()
+
+  try {
+    const { data, error } = await supabase
+      .from('pantry_items')
+      .select('id, name, quantity, unit, expires_at')
+      .eq('user_id', userId)
+      .order('expires_at', { ascending: true, nullsFirst: false })
+      .limit(30)
+
+    if (error) return []
+    return (data ?? []).map((item: any) => ({
+      id: String(item.id),
+      name: String(item.name ?? 'pantry item'),
+      quantity: Number(item.quantity ?? 1) || 0,
+      unit: String(item.unit ?? 'unit'),
+      daysUntilExpiry: item.expires_at ? getDaysUntilExpiry(String(item.expires_at)) : null,
+    }))
+  } catch {
+    return []
+  }
+}
+
+async function loadGrocerySummary(
+  userId: string,
+  weekStart: string,
+): Promise<{ totalEstimatedCost: number; itemCount: number } | null> {
+  const supabase = await createClient()
+
+  try {
+    const { data: list, error: listError } = await supabase
+      .from('grocery_lists')
+      .select('id, total_estimated_cost')
+      .eq('user_id', userId)
+      .eq('week_start', weekStart)
+      .maybeSingle()
+
+    if (listError || !list?.id) return null
+
+    const { count } = await supabase
+      .from('grocery_items')
+      .select('id', { count: 'exact', head: true })
+      .eq('grocery_list_id', list.id)
+      .eq('user_removed', false)
+
+    return {
+      totalEstimatedCost: Number(list.total_estimated_cost ?? 0) || 0,
+      itemCount: count ?? 0,
+    }
+  } catch {
+    return null
+  }
+}
+
+async function loadMemoryCount(userId: string): Promise<number> {
+  const supabase = await createClient()
+
+  try {
+    const { count, error } = await supabase
+      .from('household_memory_items')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
+
+    if (error) return 0
+    return count ?? 0
+  } catch {
+    return 0
+  }
+}
+
+function formatQuantity(quantity: number, unit: string): string {
+  const rounded = Number.isInteger(quantity) ? quantity.toFixed(0) : quantity.toFixed(1)
+  return `${rounded} ${unit}`.trim()
 }
 
 function getWeekStartDate(now = new Date()): string {

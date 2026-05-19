@@ -15,6 +15,7 @@ import { NextBestActionCard } from '@/components/dashboard/NextBestActionCard'
 import { WeeklyImpactCard } from '@/components/dashboard/WeeklyImpactCard'
 import { PredictiveIntelligenceCard } from '@/components/dashboard/PredictiveIntelligenceCard'
 import { AutonomousActionsCard } from '@/components/dashboard/AutonomousActionsCard'
+import { DashboardSupportLine } from '@/components/dashboard/DashboardSupportLine'
 import { WeeklyReminderNudge } from '@/components/shared/SaveReminderCard'
 import { StaggerGroup } from '@/components/motion'
 import type { DashboardPayload } from '@/lib/dashboard/types'
@@ -118,6 +119,8 @@ export function NewDashboardClient({ initial }: { initial: DashboardPayload }) {
         )}
 
         <GreetingHeader firstName={displayUser.firstName} budget={budget} />
+
+        <DashboardSupportLine />
 
         <StaggerGroup className="grid xl:grid-cols-[minmax(0,1fr)_22rem] gap-4 md:gap-6 items-start" staggerDelay={0.1}>
           <div>

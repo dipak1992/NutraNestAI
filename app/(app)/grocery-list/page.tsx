@@ -385,6 +385,46 @@ export default function GroceryListPage() {
         </div>
       )}
 
+      {!regionLoading && (!groceryList || groceryList.items.length === 0) && (
+        <section
+          aria-label="Grocery commerce preview"
+          className="rounded-2xl border border-orange-100 bg-gradient-to-br from-orange-50/80 via-white to-emerald-50/70 px-4 py-4 shadow-sm dark:border-neutral-800 dark:from-neutral-950 dark:via-neutral-950 dark:to-emerald-950/20"
+        >
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-start gap-3">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white text-[#D97757] ring-1 ring-orange-100 dark:bg-neutral-900 dark:ring-neutral-800">
+                <ShoppingCart className="h-5 w-5" />
+              </span>
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#B9603D]">
+                  Grocery commerce ready
+                </p>
+                <h2 className="mt-1 text-sm font-bold text-neutral-950 dark:text-neutral-50">
+                  Build a list and MealEase will compare supported grocery handoffs.
+                </h2>
+                <p className="mt-1 max-w-2xl text-xs leading-relaxed text-neutral-600 dark:text-neutral-400">
+                  Once your plan has ingredients, this page shows provider options, estimated totals, handoff quality, copy-list fallback, and household sync in one place.
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Link
+                href="/plan"
+                className="inline-flex items-center justify-center rounded-full bg-neutral-950 px-3.5 py-2 text-xs font-bold text-white transition hover:bg-neutral-800 dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-200"
+              >
+                Plan meals
+              </Link>
+              <Link
+                href="/dashboard/cook"
+                className="inline-flex items-center justify-center rounded-full bg-white px-3.5 py-2 text-xs font-bold text-neutral-800 ring-1 ring-orange-100 transition hover:ring-orange-200 dark:bg-neutral-900 dark:text-neutral-100 dark:ring-neutral-800"
+              >
+                Scan fridge
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
+
       {workspace && groceryList && (
         <section className="rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50/70 to-white px-4 py-3 shadow-sm dark:border-emerald-900/40 dark:from-emerald-950/20 dark:to-neutral-950">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

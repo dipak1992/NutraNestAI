@@ -25,7 +25,44 @@ export function AutonomousActionsCard({ actions }: Props) {
   const [pendingId, setPendingId] = useState<string | null>(null)
   const visibleActions = actions.filter((action) => !hiddenIds.has(action.id))
 
-  if (visibleActions.length === 0) return null
+  if (visibleActions.length === 0) {
+    return (
+      <section
+        aria-label="Autonomous Food OS actions"
+        className="rounded-2xl border border-neutral-200 bg-neutral-950 p-4 text-white shadow-sm"
+      >
+        <div className="flex items-start gap-3">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-orange-200 ring-1 ring-white/10">
+            <CalendarClock className="h-5 w-5" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-orange-200">
+              Autonomous Food OS
+            </p>
+            <h2 className="mt-1 text-sm font-bold">No automatic adjustments are needed yet.</h2>
+            <p className="mt-1 text-xs leading-relaxed text-neutral-300">
+              Once MealEase sees your plan, groceries, leftovers, budget, and household rhythm, it can propose controlled fixes like rescuing expiring food or rebalancing an expensive week.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Link
+                href="/plan"
+                className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-bold text-neutral-950 transition hover:bg-neutral-100"
+              >
+                Build week
+                <ArrowRight className="h-3 w-3" />
+              </Link>
+              <Link
+                href="/grocery-list"
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/15 px-3 py-1.5 text-xs font-bold text-neutral-200 transition hover:bg-white/10"
+              >
+                Check groceries
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+    )
+  }
 
   const primary = visibleActions[0]
   const Icon = ICONS[primary.actionType]

@@ -16,8 +16,6 @@ export function WeeklyImpactCard({ retention }: Props) {
     retention.plannedDays > 0 ||
     retention.behaviorSignalsLearned > 0
 
-  if (!hasImpact) return null
-
   return (
     <section
       aria-label="Weekly food impact"
@@ -28,8 +26,15 @@ export function WeeklyImpactCard({ retention }: Props) {
           Money-saving infrastructure
         </p>
         <h2 className="mt-1 font-serif text-xl font-bold text-neutral-950">
-          MealEase tracks the food decisions that protect your budget over time.
+          {hasImpact
+            ? 'MealEase tracks the food decisions that protect your budget over time.'
+            : 'Start a weekly loop that shows what MealEase saves, reuses, and learns.'}
         </h2>
+        {!hasImpact && (
+          <p className="mt-1 text-xs leading-relaxed text-neutral-600">
+            Plan a few dinners, reuse leftovers, or prepare a grocery handoff and this card becomes your weekly food ROI summary.
+          </p>
+        )}
       </div>
 
       <div className="grid gap-2 sm:grid-cols-3 md:min-w-[27rem]">
@@ -51,17 +56,21 @@ export function WeeklyImpactCard({ retention }: Props) {
         />
         <ImpactMetric
           icon={Brain}
-          label="Signals learned"
+          label={hasImpact ? 'Signals learned' : 'Memory ready'}
           value={String(retention.behaviorSignalsLearned)}
-          sublabel={`${retention.leftoverMealsReusedThisWeek} leftover reuse${retention.leftoverMealsReusedThisWeek === 1 ? '' : 's'} logged`}
+          sublabel={
+            hasImpact
+              ? `${retention.leftoverMealsReusedThisWeek} leftover reuse${retention.leftoverMealsReusedThisWeek === 1 ? '' : 's'} logged`
+              : 'preferences, budget, and timing'
+          }
         />
       </div>
 
       <Link
-        href="/budget?tab=swaps"
+        href={hasImpact ? '/budget?tab=swaps' : '/plan'}
         className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 hover:underline md:col-span-2"
       >
-        Keep the streak going
+        {hasImpact ? 'Keep the streak going' : 'Plan the first week'}
         <ArrowRight className="h-3.5 w-3.5" />
       </Link>
     </section>

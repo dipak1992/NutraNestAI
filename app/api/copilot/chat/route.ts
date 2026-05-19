@@ -33,6 +33,7 @@ import {
 import { buildConversationMemory, shouldResetCopilotSession } from '@/lib/copilot/session'
 import { recordCopilotLearning } from '@/lib/copilot/learning'
 import { buildPlanRefinement, type PlanRefinementRequest } from '@/lib/copilot/plan-refinement'
+import { inferMemoryType, saveHouseholdMemory } from '@/lib/ai/stateful-memory'
 import {
   clearWeeklyInstructions,
   extractWeeklyInstruction,
@@ -205,18 +206,29 @@ async function executeFunctionCall(
       if (!preference) return { result: 'Tell me the preference you want saved and I’ll remember it for Plus planning.' }
 
       try {
-        await recordCopilotLearning(
-          await createClient(),
-          userId,
-          `${category}: ${preference}`,
-          `tool:${Date.now()}`,
-        )
+        const supabase = await createClient()
+        const memoryType = inferMemoryType(category, preference)
+        await Promise.all([
+          saveHouseholdMemory(supabase, userId, {
+            memoryType,
+            subject: preference,
+            details: { category, raw: preference },
+            source: 'copilot',
+            strength: memoryType.endsWith('_inventory') ? 0.9 : 0.75,
+          }),
+          recordCopilotLearning(
+            supabase,
+            userId,
+            `${category}: ${preference}`,
+            `tool:${Date.now()}`,
+          ),
+        ])
       } catch {
         return { result: 'I could not save that preference yet, but I can still use it in this conversation.' }
       }
 
       return {
-        result: `Saved for future planning: ${preference}. I’ll use that when shaping dinners, swaps, and weekly plans.`,
+        result: `Saved for future planning: ${preference}. I’ll use that persistent memory when shaping dinners, swaps, weekly plans, and use-soon inventory picks.`,
         action: { type: 'toast', payload: { message: 'Copilot memory saved' } },
       }
     }

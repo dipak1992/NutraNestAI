@@ -22,6 +22,14 @@ import {
 } from './catalog'
 import { getCrossFeatureSignals, applyCrossFeatureFilter } from '@/lib/ai/cross-feature'
 import { loadActiveWeeklyInstructions, type WeeklyInstruction } from '@/lib/copilot/weekly-instructions'
+import { loadHouseholdMemory, type HouseholdMemoryItem } from '@/lib/ai/stateful-memory'
+
+type PantryDetail = {
+  name: string
+  expiresInDays: number | null
+  ageDays: number
+  isAging: boolean
+}
 
 // ─── LANDING PAGE ENGINE ────────────────────────────────────────────────────────
 
@@ -76,14 +84,17 @@ type PersonalizationContext = {
   cuisines: string[]
   goals: string[]
   pantry: string[]
+  pantryDetails: PantryDetail[]
   groceryItems: string[]
   leftovers: string[]
+  urgentLeftovers: string[]
   savedMeals: string[]
   dislikes: string[]
   weeklyBudget: number | null
   weekSpent: number
   maxCookTimeMin: number | null
   weeklyInstructions: WeeklyInstruction[]
+  memory: HouseholdMemoryItem[]
 }
 
 /** Convert CuratedMeal → TonightState for dashboard consumption */
@@ -326,7 +337,27 @@ function personalizeSelection(
     }
   }
 
-  // Priority 0: Weekly instruction cuisine — if set, try to match before other signals
+  // Priority 0: Stateful use-soon inventory — clear expiring/aging food before generic preferences
+  const useSoonIngredients = getUseSoonIngredients(context)
+  if (useSoonIngredients.length > 0) {
+    const memoryMatch = findIngredientMatch(pantryPreferredPool, useSoonIngredients)
+    if (memoryMatch) {
+      const usesLeftover = context.urgentLeftovers
+        .map((item) => item.toLowerCase())
+        .some((item) => item.includes(memoryMatch.matched) || memoryMatch.matched.includes(item))
+
+      return {
+        meal: memoryMatch.meal,
+        reason: `Clears ${memoryMatch.matched} from your remembered use-soon inventory before it goes to waste.`,
+        isFromPantry: true,
+        usesLeftover: usesLeftover
+          ? { leftoverId: 'stateful-memory', leftoverName: memoryMatch.matched }
+          : null,
+      }
+    }
+  }
+
+  // Priority 1: Weekly instruction cuisine — if set, try to match before other signals
   if (context.cuisines && context.cuisines.length > 0) {
     const cuisineMatch = findCuisineMatch(pantryPreferredPool, context.cuisines)
     if (cuisineMatch) {
@@ -339,7 +370,7 @@ function personalizeSelection(
     }
   }
 
-  // Priority 1: Use leftovers — highest value signal
+  // Priority 2: Use leftovers — highest value signal
   if (context.leftovers.length > 0) {
     const leftoverMatch = findIngredientMatch(pantryPreferredPool, context.leftovers)
     if (leftoverMatch) {
@@ -352,7 +383,7 @@ function personalizeSelection(
     }
   }
 
-  // Priority 2: Match pantry ingredients
+  // Priority 3: Match pantry ingredients
   if (context.pantry.length > 0) {
     const pantryMatch = findIngredientMatch(pantryPreferredPool, context.pantry)
     if (pantryMatch) {
@@ -365,7 +396,7 @@ function personalizeSelection(
     }
   }
 
-  // Priority 3: Match grocery items already bought
+  // Priority 4: Match grocery items already bought
   if (context.groceryItems.length > 0) {
     const groceryMatch = findIngredientMatch(pantryPreferredPool, context.groceryItems)
     if (groceryMatch) {
@@ -378,7 +409,7 @@ function personalizeSelection(
     }
   }
 
-  // Priority 4: Budget constraint — if over 80% of weekly budget, pick cheapest
+  // Priority 5: Budget constraint — if over 80% of weekly budget, pick cheapest
   if (context.weeklyBudget != null && context.weeklyBudget > 0) {
     const budgetRemaining = context.weeklyBudget - context.weekSpent
     const perMealBudget = context.weeklyBudget / 7
@@ -495,6 +526,82 @@ function findIngredientMatch(
   return null
 }
 
+function getUseSoonIngredients(context: PersonalizationContext): string[] {
+  const urgentLeftovers = context.urgentLeftovers
+  const agingPantry = context.pantryDetails
+    .filter((item) => item.isAging || (item.expiresInDays != null && item.expiresInDays <= 3))
+    .sort((a, b) => {
+      const aExpiry = a.expiresInDays ?? 999
+      const bExpiry = b.expiresInDays ?? 999
+      return aExpiry - bExpiry || b.ageDays - a.ageDays
+    })
+    .map((item) => item.name)
+
+  const rememberedInventory = context.memory
+    .filter((item) => item.memoryType === 'pantry_inventory' || item.memoryType === 'leftover_inventory')
+    .flatMap((item) => splitInventorySubject(item.subject))
+
+  return uniqueStrings([
+    ...urgentLeftovers,
+    ...rememberedInventory,
+    ...agingPantry,
+  ]).slice(0, 16)
+}
+
+function splitInventorySubject(subject: string): string[] {
+  return subject
+    .replace(/\bleftover\b/gi, '')
+    .replace(/\bgoing soft\b/gi, '')
+    .replace(/\buse up\b/gi, '')
+    .split(/,|\band\b|\+|\/|with/i)
+    .map((item) => item.trim())
+    .filter((item) => item.length >= 3)
+}
+
+function uniqueStrings(values: string[]): string[] {
+  const seen = new Set<string>()
+  const result: string[] = []
+  for (const value of values) {
+    const trimmed = value.trim()
+    const key = trimmed.toLowerCase()
+    if (!trimmed || seen.has(key)) continue
+    seen.add(key)
+    result.push(trimmed)
+  }
+  return result
+}
+
+function buildPantryDetail(row: Record<string, unknown>): PantryDetail | null {
+  const name = typeof row.name === 'string' ? row.name.trim() : ''
+  if (!name) return null
+
+  const now = Date.now()
+  const createdAt = typeof row.created_at === 'string'
+    ? new Date(row.created_at).getTime()
+    : now
+  const ageDays = Math.max(0, Math.floor((now - createdAt) / 86400000))
+  const expiresAt = typeof row.expires_at === 'string' && row.expires_at
+    ? new Date(row.expires_at).getTime()
+    : null
+  const expiresInDays = expiresAt == null
+    ? null
+    : Math.max(0, Math.ceil((expiresAt - now) / 86400000))
+
+  return {
+    name,
+    expiresInDays,
+    ageDays,
+    isAging: ageDays >= 5,
+  }
+}
+
+function expiresWithinDays(value: string | null | undefined, days: number): boolean {
+  if (!value) return false
+  const expiresAt = new Date(value).getTime()
+  if (!Number.isFinite(expiresAt)) return false
+  return expiresAt <= Date.now() + days * 86400000
+}
+
 function findDietaryMatch(pool: CuratedMeal[], dietary: string[]): CuratedMeal | null {
   const lowerDietary = dietary.map((d) => d.toLowerCase())
 
@@ -532,14 +639,17 @@ async function loadPersonalizationContext(
     cuisines: [],
     goals: [],
     pantry: [],
+    pantryDetails: [],
     groceryItems: [],
     leftovers: [],
+    urgentLeftovers: [],
     savedMeals: [],
     dislikes: [],
     weeklyBudget: null,
     weekSpent: 0,
     maxCookTimeMin: null,
     weeklyInstructions: [],
+    memory: [],
   }
 
   // ── Load preferences — try household_preferences first (written by onboarding) ──
@@ -647,24 +757,41 @@ async function loadPersonalizationContext(
     context.weekSpent = typeof weekRow?.spent === 'number' ? weekRow.spent : 0
   }
 
-  // ── Load household pantry ──
+  // ── Durable memory — long-lived facts Copilot saved across sessions ──
+  context.memory = await loadHouseholdMemory(supabase, userId).catch(() => [])
+
+  // ── Load user pantry with expiry/age metadata ──
+  const { data: userPantry } = await supabase
+    .from('pantry_items')
+    .select('name, expires_at, created_at, updated_at')
+    .eq('user_id', userId)
+    .limit(50)
+
+  context.pantryDetails = ((userPantry ?? [])
+    .map((item) => buildPantryDetail(item as Record<string, unknown>))
+    .filter((item: PantryDetail | null): item is PantryDetail => item !== null)) as PantryDetail[]
+  context.pantry = context.pantryDetails.map((item: PantryDetail) => item.name)
+
+  // ── Load household pantry fallback ──
   const { data: household } = await supabase
     .from('households')
     .select('id')
     .eq('owner_id', userId)
     .maybeSingle()
 
-  if (household?.id) {
+  if (household?.id && context.pantry.length === 0) {
     const { data: pantry } = await supabase
       .from('pantry_items')
       .select('name')
       .eq('household_id', household.id)
       .limit(30)
     context.pantry = (pantry ?? []).map((item) => item.name as string).filter(Boolean)
+  }
 
+  if (household?.id) {
     const { data: leftovers } = await supabase
       .from('leftovers')
-      .select('display_name, main_ingredients')
+      .select('display_name, main_ingredients, expires_at')
       .eq('household_id', household.id)
       .eq('status', 'active')
       .limit(10)
@@ -672,13 +799,20 @@ async function loadPersonalizationContext(
       item.display_name as string,
       ...(Array.isArray(item.main_ingredients) ? (item.main_ingredients as string[]) : []),
     ]).filter(Boolean)
+    context.urgentLeftovers = (leftovers ?? [])
+      .filter((item) => expiresWithinDays(item.expires_at as string | null | undefined, 2))
+      .flatMap((item) => [
+        item.display_name as string,
+        ...(Array.isArray(item.main_ingredients) ? (item.main_ingredients as string[]) : []),
+      ])
+      .filter(Boolean)
   }
 
   // ── Fallback: user-level leftovers ──
   if (context.leftovers.length === 0) {
     const { data: leftovers } = await supabase
       .from('leftovers')
-      .select('name, main_ingredients')
+      .select('name, main_ingredients, expires_at')
       .eq('user_id', userId)
       .eq('status', 'active')
       .limit(10)
@@ -686,6 +820,13 @@ async function loadPersonalizationContext(
       item.name as string,
       ...(Array.isArray(item.main_ingredients) ? (item.main_ingredients as string[]) : []),
     ]).filter(Boolean)
+    context.urgentLeftovers = (leftovers ?? [])
+      .filter((item) => expiresWithinDays(item.expires_at as string | null | undefined, 2))
+      .flatMap((item) => [
+        item.name as string,
+        ...(Array.isArray(item.main_ingredients) ? (item.main_ingredients as string[]) : []),
+      ])
+      .filter(Boolean)
   }
 
   // ── Load grocery list items (things already bought / on list) ──

@@ -189,7 +189,7 @@ export const COPILOT_TOOLS: ChatCompletionTool[] = [
           },
           category: {
             type: 'string',
-            enum: ['like', 'dislike', 'schedule', 'budget', 'cooking_time', 'household_rule'],
+            enum: ['like', 'dislike', 'schedule', 'budget', 'cooking_time', 'allergy', 'calorie_goal', 'household_rule', 'pantry_inventory', 'leftover_inventory'],
             description: 'The type of household memory',
           },
         },

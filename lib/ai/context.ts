@@ -18,8 +18,16 @@ import {
   loadActiveWeeklyInstructions,
   type WeeklyInstruction,
 } from '@/lib/copilot/weekly-instructions'
+import { loadHouseholdMemory, type HouseholdMemoryItem } from '@/lib/ai/stateful-memory'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
+
+type PantryDetail = {
+  name: string
+  expiresInDays: number | null
+  ageDays: number
+  isAging: boolean
+}
 
 export interface UserContext {
   userId: string
@@ -47,6 +55,9 @@ export interface UserContext {
 
   /** Pantry items available (no need to buy) */
   pantry: string[]
+
+  /** Pantry with expiry/age metadata for stateful inventory decisions */
+  pantryDetails: PantryDetail[]
 
   /** Active leftovers with expiry info */
   leftovers: Array<{
@@ -80,6 +91,9 @@ export interface UserContext {
 
   /** Temporary current-week Copilot instructions */
   weeklyInstructions: WeeklyInstruction[]
+
+  /** Durable remembered household facts and inventory notes */
+  memory: HouseholdMemoryItem[]
 
   /** Seasonal context */
   season: {
@@ -169,6 +183,7 @@ export async function buildUserContext(
     weekPlanResult,
     dietaryPrefsResult,
     weeklyInstructionsResult,
+    memoryResult,
   ] = await Promise.allSettled([
     // 1. Household preferences
     supabase
@@ -195,7 +210,7 @@ export async function buildUserContext(
     // 4. Pantry items
     supabase
       .from('pantry_items')
-      .select('name')
+      .select('name, expires_at, created_at, updated_at')
       .eq('user_id', userId)
       .limit(maxPantryItems),
 
@@ -253,6 +268,8 @@ export async function buildUserContext(
     includeWeeklyInstructions
       ? loadActiveWeeklyInstructions(supabase, userId)
       : Promise.resolve([]),
+
+    loadHouseholdMemory(supabase, userId),
   ])
 
   // ── Extract results safely ────────────────────────────────────────────────
@@ -268,6 +285,7 @@ export async function buildUserContext(
   const weekPlanRows = extractResult(weekPlanResult)?.data ?? []
   const dietaryPrefsRow = extractResult(dietaryPrefsResult)?.data
   const weeklyInstructions = extractResult(weeklyInstructionsResult) ?? []
+  const memory = extractResult(memoryResult) ?? []
 
   // ── Build household context ───────────────────────────────────────────────
 
@@ -374,6 +392,10 @@ export async function buildUserContext(
 
   // ── Assemble final context ────────────────────────────────────────────────
 
+  const pantryDetails: PantryDetail[] = pantryRows
+    .map((row: Record<string, unknown>) => buildPantryDetail(row, now))
+    .filter((item: PantryDetail | null): item is PantryDetail => item !== null)
+
   const ctx: UserContext = {
     userId,
     household: {
@@ -393,13 +415,15 @@ export async function buildUserContext(
       spentThisWeek,
       remainingBudget,
     },
-    pantry: pantryRows.map((r: Record<string, unknown>) => r.name as string).filter(Boolean),
+    pantry: pantryDetails.map((item: PantryDetail) => item.name),
+    pantryDetails,
     leftovers,
     groceryItems: groceryRows.map((r: Record<string, unknown>) => r.name as string).filter(Boolean),
     savedMeals: savedRows.map((r: Record<string, unknown>) => r.title as string).filter(Boolean),
     learning,
     weekPlan,
     weeklyInstructions,
+    memory,
     season: getSeasonContext(),
     builtAt: Date.now(),
   }
@@ -469,6 +493,12 @@ export function formatContextForPrompt(ctx: UserContext): string {
   if (ctx.pantry.length > 0) {
     lines.push('')
     lines.push(`Pantry staples (no need to buy): ${ctx.pantry.join(', ')}`)
+    const aging = ctx.pantryDetails
+      .filter((item) => item.isAging || (item.expiresInDays != null && item.expiresInDays <= 3))
+      .slice(0, 8)
+    if (aging.length > 0) {
+      lines.push(`Use-soon pantry: ${aging.map((item) => item.expiresInDays == null ? item.name : `${item.name} (${item.expiresInDays}d)`).join(', ')}`)
+    }
   }
 
   // Leftovers
@@ -520,6 +550,17 @@ export function formatContextForPrompt(ctx: UserContext): string {
     lines.push(`Recently saved meals (they liked these): ${ctx.savedMeals.join(', ')}`)
   }
 
+  const durableMemory = ctx.memory.filter((item) => !item.memoryType.endsWith('_inventory')).slice(0, 8)
+  if (durableMemory.length > 0) {
+    lines.push('')
+    lines.push(`Durable household memory: ${durableMemory.map((item) => `${item.memoryType}: ${item.subject}`).join('; ')}`)
+  }
+
+  const inventoryMemory = ctx.memory.filter((item) => item.memoryType.endsWith('_inventory')).slice(0, 8)
+  if (inventoryMemory.length > 0) {
+    lines.push(`Remembered inventory notes: ${inventoryMemory.map((item) => item.subject).join('; ')}`)
+  }
+
   // Season
   lines.push('')
   lines.push(`Season: ${ctx.season.name} — ${ctx.season.hint}`)
@@ -551,11 +592,17 @@ export function formatCompactContext(ctx: UserContext): string {
   if (ctx.household.lowEnergyMode) parts.push('LOW-ENERGY')
   if (ctx.budget.weeklyLimit) parts.push(`Budget: $${ctx.budget.remainingBudget?.toFixed(0) ?? '?'} left`)
   if (ctx.pantry.length) parts.push(`Pantry: ${ctx.pantry.slice(0, 10).join(',')}`)
+  const agingPantry = ctx.pantryDetails.filter((item) => item.isAging || (item.expiresInDays != null && item.expiresInDays <= 3)).slice(0, 6)
+  if (agingPantry.length) parts.push(`Use soon: ${agingPantry.map((item) => item.name).join(',')}`)
   if (ctx.leftovers.length) {
     const urgent = ctx.leftovers.filter(l => l.expiresInDays <= 2)
     if (urgent.length) parts.push(`URGENT leftovers: ${urgent.map(l => l.name).join(',')}`)
   }
   if (ctx.learning?.topCuisines.length) parts.push(`Likes: ${ctx.learning.topCuisines.join(',')}`)
+  const rememberedInventory = ctx.memory.filter((item) => item.memoryType.endsWith('_inventory')).slice(0, 5)
+  if (rememberedInventory.length) parts.push(`Remembered inventory: ${rememberedInventory.map((item) => item.subject).join(',')}`)
+  const durableMemory = ctx.memory.filter((item) => !item.memoryType.endsWith('_inventory')).slice(0, 5)
+  if (durableMemory.length) parts.push(`Memory: ${durableMemory.map((item) => `${item.memoryType}:${item.subject}`).join(',')}`)
   parts.push(`Season: ${ctx.season.name}`)
 
   return parts.join(' | ')
@@ -573,6 +620,29 @@ function getWeekStartDate(): string {
 function safeArray(val: unknown): string[] {
   if (Array.isArray(val)) return val.filter(Boolean) as string[]
   return []
+}
+
+function buildPantryDetail(row: Record<string, unknown>, nowMs: number): PantryDetail | null {
+  const name = typeof row.name === 'string' ? row.name.trim() : ''
+  if (!name) return null
+
+  const createdAt = typeof row.created_at === 'string'
+    ? new Date(row.created_at).getTime()
+    : nowMs
+  const ageDays = Math.max(0, Math.floor((nowMs - createdAt) / 86400000))
+  const expiresAt = typeof row.expires_at === 'string' && row.expires_at
+    ? new Date(row.expires_at).getTime()
+    : null
+  const expiresInDays = expiresAt == null
+    ? null
+    : Math.max(0, Math.ceil((expiresAt - nowMs) / 86400000))
+
+  return {
+    name,
+    expiresInDays,
+    ageDays,
+    isAging: ageDays >= 5,
+  }
 }
 
 function topKeys(record: Record<string, number> | undefined | null, n: number): string[] {

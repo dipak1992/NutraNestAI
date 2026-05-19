@@ -7,10 +7,11 @@ import type { GroceryProvider, ProviderId, DetectedRegion, SupportedCountry } fr
 import { walmartUS } from './walmart'
 import { walmartCA } from './walmart-canada'
 import { instacart } from './instacart'
+import { amazonFresh } from './amazon-fresh'
 import { kroger } from './kroger'
 
 /** All registered providers */
-const ALL_PROVIDERS: GroceryProvider[] = [walmartUS, walmartCA, instacart, kroger]
+const ALL_PROVIDERS: GroceryProvider[] = [walmartUS, walmartCA, instacart, amazonFresh, kroger]
 
 /** Provider map for O(1) lookup */
 const PROVIDER_MAP = new Map<ProviderId, GroceryProvider>(

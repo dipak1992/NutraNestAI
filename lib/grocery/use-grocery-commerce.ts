@@ -92,7 +92,7 @@ export function useGroceryCommerce(
 
     const cartItems = buildProviderCartItems(groceryList)
     const useSingleItemFallback = cartItems.length > LARGE_LIST_THRESHOLD
-    const url = useSingleItemFallback
+    const fallbackUrl = useSingleItemFallback
       ? buildSingleItemSearchUrl(provider, cartItems[0])
       : buildProviderSearchUrl(provider, cartItems)
     void copyGroceryList(groceryList).then((copied) => {
@@ -109,12 +109,31 @@ export function useGroceryCommerce(
         },
       )
     })
+    void fetch('/api/grocery/handoff', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        providerId,
+        weekStart: groceryList.weekStart,
+        groceryList,
+      }),
+    })
+      .then(async (res) => {
+        if (!res.ok) return null
+        return res.json() as Promise<{ url?: string }>
+      })
+      .then((data) => {
+        if (data?.url && data.url !== fallbackUrl) {
+          window.open(data.url, '_blank', 'noopener,noreferrer')
+        }
+      })
+      .catch(() => {})
     void fetch('/api/budget', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ preferredStore: provider.displayName }),
     }).catch(() => {})
-    window.open(url, '_blank', 'noopener,noreferrer')
+    window.open(fallbackUrl, '_blank', 'noopener,noreferrer')
   }, [groceryList, providers, region])
 
   const copyList = useCallback(async () => {

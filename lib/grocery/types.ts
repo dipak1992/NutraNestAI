@@ -13,7 +13,7 @@ export type DetectedRegion = SupportedCountry | 'OTHER'
 export type FulfillmentType = 'pickup' | 'delivery' | 'both'
 
 /** Provider identifier */
-export type ProviderId = 'walmart_us' | 'walmart_ca' | 'instacart' | 'kroger'
+export type ProviderId = 'walmart_us' | 'walmart_ca' | 'instacart' | 'amazon_fresh' | 'kroger'
 
 /** Provider definition */
 export interface GroceryProvider {

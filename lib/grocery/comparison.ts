@@ -79,6 +79,9 @@ function appendAffiliateParams(url: string, providerId: GroceryProvider['id']): 
     params.set('veh', 'aff')
     params.set('affiliates_ad_id', process.env.NEXT_PUBLIC_WALMART_AFFILIATE_ID)
   }
+  if (providerId === 'amazon_fresh' && process.env.NEXT_PUBLIC_AMAZON_AFFILIATE_ID) {
+    params.set('tag', process.env.NEXT_PUBLIC_AMAZON_AFFILIATE_ID)
+  }
   if (providerId === 'kroger' && process.env.NEXT_PUBLIC_KROGER_AFFILIATE_ID) {
     params.set('cid', process.env.NEXT_PUBLIC_KROGER_AFFILIATE_ID)
   }
@@ -86,6 +89,8 @@ function appendAffiliateParams(url: string, providerId: GroceryProvider['id']): 
     const missingEnv =
       providerId === 'instacart'
         ? 'NEXT_PUBLIC_INSTACART_AFFILIATE_ID'
+        : providerId === 'amazon_fresh'
+          ? 'NEXT_PUBLIC_AMAZON_AFFILIATE_ID'
         : providerId === 'kroger'
           ? 'NEXT_PUBLIC_KROGER_AFFILIATE_ID'
           : providerId === 'walmart_us' || providerId === 'walmart_ca'
@@ -118,6 +123,10 @@ function buildCombinedProviderQuery(
 
   if (provider.id === 'kroger') {
     return selected.join(', ')
+  }
+
+  if (provider.id === 'amazon_fresh') {
+    return selected.join(' ')
   }
 
   return selected.join(', ')

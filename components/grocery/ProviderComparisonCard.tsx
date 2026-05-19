@@ -135,6 +135,9 @@ function providerCtaLabel(estimate: ProviderEstimate): string {
   if (estimate.providerId === 'instacart') {
     return 'Open in Instacart'
   }
+  if (estimate.providerId === 'amazon_fresh') {
+    return 'Open Amazon Fresh'
+  }
   if (estimate.providerId === 'kroger') {
     return 'Search at Kroger'
   }

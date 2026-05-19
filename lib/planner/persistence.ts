@@ -3,6 +3,7 @@ import type { GroceryLine, GroceryList, WeeklyPlan } from './types'
 
 type PersistInput = {
   userId: string
+  householdId?: string | null
   weekStart: string
   plan?: unknown
   groceryList?: unknown
@@ -103,13 +104,15 @@ export async function persistNormalizedPlanAndGrocery(
     .from('grocery_lists')
     .upsert(
       {
-        user_id: input.userId,
-        meal_plan_id: mealPlanId,
+          user_id: input.userId,
+          household_id: input.householdId ?? null,
+          meal_plan_id: mealPlanId,
         week_start: input.weekStart,
         status: 'active',
         store_format: normalizedList.storeFormat,
-        total_estimated_cost: toNumber(normalizedList.totalEstimatedCost),
-        generated_at: normalizedList.generatedAt,
+          total_estimated_cost: toNumber(normalizedList.totalEstimatedCost),
+          updated_by: input.userId,
+          generated_at: normalizedList.generatedAt,
         updated_at: new Date().toISOString(),
       },
       { onConflict: 'user_id,week_start' },

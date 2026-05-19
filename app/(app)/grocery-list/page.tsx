@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { ShoppingCart, Lock, Globe, ChevronDown, Calendar, Utensils, AlertTriangle, RefreshCw } from 'lucide-react'
+import { ShoppingCart, Lock, Globe, ChevronDown, Calendar, Utensils, AlertTriangle, RefreshCw, Users, CheckCircle2 } from 'lucide-react'
 import { GroceryListPanel } from '@/components/grocery/GroceryListPanel'
 import { ProviderComparisonCard } from '@/components/grocery/ProviderComparisonCard'
 import { GroceryExportActions } from '@/components/grocery/GroceryExportActions'
@@ -20,6 +20,17 @@ const REGION_OPTIONS: { value: DetectedRegion; label: string; flag: string }[] =
   { value: 'CA', label: 'Canada', flag: '🇨🇦' },
   { value: 'OTHER', label: 'Other region', flag: '🌍' },
 ]
+
+type WorkspaceSummary = {
+  household: { name?: string; currentUserRole?: string } | null
+  members: Array<{ id: string; first_name?: string | null; member_name?: string | null; role?: string | null }>
+  coordination: {
+    approvalCount: number
+    changeRequestCount: number
+    lastActivityAt: string | null
+  }
+  handoffs: Array<{ id: string; provider: string; item_count: number; created_at: string }>
+}
 
 export default function GroceryListPage() {
   const { status, loading } = usePaywallStatus()
@@ -44,6 +55,7 @@ export default function GroceryListPage() {
   const [copySuccess, setCopySuccess] = useState(false)
   const [showRegionPicker, setShowRegionPicker] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
+  const [workspace, setWorkspace] = useState<WorkspaceSummary | null>(null)
   const loadedServerState = useRef(false)
   const lastSavedPayload = useRef<string | null>(null)
 
@@ -108,6 +120,24 @@ export default function GroceryListPage() {
       cancelled = true
     }
   }, [loading, plan.weekStart, setGroceryList, setPlan, status.isAuthenticated])
+
+  useEffect(() => {
+    if (!status.isAuthenticated || loading) return
+    let cancelled = false
+
+    void fetch(`/api/family/workspace?weekStart=${encodeURIComponent(plan.weekStart)}`, {
+      cache: 'no-store',
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled) setWorkspace(data)
+      })
+      .catch(() => {})
+
+    return () => {
+      cancelled = true
+    }
+  }, [loading, plan.weekStart, status.isAuthenticated])
 
   useEffect(() => {
     if (!status.isAuthenticated || loading || !loadedServerState.current || !groceryList) return
@@ -355,6 +385,42 @@ export default function GroceryListPage() {
         </div>
       )}
 
+      {workspace && groceryList && (
+        <section className="rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50/70 to-white px-4 py-3 shadow-sm dark:border-emerald-900/40 dark:from-emerald-950/20 dark:to-neutral-950">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
+                <Users className="h-4.5 w-4.5" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-neutral-900 dark:text-neutral-50">
+                  Shared with {workspace.household?.name ?? 'your household'}
+                </p>
+                <p className="mt-0.5 text-xs text-neutral-600 dark:text-neutral-400">
+                  {workspace.members.length || 1} profile{(workspace.members.length || 1) === 1 ? '' : 's'} can coordinate the same list, votes, and grocery handoffs.
+                </p>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-2 text-center sm:min-w-72">
+              <div className="rounded-xl bg-white/75 px-2 py-2 ring-1 ring-emerald-100 dark:bg-neutral-900/70 dark:ring-emerald-900/40">
+                <p className="text-base font-bold text-neutral-900 dark:text-neutral-50">{workspace.coordination.approvalCount}</p>
+                <p className="text-[10px] font-medium text-neutral-500">approvals</p>
+              </div>
+              <div className="rounded-xl bg-white/75 px-2 py-2 ring-1 ring-emerald-100 dark:bg-neutral-900/70 dark:ring-emerald-900/40">
+                <p className="text-base font-bold text-neutral-900 dark:text-neutral-50">{workspace.coordination.changeRequestCount}</p>
+                <p className="text-[10px] font-medium text-neutral-500">requests</p>
+              </div>
+              <div className="rounded-xl bg-white/75 px-2 py-2 ring-1 ring-emerald-100 dark:bg-neutral-900/70 dark:ring-emerald-900/40">
+                <p className="flex items-center justify-center text-base font-bold text-emerald-700 dark:text-emerald-300">
+                  <CheckCircle2 className="h-4 w-4" />
+                </p>
+                <p className="text-[10px] font-medium text-neutral-500">synced</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Export actions — always available when there's a list */}
       {groceryList && groceryList.items.length > 0 && (
         <GroceryExportActions
@@ -381,7 +447,7 @@ export default function GroceryListPage() {
         <div className="rounded-xl bg-neutral-50 dark:bg-neutral-900/50 border border-neutral-100 dark:border-neutral-800 px-4 py-3 text-[11px] text-neutral-400 dark:text-neutral-500 space-y-1">
           <p className="font-medium text-neutral-500 dark:text-neutral-400">ℹ️ About store links</p>
           <p>
-            MealEase is not affiliated with Walmart, Instacart, or Kroger. Clicking &ldquo;Shop&rdquo; opens the
+            MealEase is not affiliated with Walmart, Instacart, Amazon Fresh, or Kroger. Clicking &ldquo;Shop&rdquo; opens the
             retailer&rsquo;s website where you can search for and purchase items directly. MealEase also copies
             your full grocery list when you open a retailer so you have a reliable fallback. Estimated prices
             are approximations and may differ from actual store prices. MealEase does not process payments or

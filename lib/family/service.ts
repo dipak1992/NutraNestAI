@@ -77,8 +77,43 @@ export async function ensureHousehold(supabase: SupabaseLike, userId: string, fa
   return created
 }
 
+export async function getHouseholdForUser(supabase: SupabaseLike, userId: string) {
+  const { data: owned } = await supabase
+    .from('households')
+    .select('id, owner_user_id, name, max_members')
+    .eq('owner_user_id', userId)
+    .maybeSingle()
+
+  if (owned) {
+    return {
+      ...owned,
+      currentUserRole: 'owner' as const,
+      canEdit: true,
+    }
+  }
+
+  const { data: membership } = await supabase
+    .from('household_members')
+    .select('household_id, invite_role, invite_status, households:household_id(id, owner_user_id, name, max_members)')
+    .eq('user_id', userId)
+    .maybeSingle()
+
+  const household = Array.isArray(membership?.households)
+    ? membership?.households[0]
+    : membership?.households
+
+  if (!household) return null
+
+  const role = membership?.invite_role === 'editor' ? 'editor' : 'viewer'
+  return {
+    ...household,
+    currentUserRole: role as 'editor' | 'viewer',
+    canEdit: role === 'editor' && membership?.invite_status !== 'revoked',
+  }
+}
+
 export async function getFamilyMembers(supabase: SupabaseLike, userId: string): Promise<FamilyMemberRecord[]> {
-  const household = await ensureHousehold(supabase, userId)
+  const household = await getHouseholdForUser(supabase, userId) ?? await ensureHousehold(supabase, userId)
 
   const { data, error } = await supabase
     .from('household_members')

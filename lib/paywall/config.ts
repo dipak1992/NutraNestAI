@@ -44,6 +44,20 @@ export const PRO_UNLOCKS = [
 
 export const PRO_ANNUAL_SAVINGS = Math.round((1 - PRICING_TIERS.pro.yearlyPrice / (PRICING_TIERS.pro.monthlyPrice * 12)) * 100) // 34% ($79/yr vs $119.88/yr)
 
+export const ROI_ASSUMPTIONS = {
+  avoidedTakeoutNight: 38,
+  weeklyWasteReduction: 12,
+  monthlyWasteReduction: 48,
+  monthlyBreakEvenEvents: 1,
+} as const
+
+export const ROI_UNLOCKS = [
+  'Avoid one takeout night and Plus can pay for the month',
+  'Use aging pantry and leftovers before they become waste',
+  'Swap expensive dinners before the grocery cart gets painful',
+  'Keep the whole household aligned so duplicate shopping drops',
+] as const
+
 // ── Tier normalization & checks ───────────────────────────────────────────
 
 export function normalizeTier(tier: string | null | undefined): SubscriptionTier {

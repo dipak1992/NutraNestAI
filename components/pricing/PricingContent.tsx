@@ -28,7 +28,7 @@ import {
 import type { LucideIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { usePaywallStatus } from '@/lib/paywall/use-paywall-status'
-import { PRICING_TIERS, PRO_ANNUAL_SAVINGS } from '@/lib/paywall/config'
+import { PRICING_TIERS, PRO_ANNUAL_SAVINGS, ROI_ASSUMPTIONS, ROI_UNLOCKS } from '@/lib/paywall/config'
 import { cn } from '@/lib/utils'
 import { ScrollReveal, StaggerGroup, HoverCard } from '@/components/motion'
 import { Section } from '@/components/ui/Section'
@@ -73,6 +73,7 @@ const REASSURANCE = [
   { icon: Clock, text: '7-day trial' },
   { icon: ShieldCheck, text: 'Cancel anytime' },
   { icon: CheckCircle2, text: 'No card required' },
+  { icon: DollarSign, text: 'Built to offset its cost' },
 ]
 
 const PLAN_COMPARISON = [
@@ -83,13 +84,14 @@ const PLAN_COMPARISON = [
   ['Fridge and pantry scan', 'Basic demo/free usage', 'Higher limits and saved context'],
   ['Household profiles', '1 profile', 'Up to 6 household members'],
   ['Leftovers and budget', 'Limited previews', 'Connected leftovers and budget workflow'],
+  ['Cost recovery', 'You decide manually', 'Use leftovers, pantry, and cheaper swaps to offset Plus'],
 ] as const
 
 const TRUST_NOTES = [
   {
     icon: ShieldCheck,
-    title: 'No-card trial',
-    body: 'Start the 7-day Plus trial without entering payment details. Add billing only when you decide to continue.',
+    title: 'Try it before billing',
+    body: 'Start the 7-day Plus trial without entering payment details. Add billing only when the weekly flow earns its place.',
   },
   {
     icon: LockKeyhole,
@@ -129,13 +131,13 @@ const PLUS_UNLOCKS = [
   },
   {
     icon: Utensils,
-    title: 'Less food waste after cooking',
+    title: 'Recover value from leftovers',
     desc: 'Mark cooked, create leftovers, and get practical next-meal ideas before food disappears in the fridge.',
   },
   {
     icon: DollarSign,
     title: 'Budget decisions before checkout',
-    desc: 'See estimated costs from plans and grocery lists, then swap expensive meals before the cart gets painful.',
+    desc: 'See estimated costs from plans and grocery lists, then swap expensive meals before the cart gets painful or turns into takeout.',
   },
   {
     icon: Bot,
@@ -169,6 +171,10 @@ const FAQ = [
   {
     q: 'Can MealEase help with groceries?',
     a: 'Yes. MealEase turns meal plans into ready-to-shop grocery lists and shopping handoff tools. In supported regions you can use store handoff for Walmart or Instacart; elsewhere you can copy, download PDF, or use the list at your local store.',
+  },
+  {
+    q: 'How can Plus pay for itself?',
+    a: `Plus is designed to recover value from food decisions you already make. Avoiding one expensive takeout night, using leftovers before they expire, or swapping a costly grocery week can offset the subscription cost.`,
   },
   {
     q: 'What is Leftovers AI?',
@@ -309,13 +315,13 @@ export function PricingContent() {
         <div className="relative z-10">
           <ScrollReveal>
             <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-[#FFD2BD] backdrop-blur">
-              Simple pricing · Copilot included
+              Pricing built around recovered food value
             </div>
             <h1 className="mx-auto mt-4 max-w-[300px] font-serif text-4xl font-bold tracking-tight text-white [text-shadow:0_2px_12px_rgba(0,0,0,0.45)] sm:max-w-4xl md:text-5xl">
-              Start free. Try Plus when you want the full week.
+              Plus should pay for itself before it feels like another subscription.
             </h1>
             <p className="mx-auto mt-3 max-w-[280px] text-base text-white/82 sm:max-w-xl sm:text-lg">
-              Free includes 3 Copilot meal assists/day. Plus unlocks weekly briefings, voice, weekly instructions, memory, proactive nudges, and action-taking Copilot.
+              Avoid one takeout night, rescue one week of leftovers, or catch one expensive grocery cart early. That is the business case for MealEase Plus.
             </p>
           </ScrollReveal>
         </div>
@@ -369,6 +375,53 @@ export function PricingContent() {
             )
           })}
         </div>
+      </section>
+
+      {/* ── ROI PROOF ── */}
+      <section className="px-4 pb-8">
+        <ScrollReveal className="mx-auto grid max-w-3xl overflow-hidden rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-[#FDF6F1] shadow-sm shadow-emerald-900/5 dark:border-emerald-900/40 dark:from-emerald-950/20 dark:via-neutral-950 dark:to-neutral-900 md:grid-cols-[0.95fr_1.05fr]">
+          <div className="p-6 sm:p-7">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-700 dark:text-emerald-300">
+              Recouped ROI
+            </p>
+            <h2 className="mt-2 font-serif text-2xl font-bold text-neutral-950 dark:text-neutral-50">
+              One avoided takeout night can cover the month.
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-neutral-600 dark:text-neutral-400">
+              MealEase Plus is priced like a household food tool, not entertainment. The goal is to recover more than it costs through fewer emergency dinners, less wasted food, and smarter grocery swaps.
+            </p>
+          </div>
+          <div className="grid gap-3 border-t border-emerald-100 p-6 dark:border-emerald-900/40 md:border-l md:border-t-0">
+            <div className="grid grid-cols-3 gap-2">
+              <div className="rounded-2xl bg-white p-3 text-center ring-1 ring-emerald-100 dark:bg-neutral-900 dark:ring-emerald-900/40">
+                <p className="font-serif text-2xl font-bold text-neutral-950 dark:text-neutral-50">
+                  ${ROI_ASSUMPTIONS.avoidedTakeoutNight}
+                </p>
+                <p className="mt-1 text-[11px] font-medium leading-4 text-neutral-500">typical avoided takeout</p>
+              </div>
+              <div className="rounded-2xl bg-white p-3 text-center ring-1 ring-emerald-100 dark:bg-neutral-900 dark:ring-emerald-900/40">
+                <p className="font-serif text-2xl font-bold text-neutral-950 dark:text-neutral-50">
+                  ${ROI_ASSUMPTIONS.weeklyWasteReduction}
+                </p>
+                <p className="mt-1 text-[11px] font-medium leading-4 text-neutral-500">weekly waste target</p>
+              </div>
+              <div className="rounded-2xl bg-white p-3 text-center ring-1 ring-emerald-100 dark:bg-neutral-900 dark:ring-emerald-900/40">
+                <p className="font-serif text-2xl font-bold text-neutral-950 dark:text-neutral-50">
+                  1x
+                </p>
+                <p className="mt-1 text-[11px] font-medium leading-4 text-neutral-500">monthly break-even event</p>
+              </div>
+            </div>
+            <div className="grid gap-2">
+              {ROI_UNLOCKS.map((item) => (
+                <div key={item} className="flex items-center gap-2 rounded-xl bg-white/75 px-3 py-2 text-xs font-semibold text-neutral-700 ring-1 ring-emerald-100 dark:bg-neutral-900/80 dark:text-neutral-300 dark:ring-emerald-900/40">
+                  <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </ScrollReveal>
       </section>
 
       {/* ── PRICING CARDS ── */}
@@ -431,14 +484,14 @@ export function PricingContent() {
             {/* Most Popular badge */}
             <div className="absolute -top-px left-1/2 -translate-x-1/2">
               <span className="bg-gradient-to-r from-[#D97757] to-[#E8895A] text-white text-xs font-bold px-5 py-1.5 rounded-b-full whitespace-nowrap shadow-lg shadow-[#D97757]/40 tracking-wide">
-                ✦ Most Popular
+                ✦ Best ROI
               </span>
             </div>
 
             <div className="relative z-10 flex flex-col h-full p-8 pt-10">
               <div className="mb-6">
                 <div className="text-sm font-bold uppercase tracking-widest mb-2 text-[#D97757]">
-                  Plus
+                  Plus · Recovery plan
                 </div>
                 <div className="flex items-baseline gap-1">
                   {isAnnual ? (
@@ -458,8 +511,14 @@ export function PricingContent() {
                   <p className="mt-1 text-xs text-neutral-400">${proAnnual}/yr · billed annually</p>
                 )}
                 <p className="mt-2 text-sm text-neutral-400">
-                  Start with a no-card trial. Choose monthly or annual billing only if Plus earns its place.
+                  Built to offset its cost by preventing one avoidable takeout night, waste week, or expensive cart.
                 </p>
+                <div className="mt-4 rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-3">
+                  <p className="text-xs font-bold uppercase tracking-wide text-emerald-300">Break-even logic</p>
+                  <p className="mt-1 text-sm font-semibold leading-5 text-white">
+                    Avoid one ${ROI_ASSUMPTIONS.avoidedTakeoutNight} takeout order and the month is already covered.
+                  </p>
+                </div>
               </div>
 
               <ul className="flex-1 space-y-2.5 mb-8">
@@ -499,7 +558,7 @@ export function PricingContent() {
                 MealEase is operated by DDS Supply LLC. Paid billing is processed securely through Stripe.
               </p>
               <p className="text-center text-xs font-semibold text-[#F3B18E] mt-2">
-                Beta feedback points to grocery convenience as a key upgrade reason.
+                Keep it only if it helps recover more than it costs.
               </p>
             </div>
           </HoverCard>

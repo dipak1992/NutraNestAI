@@ -19,10 +19,10 @@ type FeatureCopy = {
 
 const FEATURE_COPY: Record<string, FeatureCopy> = {
   budget: {
-    eyebrow: 'Budget savings',
-    title: 'Unlock cheaper weeks with Plus',
-    description: 'See meal costs before you shop, catch budget drift early, and swap pricey dinners for lower-cost options.',
-    bullets: ['Budget-aware swaps', 'Weekly spend alerts', 'Cost estimates before shopping'],
+    eyebrow: 'Recovered grocery money',
+    title: 'Make Plus pay for itself with cheaper weeks',
+    description: 'See meal costs before you shop, catch budget drift early, and swap one pricey dinner before it turns into takeout.',
+    bullets: ['Budget-aware swaps', 'Weekly spend alerts', 'One avoided takeout night can cover the month'],
   },
   grocery: {
     eyebrow: 'Grocery utility',
@@ -37,10 +37,10 @@ const FEATURE_COPY: Record<string, FeatureCopy> = {
     bullets: ['Shared preferences', 'Household profiles', 'Better repeat suggestions'],
   },
   leftovers: {
-    eyebrow: 'Waste less',
+    eyebrow: 'Waste less, recover more',
     title: 'Use leftovers before they expire',
-    description: 'Plus tracks leftovers, alerts you at the right time, and turns extras into practical next meals.',
-    bullets: ['Use-before-expiry nudges', 'Leftover recipe ideas', 'Waste reduction tracking'],
+    description: 'Plus tracks leftovers, alerts you at the right time, and turns extras into practical next meals before food becomes sunk cost.',
+    bullets: ['Use-before-expiry nudges', 'Leftover recipe ideas', 'Reduce wasted groceries'],
   },
   planner: {
     eyebrow: 'Weekly rhythm',
@@ -73,8 +73,8 @@ const FEATURE_COPY: Record<string, FeatureCopy> = {
     bullets: ['Weekly insights', 'Household trends', 'Progress recaps'],
   },
   copilot: {
-    eyebrow: 'Household food system',
-    title: 'Let Copilot operate the whole food week',
+    eyebrow: 'Household food ROI',
+    title: 'Let Copilot protect the food budget',
     description: 'Plus turns Copilot from basic meal help into the action layer for planning, groceries, leftovers, budget, schedule, and household memory.',
     bullets: ['Weekly food briefings and proactive nudges', 'Voice plus household memory', 'Plan, budget, grocery, leftover, and schedule actions'],
   },
@@ -84,8 +84,8 @@ export function getUpgradeFeatureCopy(feature?: string | null): FeatureCopy {
   if (!feature) {
     return {
       eyebrow: 'Plus',
-      title: 'Unlock the full MealEase experience',
-      description: 'Get personalized meals, weekly planning, leftovers, grocery lists, and budget intelligence in one food-life system.',
+      title: 'Upgrade when MealEase can recover the cost',
+      description: 'Get personalized meals, weekly planning, leftovers, grocery lists, and budget intelligence designed to prevent one expensive dinner mistake.',
       bullets: ['Weekly Autopilot', 'Unlimited swaps and scans', 'Leftovers, groceries, and budget tools'],
     }
   }
@@ -94,6 +94,6 @@ export function getUpgradeFeatureCopy(feature?: string | null): FeatureCopy {
     eyebrow: 'Plus',
     title: 'Unlock this with Plus',
     description: 'Upgrade to unlock this feature and the full MealEase planning system around it.',
-    bullets: ['Premium meal planning', 'Smarter personalization', 'More useful weekly routines'],
+    bullets: ['Premium meal planning', 'Smarter personalization', 'Recover value through less takeout and less waste'],
   }
 }

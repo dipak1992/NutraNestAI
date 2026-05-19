@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 import { Crown, Lock, CheckCircle2, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { PRO_UNLOCKS } from '@/lib/paywall/config'
+import { PRO_UNLOCKS, ROI_ASSUMPTIONS } from '@/lib/paywall/config'
 import { getUpgradeFeatureCopy, type UpgradeFeature } from '@/lib/paywall/feature-copy'
 import posthog from 'posthog-js'
 
@@ -78,6 +78,10 @@ export function ProPaywallCard({
           </Badge>
           <h3 className="text-xl font-bold tracking-tight leading-snug">{title}</h3>
           <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed max-w-md">{description}</p>
+          <div className="mt-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-3.5 py-2.5 text-xs leading-relaxed text-emerald-900">
+            <span className="font-bold">Plus can pay for itself:</span>{' '}
+            avoiding one ${ROI_ASSUMPTIONS.avoidedTakeoutNight} takeout night or using food before it becomes waste can offset the monthly cost.
+          </div>
         </div>
       </div>
 

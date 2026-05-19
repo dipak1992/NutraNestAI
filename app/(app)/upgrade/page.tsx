@@ -4,7 +4,7 @@ import { UpgradeClient } from './upgrade-client'
 
 export const metadata = {
   title: 'Upgrade to Plus — MealEase',
-  description: 'Unlock the connected MealEase system: Planner, grocery, budget, leftovers, Cook Mode, and household memory.',
+  description: 'Upgrade to MealEase Plus when it can recover its cost through fewer takeout nights, less food waste, smarter groceries, and budget-aware planning.',
 }
 
 const FEATURE_REDIRECTS: Record<string, string> = {

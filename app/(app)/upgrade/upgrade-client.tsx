@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { Check, Shield, Zap, ArrowLeft } from 'lucide-react'
-import { PRICING_TIERS, PRO_ANNUAL_SAVINGS } from '@/lib/paywall/config'
+import { PRICING_TIERS, PRO_ANNUAL_SAVINGS, ROI_ASSUMPTIONS } from '@/lib/paywall/config'
 import { getUpgradeFeatureCopy } from '@/lib/paywall/feature-copy'
 import { cn } from '@/lib/utils'
 import posthog from 'posthog-js'
@@ -27,7 +27,7 @@ const TRUST_SIGNALS = [
   'Cancel anytime — one click',
   '7-day free trial included',
   'No credit card to start trial',
-  'Built for real families with real constraints',
+  'Built to recover food budget waste',
 ]
 
 /* ─────────────────────── COMPONENT ─────────────────────── */
@@ -130,7 +130,7 @@ export function UpgradeClient({ isAuthenticated }: Props) {
         )}
         {!feature && (
           <p className="mt-3 text-base text-neutral-600 dark:text-neutral-400 max-w-md mx-auto">
-            Turn Copilot into your household food operating layer: brief the week, refine plans, monitor leftovers, lower budget pressure, and keep groceries ready.
+            Turn Copilot into your household food operating layer: brief the week, use leftovers first, lower budget pressure, and avoid the takeout night that covers the month.
           </p>
         )}
       </section>
@@ -188,6 +188,12 @@ export function UpgradeClient({ isAuthenticated }: Props) {
                     ${proAnnual}/yr billed annually · <span className="line-through">${proMonthly}/mo</span>
                   </p>
                 )}
+                <div className="mx-auto mt-4 max-w-sm rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-left">
+                  <p className="text-xs font-bold uppercase tracking-wide text-emerald-300">Why it is worth paying for</p>
+                  <p className="mt-1 text-sm font-semibold leading-5 text-white">
+                    Avoid one ${ROI_ASSUMPTIONS.avoidedTakeoutNight} takeout order or rescue one waste-heavy week and Plus can pay for itself.
+                  </p>
+                </div>
               </div>
 
               {/* CTA Button */}
@@ -285,8 +291,7 @@ export function UpgradeClient({ isAuthenticated }: Props) {
             <div>
               <p className="font-semibold text-sm text-neutral-900 dark:text-neutral-50">Risk-free guarantee</p>
               <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1 leading-relaxed">
-                Start with a 7-day free trial. Cancel anytime from settings — no questions asked.
-                Your plan stays active until the end of the billing period.
+                Start with a 7-day free trial. Keep Plus only if it helps recover more than it costs through fewer expensive dinner defaults, less waste, and smarter grocery decisions.
               </p>
             </div>
           </div>

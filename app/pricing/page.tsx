@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Pricing — MealEase',
-  description: 'Simple, honest pricing. Free includes basic Copilot meal assists; Plus unlocks weekly briefings, voice, weekly instructions, memory, proactive nudges, plan refinements, budget swaps, leftover monitoring, and grocery actions.',
+  description: 'MealEase pricing framed around recovered food value. Free includes basic Copilot meal assists; Plus helps prevent takeout, reduce food waste, plan groceries, and protect the weekly food budget.',
   alternates: {
     canonical: '/pricing',
   },

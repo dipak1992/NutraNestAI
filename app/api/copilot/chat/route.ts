@@ -64,6 +64,19 @@ interface ChatRequestBody {
   }
 }
 
+function getWeekStartDate(): string {
+  const date = new Date()
+  const day = date.getDay()
+  const diff = day === 0 ? -6 : 1 - day
+  date.setDate(date.getDate() + diff)
+  date.setHours(0, 0, 0, 0)
+  return date.toISOString().slice(0, 10)
+}
+
+function groceryStableKey(name: string) {
+  return name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'copilot-item'
+}
+
 // ── Function Call Executors ────────────────────────────────────────────────────
 
 async function executeFunctionCall(
@@ -115,20 +128,77 @@ async function executeFunctionCall(
       if (!items?.length) {
         return { result: 'No items specified to add.' }
       }
-      // Call internal grocery API
+
       try {
         const supabase = await createClient()
-        for (const item of items) {
-          await supabase
-            .from('grocery_list_items')
-            .insert({ user_id: userId, name: item, checked: false })
-        }
+
+        const weekStart = getWeekStartDate()
+        const { data: groceryList, error: listError } = await supabase
+          .from('grocery_lists')
+          .upsert(
+            {
+              user_id: userId,
+              week_start: weekStart,
+              status: 'active',
+              store_format: 'standard',
+              generated_at: new Date().toISOString(),
+            },
+            { onConflict: 'user_id,week_start' },
+          )
+          .select('id')
+          .single()
+
+        if (listError || !groceryList?.id) throw listError ?? new Error('No grocery list id returned')
+
+        const normalizedItems = items
+          .map((item) => item.trim())
+          .filter(Boolean)
+          .slice(0, 20)
+          .map((item) => ({
+            grocery_list_id: groceryList.id as string,
+            stable_key: `copilot-${groceryStableKey(item)}`,
+            name: item,
+            quantity: 1,
+            unit: 'whole',
+            category: 'other',
+            estimated_cost: 0,
+            is_in_pantry: false,
+            is_checked: false,
+            is_custom: true,
+            note: 'Added by MealEase Copilot',
+          }))
+
+        if (!normalizedItems.length) return { result: 'No valid grocery items were specified.' }
+
+        const { error: itemError } = await supabase
+          .from('grocery_items')
+          .upsert(normalizedItems, { onConflict: 'grocery_list_id,stable_key' })
+
+        if (itemError) throw itemError
+
         return {
-          result: `Added ${items.length} item${items.length > 1 ? 's' : ''} to your grocery list: ${items.join(', ')} ✓`,
-          action: { type: 'toast', payload: { message: `${items.length} item(s) added to grocery list` } },
+          result: `Added ${normalizedItems.length} item${normalizedItems.length > 1 ? 's' : ''} to your active grocery list: ${normalizedItems.map((item) => item.name).join(', ')} ✓`,
+          action: { type: 'navigate', payload: { href: '/grocery-list?source=copilot-added-items' } },
         }
       } catch {
-        return { result: 'Sorry, I had trouble adding items to your grocery list. Try again?' }
+        try {
+          const supabase = await createClient()
+          for (const item of items) {
+            if (!item.trim()) continue
+            await supabase
+              .from('grocery_list_items')
+              .insert({ user_id: userId, name: item.trim(), checked: false })
+          }
+          return {
+            result: `Added ${items.length} item${items.length > 1 ? 's' : ''} to your grocery list: ${items.join(', ')} ✓`,
+            action: { type: 'navigate', payload: { href: '/grocery-list?source=copilot-added-items' } },
+          }
+        } catch {
+          return {
+            result: 'I could not write to the grocery list yet. I’ll open the list so you can add the items manually.',
+            action: { type: 'navigate', payload: { href: '/grocery-list?source=copilot-add-failed' } },
+          }
+        }
       }
     }
 

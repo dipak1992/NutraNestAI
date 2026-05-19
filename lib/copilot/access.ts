@@ -24,6 +24,13 @@ export const PLUS_ONLY_COPILOT_FEATURES = new Set([
   'weekly-briefing',
   'schedule-plan',
   'grocery-action',
+  'recipe-cheaper',
+  'plan-five-easy',
+  'plan-prep-ahead',
+  'budget-takeout',
+  'grocery-breakfast',
+  'grocery-snacks',
+  'grocery-pantry-check',
 ])
 
 export const PLUS_ONLY_COPILOT_TOOL_NAMES = new Set([

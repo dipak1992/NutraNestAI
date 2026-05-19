@@ -23,8 +23,13 @@ type ActiveInstruction = {
 
 function pathnameToScreen(pathname: string): CopilotScreen {
   if (pathname.startsWith('/dashboard/tonight')) return 'tonight'
-  if (pathname.startsWith('/dashboard/cook')) return 'cook'
-  if (pathname === '/dashboard' || pathname === '/dashboard/' || pathname.startsWith('/planner')) return 'plan'
+  if (
+    pathname.startsWith('/dashboard/cook') ||
+    pathname.startsWith('/recipes/') ||
+    pathname.startsWith('/meal/') ||
+    pathname.startsWith('/tonight/recipe')
+  ) return 'cook'
+  if (pathname === '/dashboard' || pathname === '/dashboard/' || pathname.startsWith('/planner') || pathname.startsWith('/plan')) return 'plan'
   if (pathname.startsWith('/leftovers')) return 'leftovers'
   if (pathname.startsWith('/budget')) return 'budget'
   if (pathname.startsWith('/grocery')) return 'grocery'
@@ -60,6 +65,26 @@ function triggerToMessage(chip: CopilotChip): string {
       return 'Plan around my household schedule.'
     case 'grocery-action':
       return 'Update the grocery workflow for my plan.'
+    case 'recipe-kid-friendly':
+      return 'Make this meal kid-friendly without changing the whole dinner.'
+    case 'recipe-quick':
+      return 'Give me a 15-minute version of this meal with the fewest steps.'
+    case 'recipe-protein-swap':
+      return 'Swap the protein in this recipe based on what I may already have.'
+    case 'recipe-cheaper':
+      return 'Make this recipe cheaper and explain the tradeoffs before I change anything.'
+    case 'plan-five-easy':
+      return 'Plan five easy prep-ahead dinners for this week and keep the grocery list practical.'
+    case 'plan-prep-ahead':
+      return 'Convert this week into a prep-ahead plan with the easiest batch steps.'
+    case 'budget-takeout':
+      return 'Help me avoid one takeout night this week with a cheaper dinner plan.'
+    case 'grocery-breakfast':
+      return 'Add quick breakfast items for the household to my grocery list.'
+    case 'grocery-snacks':
+      return 'Suggest kid-friendly snacks and quick breakfast items I can add to my grocery list.'
+    case 'grocery-pantry-check':
+      return 'Check what the grocery list says I already have and tell me what I still need to buy.'
     default:
       return chip.label
   }
@@ -251,6 +276,118 @@ function ModeStrip({ isPlus }: { isPlus: boolean }) {
   )
 }
 
+function GuidedPromptPanel({
+  screen,
+  chips,
+  isPlus,
+  onChipTap,
+}: {
+  screen: CopilotScreen
+  chips: CopilotChip[]
+  isPlus: boolean
+  onChipTap: (chip: CopilotChip) => void
+}) {
+  const title =
+    screen === 'cook'
+      ? 'One-tap recipe fixes'
+      : screen === 'grocery'
+        ? 'One-tap grocery help'
+        : screen === 'plan'
+          ? 'One-tap week planning'
+          : screen === 'budget'
+            ? 'One-tap savings moves'
+            : screen === 'leftovers'
+              ? 'One-tap leftover saves'
+              : 'One-tap dinner help'
+
+  const body =
+    screen === 'cook'
+      ? 'Adjust the recipe for time, kids, budget, or what you actually have.'
+      : screen === 'grocery'
+        ? 'Add practical items, check pantry coverage, or move toward store handoff.'
+        : screen === 'plan'
+          ? 'Turn an empty week into a reviewed plan instead of starting from a blank prompt.'
+          : 'Use a guided action instead of figuring out what to ask.'
+
+  return (
+    <div className="mb-3 rounded-2xl border border-orange-100 bg-white p-3 shadow-sm">
+      <div className="flex items-start gap-2">
+        <Lightbulb className="mt-0.5 h-4 w-4 shrink-0 text-[#D97757]" aria-hidden />
+        <div className="min-w-0">
+          <p className="text-sm font-bold text-neutral-900">{title}</p>
+          <p className="mt-0.5 text-xs leading-5 text-neutral-500">{body}</p>
+        </div>
+      </div>
+      <div className="mt-3 grid gap-2 sm:grid-cols-2">
+        {chips.slice(0, 4).map((chip) => (
+          <button
+            key={`guided-${chip.id}`}
+            onClick={() => onChipTap(chip)}
+            className="flex min-h-10 items-center justify-between gap-2 rounded-xl border border-neutral-200 bg-[#FFFBF7] px-3 py-2 text-left text-xs font-semibold text-neutral-800 transition-colors hover:border-[#D97757]/40 hover:bg-white active:scale-[0.98]"
+          >
+            <span className="flex items-center gap-2">
+              {chip.icon && <span className="text-sm">{chip.icon}</span>}
+              {chip.label}
+            </span>
+            {!isPlus && isPlusOnlyCopilotChip(chip) ? (
+              <span className="rounded-full bg-orange-50 px-1.5 py-0.5 text-[10px] font-bold text-[#D97757]">
+                Plus
+              </span>
+            ) : (
+              <ArrowRight className="h-3.5 w-3.5 text-neutral-400" aria-hidden />
+            )}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function ProactiveContextCard({
+  screen,
+  missingItems,
+  onPrompt,
+  onNavigate,
+}: {
+  screen: CopilotScreen
+  missingItems: string[]
+  onPrompt: (text: string) => void
+  onNavigate: (href: string) => void
+}) {
+  if (!missingItems.length || (screen !== 'cook' && screen !== 'tonight' && screen !== 'grocery')) return null
+
+  const itemCopy = missingItems.slice(0, 3).join(', ')
+  const extraCount = Math.max(0, missingItems.length - 3)
+
+  return (
+    <div className="mb-3 rounded-2xl border border-emerald-100 bg-emerald-50/80 px-4 py-3 shadow-sm">
+      <div className="flex items-start gap-3">
+        <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-emerald-700" aria-hidden />
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-bold text-neutral-900">Before you cook, I see list gaps.</p>
+          <p className="mt-1 text-xs leading-5 text-neutral-600">
+            Your grocery list still has {itemCopy}{extraCount ? ` and ${extraCount} more` : ''} marked to buy. I can help substitute from pantry items or move you to the list.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button
+              onClick={() => onPrompt(`I may be missing ${itemCopy}. Suggest pantry substitutions or a cheaper version before I cook.`)}
+              className="rounded-xl bg-emerald-700 px-3 py-1.5 text-xs font-semibold text-white transition-transform active:scale-[0.97]"
+            >
+              Find substitutes
+            </button>
+            <button
+              onClick={() => onNavigate('/grocery-list?source=copilot-missing-items')}
+              className="rounded-xl bg-white px-3 py-1.5 text-xs font-semibold text-emerald-800 ring-1 ring-emerald-200 transition-colors hover:bg-emerald-50"
+            >
+              Review list
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Component ────────────────────────────────────────────────────────────────
 
 export function CopilotSheet({ isPlus }: { isPlus: boolean }) {
@@ -293,6 +430,10 @@ export function CopilotSheet({ isPlus }: { isPlus: boolean }) {
   })
   const hasPantryItems = groceryList?.items?.some((item) => item.isInPantry) ?? false
   const hasLeftovers = leftovers.some((leftover) => leftover.status === 'active')
+  const missingGroceryItems = useMemo(
+    () => groceryList?.items?.filter((item) => !item.isInPantry && !item.isChecked).map((item) => item.name).slice(0, 6) ?? [],
+    [groceryList],
+  )
 
   // Update screen + chips when pathname changes
   useEffect(() => {
@@ -392,6 +533,25 @@ export function CopilotSheet({ isPlus }: { isPlus: boolean }) {
       close()
     }
   }, [acceptNudge, router, close, sendMessage, currentScreen])
+
+  const handlePrompt = useCallback((text: string) => {
+    if (isStreaming) return
+    open()
+    const freeUpgradeMessage = !isPlus ? getFreeCopilotUpgradeMessage(text) : null
+    if (freeUpgradeMessage) {
+      addMessage({ role: 'user', content: text })
+      addMessage({
+        role: 'assistant',
+        content: freeUpgradeMessage,
+        action: { type: 'navigate', href: '/upgrade?feature=copilot' },
+      })
+      return
+    }
+    sendMessage(text, currentScreen)
+      .finally(() => {
+        refreshInstructions()
+      })
+  }, [isStreaming, open, isPlus, addMessage, sendMessage, currentScreen, refreshInstructions])
 
   // Handle action button in message
   const handleActionClick = useCallback((href: string) => {
@@ -549,6 +709,14 @@ export function CopilotSheet({ isPlus }: { isPlus: boolean }) {
                   onDismiss={dismissNudge}
                 />
               )}
+              {!activeNudge && state === 'expanded' && (
+                <ProactiveContextCard
+                  screen={currentScreen}
+                  missingItems={missingGroceryItems}
+                  onPrompt={handlePrompt}
+                  onNavigate={handleActionClick}
+                />
+              )}
               {state === 'expanded' && <ModeStrip isPlus={isPlus} />}
               <div
                 className={
@@ -581,13 +749,21 @@ export function CopilotSheet({ isPlus }: { isPlus: boolean }) {
                 {/* Message list */}
                 <div className="min-h-0 flex-1 overflow-y-auto px-5 py-1">
                   {!hasMessages && !isStreaming && (
-                    <div className="py-4 text-center">
-                      <p className="text-sm font-semibold text-neutral-700">
-                        Tell Copilot what to change, use, save, or plan.
-                      </p>
-                      <p className="mx-auto mt-1 max-w-sm text-xs leading-5 text-neutral-500">
-                        Try “fix Thursday,” “use chicken before it expires,” “keep this under $90,” or “brief my week.”
-                      </p>
+                    <div className="py-3">
+                      <GuidedPromptPanel
+                        screen={currentScreen}
+                        chips={chips}
+                        isPlus={isPlus}
+                        onChipTap={handleChipTap}
+                      />
+                      <div className="text-center">
+                        <p className="text-sm font-semibold text-neutral-700">
+                          Copilot can execute a food task, not just chat.
+                        </p>
+                        <p className="mx-auto mt-1 max-w-sm text-xs leading-5 text-neutral-500">
+                          Tap a guided action above, use voice, or type a specific change like “fix Thursday” or “add breakfast items.”
+                        </p>
+                      </div>
                     </div>
                   )}
 

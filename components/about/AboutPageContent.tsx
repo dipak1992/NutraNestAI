@@ -45,7 +45,7 @@ const features = [
   { icon: '🧠', title: "I Don't Want to Think", sub: 'Dinner decided in under 5 seconds' },
   { icon: '📸', title: 'Snap & Cook', sub: 'Your fridge → a real meal tonight' },
   { icon: '🍽️', title: 'Smart Menu Scan', sub: 'Scan any restaurant menu, order smarter' },
-  { icon: '🔥', title: 'Food Check', sub: 'Snap any food — see calories & goal fit' },
+  { icon: '🔥', title: 'Food Check', sub: 'Snap any food — get simple nutrition context' },
   { icon: '🛒', title: 'Smart grocery list', sub: 'Built automatically, ready to share' },
   { icon: '🌙', title: 'Zero-Cook Mode', sub: "For the nights you just can't" },
 ]
@@ -301,8 +301,8 @@ export function AboutPageContent() {
             <em className="text-foreground font-medium">Smart Menu Scan</em> — photograph any restaurant
             menu, pick a goal, and get AI-powered recommendations in seconds. And{' '}
             <em className="text-foreground font-medium">Food Check</em> — snap any plate or snack and
-            instantly see calorie estimates, protein levels, and whether it fits your goals. MealEase now
-            helps you make smarter choices everywhere you eat, not just at home.
+            get simple nutrition context without turning dinner into a logging chore. MealEase now
+            helps you make calmer choices everywhere you eat, not just at home.
           </motion.p>
 
           <motion.p variants={fadeUp} className="text-[16px] leading-8 text-muted-foreground">

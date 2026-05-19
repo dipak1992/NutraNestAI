@@ -13,18 +13,17 @@ interface ScanErrorProps {
 }
 
 interface ErrorConfig {
-  emoji: string
   title: string
   description: string
   primaryLabel: string
   primaryAction: 'retake' | 'close' | 'settings' | 'upgrade'
   secondaryLabel?: string
   Icon: React.ComponentType<{ className?: string }>
+  tips?: string[]
 }
 
 const ERROR_CONFIGS: Record<ScanErrorKind, ErrorConfig> = {
   camera_permission: {
-    emoji: '📷',
     title: 'Camera access denied',
     description:
       'MealEase needs camera access to scan your fridge and food. Please allow camera access in your browser or device settings.',
@@ -34,7 +33,6 @@ const ERROR_CONFIGS: Record<ScanErrorKind, ErrorConfig> = {
     Icon: Camera,
   },
   network: {
-    emoji: '📡',
     title: 'Connection issue',
     description:
       "We couldn't reach our servers. Check your internet connection and try again.",
@@ -44,7 +42,6 @@ const ERROR_CONFIGS: Record<ScanErrorKind, ErrorConfig> = {
     Icon: Wifi,
   },
   low_quality: {
-    emoji: '🔍',
     title: 'Image too blurry',
     description:
       "The photo wasn't clear enough to analyze. Try holding your phone steady and ensuring good lighting.",
@@ -52,9 +49,9 @@ const ERROR_CONFIGS: Record<ScanErrorKind, ErrorConfig> = {
     primaryAction: 'retake',
     secondaryLabel: 'Cancel',
     Icon: ImageOff,
+    tips: ['Turn on the fridge light', 'Fill the frame with ingredients', 'Wipe the lens and hold steady'],
   },
   no_ingredients: {
-    emoji: '🤔',
     title: 'No ingredients found',
     description:
       "We couldn't identify any ingredients in this photo. Try a clearer shot of your fridge or pantry.",
@@ -62,9 +59,9 @@ const ERROR_CONFIGS: Record<ScanErrorKind, ErrorConfig> = {
     primaryAction: 'retake',
     secondaryLabel: 'Cancel',
     Icon: ImageOff,
+    tips: ['Open containers or move items forward', 'Avoid dark shelves and heavy glare', 'Try a counter photo of the main ingredients'],
   },
   no_menu: {
-    emoji: '📋',
     title: 'No menu detected',
     description:
       "We couldn't read a menu in this photo. Make sure the menu text is clearly visible and well-lit.",
@@ -74,7 +71,6 @@ const ERROR_CONFIGS: Record<ScanErrorKind, ErrorConfig> = {
     Icon: ImageOff,
   },
   no_food: {
-    emoji: '🍽️',
     title: 'No food detected',
     description:
       "We couldn't identify any food in this photo. Try a closer shot of your meal.",
@@ -84,7 +80,6 @@ const ERROR_CONFIGS: Record<ScanErrorKind, ErrorConfig> = {
     Icon: ImageOff,
   },
   rate_limited: {
-    emoji: '🔒',
     title: 'Scan limit reached',
     description:
       "You've used all your free scans for this period. Upgrade to MealEase Plus for unlimited scans.",
@@ -94,7 +89,6 @@ const ERROR_CONFIGS: Record<ScanErrorKind, ErrorConfig> = {
     Icon: Lock,
   },
   server: {
-    emoji: '⚙️',
     title: 'Server error',
     description: 'Something went wrong on our end. Please try again in a moment.',
     primaryLabel: 'Try again',
@@ -103,7 +97,6 @@ const ERROR_CONFIGS: Record<ScanErrorKind, ErrorConfig> = {
     Icon: Server,
   },
   unknown: {
-    emoji: '😕',
     title: 'Something went wrong',
     description: 'An unexpected error occurred. Please try again.',
     primaryLabel: 'Try again',
@@ -151,9 +144,7 @@ export function ScanError({ kind, message, onRetake, onClose }: ScanErrorProps) 
       >
         {/* Icon circle */}
         <div className="w-20 h-20 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center">
-          <span className="text-4xl" role="img" aria-hidden>
-            {config.emoji}
-          </span>
+          <config.Icon className="h-9 w-9 text-red-600 dark:text-red-300" aria-hidden />
         </div>
 
         {/* Text */}
@@ -165,6 +156,19 @@ export function ScanError({ kind, message, onRetake, onClose }: ScanErrorProps) 
             {message ?? config.description}
           </p>
         </div>
+
+        {config.tips && (
+          <div className="w-full rounded-2xl bg-neutral-50 p-3 text-left ring-1 ring-neutral-200 dark:bg-neutral-900 dark:ring-neutral-800">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-neutral-500 dark:text-neutral-400">
+              Quick fix
+            </p>
+            <ul className="mt-2 space-y-1.5 text-xs leading-5 text-neutral-600 dark:text-neutral-300">
+              {config.tips.map((tip) => (
+                <li key={tip}>- {tip}</li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {/* Actions */}
         <div className="flex flex-col gap-3 w-full mt-2">

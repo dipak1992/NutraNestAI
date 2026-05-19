@@ -25,8 +25,8 @@ const steps = [
   },
   {
     icon: ShoppingCart,
-    title: 'Shop or export',
-    body: 'Use supported store handoff tools, copy your list, download PDF, or shop locally.',
+    title: 'Choose the best handoff',
+    body: 'Compare supported retailers, see estimate confidence, then open the best cart/search handoff with a copy-list fallback.',
   },
 ]
 
@@ -38,7 +38,7 @@ const groceryItems = [
 ]
 
 const exportOptions = [
-  { icon: ShoppingCart, label: 'Store handoff', detail: 'Walmart, Instacart, Kroger, Costco, and more' },
+  { icon: ShoppingCart, label: 'Retailer handoff', detail: 'Walmart, Instacart, Kroger, Costco, and regional options' },
   { icon: FileDown, label: 'PDF export', detail: 'Clean list for any store' },
   { icon: ClipboardList, label: 'Copy list', detail: 'Paste into notes or delivery apps' },
 ]
@@ -64,18 +64,18 @@ export function GroceryCommerceSection() {
                 id="grocery-commerce-heading"
                 className="mt-3 font-serif text-4xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50 md:text-5xl"
               >
-                The plan becomes a grocery run you do not have to rebuild.
+                The plan becomes a grocery run with fewer tabs and less retyping.
               </h2>
               <p className="mt-5 text-lg leading-relaxed text-neutral-600 dark:text-neutral-400">
                 MealEase consolidates ingredients, deducts what you already have,
-                groups the list by aisle, and keeps export flexible for any local market.
+                compares supported retailers, and keeps a backup list ready when live cart or stock data is retailer-limited.
               </p>
 
               <div className="mt-8 grid gap-3 sm:grid-cols-3">
                 {[
                   { label: 'Aisle grouped', value: '6' },
                   { label: 'Pantry saves', value: '$11' },
-                  { label: 'Ready in', value: '1 tap' },
+                  { label: 'Handoff', value: '1 tap' },
                 ].map((item) => (
                   <div
                     key={item.label}
@@ -90,7 +90,7 @@ export function GroceryCommerceSection() {
               </div>
 
               <p className="mt-8 text-sm font-medium text-neutral-500 dark:text-neutral-400">
-                Copy, PDF, or supported store handoff where available.
+                Retailer handoff where available. Copy and PDF everywhere.
               </p>
             </div>
           </FadeIn>
@@ -129,7 +129,7 @@ export function GroceryCommerceSection() {
         </div>
 
         <div className="mx-auto mt-8 grid max-w-5xl gap-2 md:hidden">
-          {['Plan becomes one grocery list', 'Pantry items are deducted first', 'Copy, PDF, or supported store handoff'].map((item) => (
+          {['Plan becomes one grocery list', 'Pantry items are deducted first', 'Retailer handoff plus backup export'].map((item) => (
             <div key={item} className="flex items-center gap-3 rounded-2xl bg-[#FDF6F1] px-4 py-3 text-sm font-semibold text-neutral-800 ring-1 ring-[#D97757]/15 dark:bg-neutral-900 dark:text-neutral-200 dark:ring-neutral-800">
               <CheckCircle2 className="h-4 w-4 shrink-0 text-[#D97757]" aria-hidden />
               {item}
@@ -175,8 +175,8 @@ export function GroceryCommerceSection() {
                       Supported store handoff in North America. Flexible export everywhere.
                     </p>
                     <p className="mt-2 text-sm leading-6 text-neutral-300">
-                      Shop at supported stores such as Walmart, Instacart, Kroger, Costco, Amazon Fresh, or regional grocers where available.
-                      Elsewhere, copy your list, download a PDF, or use it at your local store.
+                      Shop through supported handoffs such as Walmart, Instacart, Kroger, Costco, Amazon Fresh, or regional grocers where available.
+                      MealEase also keeps a clean copy/PDF fallback so the list never gets trapped in one retailer.
                     </p>
                   </div>
                 </div>
@@ -200,7 +200,7 @@ export function GroceryCommerceSection() {
             <div className="border-t border-white/10 px-6 py-5 md:px-8">
               <div className="flex items-center gap-2 text-sm text-neutral-300">
                 <MapPin className="h-4 w-4 text-[#F3B18E]" aria-hidden />
-                Availability depends on region and store coverage.
+                Live stock, exact prices, and completed carts depend on retailer API coverage.
               </div>
             </div>
           </div>
@@ -252,7 +252,7 @@ function GroceryListCard({ className = '' }: { className?: string }) {
           className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#D97757] px-4 py-3 text-sm font-bold text-white shadow-sm transition-colors hover:bg-[#C86646]"
         >
           <ShoppingCart className="h-4 w-4" aria-hidden />
-          Review grocery handoff
+          Compare grocery handoff
         </button>
       </div>
     </div>

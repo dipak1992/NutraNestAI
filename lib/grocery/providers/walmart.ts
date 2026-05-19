@@ -16,6 +16,9 @@ export const walmartUS: GroceryProvider = {
   searchUrlTemplate: 'https://www.walmart.com/search?q={{query}}',
   multiItemSearchUrl: 'https://www.walmart.com/search?q={{items}}',
   cartBuilderSupported: false, // No public API for cart building
+  cartHandoffMode: 'multi_item_search',
+  pricingConfidence: 'estimated',
+  availabilityConfidence: 'store_dependent',
   estimatedDeliveryTime: '1-3 hours',
   estimatedPickupTime: 'Today',
   color: '#0071DC',

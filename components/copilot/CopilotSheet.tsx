@@ -83,6 +83,8 @@ function triggerToMessage(chip: CopilotChip): string {
       return 'Add quick breakfast items for the household to my grocery list.'
     case 'grocery-snacks':
       return 'Suggest kid-friendly snacks and quick breakfast items I can add to my grocery list.'
+    case 'grocery-cheaper':
+      return 'Lower this grocery list cost, keep dinner realistic, and show what changed before applying anything.'
     case 'grocery-pantry-check':
       return 'Check what the grocery list says I already have and tell me what I still need to buy.'
     default:

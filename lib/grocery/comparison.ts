@@ -211,6 +211,10 @@ export function compareProviders(
       fulfillmentType: preferredFulfillment,
       searchUrl: buildProviderSearchUrl(provider, cartItems),
       confidence: groceryList.totalEstimatedCost > 0 ? 'medium' : 'low',
+      cartHandoffMode: provider.cartHandoffMode,
+      pricingConfidence: provider.pricingConfidence,
+      availabilityConfidence: provider.availabilityConfidence,
+      readinessLabel: getReadinessLabel(provider),
     })
   }
 
@@ -239,4 +243,10 @@ function scoreEstimate(estimate: ProviderEstimate, preferredStore?: string | nul
 
 function normalizeProviderName(value?: string | null): string {
   return (value ?? '').trim().toLowerCase().replace(/\s+/g, '_')
+}
+
+function getReadinessLabel(provider: GroceryProvider): string {
+  if (provider.cartHandoffMode === 'cart_api') return 'Cart API ready'
+  if (provider.cartHandoffMode === 'multi_item_search') return 'List handoff ready'
+  return 'First item search'
 }

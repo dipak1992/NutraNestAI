@@ -11,6 +11,7 @@ export type ScanEvent =
   | 'scan_retake'
   | 'scan_closed'
   | 'scan_save_pantry'
+  | 'scan_ingredient_manual_add'
   | 'scan_add_to_log'
 
 export interface ScanEventProps {

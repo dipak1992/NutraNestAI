@@ -48,15 +48,15 @@ export function buildMacroTargetPlan(input: string, householdSize: number, budge
   const fatCalories = Math.max(60, Math.round(remainingCalories * 0.25))
 
   return {
-    title: `${calories} calorie / ${protein}g protein dinner target`,
+    title: `Portion-guided ${profile.label} dinner`,
     summary: `Sized for ${people} ${people === 1 ? 'person' : 'people'} with a rough $${dinnerBudget} dinner target.`,
     savings: `Portion math: ${units} ${profile.unit}${units === 1 ? '' : 's'} of ${profile.label} gets close to ${protein}g protein.`,
     lines: [
       `Protein base: ${units} ${profile.unit}${units === 1 ? '' : 's'} ${profile.label} per serving, then multiply by ${people}.`,
-      `Carb range: about ${carbCalories} calories from rice, potatoes, tortillas, pasta, or beans.`,
-      `Fat and sauce range: about ${fatCalories} calories from olive oil, avocado, cheese, yogurt sauce, or dressing.`,
+      `Energy range: about ${carbCalories} calories from rice, potatoes, tortillas, pasta, or beans.`,
+      `Sauce and fat range: about ${fatCalories} calories from olive oil, avocado, cheese, yogurt sauce, or dressing.`,
       'Add at least 2 cups of vegetables per serving when possible so the plate feels full without blowing the target.',
-      'MealEase can save this as a repeatable macro target so future dinners start from your calories, protein, budget, and pantry.',
+      'MealEase can save this as a repeatable portion preference so future dinners start from your goal, budget, and pantry.',
     ],
   }
 }

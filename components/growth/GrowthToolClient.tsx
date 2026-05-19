@@ -144,7 +144,7 @@ export function GrowthToolClient({ tool }: { tool: GrowthTool }) {
     if (tool.mode === 'pantry') return 'eggs, rice, chicken, spinach'
     if (tool.mode === 'leftovers') return 'leftover chicken, rice, roasted carrots'
     if (tool.mode === 'scanner') return 'chicken bowl with rice and vegetables'
-    if (tool.mode === 'macro') return '550 calories, 40g protein, chicken, rice, vegetables'
+    if (tool.mode === 'macro') return 'lighter dinner, protein-forward, chicken, rice, vegetables'
     if (tool.mode === 'pregnancy') return 'due 2026-10-15, chicken, rice, spinach, nausea-friendly'
     return '20 minutes, tired, kid-friendly, chicken in fridge'
   }, [tool.mode])

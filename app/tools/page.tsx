@@ -8,9 +8,9 @@ import { growthTools } from '@/lib/growth/content'
 export const metadata = buildMetadata({
   title: 'Free Meal Planning Tools',
   description:
-    'Use free MealEase tools for dinner ideas, pantry recipes, grocery budgets, leftovers, macro targets, pregnancy-safe meal planning, and dinner cost estimates.',
+    'Use free MealEase tools for dinner ideas, pantry recipes, grocery budgets, leftovers, portion guidance, pregnancy-safe meal planning, and dinner cost estimates.',
   path: '/tools',
-  keywords: ['free meal planning tools', 'dinner generator', 'pantry recipe finder', 'grocery budget calculator', 'macro target meal planner', 'pregnancy safe meal planner'],
+  keywords: ['free meal planning tools', 'dinner generator', 'pantry recipe finder', 'grocery budget calculator', 'portion guide meal planner', 'pregnancy safe meal planner'],
 })
 
 export default function ToolsIndexPage() {
@@ -27,7 +27,7 @@ export default function ToolsIndexPage() {
               Solve dinner first. Save the plan next.
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-neutral-700 dark:text-neutral-300">
-              Each tool gives a useful result before signup, including specialized workflows for budget, leftovers, macro targets, and pregnancy-aware dinner planning.
+              Each tool gives a useful result before signup, including specialized workflows for budget, leftovers, portion guidance, and pregnancy-aware dinner planning.
             </p>
           </div>
         </section>

@@ -50,7 +50,7 @@ export async function POST(req: Request) {
         external_cart_url: result.url,
         item_count: result.itemCount,
         estimated_total_usd: groceryList.totalEstimatedCost ?? 0,
-        items: result.cartItems,
+        items: result.retailerPayload.items,
       }),
       supabase.from('household_workspace_events').insert({
         household_id: household.id,
@@ -63,6 +63,10 @@ export async function POST(req: Request) {
           providerName: result.providerName,
           itemCount: result.itemCount,
           mode: result.mode,
+          cartHandoffMode: result.cartHandoffMode,
+          pricingConfidence: result.pricingConfidence,
+          availabilityConfidence: result.availabilityConfidence,
+          nextBestAction: result.nextBestAction,
         },
       }),
     ])

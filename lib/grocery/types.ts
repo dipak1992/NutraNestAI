@@ -12,6 +12,12 @@ export type DetectedRegion = SupportedCountry | 'OTHER'
 /** Fulfillment method offered by a provider */
 export type FulfillmentType = 'pickup' | 'delivery' | 'both'
 
+/** How close MealEase can get to a completed retailer cart today */
+export type CartHandoffMode = 'cart_api' | 'multi_item_search' | 'single_item_search'
+
+/** How precise the provider estimate can be before the retailer page opens */
+export type CommerceConfidence = 'live' | 'estimated' | 'store_dependent'
+
 /** Provider identifier */
 export type ProviderId =
   | 'walmart_us'
@@ -36,6 +42,9 @@ export interface GroceryProvider {
   searchUrlTemplate: string // template with {{query}} placeholder
   multiItemSearchUrl?: string // template with {{items}} placeholder
   cartBuilderSupported: boolean
+  cartHandoffMode: CartHandoffMode
+  pricingConfidence: CommerceConfidence
+  availabilityConfidence: CommerceConfidence
   estimatedDeliveryTime?: string // e.g. "1-2 hours"
   estimatedPickupTime?: string // e.g. "Today"
   color: string // brand color for UI
@@ -61,6 +70,10 @@ export interface ProviderEstimate {
   fulfillmentType: FulfillmentType
   searchUrl: string
   confidence: 'high' | 'medium' | 'low'
+  cartHandoffMode: CartHandoffMode
+  pricingConfidence: CommerceConfidence
+  availabilityConfidence: CommerceConfidence
+  readinessLabel: string
 }
 
 /** Export format for global fallback */

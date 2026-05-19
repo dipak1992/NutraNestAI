@@ -66,17 +66,17 @@ export function generateChips(ctx: ChipContext): CopilotChip[] {
       break
     case 'grocery':
       chips.push(
+        { id: 'grocery-store-handoff', label: 'Compare stores', icon: '🛒', action: { type: 'navigate', href: '/grocery-list?source=copilot&handoff=1' } },
         { id: 'grocery-breakfast', label: 'Add quick breakfasts', icon: '☀️', action: { type: 'trigger', feature: 'grocery-breakfast' } },
-        { id: 'grocery-snacks', label: 'Add kid snacks', icon: '🍎', action: { type: 'trigger', feature: 'grocery-snacks' } },
+        { id: 'grocery-cheaper', label: 'Lower list cost', icon: '🏷️', action: { type: 'trigger', feature: 'grocery-cheaper' } },
         { id: 'grocery-check', label: 'Check pantry first', icon: '🧊', action: { type: 'trigger', feature: 'grocery-pantry-check' } },
-        { id: 'grocery-handoff', label: 'Send to store', icon: '🛒', action: { type: 'navigate', href: '/grocery-list?source=copilot&handoff=1' } },
       )
       break
     case 'home':
       chips.push(
         { id: 'home-tonight', label: "What's for dinner?", icon: '🍽️', action: { type: 'navigate', href: '/dashboard/tonight' } },
+        { id: 'home-scan', label: 'Scan fridge', icon: '📸', action: { type: 'navigate', href: '/demo/scan?source=copilot' } },
         { id: 'home-brief', label: 'Brief my food week', icon: '✨', action: { type: 'trigger', feature: 'weekly-briefing' } },
-        { id: 'home-plan', label: 'Plan this week', icon: '📅', action: { type: 'navigate', href: '/planner' } },
         { id: 'home-grocery', label: 'Review groceries', icon: '🛒', action: { type: 'navigate', href: '/grocery-list' } },
       )
       break

@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowRight, Clock, MapPin, Truck, ShoppingBag } from 'lucide-react'
+import { ArrowRight, Clock, MapPin, ShieldCheck, Truck, ShoppingBag } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { ProviderEstimate } from '@/lib/grocery/types'
 
@@ -20,7 +20,7 @@ export function ProviderComparisonCard({ estimates, onSelectProvider }: Props) {
           Shop your list
         </h3>
         <span className="text-xs text-neutral-500 dark:text-neutral-400">
-          · Compare options
+          · Compare price, pickup, and handoff quality
         </span>
       </div>
 
@@ -62,7 +62,7 @@ export function ProviderComparisonCard({ estimates, onSelectProvider }: Props) {
                     {estimate.provider.description.slice(0, 45)}
                   </span>
                   <span className="rounded-full bg-neutral-100 px-1.5 py-0.5 text-[10px] font-semibold text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
-                    {estimate.provider.cartBuilderSupported ? 'Direct cart' : 'Search handoff'}
+                    {estimate.readinessLabel}
                   </span>
                 </div>
               </div>
@@ -98,6 +98,17 @@ export function ProviderComparisonCard({ estimates, onSelectProvider }: Props) {
               </div>
             </div>
 
+            <div className="mb-3 grid grid-cols-2 gap-2">
+              <CapabilityPill
+                label="Price"
+                value={confidenceCopy(estimate.pricingConfidence)}
+              />
+              <CapabilityPill
+                label="Stock"
+                value={confidenceCopy(estimate.availabilityConfidence)}
+              />
+            </div>
+
             {/* CTA */}
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-[#D97757] group-hover:underline underline-offset-2">
@@ -122,10 +133,26 @@ export function ProviderComparisonCard({ estimates, onSelectProvider }: Props) {
       </div>
 
       <p className="text-[10px] text-neutral-400 dark:text-neutral-500 text-center">
-        Estimates are approximate. Retailer buttons currently open store search pages, and MealEase copies your full list as backup.
+        MealEase prepares a retailer-ready payload, opens the best supported handoff, and keeps a copy-list fallback when live carts or local stock are retailer-limited.
       </p>
     </section>
   )
+}
+
+function CapabilityPill({ label, value }: { label: string; value: string }) {
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full bg-neutral-100 px-2 py-1 text-[10px] font-semibold text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
+      <ShieldCheck className="h-3 w-3 text-emerald-600 dark:text-emerald-400" aria-hidden />
+      <span className="text-neutral-400 dark:text-neutral-500">{label}</span>
+      {value}
+    </span>
+  )
+}
+
+function confidenceCopy(value: ProviderEstimate['pricingConfidence']): string {
+  if (value === 'live') return 'live'
+  if (value === 'estimated') return 'est.'
+  return 'store'
 }
 
 function providerCtaLabel(estimate: ProviderEstimate): string {

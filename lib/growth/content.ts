@@ -38,7 +38,16 @@ export type GrowthTool = {
   description: string
   h1: string
   cluster: GrowthClusterId
-  mode: 'tonight' | 'pantry' | 'budget' | 'family' | 'leftovers' | 'cost' | 'scanner'
+  mode:
+    | 'tonight'
+    | 'pantry'
+    | 'budget'
+    | 'family'
+    | 'leftovers'
+    | 'cost'
+    | 'scanner'
+    | 'macro'
+    | 'pregnancy'
   cta: string
   sampleInputs: string[]
   outcomes: string[]
@@ -183,6 +192,30 @@ export const growthTools: GrowthTool[] = [
     cta: 'Try the scanner teaser',
     sampleInputs: ['plate photo', 'serving guess', 'meal goal'],
     outcomes: ['nutrition preview', 'balanced swaps', 'saved meal history prompt'],
+  },
+  {
+    slug: 'macro-target-meal-planner',
+    title: 'Macro Target Meal Planner',
+    description:
+      'Enter a calorie and protein target to get a portion-sized dinner plan without manual nutrition logging.',
+    h1: 'Macro Target Meal Planner',
+    cluster: 'commercial',
+    mode: 'macro',
+    cta: 'Build a macro-targeted dinner',
+    sampleInputs: ['550 calories', '40g protein', 'chicken', 'rice', 'vegetables'],
+    outcomes: ['calorie target', 'protein target', 'portion sizing'],
+  },
+  {
+    slug: 'pregnancy-safe-meal-planner',
+    title: 'Pregnancy-Safe Meal Planner',
+    description:
+      'Plan pregnancy-aware dinners using a due date, trimester cues, food safety rules, and household servings.',
+    h1: 'Pregnancy-Safe Meal Planner',
+    cluster: 'commercial',
+    mode: 'pregnancy',
+    cta: 'Plan a pregnancy-safe dinner',
+    sampleInputs: ['due 2026-10-15', 'chicken', 'rice', 'spinach', 'nausea-friendly'],
+    outcomes: ['trimester-aware', 'food safety checks', 'family servings'],
   },
 ]
 

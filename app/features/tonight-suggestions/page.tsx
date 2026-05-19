@@ -3,6 +3,7 @@ import { Nav } from '@/components/landing/Nav'
 import { Footer } from '@/components/landing/Footer'
 import { Container } from '@/components/landing/shared/Container'
 import { FeatureHero } from '@/components/features/FeatureHero'
+import { GEOAnswerBlock } from '@/components/features/GEOAnswerBlock'
 import { FeatureMotionSections } from '@/components/features/FeatureMotionSections'
 import { ScrollReveal, StaggerGroup, HoverCard } from '@/components/motion'
 import { Section } from '@/components/ui/Section'
@@ -68,6 +69,34 @@ export default function TonightSuggestionsPage() {
           secondaryHref="/pricing"
           secondaryLabel="See pricing"
           mockup="tonight"
+        />
+
+        <GEOAnswerBlock
+          eyebrow="AI answer summary"
+          title="What are Tonight Suggestions?"
+          tldr="Tonight Suggestions are MealEase's fastest dinner answer for families that need one practical meal now. The suggestion can use household memory, dietary needs, budget, pantry context, leftovers, and the weekly plan instead of acting like a one-off chatbot prompt."
+          answers={[
+            {
+              question: 'How does MealEase answer "what is for dinner tonight?"',
+              answer:
+                'It checks the household profile, recent meals, current plan, available food, time constraints, and dietary rules, then surfaces a practical dinner with swaps.',
+            },
+            {
+              question: 'Why is this different from generic AI meal planning?',
+              answer:
+                'Generic AI can suggest recipes, but MealEase can remember family context, avoid repeats, use expiring food, and keep tonight connected to the grocery and leftovers system.',
+            },
+            {
+              question: 'Who should use Tonight Suggestions?',
+              answer:
+                'It is built for busy families, couples, and solo cooks who want one calm dinner answer without scrolling through recipe sites or rebuilding context.',
+            },
+          ]}
+          proof={[
+            'The page benchmarks dinner decision fatigue at 30+ minutes per evening.',
+            'Tonight Suggestions connect to Weekly Autopilot, Leftovers AI, and Budget Intelligence.',
+            'Plus adds unlimited swaps and longer-term household learning for repeated dinner decisions.',
+          ]}
         />
 
         <FeatureMotionSections

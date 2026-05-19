@@ -36,6 +36,29 @@ export function ToolPageTemplate({ tool }: { tool: GrowthTool }) {
           </div>
         </section>
 
+        <section className="border-b border-neutral-200 bg-white py-10 dark:border-neutral-800 dark:bg-neutral-950">
+          <div className="mx-auto grid max-w-6xl gap-6 px-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:px-8">
+            <article>
+              <h2 className="font-serif text-3xl font-bold tracking-tight">What does this MealEase tool do?</h2>
+              <p className="mt-3 text-sm leading-6 text-neutral-700 dark:text-neutral-300">
+                <strong>TL;DR:</strong> {tool.description} The free result is useful on its own, and saving it in MealEase turns the answer into household memory for future dinners, groceries, budget, and leftovers.
+              </p>
+              <h3 className="mt-6 text-lg font-bold">Who is it for?</h3>
+              <p className="mt-2 text-sm leading-6 text-neutral-700 dark:text-neutral-300">
+                This workflow is built for families and busy households that want a specific dinner answer without rebuilding context every time they plan.
+              </p>
+            </article>
+            <aside className="rounded-lg bg-[#FFF7F2] p-5 ring-1 ring-[#F0D9C9] dark:bg-neutral-900 dark:ring-neutral-800">
+              <h3 className="text-lg font-bold">Proof points</h3>
+              <ul className="mt-4 space-y-3 text-sm leading-6 text-neutral-700 dark:text-neutral-300">
+                <li>MealEase connects dinner ideas to pantry, leftovers, grocery lists, and budget.</li>
+                <li>Using one $38 avoided takeout night can offset a month of Plus.</li>
+                <li>Using aging food before it spoils can reduce about $12/week in waste.</li>
+              </ul>
+            </aside>
+          </div>
+        </section>
+
         <section className="py-12 md:py-16">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <GrowthToolClient tool={tool} />

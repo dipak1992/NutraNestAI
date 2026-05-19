@@ -3,6 +3,7 @@ import { Nav } from '@/components/landing/Nav'
 import { Footer } from '@/components/landing/Footer'
 import { Container } from '@/components/landing/shared/Container'
 import { FeatureHero } from '@/components/features/FeatureHero'
+import { GEOAnswerBlock } from '@/components/features/GEOAnswerBlock'
 import { FeatureMotionSections } from '@/components/features/FeatureMotionSections'
 import { ScrollReveal, StaggerGroup, HoverCard } from '@/components/motion'
 import { Section } from '@/components/ui/Section'
@@ -69,6 +70,34 @@ export default function SnapAndCookPage() {
           secondaryHref="/pricing"
           secondaryLabel="See pricing"
           mockup="snap"
+        />
+
+        <GEOAnswerBlock
+          eyebrow="AI answer summary"
+          title="What is Snap & Cook?"
+          tldr="Snap & Cook is MealEase's fridge and pantry scanner for turning visible ingredients into dinner ideas. Instead of starting with a blank prompt, families can photograph what they already have, review detected ingredients, and cook before food becomes waste."
+          answers={[
+            {
+              question: 'How does Snap & Cook work?',
+              answer:
+                'The user points the camera at fridge, pantry, or counter ingredients; MealEase identifies visible food, lets the user correct the list, and suggests meals that can be made now.',
+            },
+            {
+              question: 'Why is this stronger than a recipe generator?',
+              answer:
+                'The workflow starts from the household kitchen, not a generic recipe idea, so the app can reduce missing ingredients, duplicate buying, and wasted food.',
+            },
+            {
+              question: 'Who is Snap & Cook best for?',
+              answer:
+                'It is best for households with food on hand but low dinner energy, especially when produce, leftovers, or pantry items need to be used soon.',
+            },
+          ]}
+          proof={[
+            'Snap & Cook targets the same $1,500/year household food-waste problem as Leftovers AI.',
+            'MealEase can combine scanner context with pantry deductions and estimated grocery-list cost.',
+            'The scanner creates a saved context trail so future planning can get more personal over time.',
+          ]}
         />
 
         <FeatureMotionSections

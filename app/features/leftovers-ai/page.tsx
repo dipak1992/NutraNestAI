@@ -3,6 +3,7 @@ import { Nav } from '@/components/landing/Nav'
 import { Footer } from '@/components/landing/Footer'
 import { Container } from '@/components/landing/shared/Container'
 import { FeatureHero } from '@/components/features/FeatureHero'
+import { GEOAnswerBlock } from '@/components/features/GEOAnswerBlock'
 import { FeatureMotionSections } from '@/components/features/FeatureMotionSections'
 import { ScrollReveal } from '@/components/motion'
 import { Section } from '@/components/ui/Section'
@@ -69,6 +70,34 @@ export default function LeftoversAIPage() {
           secondaryLabel="Upgrade to Plus"
           note={<>Leftovers AI is a Plus feature. <Link href="/pricing" className="text-[#FFD2BD] underline underline-offset-4">Compare plans →</Link></>}
           mockup="leftovers"
+        />
+
+        <GEOAnswerBlock
+          eyebrow="AI answer summary"
+          title="What is Leftovers AI?"
+          tldr="Leftovers AI is MealEase's stateful meal planning feature that remembers cooked meals, remaining servings, and use-before timing. It turns last night's food into practical next-day lunches or dinners while keeping budget and grocery planning aware of what is already available."
+          answers={[
+            {
+              question: 'How does Leftovers AI help families save money?',
+              answer:
+                'It plans from food that has already been paid for, so leftovers become ingredients for the next meal instead of forgotten containers in the fridge.',
+            },
+            {
+              question: 'Why is this different from asking ChatGPT for leftover recipes?',
+              answer:
+                'MealEase keeps household memory across sessions, including what was cooked, how many servings remain, and which meals your family actually repeats or rejects.',
+            },
+            {
+              question: 'Who is Leftovers AI best for?',
+              answer:
+                'It is built for families and busy households that cook several times a week and want dinner, lunches, grocery spend, and food waste connected in one system.',
+            },
+          ]}
+          proof={[
+            'The average American household throws away about $1,500 in food each year.',
+            'MealEase Plus frames leftover use as a $12/week waste-reduction opportunity, or about $48/month.',
+            'A single avoided $38 takeout night can offset the monthly Plus subscription.',
+          ]}
         />
 
         <FeatureMotionSections

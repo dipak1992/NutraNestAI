@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { trackEvent } from '@/lib/analytics'
 import type { GrowthTool } from '@/lib/growth/content'
+import { buildMacroTargetPlan, buildPregnancySafePlan } from '@/lib/nutrition/specialized-workflows'
 
 type GeneratedResult = {
   title: string
@@ -39,6 +40,24 @@ function generateResult(tool: GrowthTool, input: string, budget: string, househo
   const people = Number(household) || 4
   const budgetValue = Number(budget) || 100
   const perDinner = Math.max(8, Math.round(budgetValue / 5))
+
+  if (tool.mode === 'macro') {
+    const macroPlan = buildMacroTargetPlan(text, people, budgetValue)
+    return {
+      title: macroPlan.title,
+      savings: macroPlan.savings,
+      lines: [macroPlan.summary, ...macroPlan.lines],
+    }
+  }
+
+  if (tool.mode === 'pregnancy') {
+    const pregnancyPlan = buildPregnancySafePlan(text, people)
+    return {
+      title: pregnancyPlan.title,
+      savings: pregnancyPlan.summary,
+      lines: pregnancyPlan.lines,
+    }
+  }
 
   if (tool.mode === 'budget' || tool.mode === 'cost') {
     return {
@@ -125,6 +144,8 @@ export function GrowthToolClient({ tool }: { tool: GrowthTool }) {
     if (tool.mode === 'pantry') return 'eggs, rice, chicken, spinach'
     if (tool.mode === 'leftovers') return 'leftover chicken, rice, roasted carrots'
     if (tool.mode === 'scanner') return 'chicken bowl with rice and vegetables'
+    if (tool.mode === 'macro') return '550 calories, 40g protein, chicken, rice, vegetables'
+    if (tool.mode === 'pregnancy') return 'due 2026-10-15, chicken, rice, spinach, nausea-friendly'
     return '20 minutes, tired, kid-friendly, chicken in fridge'
   }, [tool.mode])
 
@@ -179,7 +200,7 @@ export function GrowthToolClient({ tool }: { tool: GrowthTool }) {
               <Input value={household} onChange={(event) => setHousehold(event.target.value)} inputMode="numeric" className="mt-2 h-10" />
             </label>
             <label className="block text-sm font-semibold">
-              {needsBudget ? 'Weekly dinner budget' : 'Budget target'}
+              {tool.mode === 'macro' ? 'Weekly grocery budget' : needsBudget ? 'Weekly dinner budget' : 'Budget target'}
               <Input value={budget} onChange={(event) => setBudget(event.target.value)} inputMode="numeric" className="mt-2 h-10" />
             </label>
           </div>

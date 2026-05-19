@@ -118,6 +118,8 @@ export type RetentionState = {
   isDinnerWindow: boolean
   plannedDays: number
   weeklyBudgetRemaining: number | null
+  leftoverMealsReusedThisWeek: number
+  estimatedSavedThisWeek: number
 }
 
 export type DashboardPayload = {

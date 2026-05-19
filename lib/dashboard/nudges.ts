@@ -213,8 +213,7 @@ export function buildNudgeCandidates(
 
   // 10. Weekly savings recap
   if (
-    ctx.retention.weeklyBudgetRemaining != null &&
-    ctx.retention.weeklyBudgetRemaining > 0 &&
+    ctx.retention.estimatedSavedThisWeek > 0 &&
     ctx.user.plan !== 'free'
   ) {
     candidates.push({
@@ -222,7 +221,7 @@ export function buildNudgeCandidates(
       type: 'weekly_savings_recap',
       priority: NUDGE_PRIORITY.weekly_savings_recap,
       title: 'You are under budget',
-      body: `$${ctx.retention.weeklyBudgetRemaining.toFixed(0)} left this week. Want lower-cost ideas to keep it that way?`,
+      body: `MealEase helped protect about $${ctx.retention.estimatedSavedThisWeek.toFixed(0)} this week${ctx.retention.leftoverMealsReusedThisWeek > 0 ? ` and reused ${ctx.retention.leftoverMealsReusedThisWeek} leftover meal${ctx.retention.leftoverMealsReusedThisWeek === 1 ? '' : 's'}` : ''}.`,
       ctaLabel: 'See savings',
       ctaHref: '/budget?tab=swaps',
       dismissible: true,

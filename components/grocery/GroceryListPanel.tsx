@@ -839,9 +839,8 @@ export function GroceryListPanel() {
           Estimates based on average grocery prices. Actual costs may vary.
         </p>
 
-        {/* Future: Cart integration CTA */}
-        <div className="mt-3 rounded-xl border border-dashed border-border/60 p-3 text-center text-xs text-muted-foreground">
-          🛒 <strong>Cart integration coming soon</strong> — add items directly to Walmart or Instacart
+        <div className="mt-3 rounded-xl border border-emerald-100 bg-emerald-50 p-3 text-center text-xs text-emerald-800">
+          🛒 <strong>Retailer handoff ready</strong> — use the store cards above for Walmart, Instacart, Amazon Fresh, or Kroger where available. Your full list is copied as backup before the retailer opens.
         </div>
 
         {checkedCount === totalItems && totalItems > 0 && (

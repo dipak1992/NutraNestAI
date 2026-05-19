@@ -77,16 +77,20 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Generate suggestions (mock — replace with real AI call)
+  // Generate practical transformations. Keep these deterministic and fast for launch;
+  // they are designed around different eating moments, not three generic recipes.
   const ingredients = (leftover.main_ingredients as MainIngredient[]) ?? []
   const ingNames = ingredients.map((i) => i.name)
   const name = leftover.name as string
+  const hasGrain = ingredients.some((i) => i.category === 'grain' || /rice|pasta|noodle|quinoa|potato/i.test(i.name))
+  const hasProtein = ingredients.some((i) => ['meat', 'poultry', 'seafood', 'egg', 'legume'].includes(i.category))
+  const anchor = ingNames.slice(0, 3).join(', ') || name
 
   const suggestions: LeftoverSuggestion[] = [
     {
       id: `${leftoverId}-1`,
-      name: `${name} Fried Rice`,
-      description: `Transform your ${name} into a quick fried rice with eggs and soy sauce. Ready in under 15 minutes.`,
+      name: hasGrain ? `${name} Skillet Bowl` : `${name} Rice Bowl`,
+      description: `Dinner remix: warm ${name.toLowerCase()} with ${hasGrain ? 'a crisp skillet finish' : 'rice or another grain'}, add one fresh vegetable, and finish with sauce so it feels like a new meal.`,
       cookTimeMin: 15,
       usesIngredients: ingNames.slice(0, 3),
       difficulty: 'easy',
@@ -94,18 +98,18 @@ export async function POST(req: NextRequest) {
     },
     {
       id: `${leftoverId}-2`,
-      name: `${name} Wrap`,
-      description: `Wrap your ${name} in a tortilla with fresh veggies and a drizzle of hot sauce for a satisfying lunch.`,
-      cookTimeMin: 5,
-      usesIngredients: ingNames.slice(0, 2),
+      name: `${name} Lunch Wrap`,
+      description: `Lunch save: wrap ${anchor.toLowerCase()} with crunchy vegetables and yogurt sauce, salsa, hummus, or dressing. Pack it cold or toast it for a 5-minute lunch.`,
+      cookTimeMin: 8,
+      usesIngredients: ingNames.slice(0, 3),
       difficulty: 'easy',
       image: null,
     },
     {
       id: `${leftoverId}-3`,
-      name: `${name} Soup`,
-      description: `Simmer your ${name} with broth, onion, and garlic for a warming soup that stretches your leftovers further.`,
-      cookTimeMin: 25,
+      name: hasProtein ? `${name} Soup Stretch` : `${name} Protein Boost Soup`,
+      description: `Waste-reduction stretch: simmer ${name.toLowerCase()} with broth, onion, garlic, and ${hasProtein ? 'extra vegetables' : 'beans, eggs, tofu, or shredded chicken'} to turn a small leftover into more servings.`,
+      cookTimeMin: 22,
       usesIngredients: ingNames,
       difficulty: 'medium',
       image: null,

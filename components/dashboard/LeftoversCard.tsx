@@ -14,6 +14,7 @@ type Props = {
 export function LeftoversCard({ state }: Props) {
   const { active, expiringSoon } = state
   const urgentToday = active.find((l) => l.urgency === 'today')
+  const activeServings = active.reduce((sum, item) => sum + item.servingsRemaining, 0)
 
   // --- EMPTY STATE ---
   if (active.length === 0) {
@@ -79,6 +80,11 @@ export function LeftoversCard({ state }: Props) {
           </span>
         )}
       </header>
+
+      <div className="mx-6 mb-3 rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800 ring-1 ring-emerald-100">
+        <span className="font-semibold">Waste saved:</span>{' '}
+        {activeServings} serving{activeServings === 1 ? '' : 's'} ready to reuse before another grocery run.
+      </div>
 
       {/* Items */}
       <ul className="px-6 space-y-3 flex-1">

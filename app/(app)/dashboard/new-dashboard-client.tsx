@@ -12,6 +12,7 @@ import { LeftoversCard } from '@/components/dashboard/LeftoversCard'
 import { WeekPlanStrip } from '@/components/dashboard/WeekPlanStrip'
 import { QuickActions } from '@/components/dashboard/QuickActions'
 import { NextBestActionCard } from '@/components/dashboard/NextBestActionCard'
+import { WeeklyImpactCard } from '@/components/dashboard/WeeklyImpactCard'
 import { WeeklyReminderNudge } from '@/components/shared/SaveReminderCard'
 import { StaggerGroup } from '@/components/motion'
 import type { DashboardPayload } from '@/lib/dashboard/types'
@@ -118,6 +119,8 @@ export function NewDashboardClient({ initial }: { initial: DashboardPayload }) {
         </StaggerGroup>
 
         <NextBestActionCard user={displayUser} retention={displayRetention} nudge={displayNudge} />
+
+        <WeeklyImpactCard retention={displayRetention} />
 
         <div className="xl:hidden">
           <LeftoversCard state={displayLeftovers} />

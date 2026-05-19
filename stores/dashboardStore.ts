@@ -121,7 +121,7 @@ export const useDashboardStore = create<DashboardStore>()(
         ).slice(-25)
 
         const controller = new AbortController()
-        const timeout = window.setTimeout(() => controller.abort(), 1800)
+        const timeout = window.setTimeout(() => controller.abort(), 5000)
 
         set({ isRegeneratingTonight: true, error: null })
         try {
@@ -143,7 +143,7 @@ export const useDashboardStore = create<DashboardStore>()(
         } catch (e) {
           const message =
             e instanceof DOMException && e.name === 'AbortError'
-              ? 'Meal swap timed out'
+              ? 'Meal swap is taking longer than expected'
               : e instanceof Error
                 ? e.message
                 : 'Meal swap failed'

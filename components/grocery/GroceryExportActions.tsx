@@ -120,7 +120,7 @@ export function GroceryExportActions({
       {hasProviders && (
         <p className="text-[10px] text-neutral-400 dark:text-neutral-500 flex items-center gap-1">
           <ExternalLink className="h-2.5 w-2.5" />
-          Or export your list for any store using the options above
+          Backup exports stay available even after retailer handoff
         </p>
       )}
     </section>

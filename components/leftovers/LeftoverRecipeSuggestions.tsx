@@ -55,7 +55,7 @@ export function LeftoverRecipeSuggestions({ leftoverId, leftoverName }: Props) {
         'Season, taste, and serve while warm.',
       ],
       variations: [],
-      leftoverTip: null,
+      leftoverTip: `This uses ${leftoverName} before it becomes waste and can become tomorrow's lunch.`,
       shoppingList: [
         { name: 'Eggs or protein boost', quantity: '2', unit: 'whole', category: 'protein', estimatedCost: 2, substituteOptions: [] },
         { name: 'Fresh vegetables', quantity: '2', unit: 'cups', category: 'produce', estimatedCost: 2, substituteOptions: [] },

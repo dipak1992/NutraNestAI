@@ -112,6 +112,15 @@ export async function getDashboardPayload(
 
   const _now = new Date()
   const _hour = _now.getHours()
+  const weekStart = getWeekStartDate(_now)
+  const [plannedDays, leftoverMealsReusedThisWeek] = await Promise.all([
+    loadPlannedDays(userId, weekStart),
+    loadLeftoversReusedThisWeek(userId, weekStart),
+  ])
+  const weeklyBudgetRemaining =
+    budget.weeklyLimit != null
+      ? Math.max(0, budget.weeklyLimit - budget.weekSpent)
+      : null
 
   const base: DashboardPayload = {
     user: {
@@ -134,11 +143,12 @@ export async function getDashboardPayload(
       expiringSoon: leftovers.filter((l) => l.daysUntilExpiry <= 2).length,
       isSunday: _now.getDay() === 0,
       isDinnerWindow: _hour >= 16 && _hour < 20,
-      plannedDays: 0,
-      weeklyBudgetRemaining:
-        budget.weeklyLimit != null
-          ? Math.max(0, budget.weeklyLimit - budget.weekSpent)
-          : null,
+      plannedDays,
+      weeklyBudgetRemaining,
+      leftoverMealsReusedThisWeek,
+      estimatedSavedThisWeek: Math.round(
+        (weeklyBudgetRemaining ?? 0) + leftoverMealsReusedThisWeek * 6,
+      ),
     },
     quickActions,
     nudge: null,
@@ -150,6 +160,59 @@ export async function getDashboardPayload(
   base.nudge = pickNudge(nudges)
 
   return base
+}
+
+function getWeekStartDate(now = new Date()): string {
+  const date = new Date(now)
+  const day = date.getDay()
+  const diff = day === 0 ? -6 : 1 - day
+  date.setDate(date.getDate() + diff)
+  date.setHours(0, 0, 0, 0)
+  return date.toISOString().slice(0, 10)
+}
+
+async function loadPlannedDays(userId: string, weekStart: string): Promise<number> {
+  const supabase = await createClient()
+
+  try {
+    const { data: plan } = await supabase
+      .from('meal_plans')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('week_start', weekStart)
+      .maybeSingle()
+
+    if (!plan?.id) return 0
+
+    const { count, error } = await supabase
+      .from('meal_plan_days')
+      .select('id', { count: 'exact', head: true })
+      .eq('meal_plan_id', plan.id)
+      .not('meal_id', 'is', null)
+
+    if (error) return 0
+    return count ?? 0
+  } catch {
+    return 0
+  }
+}
+
+async function loadLeftoversReusedThisWeek(userId: string, weekStart: string): Promise<number> {
+  const supabase = await createClient()
+
+  try {
+    const { count, error } = await supabase
+      .from('leftovers')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .eq('status', 'used')
+      .gte('used_at', weekStart)
+
+    if (error) return 0
+    return count ?? 0
+  } catch {
+    return 0
+  }
 }
 
 async function loadDashboardLeftovers(userId: string): Promise<Leftover[]> {

@@ -1,16 +1,38 @@
 -- Family coordination moat + grocery commerce handoff foundation.
 -- Adds household-scoped collaboration, meal approval votes, and recorded retailer handoffs.
 
-alter table public.weekly_plans
-  add column if not exists household_id uuid references public.households(id) on delete cascade,
-  add column if not exists last_edited_by uuid references auth.users(id) on delete set null,
-  add column if not exists approval_status text not null default 'draft'
-    check (approval_status in ('draft', 'needs_review', 'approved', 'changes_requested')),
-  add column if not exists approved_at timestamptz;
+do $$
+begin
+  if exists (
+    select 1 from information_schema.tables
+    where table_schema = 'public' and table_name = 'household_members'
+  ) then
+    alter table public.household_members
+      add column if not exists invite_status text not null default 'accepted'
+        check (invite_status in ('none', 'pending', 'accepted', 'revoked')),
+      add column if not exists invite_role text not null default 'editor'
+        check (invite_role in ('viewer', 'editor'));
+  end if;
+end $$;
 
-create index if not exists weekly_plans_household_week_idx
-  on public.weekly_plans(household_id, week_of desc)
-  where household_id is not null;
+do $$
+begin
+  if exists (
+    select 1 from information_schema.tables
+    where table_schema = 'public' and table_name = 'weekly_plans'
+  ) then
+    alter table public.weekly_plans
+      add column if not exists household_id uuid references public.households(id) on delete cascade,
+      add column if not exists last_edited_by uuid references auth.users(id) on delete set null,
+      add column if not exists approval_status text not null default 'draft'
+        check (approval_status in ('draft', 'needs_review', 'approved', 'changes_requested')),
+      add column if not exists approved_at timestamptz;
+
+    create index if not exists weekly_plans_household_week_idx
+      on public.weekly_plans(household_id, week_of desc)
+      where household_id is not null;
+  end if;
+end $$;
 
 do $$
 begin
@@ -143,130 +165,178 @@ as $$
   );
 $$;
 
-drop policy if exists "weekly_plans_select_household" on public.weekly_plans;
-create policy "weekly_plans_select_household"
-  on public.weekly_plans for select
-  using (user_id = auth.uid() or public.is_household_participant(household_id));
+do $$
+begin
+  if exists (
+    select 1 from information_schema.tables
+    where table_schema = 'public' and table_name = 'weekly_plans'
+  ) then
+    drop policy if exists "weekly_plans_select_household" on public.weekly_plans;
+    create policy "weekly_plans_select_household"
+      on public.weekly_plans for select
+      using (user_id = auth.uid() or public.is_household_participant(household_id));
 
-drop policy if exists "weekly_plans_insert_household" on public.weekly_plans;
-create policy "weekly_plans_insert_household"
-  on public.weekly_plans for insert
-  with check (user_id = auth.uid() or public.is_household_editor(household_id));
+    drop policy if exists "weekly_plans_insert_household" on public.weekly_plans;
+    create policy "weekly_plans_insert_household"
+      on public.weekly_plans for insert
+      with check (user_id = auth.uid() or public.is_household_editor(household_id));
 
-drop policy if exists "weekly_plans_update_household" on public.weekly_plans;
-create policy "weekly_plans_update_household"
-  on public.weekly_plans for update
-  using (user_id = auth.uid() or public.is_household_editor(household_id))
-  with check (user_id = auth.uid() or public.is_household_editor(household_id));
+    drop policy if exists "weekly_plans_update_household" on public.weekly_plans;
+    create policy "weekly_plans_update_household"
+      on public.weekly_plans for update
+      using (user_id = auth.uid() or public.is_household_editor(household_id))
+      with check (user_id = auth.uid() or public.is_household_editor(household_id));
+  end if;
+end $$;
 
-drop policy if exists "meal_plans_select_household" on public.meal_plans;
-create policy "meal_plans_select_household"
-  on public.meal_plans for select
-  using (user_id = auth.uid() or public.is_household_participant(household_id));
+do $$
+begin
+  if exists (
+    select 1 from information_schema.tables
+    where table_schema = 'public' and table_name = 'meal_plans'
+  ) then
+    drop policy if exists "meal_plans_select_household" on public.meal_plans;
+    create policy "meal_plans_select_household"
+      on public.meal_plans for select
+      using (user_id = auth.uid() or public.is_household_participant(household_id));
 
-drop policy if exists "meal_plans_insert_household" on public.meal_plans;
-create policy "meal_plans_insert_household"
-  on public.meal_plans for insert
-  with check (user_id = auth.uid() or public.is_household_editor(household_id));
+    drop policy if exists "meal_plans_insert_household" on public.meal_plans;
+    create policy "meal_plans_insert_household"
+      on public.meal_plans for insert
+      with check (user_id = auth.uid() or public.is_household_editor(household_id));
 
-drop policy if exists "meal_plans_update_household" on public.meal_plans;
-create policy "meal_plans_update_household"
-  on public.meal_plans for update
-  using (user_id = auth.uid() or public.is_household_editor(household_id))
-  with check (user_id = auth.uid() or public.is_household_editor(household_id));
+    drop policy if exists "meal_plans_update_household" on public.meal_plans;
+    create policy "meal_plans_update_household"
+      on public.meal_plans for update
+      using (user_id = auth.uid() or public.is_household_editor(household_id))
+      with check (user_id = auth.uid() or public.is_household_editor(household_id));
+  end if;
 
-drop policy if exists "meal_plan_days_select_household" on public.meal_plan_days;
-create policy "meal_plan_days_select_household"
-  on public.meal_plan_days for select
-  using (
-    exists (
-      select 1 from public.meal_plans mp
-      where mp.id = meal_plan_days.meal_plan_id
-        and (mp.user_id = auth.uid() or public.is_household_participant(mp.household_id))
-    )
-  );
+  if exists (
+    select 1 from information_schema.tables
+    where table_schema = 'public' and table_name = 'meal_plan_days'
+  ) and exists (
+    select 1 from information_schema.tables
+    where table_schema = 'public' and table_name = 'meal_plans'
+  ) then
+    drop policy if exists "meal_plan_days_select_household" on public.meal_plan_days;
+    create policy "meal_plan_days_select_household"
+      on public.meal_plan_days for select
+      using (
+        exists (
+          select 1 from public.meal_plans mp
+          where mp.id = meal_plan_days.meal_plan_id
+            and (mp.user_id = auth.uid() or public.is_household_participant(mp.household_id))
+        )
+      );
+  end if;
 
-drop policy if exists "grocery_lists_select_household" on public.grocery_lists;
-create policy "grocery_lists_select_household"
-  on public.grocery_lists for select
-  using (user_id = auth.uid() or public.is_household_participant(household_id));
+  if exists (
+    select 1 from information_schema.tables
+    where table_schema = 'public' and table_name = 'grocery_lists'
+  ) then
+    drop policy if exists "grocery_lists_select_household" on public.grocery_lists;
+    create policy "grocery_lists_select_household"
+      on public.grocery_lists for select
+      using (user_id = auth.uid() or public.is_household_participant(household_id));
 
-drop policy if exists "grocery_lists_insert_household" on public.grocery_lists;
-create policy "grocery_lists_insert_household"
-  on public.grocery_lists for insert
-  with check (user_id = auth.uid() or public.is_household_editor(household_id));
+    drop policy if exists "grocery_lists_insert_household" on public.grocery_lists;
+    create policy "grocery_lists_insert_household"
+      on public.grocery_lists for insert
+      with check (user_id = auth.uid() or public.is_household_editor(household_id));
 
-drop policy if exists "grocery_lists_update_household" on public.grocery_lists;
-create policy "grocery_lists_update_household"
-  on public.grocery_lists for update
-  using (user_id = auth.uid() or public.is_household_editor(household_id))
-  with check (user_id = auth.uid() or public.is_household_editor(household_id));
+    drop policy if exists "grocery_lists_update_household" on public.grocery_lists;
+    create policy "grocery_lists_update_household"
+      on public.grocery_lists for update
+      using (user_id = auth.uid() or public.is_household_editor(household_id))
+      with check (user_id = auth.uid() or public.is_household_editor(household_id));
+  end if;
 
-drop policy if exists "grocery_items_select_household" on public.grocery_items;
-create policy "grocery_items_select_household"
-  on public.grocery_items for select
-  using (
-    exists (
-      select 1 from public.grocery_lists gl
-      where gl.id = grocery_items.grocery_list_id
-        and (gl.user_id = auth.uid() or public.is_household_participant(gl.household_id))
-    )
-  );
+  if exists (
+    select 1 from information_schema.tables
+    where table_schema = 'public' and table_name = 'grocery_items'
+  ) and exists (
+    select 1 from information_schema.tables
+    where table_schema = 'public' and table_name = 'grocery_lists'
+  ) then
+    drop policy if exists "grocery_items_select_household" on public.grocery_items;
+    create policy "grocery_items_select_household"
+      on public.grocery_items for select
+      using (
+        exists (
+          select 1 from public.grocery_lists gl
+          where gl.id = grocery_items.grocery_list_id
+            and (gl.user_id = auth.uid() or public.is_household_participant(gl.household_id))
+        )
+      );
 
-drop policy if exists "grocery_items_insert_household" on public.grocery_items;
-create policy "grocery_items_insert_household"
-  on public.grocery_items for insert
-  with check (
-    exists (
-      select 1 from public.grocery_lists gl
-      where gl.id = grocery_items.grocery_list_id
-        and (gl.user_id = auth.uid() or public.is_household_editor(gl.household_id))
-    )
-  );
+    drop policy if exists "grocery_items_insert_household" on public.grocery_items;
+    create policy "grocery_items_insert_household"
+      on public.grocery_items for insert
+      with check (
+        exists (
+          select 1 from public.grocery_lists gl
+          where gl.id = grocery_items.grocery_list_id
+            and (gl.user_id = auth.uid() or public.is_household_editor(gl.household_id))
+        )
+      );
 
-drop policy if exists "grocery_items_update_household" on public.grocery_items;
-create policy "grocery_items_update_household"
-  on public.grocery_items for update
-  using (
-    exists (
-      select 1 from public.grocery_lists gl
-      where gl.id = grocery_items.grocery_list_id
-        and (gl.user_id = auth.uid() or public.is_household_editor(gl.household_id))
-    )
-  )
-  with check (
-    exists (
-      select 1 from public.grocery_lists gl
-      where gl.id = grocery_items.grocery_list_id
-        and (gl.user_id = auth.uid() or public.is_household_editor(gl.household_id))
-    )
-  );
+    drop policy if exists "grocery_items_update_household" on public.grocery_items;
+    create policy "grocery_items_update_household"
+      on public.grocery_items for update
+      using (
+        exists (
+          select 1 from public.grocery_lists gl
+          where gl.id = grocery_items.grocery_list_id
+            and (gl.user_id = auth.uid() or public.is_household_editor(gl.household_id))
+        )
+      )
+      with check (
+        exists (
+          select 1 from public.grocery_lists gl
+          where gl.id = grocery_items.grocery_list_id
+            and (gl.user_id = auth.uid() or public.is_household_editor(gl.household_id))
+        )
+      );
+  end if;
 
-drop policy if exists "grocery_item_sources_insert_household" on public.grocery_item_sources;
-create policy "grocery_item_sources_insert_household"
-  on public.grocery_item_sources for insert
-  with check (
-    exists (
-      select 1
-      from public.grocery_items gi
-      join public.grocery_lists gl on gl.id = gi.grocery_list_id
-      where gi.id = grocery_item_sources.grocery_item_id
-        and (gl.user_id = auth.uid() or public.is_household_editor(gl.household_id))
-    )
-  );
+  if exists (
+    select 1 from information_schema.tables
+    where table_schema = 'public' and table_name = 'grocery_item_sources'
+  ) and exists (
+    select 1 from information_schema.tables
+    where table_schema = 'public' and table_name = 'grocery_items'
+  ) and exists (
+    select 1 from information_schema.tables
+    where table_schema = 'public' and table_name = 'grocery_lists'
+  ) then
+    drop policy if exists "grocery_item_sources_insert_household" on public.grocery_item_sources;
+    create policy "grocery_item_sources_insert_household"
+      on public.grocery_item_sources for insert
+      with check (
+        exists (
+          select 1
+          from public.grocery_items gi
+          join public.grocery_lists gl on gl.id = gi.grocery_list_id
+          where gi.id = grocery_item_sources.grocery_item_id
+            and (gl.user_id = auth.uid() or public.is_household_editor(gl.household_id))
+        )
+      );
 
-drop policy if exists "grocery_item_sources_delete_household" on public.grocery_item_sources;
-create policy "grocery_item_sources_delete_household"
-  on public.grocery_item_sources for delete
-  using (
-    exists (
-      select 1
-      from public.grocery_items gi
-      join public.grocery_lists gl on gl.id = gi.grocery_list_id
-      where gi.id = grocery_item_sources.grocery_item_id
-        and (gl.user_id = auth.uid() or public.is_household_editor(gl.household_id))
-    )
-  );
+    drop policy if exists "grocery_item_sources_delete_household" on public.grocery_item_sources;
+    create policy "grocery_item_sources_delete_household"
+      on public.grocery_item_sources for delete
+      using (
+        exists (
+          select 1
+          from public.grocery_items gi
+          join public.grocery_lists gl on gl.id = gi.grocery_list_id
+          where gi.id = grocery_item_sources.grocery_item_id
+            and (gl.user_id = auth.uid() or public.is_household_editor(gl.household_id))
+        )
+      );
+  end if;
+end $$;
 
 alter table public.household_workspace_events enable row level security;
 alter table public.household_meal_votes enable row level security;

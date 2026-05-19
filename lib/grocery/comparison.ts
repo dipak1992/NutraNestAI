@@ -109,7 +109,12 @@ function buildCombinedProviderQuery(
   provider: GroceryProvider,
   items: ProviderCartItem[]
 ): string {
-  const maxItems = provider.id === 'instacart' ? 8 : 10
+  const maxItems =
+    provider.id === 'instacart'
+      ? 8
+      : provider.id === 'costco_us' || provider.id === 'costco_ca'
+        ? 6
+        : 10
   const selected = items
     .slice(0, maxItems)
     .map((item) => item.searchQuery.trim())
@@ -126,6 +131,14 @@ function buildCombinedProviderQuery(
   }
 
   if (provider.id === 'amazon_fresh') {
+    return selected.join(' ')
+  }
+
+  if (provider.id === 'costco_us' || provider.id === 'costco_ca') {
+    return selected.join(' bulk ')
+  }
+
+  if (provider.id === 'regional_market') {
     return selected.join(' ')
   }
 

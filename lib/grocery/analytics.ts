@@ -50,6 +50,9 @@ export function trackProviderSelected(providerId: ProviderId, region: DetectedRe
     walmart_ca: 'walmart_selected',
     instacart: 'instacart_selected',
     kroger: 'kroger_selected',
+    costco_us: 'costco_selected',
+    costco_ca: 'costco_selected',
+    regional_market: 'regional_provider_selected',
   }
   trackGroceryEvent(eventMap[providerId] ?? 'provider_search_opened', {
     provider_id: providerId,

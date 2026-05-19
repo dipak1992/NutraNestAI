@@ -121,6 +121,9 @@ export type RetentionState = {
   weeklyBudgetRemaining: number | null
   leftoverMealsReusedThisWeek: number
   estimatedSavedThisWeek: number
+  projectedMonthlySavings: number
+  subscriptionOffsetRatio: number | null
+  behaviorSignalsLearned: number
 }
 
 export type PredictiveInsight = {

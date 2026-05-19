@@ -38,7 +38,7 @@ const groceryItems = [
 ]
 
 const exportOptions = [
-  { icon: ShoppingCart, label: 'Store handoff', detail: 'Walmart or Instacart where supported' },
+  { icon: ShoppingCart, label: 'Store handoff', detail: 'Walmart, Instacart, Kroger, Costco, and more' },
   { icon: FileDown, label: 'PDF export', detail: 'Clean list for any store' },
   { icon: ClipboardList, label: 'Copy list', detail: 'Paste into notes or delivery apps' },
 ]
@@ -175,7 +175,7 @@ export function GroceryCommerceSection() {
                       Supported store handoff in North America. Flexible export everywhere.
                     </p>
                     <p className="mt-2 text-sm leading-6 text-neutral-300">
-                      Shop at supported stores such as Walmart or Instacart where available.
+                      Shop at supported stores such as Walmart, Instacart, Kroger, Costco, Amazon Fresh, or regional grocers where available.
                       Elsewhere, copy your list, download a PDF, or use it at your local store.
                     </p>
                   </div>

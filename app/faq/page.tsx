@@ -84,8 +84,8 @@ const faqCategories = [
         a: 'MealEase turns your weekly plan into an organized grocery list. You can edit items first, then use supported store handoff tools where available, or export the list for any local store.',
       },
       {
-        q: 'Can I shop at Walmart or Instacart?',
-        a: 'Where supported, MealEase can help hand off your grocery list to providers such as Walmart or Instacart. Availability depends on region, provider coverage, and item matching.',
+        q: 'Can I shop at Walmart, Instacart, Kroger, or Costco?',
+        a: 'Where supported, MealEase can help hand off your grocery list to providers such as Walmart, Instacart, Kroger, Costco, Amazon Fresh, and regional grocery search. Availability depends on region, provider coverage, and item matching.',
       },
       {
         q: 'What if my country does not support those stores?',

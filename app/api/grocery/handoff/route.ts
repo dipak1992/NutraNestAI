@@ -6,7 +6,16 @@ import { buildGroceryHandoff } from '@/lib/grocery/handoff'
 import type { GroceryList } from '@/lib/planner/types'
 import type { ProviderId } from '@/lib/grocery/types'
 
-const providerSchema = z.enum(['instacart', 'amazon_fresh', 'walmart_us', 'walmart_ca', 'kroger'])
+const providerSchema = z.enum([
+  'instacart',
+  'amazon_fresh',
+  'walmart_us',
+  'walmart_ca',
+  'kroger',
+  'costco_us',
+  'costco_ca',
+  'regional_market',
+])
 
 const handoffSchema = z.object({
   providerId: providerSchema,

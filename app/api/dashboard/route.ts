@@ -115,13 +115,24 @@ export async function getDashboardPayload(
   const _now = new Date()
   const _hour = _now.getHours()
   const weekStart = getWeekStartDate(_now)
-  const [plannedDays, leftoverMealsReusedThisWeek] = await Promise.all([
+  const [plannedDays, leftoverMealsReusedThisWeek, behaviorSignalsLearned] = await Promise.all([
     loadPlannedDays(userId, weekStart),
     loadLeftoversReusedThisWeek(userId, weekStart),
+    loadBehaviorSignalsLearned(userId),
   ])
   const weeklyBudgetRemaining =
     budget.weeklyLimit != null
       ? Math.max(0, budget.weeklyLimit - budget.weekSpent)
+      : null
+
+  const estimatedSavedThisWeek = Math.round(
+    (weeklyBudgetRemaining ?? 0) + leftoverMealsReusedThisWeek * 6,
+  )
+  const projectedMonthlySavings = Math.round(estimatedSavedThisWeek * 4.33)
+  const monthlyPlusPrice = 9.99
+  const subscriptionOffsetRatio =
+    estimatedSavedThisWeek > 0
+      ? Math.min(9.99, Math.round((projectedMonthlySavings / monthlyPlusPrice) * 100) / 100)
       : null
 
   const predictiveInsights = await loadPredictiveInsights({
@@ -130,6 +141,7 @@ export async function getDashboardPayload(
     plannedDays,
     budget,
     leftovers,
+    behaviorSignalsLearned,
     now: _now,
   })
 
@@ -157,9 +169,10 @@ export async function getDashboardPayload(
       plannedDays,
       weeklyBudgetRemaining,
       leftoverMealsReusedThisWeek,
-      estimatedSavedThisWeek: Math.round(
-        (weeklyBudgetRemaining ?? 0) + leftoverMealsReusedThisWeek * 6,
-      ),
+      estimatedSavedThisWeek,
+      projectedMonthlySavings,
+      subscriptionOffsetRatio,
+      behaviorSignalsLearned,
     },
     quickActions,
     nudge: null,
@@ -202,6 +215,7 @@ async function loadPredictiveInsights({
   plannedDays,
   budget,
   leftovers,
+  behaviorSignalsLearned,
   now,
 }: {
   userId: string
@@ -209,6 +223,7 @@ async function loadPredictiveInsights({
   plannedDays: number
   budget: DashboardPayload['budget']
   leftovers: Leftover[]
+  behaviorSignalsLearned: number
   now: Date
 }): Promise<PredictiveInsight[]> {
   const [pantryItems, grocerySummary, memoryCount] = await Promise.all([
@@ -283,12 +298,13 @@ async function loadPredictiveInsights({
     })
   }
 
-  if (memoryCount > 0) {
+  if (memoryCount > 0 || behaviorSignalsLearned > 0) {
+    const totalSignals = memoryCount + behaviorSignalsLearned
     insights.push({
       id: 'memory-active',
       type: 'memory',
       title: 'Household memory is active',
-      body: `${memoryCount} saved household signal${memoryCount === 1 ? '' : 's'} can guide dinners, grocery choices, timing, and repeats automatically.`,
+      body: `${totalSignals} durable signal${totalSignals === 1 ? '' : 's'} can guide dinners, grocery choices, timing, repeats, and avoid lists automatically.`,
       ctaLabel: 'Review household',
       ctaHref: '/dashboard/household',
       confidence: 'high',
@@ -373,6 +389,22 @@ async function loadMemoryCount(userId: string): Promise<number> {
       .select('id', { count: 'exact', head: true })
       .eq('user_id', userId)
       .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
+
+    if (error) return 0
+    return count ?? 0
+  } catch {
+    return 0
+  }
+}
+
+async function loadBehaviorSignalsLearned(userId: string): Promise<number> {
+  const supabase = await createClient()
+
+  try {
+    const { count, error } = await supabase
+      .from('meal_signals')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', userId)
 
     if (error) return 0
     return count ?? 0

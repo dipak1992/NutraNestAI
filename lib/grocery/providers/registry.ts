@@ -9,9 +9,20 @@ import { walmartCA } from './walmart-canada'
 import { instacart } from './instacart'
 import { amazonFresh } from './amazon-fresh'
 import { kroger } from './kroger'
+import { costcoUS, costcoCA } from './costco'
+import { regionalMarket } from './regional-market'
 
 /** All registered providers */
-const ALL_PROVIDERS: GroceryProvider[] = [walmartUS, walmartCA, instacart, amazonFresh, kroger]
+const ALL_PROVIDERS: GroceryProvider[] = [
+  walmartUS,
+  walmartCA,
+  instacart,
+  amazonFresh,
+  kroger,
+  costcoUS,
+  costcoCA,
+  regionalMarket,
+]
 
 /** Provider map for O(1) lookup */
 const PROVIDER_MAP = new Map<ProviderId, GroceryProvider>(

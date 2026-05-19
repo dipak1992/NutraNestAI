@@ -146,5 +146,13 @@ function providerCtaLabel(estimate: ProviderEstimate): string {
       ? 'Shop at Walmart Canada'
       : 'Shop at Walmart'
   }
+  if (estimate.providerId === 'costco_us' || estimate.providerId === 'costco_ca') {
+    return estimate.provider.displayName === 'Costco Canada'
+      ? 'Search Costco Canada'
+      : 'Search Costco'
+  }
+  if (estimate.providerId === 'regional_market') {
+    return 'Find local grocers'
+  }
   return `Open ${estimate.provider.displayName}`
 }

@@ -170,7 +170,7 @@ const FAQ = [
   },
   {
     q: 'Can MealEase help with groceries?',
-    a: 'Yes. MealEase turns meal plans into ready-to-shop grocery lists and shopping handoff tools. In supported regions you can use store handoff for Walmart or Instacart; elsewhere you can copy, download PDF, or use the list at your local store.',
+    a: 'Yes. MealEase turns meal plans into ready-to-shop grocery lists and shopping handoff tools. In supported regions you can use handoff for Walmart, Instacart, Kroger, Costco, Amazon Fresh, or regional grocery search; elsewhere you can copy, download PDF, or use the list at your local store.',
   },
   {
     q: 'How can Plus pay for itself?',

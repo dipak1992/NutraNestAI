@@ -14,6 +14,7 @@ import {
   Users,
 } from 'lucide-react'
 import { getLandingTonightMeal } from '@/lib/tonight/engine'
+import { PhoneStatusTime, PhoneGreeting, PhoneDayTag } from './LandingPhoneClock'
 
 const navItems = [
   { label: 'Tonight', icon: Utensils, active: true },
@@ -35,7 +36,7 @@ export function LandingTonightPreview() {
   return (
     <div className="absolute inset-0 z-20 flex flex-col overflow-hidden bg-[#FFFDF8]">
       <div className="flex items-center justify-between px-8 pt-5 text-neutral-950">
-        <span className="text-[13px] font-bold tracking-tight">12:35</span>
+        <PhoneStatusTime />
         <div className="flex items-center gap-1.5" aria-hidden>
           <span className="h-2.5 w-1 rounded-full bg-neutral-300" />
           <span className="h-3.5 w-1 rounded-full bg-neutral-400" />
@@ -49,11 +50,7 @@ export function LandingTonightPreview() {
           <p className="text-[14px] font-black uppercase tracking-[0.16em] text-[#D97757]">
             MealEase
           </p>
-          <h3 className="mt-3 font-serif text-[32px] font-bold leading-[0.98] tracking-tight text-neutral-950">
-            Good afternoon,
-            <br />
-            Foodie!
-          </h3>
+          <PhoneGreeting />
         </div>
         <span className="mt-1 inline-flex h-11 w-11 items-center justify-center rounded-full bg-white text-[#D97757] shadow-lg shadow-orange-100 ring-1 ring-orange-100">
           <Home className="h-5 w-5" aria-hidden />
@@ -108,6 +105,7 @@ export function LandingTonightPreview() {
                 {meal.servings} servings
               </span>
               <span>{difficulty}</span>
+              <PhoneDayTag />
             </div>
             <span className="mt-2 inline-flex rounded-full bg-emerald-700 px-3 py-1.5 text-[12px] font-bold">
               {cost}

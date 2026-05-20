@@ -41,7 +41,7 @@ function getWeekdayLabel(date: Date) {
 }
 
 function useLiveHeroTime() {
-  const [now, setNow] = useState(() => new Date())
+  const [now, setNow] = useState<Date | null>(null)
 
   useEffect(() => {
     const update = () => setNow(new Date())
@@ -58,7 +58,7 @@ export function LandingHeroStatusTime() {
 
   return (
     <span suppressHydrationWarning className="text-[13px] font-bold tracking-tight">
-      {formatStatusTime(now)}
+      {now ? formatStatusTime(now) : '--:--'}
     </span>
   )
 }
@@ -71,7 +71,7 @@ export function LandingHeroGreeting() {
       suppressHydrationWarning
       className="mt-3 font-serif text-[32px] font-bold leading-[0.98] tracking-tight text-neutral-950"
     >
-      {getGreeting(now)},
+      {now ? getGreeting(now) : 'Good'},
       <br />
       Home Cook!
     </h3>
@@ -87,7 +87,7 @@ export function LandingHeroWeekdayBadge() {
       className="inline-flex items-center gap-1.5 rounded-full bg-[#FFF6EC] px-3 py-1.5 text-[12px] font-bold text-[#C86646] ring-1 ring-orange-200"
     >
       <Sparkles className="h-3.5 w-3.5" aria-hidden />
-      {getWeekdayLabel(now)}
+      {now ? getWeekdayLabel(now) : 'Tonight'}
     </span>
   )
 }
@@ -97,7 +97,7 @@ export function LandingHeroPromptTime() {
 
   return (
     <span suppressHydrationWarning>
-      {formatPromptTime(now)}
+      {now ? formatPromptTime(now) : '--:--'}
     </span>
   )
 }

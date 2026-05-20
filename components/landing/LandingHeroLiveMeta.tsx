@@ -20,6 +20,14 @@ function getGreeting(date: Date) {
   return 'Good evening'
 }
 
+function getPromptMessage(date: Date) {
+  const hour = date.getHours()
+  if (hour < 12) return 'Planning dinner before the day gets busy?'
+  if (hour < 17) return 'Starting to think about dinner?'
+  if (hour < 21) return 'Ready to get dinner on the table?'
+  return "Want tomorrow's dinner handled?"
+}
+
 function formatStatusTime(date: Date) {
   return date.toLocaleTimeString([], {
     hour: 'numeric',
@@ -98,6 +106,16 @@ export function LandingHeroPromptTime() {
   return (
     <span suppressHydrationWarning>
       {now ? formatPromptTime(now) : '--:--'}
+    </span>
+  )
+}
+
+export function LandingHeroPromptMessage() {
+  const now = useLiveHeroTime()
+
+  return (
+    <span suppressHydrationWarning>
+      {now ? getPromptMessage(now) : 'Getting dinner ready?'}
     </span>
   )
 }

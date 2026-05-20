@@ -16,6 +16,7 @@ import {
 import { getLandingTonightMeal } from '@/lib/tonight/engine'
 import {
   LandingHeroGreeting,
+  LandingHeroPromptMessage,
   LandingHeroPromptTime,
   LandingHeroStatusTime,
   LandingHeroWeekdayBadge,
@@ -65,7 +66,7 @@ export function LandingTonightPreview() {
       <div className="px-8">
         <LandingHeroWeekdayBadge />
         <p className="mt-3 text-[13px] font-medium text-neutral-500">
-          <LandingHeroPromptTime /> <span className="px-1">·</span> Starting to think about dinner?
+          <LandingHeroPromptTime /> <span className="px-1">·</span> <LandingHeroPromptMessage />
         </p>
       </div>
 

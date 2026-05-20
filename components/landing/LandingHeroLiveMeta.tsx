@@ -73,7 +73,7 @@ export function LandingHeroGreeting() {
     >
       {getGreeting(now)},
       <br />
-      Foodie!
+      Home Cook!
     </h3>
   )
 }

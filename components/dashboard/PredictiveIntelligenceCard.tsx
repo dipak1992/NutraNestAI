@@ -18,46 +18,7 @@ const ICONS: Record<PredictiveInsight['type'], LucideIcon> = {
 }
 
 export function PredictiveIntelligenceCard({ insights }: Props) {
-  if (insights.length === 0) {
-    return (
-      <section
-        aria-label="Predictive household intelligence"
-        className="overflow-hidden rounded-2xl border border-orange-100 bg-gradient-to-br from-orange-50 via-white to-emerald-50 p-4 shadow-sm"
-      >
-        <div className="flex items-start gap-3">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white text-[#D97757] ring-1 ring-orange-100">
-            <Brain className="h-5 w-5" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#B9603D]">
-              Predictive household intelligence
-            </p>
-            <h2 className="mt-1 text-sm font-bold text-neutral-950">
-              MealEase is ready to learn the household patterns that make dinner easier.
-            </h2>
-            <p className="mt-1 text-xs leading-relaxed text-neutral-600">
-              Add pantry context, plan a week, or mark a leftover so MealEase can start warning you about low staples, busy nights, expiring food, and budget pressure.
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              <Link
-                href="/dashboard/cook"
-                className="inline-flex items-center gap-1.5 rounded-full bg-neutral-950 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-neutral-800"
-              >
-                Scan fridge
-                <ArrowRight className="h-3 w-3" />
-              </Link>
-              <Link
-                href="/plan"
-                className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-bold text-neutral-800 ring-1 ring-orange-100 transition hover:ring-orange-200"
-              >
-                Plan week
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-    )
-  }
+  if (insights.length === 0) return null
 
   const primary = insights[0]
   const PrimaryIcon = ICONS[primary.type] ?? Brain

@@ -16,6 +16,7 @@ import { WeeklyImpactCard } from '@/components/dashboard/WeeklyImpactCard'
 import { PredictiveIntelligenceCard } from '@/components/dashboard/PredictiveIntelligenceCard'
 import { AutonomousActionsCard } from '@/components/dashboard/AutonomousActionsCard'
 import { DashboardSupportLine } from '@/components/dashboard/DashboardSupportLine'
+import { FoodOsSetupCard } from '@/components/dashboard/FoodOsSetupCard'
 import { WeeklyReminderNudge } from '@/components/shared/SaveReminderCard'
 import { StaggerGroup } from '@/components/motion'
 import type { DashboardPayload } from '@/lib/dashboard/types'
@@ -91,6 +92,15 @@ export function NewDashboardClient({ initial }: { initial: DashboardPayload }) {
     ? autonomousActions
     : initial.autonomousActions
   const displayNudge = nudge ?? initial.nudge
+  const hasWeeklyImpact =
+    displayRetention.estimatedSavedThisWeek > 0 ||
+    displayRetention.leftoverMealsReusedThisWeek > 0 ||
+    displayRetention.plannedDays > 0 ||
+    displayRetention.behaviorSignalsLearned > 0
+  const showFoodOsSetup =
+    !hasWeeklyImpact &&
+    displayPredictiveInsights.length === 0 &&
+    displayAutonomousActions.length === 0
 
   return (
     <>
@@ -132,6 +142,8 @@ export function NewDashboardClient({ initial }: { initial: DashboardPayload }) {
         </StaggerGroup>
 
         <NextBestActionCard user={displayUser} retention={displayRetention} nudge={displayNudge} />
+
+        {showFoodOsSetup && <FoodOsSetupCard />}
 
         <WeeklyImpactCard retention={displayRetention} />
 

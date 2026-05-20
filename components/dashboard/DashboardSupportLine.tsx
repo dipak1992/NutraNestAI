@@ -30,7 +30,7 @@ export function DashboardSupportLine() {
               {message.supportLine}
             </p>
             <p className="mt-0.5 text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">
-              MealEase keeps the next food decision visible without turning the dashboard into a blank prompt.
+              A calmer food week starts with one clear next step.
             </p>
           </div>
         </div>

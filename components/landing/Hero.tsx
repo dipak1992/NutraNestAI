@@ -147,7 +147,6 @@ export function Hero() {
                     fill
                     sizes="(min-width: 1024px) 360px, 40vw"
                     className="object-cover"
-                    priority
                   />
                   <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(23,18,15,0.72)_0%,rgba(23,18,15,0.22)_48%,rgba(255,255,255,0.18)_100%)]" />
                   <MotionFloat intensity={0.75} delay={0.35} className="absolute bottom-5 left-5 w-[260px] rounded-2xl bg-white/94 p-4 shadow-xl backdrop-blur">

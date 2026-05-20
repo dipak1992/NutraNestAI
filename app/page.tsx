@@ -1,8 +1,8 @@
 import { Nav } from '@/components/landing/Nav'
 import { Hero } from '@/components/landing/Hero'
 import { ProductProofStrip } from '@/components/landing/ProductProofStrip'
-import { MobileStickyCTA } from '@/components/landing/MobileStickyCTA'
 import { DeferredLandingSections } from '@/components/landing/DeferredLandingSections'
+import { DeferredMobileStickyCTA } from '@/components/landing/DeferredMobileStickyCTA'
 import { productSchema, softwareAppSchema, faqSchema } from '@/lib/schema'
 import { productStory } from '@/lib/marketing/stats'
 
@@ -46,7 +46,7 @@ export default async function LandingPage() {
 
       <main id="main-content">
         <Hero />
-        <MobileStickyCTA />
+        <DeferredMobileStickyCTA />
         <ProductProofStrip />
         <DeferredLandingSections />
       </main>

@@ -77,7 +77,6 @@ export function LandingTonightPreview() {
             fill
             sizes="(max-width: 768px) 260px, 300px"
             className="object-cover"
-            priority
           />
           <div className="absolute inset-0 bg-gradient-to-b from-neutral-950/22 via-neutral-950/38 to-neutral-950/72" />
           <div className="absolute left-4 right-4 top-4 flex gap-1.5">

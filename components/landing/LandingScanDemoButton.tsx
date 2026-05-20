@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, type ComponentType } from 'react'
-import { motion, useReducedMotion } from 'framer-motion'
 import { Camera } from 'lucide-react'
 
 /**
@@ -10,7 +9,6 @@ import { Camera } from 'lucide-react'
  * Both are loaded on-demand only when the user clicks.
  */
 export function LandingScanDemoButton() {
-  const shouldReduceMotion = useReducedMotion()
   const [ScanModal, setScanModal] = useState<ComponentType | null>(null)
   const [isOpen, setIsOpen] = useState(false)
 
@@ -33,17 +31,14 @@ export function LandingScanDemoButton() {
 
   return (
     <>
-      <motion.button
+      <button
         type="button"
         onClick={handleClick}
         className="inline-flex min-h-[48px] w-[88%] items-center justify-center gap-2 rounded-full border border-[#D97757]/30 bg-white/82 px-6 text-base font-semibold text-[#B75F40] shadow-sm backdrop-blur transition hover:bg-orange-50 sm:w-auto"
-        whileHover={shouldReduceMotion ? undefined : { y: -2, scale: 1.015 }}
-        whileTap={shouldReduceMotion ? undefined : { y: 0, scale: 0.975 }}
-        transition={{ type: 'spring', stiffness: 420, damping: 28 }}
       >
         <Camera className="h-4 w-4" />
         Try the scanner
-      </motion.button>
+      </button>
       {ScanModal && isOpen ? <ScanModal /> : null}
     </>
   )
